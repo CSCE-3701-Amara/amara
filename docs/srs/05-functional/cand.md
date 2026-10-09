@@ -1,10 +1,10 @@
 ## 5.2 CAND: Candidates & Dynamic Resume
 
-Owner: Ali | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
+Owner: Ali Mohammed | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
 
 # Candidate Functional Requirements
 
-## 1. Overview
+### 5.2.1 Overview
 
 This section defines the functional requirements related to the **Candidate Subsystem** of the platform.
 
@@ -27,7 +27,7 @@ User account creation, authentication, and account management are outside the sc
 
 ---
 
-# 2. Scope
+### 5.2.2 Scope
 
 The Candidate Subsystem includes the following functional areas:
 
@@ -46,395 +46,203 @@ The Candidate Subsystem includes the following functional areas:
 
 ---
 
-# 3. Functional Requirements
+### 5.2.3 Functional Requirements
 
-## 3.1 Job Discovery
+#### 5.2.3.1 Browse Job Postings
 
-### FR-CAND-001 — Browse Job Postings
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-001** | The system **SHALL** display currently available job postings to candidates. | UC-CAND-01 — Browse Job Postings | TBD |
+| **FR-CAND-002** | The system **SHALL** display the essential information associated with each job posting. | UC-CAND-01 — Browse Job Postings | TBD |
+| **FR-CAND-003** | The system **SHALL** exclude job postings that are no longer available for application. | UC-CAND-01 — Browse Job Postings | TBD |
 
-**Description:**  
-The system shall allow candidates to browse available job postings relevant to Computer Science-related fields.
+#### 5.2.3.2 Filter Job Postings
 
-**Requirements:**
-- The system shall display currently available job postings to candidates.
-- The system shall display the essential information associated with each job posting.
-- The system shall exclude job postings that are no longer available for application.
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-004** | The system **SHALL** allow candidates to filter postings by offered compensation. | UC-CAND-02 — Filter Job Postings | TBD |
+| **FR-CAND-005** | The system **SHALL** allow candidates to filter postings by position. | UC-CAND-02 — Filter Job Postings | TBD |
+| **FR-CAND-006** | The system **SHALL** allow candidates to filter postings by job grade. | UC-CAND-02 — Filter Job Postings | TBD |
+| **FR-CAND-007** | The system **SHALL** allow candidates to filter postings by company. | UC-CAND-02 — Filter Job Postings | TBD |
+| **FR-CAND-008** | The system **SHALL** allow candidates to combine multiple filter criteria. | UC-CAND-02 — Filter Job Postings | TBD |
+| **FR-CAND-009** | The system **SHALL** update the displayed postings according to the selected criteria. | UC-CAND-02 — Filter Job Postings | TBD |
 
-**Priority:** Highest
+#### 5.2.3.3 View Job Posting Details
 
-**Related Use Case:** UC-CAND-01 — Browse Job Postings
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-010** | The system **SHALL** display the position title. | UC-CAND-03 — View Job Posting Details | TBD |
+| **FR-CAND-011** | The system **SHALL** display the company associated with the posting. | UC-CAND-03 — View Job Posting Details | TBD |
+| **FR-CAND-012** | The system **SHALL** display the job grade. | UC-CAND-03 — View Job Posting Details | TBD |
+| **FR-CAND-013** | The system **SHALL** display the offered compensation when provided. | UC-CAND-03 — View Job Posting Details | TBD |
+| **FR-CAND-014** | The system **SHALL** display the job description. | UC-CAND-03 — View Job Posting Details | TBD |
+| **FR-CAND-015** | The system **SHALL** display the required skills and qualifications. | UC-CAND-03 — View Job Posting Details | TBD |
+| **FR-CAND-016** | The system **SHALL** display the relevant hiring process information when provided. | UC-CAND-03 — View Job Posting Details | TBD |
+
+#### 5.2.3.4 Submit Job Application
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-017** | The system **SHALL** allow a candidate to initiate an application from an available job posting. | UC-CAND-04 — Submit Job Application | TBD |
+| **FR-CAND-018** | The system **SHALL** associate the submitted application with the candidate and the selected job posting. | UC-CAND-04 — Submit Job Application | TBD |
+| **FR-CAND-019** | The system **SHALL** record the date and time at which the application was submitted. | UC-CAND-04 — Submit Job Application | TBD |
+| **FR-CAND-020** | The system **SHALL** confirm successful submission of the application to the candidate. | UC-CAND-04 — Submit Job Application | TBD |
+
+#### 5.2.3.5 Prevent Duplicate Applications
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-021** | The system **SHALL** determine whether the candidate already has an active application for the selected job posting. | UC-CAND-04 — Prevent Duplicate Applications | TBD |
+| **FR-CAND-022** | The system **SHALL** prevent submission of a duplicate active application. | UC-CAND-04 — Prevent Duplicate Applications | TBD |
+| **FR-CAND-023** | The system **SHALL** inform the candidate when an active application already exists. | UC-CAND-04 — Prevent Duplicate Applications | TBD |
+
+#### 5.2.3.6 View Application History
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-024** | The system **SHALL** display the jobs to which the candidate has applied. | UC-CAND-05 — View Application History | TBD |
+| **FR-CAND-025** | The system **SHALL** display the current status of each application. | UC-CAND-05 — View Application History | TBD |
+| **FR-CAND-026** | The system **SHALL** allow the candidate to access the relevant application details. | UC-CAND-05 — View Application History | TBD |
+
+#### 5.2.3.7 View Hiring Pipeline
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-027** | The system **SHALL** display the stages applicable to the candidate's application. | UC-CAND-06 — View Hiring Pipeline | TBD |
+| **FR-CAND-028** | The system **SHALL** indicate the candidate's current stage. | UC-CAND-06 — View Hiring Pipeline | TBD |
+| **FR-CAND-029** | The system **SHALL** indicate the completion status of applicable stages. | UC-CAND-06 — View Hiring Pipeline | TBD |
+| **FR-CAND-030** | The system **SHALL** indicate stages that are not yet available to the candidate. | UC-CAND-06 — View Hiring Pipeline | TBD |
+
+#### 5.2.3.8 Access Assigned Assessment
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-031** | The system **SHALL** make an assessment available when the candidate reaches its corresponding pipeline stage. | UC-CAND-07 — Access Assigned Assessment | TBD |
+| **FR-CAND-032** | The system **SHALL** prevent candidates from accessing assessments that are not yet available to them. | UC-CAND-07 — Access Assigned Assessment | TBD |
+| **FR-CAND-033** | The system **SHALL** provide the candidate with the information necessary to begin the assessment. | UC-CAND-07 — Access Assigned Assessment | TBD |
+
+#### 5.2.3.9 Complete Assessment
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-034** | The system **SHALL** present the assessment content to the candidate. | UC-CAND-07 — Complete Assessment | TBD |
+| **FR-CAND-035** | The system **SHALL** record the candidate's submitted responses. | UC-CAND-07 — Complete Assessment | TBD |
+| **FR-CAND-036** | The system **SHALL** evaluate the candidate's responses according to the assessment's defined evaluation criteria. | UC-CAND-07 — Complete Assessment | TBD |
+| **FR-CAND-037** | The system **SHALL** record the outcome of the assessment. | UC-CAND-07 — Complete Assessment | TBD |
+| **FR-CAND-038** | The system **SHALL** associate the assessment result with the candidate's application. | UC-CAND-07 — Complete Assessment | TBD |
+
+#### 5.2.3.10 Track Assessment Progress
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-039** | The system **SHALL** indicate the candidate's assessment completion status. | UC-CAND-07 — Track Assessment Progress | TBD |
+| **FR-CAND-040** | The system **SHALL** preserve assessment progress where the assessment permits interruption. | UC-CAND-07 — Track Assessment Progress | TBD |
+| **FR-CAND-041** | The system **SHALL** indicate whether an assessment has been completed or remains incomplete. | UC-CAND-07 — Track Assessment Progress | TBD |
+
+#### 5.2.3.11 View Assessment Feedback
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-042** | The system **SHALL** provide the candidate with feedback after the assessment has been evaluated, when feedback is available. | UC-CAND-08 — View Assessment Feedback | TBD |
+| **FR-CAND-043** | The system **SHALL** associate the feedback with the corresponding assessment. | UC-CAND-08 — View Assessment Feedback | TBD |
+| **FR-CAND-044** | The system **SHALL** make available any applicable areas of improvement identified by the assessment. | UC-CAND-08 — View Assessment Feedback | TBD |
+| **FR-CAND-045** | The system **SHALL** make the feedback accessible from the candidate's application. | UC-CAND-08 — View Assessment Feedback | TBD |
+
+#### 5.2.3.12 View Assessment Result
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-046** | The system **SHALL** indicate whether the candidate passed or failed the applicable assessment when the result is disclosed. | UC-CAND-08 — View Assessment Result | TBD |
+| **FR-CAND-047** | The system **SHALL** display the assessment result together with its associated feedback when available. | UC-CAND-08 — View Assessment Result | TBD |
+
+#### 5.2.3.13 View Application Status
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-048** | The system **SHALL** display the current status of each active application. | UC-CAND-05 — View Application Status | TBD |
+| **FR-CAND-049** | The system **SHALL** update the application status when the application progresses through the hiring pipeline. | UC-CAND-05 — View Application Status | TBD |
+| **FR-CAND-050** | The system **SHALL** indicate when an application has reached a final decision. | UC-CAND-05 — View Application Status | TBD |
+
+#### 5.2.3.14 Receive Final Hiring Decision
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-051** | The system **SHALL** display the final decision once the employer has submitted it. | UC-CAND-09 — Receive Final Hiring Decision | TBD |
+| **FR-CAND-052** | The system **SHALL** associate the decision with the corresponding application. | UC-CAND-09 — Receive Final Hiring Decision | TBD |
+| **FR-CAND-053** | The system **SHALL** provide any final feedback made available by the employer. | UC-CAND-09 — Receive Final Hiring Decision | TBD |
+
+#### 5.2.3.15 Award Verified Crest
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-054** | The system **SHALL** determine whether the candidate has successfully completed the applicable assessment. | UC-CAND-10 — Award Verified Crest | TBD |
+| **FR-CAND-055** | The system **SHALL** award the corresponding Crest when the required criteria are satisfied. | UC-CAND-10 — Award Verified Crest | TBD |
+| **FR-CAND-056** | The system **SHALL** associate the Crest with the skill or competency verified by the assessment. | UC-CAND-10 — Award Verified Crest | TBD |
+| **FR-CAND-057** | The system **SHALL** associate the Crest with the candidate's profile. | UC-CAND-10 — Award Verified Crest | TBD |
+
+#### 5.2.3.16 View Earned Crests
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-058** | The system **SHALL** display the Crests associated with the candidate. | UC-CAND-11 — View Earned Crests | TBD |
+| **FR-CAND-059** | The system **SHALL** display the skill or competency represented by each Crest. | UC-CAND-11 — View Earned Crests | TBD |
+| **FR-CAND-060** | The system **SHALL** display the relevant verification information associated with each Crest. | UC-CAND-11 — View Earned Crests | TBD |
+
+#### 5.2.3.17 Maintain Verified Skills
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-061** | The system **SHALL** associate verified skills with the candidate. | UC-CAND-10 — Maintain Verified Skills | TBD |
+| **FR-CAND-062** | The system **SHALL** retain verified skills across different eligible hiring processes. | UC-CAND-10 — Maintain Verified Skills | TBD |
+| **FR-CAND-063** | The system **SHALL** update the candidate's verified skills when new eligible assessments are successfully completed. | UC-CAND-10 — Maintain Verified Skills | TBD |
+
+#### 5.2.3.18 Generate Dynamic Resume
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-064** | The system **SHALL** include the candidate's verified skills in the dynamic resume. | UC-CAND-12 — Generate Dynamic Resume | TBD |
+| **FR-CAND-065** | The system **SHALL** include the candidate's earned Crests in the dynamic resume. | UC-CAND-12 — Generate Dynamic Resume | TBD |
+| **FR-CAND-066** | The system **SHALL** incorporate newly verified competencies into the dynamic resume. | UC-CAND-12 — Generate Dynamic Resume | TBD |
+| **FR-CAND-067** | The system **SHALL** update the dynamic resume when relevant candidate information changes. | UC-CAND-12 — Generate Dynamic Resume | TBD |
+
+#### 5.2.3.19 View Dynamic Resume
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-068** | The system **SHALL** display the candidate's professional information included in the resume. | UC-CAND-12 — View Dynamic Resume | TBD |
+| **FR-CAND-069** | The system **SHALL** display the candidate's verified competencies. | UC-CAND-12 — View Dynamic Resume | TBD |
+| **FR-CAND-070** | The system **SHALL** display the candidate's earned Crests. | UC-CAND-12 — View Dynamic Resume | TBD |
+| **FR-CAND-071** | The system **SHALL** reflect the candidate's current verified skills. | UC-CAND-12 — View Dynamic Resume | TBD |
+
+#### 5.2.3.20 Apply Candidate Anonymity
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-083** | The system **COULD** determine whether anonymity is enabled for the applicable hiring pipeline stage. | UC-CAND-13 — Apply Candidate Anonymity | TBD |
+| **FR-CAND-084** | The system **COULD** hide candidate information designated as non-disclosable during anonymous stages. | UC-CAND-13 — Apply Candidate Anonymity | TBD |
+| **FR-CAND-085** | The system **COULD** continue to expose information required for evaluating the candidate's professional qualifications. | UC-CAND-13 — Apply Candidate Anonymity | TBD |
+| **FR-CAND-086** | The system **COULD** prevent hidden candidate information from being displayed to authorized evaluators during the anonymous stage. | UC-CAND-13 — Apply Candidate Anonymity | TBD |
+
+#### 5.2.3.21 Reveal Candidate Identity
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-087** | The system **COULD** determine when the candidate reaches the configured identity-disclosure stage. | UC-CAND-14 — Reveal Candidate Identity | TBD |
+| **FR-CAND-088** | The system **COULD** make the candidate's identity available to authorized users at that stage. | UC-CAND-14 — Reveal Candidate Identity | TBD |
+| **FR-CAND-089** | The system **COULD** retain the candidate's application and assessment history after identity disclosure. | UC-CAND-14 — Reveal Candidate Identity | TBD |
+
+#### 5.2.3.22 Receive Application Notifications
+
+| ID | Requirement | Use Case | Jira |
+|---|---|---|---|
+| **FR-CAND-090** | The system **SHOULD** notify candidates when they advance to a new applicable hiring pipeline stage. | UC-CAND-15 — Receive Application Notifications | TBD |
+| **FR-CAND-091** | The system **SHOULD** notify candidates when an assessment becomes available. | UC-CAND-15 — Receive Application Notifications | TBD |
+| **FR-CAND-092** | The system **SHOULD** notify candidates when an assessment result becomes available. | UC-CAND-15 — Receive Application Notifications | TBD |
+| **FR-CAND-093** | The system **SHOULD** notify candidates when a final hiring decision becomes available. | UC-CAND-15 — Receive Application Notifications | TBD |
 
 ---
 
-### FR-CAND-002 — Filter Job Postings
-
-**Description:**  
-The system shall allow candidates to filter available job postings according to supported criteria.
-
-**Requirements:**
-- The system shall allow candidates to filter postings by offered compensation.
-- The system shall allow candidates to filter postings by position.
-- The system shall allow candidates to filter postings by job grade.
-- The system shall allow candidates to filter postings by company.
-- The system shall allow candidates to combine multiple filter criteria.
-- The system shall update the displayed postings according to the selected criteria.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-02 — Filter Job Postings
-
----
-
-### FR-CAND-003 — View Job Posting Details
-
-**Description:**  
-The system shall allow candidates to view the details of an available job posting.
-
-**Requirements:**
-- The system shall display the position title.
-- The system shall display the company associated with the posting.
-- The system shall display the job grade.
-- The system shall display the offered compensation when provided.
-- The system shall display the job description.
-- The system shall display the required skills and qualifications.
-- The system shall display the relevant hiring process information when provided.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-03 — View Job Posting
-
----
-
-## 3.2 Job Applications
-
-### FR-CAND-004 — Submit Job Application
-
-**Description:**  
-The system shall allow candidates to submit an application for an available job posting.
-
-**Requirements:**
-- The system shall allow a candidate to initiate an application from an available job posting.
-- The system shall associate the submitted application with the candidate and the selected job posting.
-- The system shall record the date and time at which the application was submitted.
-- The system shall confirm successful submission of the application to the candidate.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-04 — Apply for Job
-
----
-
-### FR-CAND-005 — Prevent Duplicate Applications
-
-**Description:**  
-The system shall prevent a candidate from submitting multiple active applications for the same job posting.
-
-**Requirements:**
-- The system shall determine whether the candidate already has an active application for the selected job posting.
-- The system shall prevent submission of a duplicate active application.
-- The system shall inform the candidate when an active application already exists.
-
-**Priority:** High
-
-**Related Use Case:** UC-CAND-04 — Apply for Job
-
----
-
-### FR-CAND-006 — View Application History
-
-**Description:**  
-The system shall allow candidates to view their submitted job applications.
-
-**Requirements:**
-- The system shall display the jobs to which the candidate has applied.
-- The system shall display the current status of each application.
-- The system shall allow the candidate to access the relevant application details.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-05 — View Applications
-
----
-
-## 3.3 Hiring Pipeline
-
-### FR-CAND-007 — View Hiring Pipeline
-
-**Description:**  
-The system shall allow candidates to view the stages of the hiring pipeline associated with an application.
-
-**Requirements:**
-- The system shall display the stages applicable to the candidate's application.
-- The system shall indicate the candidate's current stage.
-- The system shall indicate the completion status of applicable stages.
-- The system shall indicate stages that are not yet available to the candidate.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-06 — View Hiring Pipeline
-
----
-
-### FR-CAND-008 — Access Assigned Assessment
-
-**Description:**  
-The system shall allow candidates to access an assessment when the corresponding hiring pipeline stage becomes available to them.
-
-**Requirements:**
-- The system shall make an assessment available when the candidate reaches its corresponding pipeline stage.
-- The system shall prevent candidates from accessing assessments that are not yet available to them.
-- The system shall provide the candidate with the information necessary to begin the assessment.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-07 — Take Assessment
-
----
-
-### FR-CAND-009 — Complete Assessment
-
-**Description:**  
-The system shall allow candidates to complete assessment modules assigned to them as part of a hiring pipeline.
-
-**Requirements:**
-- The system shall present the assessment content to the candidate.
-- The system shall record the candidate's submitted responses.
-- The system shall evaluate the candidate's responses according to the assessment's defined evaluation criteria.
-- The system shall record the outcome of the assessment.
-- The system shall associate the assessment result with the candidate's application.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-07 — Take Assessment
-
----
-
-### FR-CAND-010 — Track Assessment Progress
-
-**Description:**  
-The system shall allow candidates to track their progress within an available assessment.
-
-**Requirements:**
-- The system shall indicate the candidate's assessment completion status.
-- The system shall preserve assessment progress where the assessment permits interruption.
-- The system shall indicate whether an assessment has been completed or remains incomplete.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-07 — Take Assessment
-
----
-
-## 3.4 Assessment Feedback
-
-### FR-CAND-011 — View Assessment Feedback
-
-**Description:**  
-The system shall provide candidates with feedback associated with their completed assessments when feedback is available.
-
-**Requirements:**
-- The system shall provide the candidate with feedback after the assessment has been evaluated.
-- The system shall associate the feedback with the corresponding assessment.
-- The system shall make available any applicable areas of improvement identified by the assessment.
-- The system shall make the feedback accessible from the candidate's application.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-08 — View Assessment Feedback
-
----
-
-### FR-CAND-012 — View Assessment Result
-
-**Description:**  
-The system shall allow candidates to view the outcome of completed assessments when the employer has configured the assessment result to be visible.
-
-**Requirements:**
-- The system shall indicate whether the candidate passed or failed the applicable assessment when the result is disclosed.
-- The system shall display the assessment result together with its associated feedback when available.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-08 — View Assessment Feedback
-
----
-
-## 3.5 Application Status and Hiring Decision
-
-### FR-CAND-013 — View Application Status
-
-**Description:**  
-The system shall allow candidates to view the current status of their job applications.
-
-**Requirements:**
-- The system shall display the current status of each active application.
-- The system shall update the application status when the application progresses through the hiring pipeline.
-- The system shall indicate when an application has reached a final decision.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-05 — View Applications
-
----
-
-### FR-CAND-014 — Receive Final Hiring Decision
-
-**Description:**  
-The system shall provide candidates with the final hiring decision associated with their application.
-
-**Requirements:**
-- The system shall display the final decision once the employer has submitted it.
-- The system shall associate the decision with the corresponding application.
-- The system shall provide any final feedback made available by the employer.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-09 — View Hiring Decision
-
----
-
-## 3.6 Verified Skills and Crests
-
-### FR-CAND-015 — Award Verified Crest
-
-**Description:**  
-The system shall award a Crest to a candidate when the candidate successfully completes an eligible assessment module.
-
-**Requirements:**
-- The system shall determine whether the candidate has successfully completed the applicable assessment.
-- The system shall award the corresponding Crest when the required criteria are satisfied.
-- The system shall associate the Crest with the skill or competency verified by the assessment.
-- The system shall associate the Crest with the candidate's profile.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-10 — Earn Crest
-
----
-
-### FR-CAND-016 — View Earned Crests
-
-**Description:**  
-The system shall allow candidates to view the Crests they have earned.
-
-**Requirements:**
-- The system shall display the Crests associated with the candidate.
-- The system shall display the skill or competency represented by each Crest.
-- The system shall display the relevant verification information associated with each Crest.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-11 — View Crests
-
----
-
-### FR-CAND-017 — Maintain Verified Skills
-
-**Description:**  
-The system shall maintain a record of skills and competencies verified through successfully completed assessment modules.
-
-**Requirements:**
-- The system shall associate verified skills with the candidate.
-- The system shall retain verified skills across different eligible hiring processes.
-- The system shall update the candidate's verified skills when new eligible assessments are successfully completed.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-10 — Earn Crest
-
----
-
-## 3.7 Dynamic Resume
-
-### FR-CAND-018 — Generate Dynamic Resume
-
-**Description:**  
-The system shall generate a dynamic resume based on the candidate's professional information and verified competencies.
-
-**Requirements:**
-- The system shall include the candidate's verified skills in the dynamic resume.
-- The system shall include the candidate's earned Crests in the dynamic resume.
-- The system shall incorporate newly verified competencies into the dynamic resume.
-- The system shall update the dynamic resume when relevant candidate information changes.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-12 — Manage Dynamic Resume
-
----
-
-### FR-CAND-019 — View Dynamic Resume
-
-**Description:**  
-The system shall allow candidates to view their dynamic resume.
-
-**Requirements:**
-- The system shall display the candidate's professional information included in the resume.
-- The system shall display the candidate's verified competencies.
-- The system shall display the candidate's earned Crests.
-- The system shall reflect the candidate's current verified skills.
-
-**Priority:** Highest
-
-**Related Use Case:** UC-CAND-12 — Manage Dynamic Resume
-
----
-
-## 3.8 Candidate Anonymity
-
-### FR-CAND-020 — Apply Candidate Anonymity
-
-**Description:**  
-The system shall hide designated personally identifiable candidate information during hiring pipeline stages configured for anonymous evaluation.
-
-**Requirements:**
-- The system shall determine whether anonymity is enabled for the applicable hiring pipeline stage.
-- The system shall hide candidate information designated as non-disclosable during anonymous stages.
-- The system shall continue to expose information required for evaluating the candidate's professional qualifications.
-- The system shall prevent hidden candidate information from being displayed to authorized evaluators during the anonymous stage.
-
-**Priority:** Medium
-
-**Related Use Case:** UC-CAND-13 — Participate in Anonymous Evaluation
-
----
-
-### FR-CAND-021 — Reveal Candidate Identity
-
-**Description:**  
-The system shall reveal the candidate's identity when the candidate reaches a hiring pipeline stage configured for identity disclosure.
-
-**Requirements:**
-- The system shall determine when the candidate reaches the configured identity-disclosure stage.
-- The system shall make the candidate's identity available to authorized users at that stage.
-- The system shall retain the candidate's application and assessment history after identity disclosure.
-
-**Priority:** Medium
-
-**Related Use Case:** UC-CAND-13 — Participate in Anonymous Evaluation
-
----
-
-## 3.9 Candidate Notifications
-
-### FR-CAND-022 — Receive Application Notifications
-
-**Description:**  
-The system shall notify candidates of significant changes to their job applications.
-
-**Requirements:**
-- The system shall notify candidates when they advance to a new applicable hiring pipeline stage.
-- The system shall notify candidates when an assessment becomes available.
-- The system shall notify candidates when an assessment result becomes available.
-- The system shall notify candidates when a final hiring decision becomes available.
-
-**Priority:** High
-
-**Related Use Case:** UC-CAND-14 — Receive Notifications
-
----
-
-# 4. Business Rules
+### 5.2.4 Business Rules
 
 The following business rules govern the behavior of the Candidate Subsystem:
 
@@ -449,7 +257,7 @@ The following business rules govern the behavior of the Candidate Subsystem:
 
 ---
 
-# 5. Error Handling
+### 5.2.5 Error Handling
 
 The system shall provide appropriate feedback when:
 
@@ -462,69 +270,3 @@ The system shall provide appropriate feedback when:
 - An assessment cannot be submitted successfully.
 - Assessment results or feedback are not yet available.
 - A candidate attempts to access information that is restricted during an anonymous hiring stage.
-
----
-
-# 6. Priority Summary
-
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-CAND-001 | Browse Job Postings | Highest |
-| FR-CAND-002 | Filter Job Postings | Highest |
-| FR-CAND-003 | View Job Posting Details | Highest |
-| FR-CAND-004 | Submit Job Application | Highest |
-| FR-CAND-005 | Prevent Duplicate Applications | High |
-| FR-CAND-006 | View Application History | Highest |
-| FR-CAND-007 | View Hiring Pipeline | Highest |
-| FR-CAND-008 | Access Assigned Assessment | Highest |
-| FR-CAND-009 | Complete Assessment | Highest |
-| FR-CAND-010 | Track Assessment Progress | Highest |
-| FR-CAND-011 | View Assessment Feedback | Highest |
-| FR-CAND-012 | View Assessment Result | Highest |
-| FR-CAND-013 | View Application Status | Highest |
-| FR-CAND-014 | Receive Final Hiring Decision | Highest |
-| FR-CAND-015 | Award Verified Crest | Highest |
-| FR-CAND-016 | View Earned Crests | Highest |
-| FR-CAND-017 | Maintain Verified Skills | Highest |
-| FR-CAND-018 | Generate Dynamic Resume | Highest |
-| FR-CAND-019 | View Dynamic Resume | Highest |
-| FR-CAND-020 | Manage Professional Information | Highest |
-| FR-CAND-021 | Upload Professional Documents | High |
-| FR-CAND-022 | Manage Professional Links | High |
-| FR-CAND-023 | Apply Candidate Anonymity | Medium |
-| FR-CAND-024 | Reveal Candidate Identity | Medium |
-| FR-CAND-025 | Receive Application Notifications | High |
-
----
-
-# 7. Traceability
-
-The Jira/User Story identifiers shall be assigned after the candidate user stories have been finalized.
-
-| Requirement | Use Case | Jira/User Story |
-|---|---|---|
-| FR-CAND-001 | UC-CAND-01 | TBD |
-| FR-CAND-002 | UC-CAND-02 | TBD |
-| FR-CAND-003 | UC-CAND-03 | TBD |
-| FR-CAND-004 | UC-CAND-04 | TBD |
-| FR-CAND-005 | UC-CAND-04 | TBD |
-| FR-CAND-006 | UC-CAND-05 | TBD |
-| FR-CAND-007 | UC-CAND-06 | TBD |
-| FR-CAND-008 | UC-CAND-07 | TBD |
-| FR-CAND-009 | UC-CAND-07 | TBD |
-| FR-CAND-010 | UC-CAND-07 | TBD |
-| FR-CAND-011 | UC-CAND-08 | TBD |
-| FR-CAND-012 | UC-CAND-08 | TBD |
-| FR-CAND-013 | UC-CAND-05 | TBD |
-| FR-CAND-014 | UC-CAND-09 | TBD |
-| FR-CAND-015 | UC-CAND-10 | TBD |
-| FR-CAND-016 | UC-CAND-11 | TBD |
-| FR-CAND-017 | UC-CAND-10 | TBD |
-| FR-CAND-018 | UC-CAND-12 | TBD |
-| FR-CAND-019 | UC-CAND-12 | TBD |
-| FR-CAND-020 | UC-CAND-13 | TBD |
-| FR-CAND-021 | UC-CAND-13 | TBD |
-| FR-CAND-022 | UC-CAND-13 | TBD |
-| FR-CAND-023 | UC-CAND-14 | TBD |
-| FR-CAND-024 | UC-CAND-14 | TBD |
-| FR-CAND-025 | UC-CAND-15 | TBD |
