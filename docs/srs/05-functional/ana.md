@@ -39,9 +39,9 @@ The Analytics Subsystem is concerned with receiving real-time telemetry data, co
 
 #### Functional Requirements
 
-| ID | Requirement | Priority | Target Milestone | Related Use Case | Jira |
-| --- | --- | --- | --- | --- | --- |
-| FR-ANA-01 | The subsystem shall stream and ingest telemetry events (keystrokes, pastes, focus events, cursor moves) at sub-second intervals. | Must Have | M2 | | AMARA-33 |
+| ID | Requirement | Priority | Related Use Case | Jira |
+| --- | --- | --- | --- | --- |
+| FR-ANA-01 | The subsystem shall stream and ingest telemetry events (keystrokes, pastes, focus events, cursor moves) at sub-second intervals. | Must Have | | AMARA-33 |
 
 ---
 
@@ -56,10 +56,10 @@ The Analytics Subsystem is concerned with receiving real-time telemetry data, co
 
 #### Functional Requirements
 
-| ID | Requirement | Priority | Target Milestone | Related Use Case | Jira |
-| --- | --- | --- | --- | --- | --- |
-| FR-ANA-02 | The subsystem shall calculate individual execution efficiency metrics (runtime, peak memory, O-complexity approximation) upon code submission to the sandbox. | Must Have | M2 | | AMARA-33 |
-| FR-ANA-03 | The subsystem shall calculate a Pass Rate Score based on the tests passed. | Must Have | M2 | | AMARA-33 |
+| ID | Requirement | Priority | Related Use Case | Jira |
+| --- | --- | --- | --- | --- |
+| FR-ANA-02 | The subsystem shall calculate individual execution efficiency metrics (runtime, peak memory, O-complexity approximation) upon code submission to the sandbox. | Must Have | | AMARA-33 |
+| FR-ANA-03 | The subsystem shall calculate a Pass Rate Score based on the tests passed. | Must Have | | AMARA-33 |
 
 ---
 
@@ -74,10 +74,10 @@ The Analytics Subsystem is concerned with receiving real-time telemetry data, co
 
 #### Functional Requirements
 
-| ID | Requirement | Priority | Target Milestone | Related Use Case | Jira |
-| --- | --- | --- | --- | --- | --- |
-| FR-ANA-04 | The subsystem shall compute a normalized Behavioral Score based on peer review surveys, PR interactions, and task-board allocation metrics. | Should Have | M3 | | AMARA-33 |
-| FR-ANA-05 | The subsystem shall generate an Integrity Risk Score (0-100) and attach evidence logs (paste size, focus loss timestamps) whenever threshold heuristics are exceeded. | Should Have | M4 | | AMARA-33 |
+| ID | Requirement | Priority | Related Use Case | Jira |
+| --- | --- | --- | --- | --- |
+| FR-ANA-04 | The subsystem shall compute a normalized Behavioral Score based on peer review surveys, PR interactions, and task-board allocation metrics. | Should Have | | AMARA-33 |
+| FR-ANA-05 | The subsystem shall generate an Integrity Risk Score (0−100) and attach evidence logs (paste size, focus loss timestamps) whenever threshold heuristics are exceeded. | Should Have | | AMARA-33 |
 
 ---
 
@@ -91,9 +91,9 @@ The Analytics Subsystem is concerned with receiving real-time telemetry data, co
 
 #### Functional Requirements
 
-| ID | Requirement | Priority | Target Milestone | Related Use Case | Jira |
-| --- | --- | --- | --- | --- | --- |
-| FR-ANA-07 | The subsystem shall aggregate technical, behavioral, and integrity metrics into a single exportable candidate report (PDF/JSON). | Could Have | M4 | | AMARA-33 |
+| ID | Requirement | Priority | Related Use Case | Jira |
+| --- | --- | --- | --- | --- |
+| FR-ANA-07 | The subsystem shall aggregate technical, behavioral, and integrity metrics into a single exportable candidate report (PDF/JSON). | Could Have | | AMARA-33 |
 
 ---
 
