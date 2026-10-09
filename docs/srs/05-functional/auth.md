@@ -100,18 +100,3 @@ This subsystem offers the following functionality:
 | FR-AUTH-038 | The system shall allow admins to view and accept/reject company registration requests. | TBD | TBD |
 | FR-AUTH-039 | The system shall allow admins to manage system taxonomies, platform constants, and reference values. | TBD | TBD |
 | FR-AUTH-040 | The system should provide statistics and reporting features for the admins to get aggregate data related to job posting. This data can be used to enhance the platform or for other research purposes. | TBD | TBD |
-
-### 5.1.4 Traceability
-| Requirement | Use Case | Jira |
-|-------------|----------|------|
-| FR-AUTH-001 |    TBD   | TBD  |
-| FR-AUTH-002 |    TBD   | TBD  |
-| FR-AUTH-003 |    TBD   | TBD  |
-| FR-AUTH-004 |    TBD   | TBD  |
-| FR-AUTH-005 |    TBD   | TBD  |
-| FR-AUTH-006 |    TBD   | TBD  |
-| FR-AUTH-007 |    TBD   | TBD  |
-| FR-AUTH-008 |    TBD   | TBD  |
-| FR-AUTH-009 |    TBD   | TBD  |
-| FR-AUTH-010 |    TBD   | TBD  |
-| FR-AUTH-011 |    TBD   | TBD  |
