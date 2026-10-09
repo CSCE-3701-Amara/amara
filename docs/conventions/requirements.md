@@ -17,7 +17,7 @@ Owner: Ziad Eliwa | Status: Draft | Last updated: 2026-10-08 | Jira: AMARA-59
 | Risk / FMEA row | `RISK-nn` | `RISK-07` |
 | Test case | `TC-<EPIC>-nn` | `TC-APP-04` |
 
-Epic prefixes: `AUTH`, `CAND`, `JOB`, `APP`, `ANA`. NFR areas: `PERF`, `SEC`, `PRIV`, `USAB`, `ACC`, `REL`, `AVAIL`, `MAINT`, `PORT`, `SCAL`.
+Epic prefixes: `AUTH`, `CAND`, `JOB`, `APP`, `ANA`. NFR areas: `PERF`, `SEC`, `PRIV`, `USAB`, `ACC`, `REL`, `AVAIL`, `MAINT`, `PORT`, `SCAL`, `CAP`, `COMP`, `ENV`.
 
 Rules:
 - IDs are assigned by the epic owner, in order, and **never reused or renumbered**.
