@@ -1,6 +1,6 @@
 ## 5.1 AUTH: Accounts, Identity & Trust
 
-Owner: Hazem Nasr | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
+Owner: Hazem Nasr | Status: Draft | Last updated: 2026-10-09 | Jira: HIRE-n
 
 ### 5.1.1 Overview
 This section defines the functional requirements related to **AMARA-6 AUTH: Accounts, Identity & Trust**.
