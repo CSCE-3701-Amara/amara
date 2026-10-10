@@ -4,7 +4,7 @@ Owner: Yousef Abood | Status: Draft | Last updated: 2026-10-10 | Jira: AMARA-31
 
 ### 5.4.1 Overview
 
-This section defines the functional requirements of the JOB epic. JOB covers the life of a job posting as a published offering (creating, publishing, controlling its visibility, archiving, republishing, and deleting it) and how Interviewees discover it (jobs feed, filtering, search, posting details, saved jobs, following companies, recommendations, and sharing). Its actors are the **Hiring Manager** and the **Interviewee**; Admins act on postings through AUTH. Every user must be signed in to browse (FR-JOB-034).
+This section defines the functional requirements of the JOB epic. JOB covers the life of a job posting as a published offering (creating, publishing, controlling its visibility, archiving, republishing, and deleting it) and how Interviewees discover it (jobs feed, filtering, search, posting details, saved jobs, following companies, recommendations, and sharing). Its actors are the **Hiring Manager** and the **Interviewee**; Admins act on postings through AUTH. It also covers awarding Verified Crests for successfully completed assessments and applying candidate anonymity and identity reveal. Every user must be signed in to browse (FR-JOB-034).
 
 JOB does not define what happens once an Interviewee applies. Hiring configuration of a posting (content fields, deadlines, capacity, criteria, finalist target), application status, pipelines, assessments, interviews, anonymity, feedback, offers, and notifications belong to APP. This section refers to APP requirements by ID and never repeats them. Every notification mentioned here is sent through the notification mechanism owned by APP.
 
@@ -21,10 +21,11 @@ Diagrams (TBD): Figure 1: JOB use case diagram. Figure 2: job posting lifecycle 
 - Jobs feed, filtering, sorting, and search (5.4.3.4 to 5.4.3.6)
 - Posting details, saved jobs, following companies (5.4.3.7 to 5.4.3.9)
 - Recommendations, saved searches, new-jobs tracker, and sharing (5.4.3.10, 5.4.3.11)
+- Verified Crest award, candidate anonymity, and identity reveal (5.4.3.12 to 5.4.3.14)
 
 **Out of scope (owned elsewhere)**
 - Hiring configuration of a posting: content fields, dates, capacity, Must-have and Nice-to-have criteria, application questions, finalist target (APP 3.1, FR-APP-01 to FR-APP-12)
-- Applying, withdrawing, screening, application statuses, pipelines, test modules (including sharing them between companies, as an extension of FR-APP-49), live interviews, advancement, anonymity, feedback, offers, Interviewee application tracking, and all notifications (APP)
+- Applying, withdrawing, screening, application statuses, pipelines, test modules (including sharing them between companies, as an extension of FR-APP-49), live interviews, advancement, anonymity configuration (APP 3.10), feedback, offers, Interviewee application tracking, and all notifications (APP)
 - Company registration, verification, roles and permissions, company public profile page, job preferences, document upload, reporting, and admin management of users and taxonomies (AUTH)
 - Interviewee resume and profile (CAND)
 - Company-level analytics and cross-posting (ANA)
@@ -219,6 +220,50 @@ Diagrams (TBD): Figure 1: JOB use case diagram. Figure 2: job posting lifecycle 
 |---|---|---|---|
 | FR-JOB-076 | The system **SHOULD** provide a link to copy and share for a posting, which opens its detail page after sign-in (FR-JOB-034) and, for a private posting, is its private link (FR-JOB-016). | TBD | TBD |
 
+#### 5.4.3.12 Award Verified Crest
+
+**Feature Description:** An Interviewee who successfully completes an assessment receives a Verified Crest, a credential tied to the skill or competency that the assessment verified.
+
+**Preconditions:**
+* The Interviewee has completed an assessment module (APP 3.5).
+* The assessment is one for which a Crest can be awarded (see open points).
+
+| ID | Requirement | Related Use Case | Jira |
+|---|---|---|---|
+| FR-JOB-077 | The system **SHALL**, when an Interviewee completes an assessment, determine whether the Interviewee completed it successfully, according to the criteria required for its Crest. | TBD | TBD |
+| FR-JOB-078 | The system **SHALL**, when the required criteria are satisfied, award the corresponding Crest to the Interviewee. | TBD | TBD |
+| FR-JOB-079 | The system **SHALL**, when a Crest is awarded, associate it with the skill or competency verified by the assessment. | TBD | TBD |
+| FR-JOB-080 | The system **SHALL**, when a Crest is awarded, associate it with the Interviewee's profile. | TBD | TBD |
+
+#### 5.4.3.13 Apply Interviewee Anonymity
+
+**Feature Description:** During anonymous stages of a pipeline, identifying information about the Interviewee is hidden from Hiring Managers and Interviewers, while the information needed to evaluate professional qualifications stays visible.
+
+**Preconditions:**
+* The Hiring Manager has enabled anonymity for the pipeline and chosen the identity-reveal point (FR-APP-97).
+* The Interviewee has been admitted to the pipeline.
+
+| ID | Requirement | Related Use Case | Jira |
+|---|---|---|---|
+| FR-JOB-081 | The system **COULD**, when a Hiring Manager or Interviewer opens an application, determine whether anonymity is enabled for the application's current stage. | TBD | TBD |
+| FR-JOB-082 | The system **COULD**, while anonymity applies to a stage, hide the Interviewee information designated as non-disclosable. | TBD | TBD |
+| FR-JOB-083 | The system **COULD**, while anonymity applies to a stage, continue to display the information needed to evaluate the Interviewee's professional qualifications, such as scores, module results, skills, and Crests. | TBD | TBD |
+| FR-JOB-084 | The system **COULD**, while anonymity applies to a stage, prevent hidden Interviewee information from being displayed to authorized evaluators in any view, including resume copies, the dashboard, scorecards, and notes. | TBD | TBD |
+
+#### 5.4.3.14 Reveal Interviewee Identity
+
+**Feature Description:** When an Interviewee reaches the configured identity-disclosure stage, the hidden identity is made available to authorized users, and the application history is kept.
+
+**Preconditions:**
+* Anonymity applies to the pipeline (5.4.3.13).
+* An identity-reveal point is configured (FR-APP-97).
+
+| ID | Requirement | Related Use Case | Jira |
+|---|---|---|---|
+| FR-JOB-085 | The system **COULD** determine when an Interviewee reaches the identity-disclosure stage configured for the pipeline. | TBD | TBD |
+| FR-JOB-086 | The system **COULD**, when the Interviewee reaches that stage, make the Interviewee's identity available to authorized users. | TBD | TBD |
+| FR-JOB-087 | The system **COULD**, after identity disclosure, retain the Interviewee's application and assessment history. | TBD | TBD |
+
 ### 5.4.4 Business Rules
 
 * A posting is Draft, Published, or Archived, and only the transitions in FR-JOB-010 exist.
@@ -236,6 +281,9 @@ Diagrams (TBD): Figure 1: JOB use case diagram. Figure 2: job posting lifecycle 
 * Recommendations never use protected or identifying attributes (FR-JOB-072).
 * Tags come only from the taxonomy managed by Admins (FR-JOB-032).
 * All notifications of this section are sent through the notification mechanism owned by APP.
+* A Verified Crest is awarded only for the successful completion of an assessment and is tied to the skill or competency it verified (FR-JOB-077 to FR-JOB-079).
+* While anonymity applies, qualification information stays visible and identifying information stays hidden in every view (FR-JOB-083, FR-JOB-084).
+* Identity disclosure never removes the Interviewee's application or assessment history (FR-JOB-087).
 
 ### 5.4.5 Error Handling
 
@@ -249,4 +297,5 @@ Diagrams (TBD): Figure 1: JOB use case diagram. Figure 2: job posting lifecycle 
 * **Salary filter with minimum above maximum, or too-short search query:** show a message identifying the invalid input and keep the previous results.
 * **Search service unavailable:** show "Search is temporarily unavailable" and keep the feed and filters working.
 * **Invitation or notification email fails:** follow the retry and in-platform rules of APP 3.11; for an invitation, tell the Hiring Manager which addresses failed and keep the private link available to copy.
+* **Crest cannot be awarded or attached to the profile (service or data error):** keep the assessment result, retry, and do not mark the Crest as awarded until it is attached.
 * **Tag removed from the taxonomy by an Admin:** existing postings keep the tag, and it can no longer be added to new ones.
