@@ -1,6 +1,6 @@
 # Git Conventions
 
-Owner: Ziad Eliwa | Status: Draft | Last updated: 2026-10-08 | Jira: AMARA-59
+Owner: Ziad Eliwa | Status: Draft | Last updated: 2026-10-10 | Jira: AMARA-59
 
 ## 1. Purpose
 
@@ -89,19 +89,16 @@ feat(AMARA-101): implement user login
 
 SRS requirements MUST have their own domain-specific identifiers.
 
+Use the three-digit form in [requirements.md](requirements.md), for example `FR-JOB-001` and `CON-001`.
+
 Examples:
 
 ```text
-FR-APP-001
-FR-APP-002
-
+FR-AUTH-001
+FR-CAND-001
 FR-JOB-001
-FR-JOB-002
-
-FR-APP-001
-FR-APP-002
-
-FR-APP-001
+FR-JOB-001
+FR-ANA-001
 ```
 
 Jira issues use the project's Jira key:
@@ -121,7 +118,7 @@ The two identifiers serve different purposes:
 | `feature/AMARA-101-user-login`          | Identifies the Git branch       |
 | `feat(AMARA-101): implement user login` | Identifies the Git change       |
 
-The project MUST NOT attempt to create separate Jira projects solely to obtain domain-specific keys such as `AUTH-1`, `JOB-1`, or `APP-1`.
+The project MUST NOT attempt to create separate Jira projects solely to obtain domain-specific keys such as `AUTH-1`, `JOB-1`, or `INVW-1`.
 
 Domain organization SHOULD instead be handled through SRS requirement IDs, Jira Components, labels, and issue summaries.
 
@@ -605,7 +602,7 @@ SRS requirements remain separately identifiable through domain-specific requirem
 ```text
 FR-AUTH-001
 FR-JOB-001
-FR-APP-001
+FR-JOB-001
 FR-ANA-001
 ```
 
