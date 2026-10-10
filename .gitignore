@@ -31,3 +31,6 @@ go.work.sum
 # Editor/IDE
 # .idea/
 .vscode/
+
+# Local planning notes (not part of the shared repository)
+/local-plans/
