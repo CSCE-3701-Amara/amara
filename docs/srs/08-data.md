@@ -1,3 +1,3 @@
 ## 8. Data requirements
 
-Owner: TBD | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
+Owner: Yousef Abood | Status: Draft | Last updated: 2026-10-11 | Jira: AMARA-20
