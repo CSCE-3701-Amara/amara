@@ -19,12 +19,12 @@ This subsystem offers the following functionality:
 #### 5.1.3.1 General Authentication Requirements
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
-| FR-AUTH-001 | The system **SHALL** create the account when all validations succeed. | UC-AUTH-01, UC-AUTH-02, UC-AUTH-16 | TBD |
-| FR-AUTH-002 | The system **SHALL** create an authenticated session upon successful login. | UC-AUTH-03, UC-AUTH-04 | TDB |
+| FR-AUTH-001 | The system **SHALL** create the account when all validations succeed. | UC-AUTH-01, UC-AUTH-02, UC-AUTH-16, UC-AUTH-21 | TBD |
+| FR-AUTH-002 | The system **SHALL** create an authenticated session upon successful login. | UC-AUTH-03, UC-AUTH-04, UC-AUTH-22 | TDB |
 | FR-AUTH-003 | The system **SHALL** display an appropriate error message when authentation, validation, or verification fail. | UC-AUTH-01 to UC-AUTH-20 | TBD |
-| FR-AUTH-004 | The system **SHALL** implement a Role-Based Access Control (RBAC) system to avoid unauthorized access to resources and services. | UC-AUTH-03 to UC-AUTH-14, UC-AUTH-16 to UC-AUTH-20 | TBD |
-| FR-AUTH-005 | The system **SHALL** validate passwords according to the defined password policy. | UC-AUTH-01, UC-AUTH-13, UC-AUTH-16 | TBD |
-| FR-AUTH-006 | The system **SHALL** allow all users to log out at any time, upon which their authenticated session **SHALL** be terminated. | UC-AUTH-14 | TBD |
+| FR-AUTH-004 | The system **SHALL** implement a Role-Based Access Control (RBAC) system to avoid unauthorized access to resources and services. | UC-AUTH-03 to UC-AUTH-14, UC-AUTH-16 to UC-AUTH-22 | TBD |
+| FR-AUTH-005 | The system **SHALL** validate passwords according to the defined password policy. | UC-AUTH-01, UC-AUTH-13, UC-AUTH-16, UC-AUTH-21 | TBD |
+| FR-AUTH-006 | The system **SHALL** allow all users, including interviewers, to log out at any time, upon which their authenticated session **SHALL** be terminated. | UC-AUTH-14 | TBD |
 
 #### 5.1.3.2 Candidate Registration
 |     ID      | Requirement | Related Use Case(s) | Jira |
@@ -60,7 +60,14 @@ This subsystem offers the following functionality:
 |-------------|-------------|------------------|------|
 | FR-AUTH-020 | The system **SHALL** allow companies to login only using MFA. | UC-AUTH-04 | TBD |
 
-#### 5.1.3.7 Reporting and Rating
+#### 5.1.3.7 Interviewer Registration and Login
+|     ID      | Requirement | Related Use Case(s) | Jira |
+|-------------|-------------|------------------|------|
+| FR-AUTH-041 | The system **SHALL** allow interviewers to create accounts using a valid email address, password, and association with the company for which they work. | UC-AUTH-21 | TBD |
+| FR-AUTH-042 | The system **SHALL** validate and record the interviewer's association with an approved company before activating the interviewer account. | UC-AUTH-21 | TBD |
+| FR-AUTH-043 | The system **SHALL** allow interviewers to login using their direct credentials and create an authenticated session with permissions scoped to their associated company. | UC-AUTH-22 | TBD |
+
+#### 5.1.3.8 Reporting and Rating
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
 | FR-AUTH-021 | The system **SHOULD** allow candidates to report fake companies to system admins. | UC-AUTH-05 | TBD |
@@ -68,7 +75,7 @@ This subsystem offers the following functionality:
 | FR-AUTH-023 | The system **COULD** allow candidates to rate the companies being tested by. | UC-AUTH-11 | TBD |
 | FR-AUTH-024 | The system **COULD** allow companies to rate the candidates they test. | UC-AUTH-12 | TBD |
 
-#### 5.1.3.8 Profile Management
+#### 5.1.3.9 Profile Management
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
 | FR-AUTH-025 | The system **SHALL** allow candidates to view and edit their profiles at any time. | UC-AUTH-07 | TBD |
@@ -78,19 +85,19 @@ This subsystem offers the following functionality:
 | FR-AUTH-029 | The system **SHALL** provide a public company profile page that shows the information related to the company and their job postings. | UC-AUTH-15 | TBD |
 | FR-AUTH-030 | The system **COULD** allow candidates to set job preferneces that the system can use to recommend job positions. | UC-AUTH-07 | TBD |
  
-#### 5.1.3.9 Account Activation
+#### 5.1.3.10 Account Activation
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
-| FR-AUTH-031 | The system **SHALL** support account activation via email for all users. | UC-AUTH-01, UC-AUTH-02, UC-AUTH-03, UC-AUTH-04 | TBD |
-| FR-AUTH-032 | The system **SHALL** not allow non-activated accounts to login. | UC-AUTH-03, UC-AUTH-04 | TBD |
+| FR-AUTH-031 | The system **SHALL** support account activation via email for all users. | UC-AUTH-01, UC-AUTH-02, UC-AUTH-03, UC-AUTH-04, UC-AUTH-21 | TBD |
+| FR-AUTH-032 | The system **SHALL** not allow non-activated accounts to login. | UC-AUTH-03, UC-AUTH-04, UC-AUTH-22 | TBD |
 
-#### 5.1.3.10 Document Uploads
+#### 5.1.3.11 Document Uploads
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
-| FR-AUTH-033 | The system **SHALL** allow all users to upload supplementary documents in PDF and DOCX formats. | UC-AUTH-10 | TBD |
+| FR-AUTH-033 | The system **SHALL** allow all users to upload supplementary documents in PDF and DOCX formats with a maximum of 10MB per document. | UC-AUTH-10 | TBD |
 | FR-AUTH-034 | The system **COULD** automatically extract profile information from the uploaded documents and fill the related profile fields accordingly. | UC-AUTH-10 | TBD |
 
-#### 5.1.3.11 System Administration
+#### 5.1.3.12 System Administration
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
 | FR-AUTH-035 | The system **SHALL** provide a user management interface for admins. | UC-AUTH-16 | TBD |

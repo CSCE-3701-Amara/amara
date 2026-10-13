@@ -97,7 +97,7 @@ Owner: Hazem Nasr | Status: Draft | Last updated: 2026-10-09 | Jira: AMARA-30
 ### UC-AUTH-10: Upload Supporting Documents
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Candidate, Company Representative, System |
+|**Actor(s)**| Candidate, Company Representative, Interviewer, System |
 |**Preconditions**| The user is authenticated |
 |**Trigger**| The user opens the document upload controls. |
 | **Main Flow** | 1. The user chooses a supporting document.<br>2. The user uploads the document.<br>3. The system validates that the document is in PDF or DOCX format.<br>4. The system stores the document and associates it with the user's account.<br>5. If supported, the system extracts profile information from the document.<br>6. The system displays the extracted information for the user to review.<br>7. The user confirms the information to fill the related profile fields.<br>8. The system saves the confirmed profile information and displays a confirmation.|
@@ -128,7 +128,7 @@ Owner: Hazem Nasr | Status: Draft | Last updated: 2026-10-09 | Jira: AMARA-30
 ### UC-AUTH-13: Reset Password
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Candidate, Company Representative, System |
+|**Actor(s)**| Candidate, Company Representative, Interviewer, System |
 |**Preconditions**| The user has a registered account and access to its registered email address. |
 |**Trigger**| The user selects **Forgot Password** or **Reset Password** on the login page. |
 | **Main Flow** | 1. The user enters the email address associated with their account.<br>2. The user submits the password-reset request.<br>3. The system sends a verification code to the registered email address.<br>4. The user enters the verification code.<br>5. The system verifies the user's identity.<br>6. The user enters and confirms a new password.<br>7. The system validates the new password against the password policy.<br>8. The system updates the password, invalidates existing authenticated sessions, and displays a confirmation.|
@@ -139,7 +139,7 @@ Owner: Hazem Nasr | Status: Draft | Last updated: 2026-10-09 | Jira: AMARA-30
 ### UC-AUTH-14: Logout
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Candidate, Company Representative, System |
+|**Actor(s)**| Candidate, Company Representative, Interviewer, System |
 |**Preconditions**| The user has an authenticated session. |
 |**Trigger**| The user selects **Logout**. |
 | **Main Flow** | 1. The user selects **Logout**.<br>2. The system terminates the user's authenticated session.<br>3. The system redirects the user to the login page.|
@@ -208,3 +208,24 @@ Owner: Hazem Nasr | Status: Draft | Last updated: 2026-10-09 | Jira: AMARA-30
 | **Main Flow** | 1. The system admin selects a report or statistics view.<br>2. The system retrieves aggregate data related to job postings.<br>3. The system displays the aggregate data and reporting results.<br>4. The system admin reviews the results for platform improvement or research.|
 |**Exception Flows**|**Unauthorized access**: The system denies access to administrative reports.<br>**Data unavailable**: The system displays an error message and indicates that the report cannot currently be generated.<br>**Report generation fails**: The system displays an error message and does not display incomplete results.|
 |**Postconditions**|The system admin has viewed the requested aggregate job-posting data, or no incomplete report is presented.|
+
+### UC-AUTH-21: Interviewer Registration
+|Field|Description|
+|-----|-----------|
+|**Actor(s)**| Guest, System, Company Representative (optional) |
+|**Preconditions**| The user does not have an interviewer account and works for an approved company. |
+|**Trigger**| A user opens the interviewer registration page. |
+| **Main Flow** | 1. The user enters their personal information, email address, password, and company association information.<br>2. The user submits the registration form.<br>3. The system validates the password and registration information.<br>4. The system verifies that the email address is not already registered.<br>5. The system validates the user's association with an approved company.<br>6. The system creates the interviewer account associated with that company.<br>7. The system sends a verification code to the user's email address and redirects the user to the verification page.<br>8. The user enters the verification code.<br>9. The system checks the code and activates the interviewer account.|
+|**Alternative Flows**|**Company confirmation required**: The system asks a company representative to confirm the interviewer's association before activating the account.|
+|**Exception Flows**|**Invalid registration information**: The system displays an error message.<br>**Company association cannot be verified**: The system does not activate the interviewer account and informs the user of the required next step.<br>**The user does not receive the code**: The user requests a new verification code, and the system sends it to the registered email address.<br>**Invalid verification code**: The system displays an error message and allows the user to re-enter the code or request a new code.|
+|**Postconditions**|The interviewer has an active account associated with the company and can login.|
+
+### UC-AUTH-22: Interviewer Login
+|Field|Description|
+|-----|-----------|
+|**Actor(s)**| Interviewer, System |
+|**Preconditions**| The interviewer has a registered and activated account associated with an approved company. |
+|**Trigger**| The interviewer opens the login page. |
+| **Main Flow** | 1. The interviewer enters their email address and password.<br>2. The interviewer clicks **Login**.<br>3. The system validates the credentials.<br>4. The system checks that the account is activated and not deactivated or banned.<br>5. The system creates an authenticated session with permissions scoped to the interviewer's associated company.<br>6. The system redirects the interviewer to the appropriate company workspace.|
+|**Exception Flows**|**Invalid credentials**: The system displays an error message and does not create a session.<br>**Account is not activated**: The system informs the interviewer that activation is required and offers to resend the activation code.<br>**Company association is no longer valid**: The system prevents login and informs the interviewer that access must be reviewed.|
+|**Postconditions**|The interviewer has an authenticated session and can access resources permitted by their interviewer role and associated company.|
