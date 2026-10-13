@@ -74,7 +74,7 @@ The Jira key identifies the **work item**, while the SRS requirement ID identifi
 For example:
 
 ```text
-AUTH-FR-001
+FR-AUTH-001
     ↓
 AMARA-101
     ↓
@@ -92,16 +92,16 @@ SRS requirements MUST have their own domain-specific identifiers.
 Examples:
 
 ```text
-AUTH-FR-001
-AUTH-FR-002
+FR-APP-001
+FR-APP-002
 
-JOB-FR-001
-JOB-FR-002
+FR-JOB-001
+FR-JOB-002
 
-APP-FR-001
-APP-FR-002
+FR-APP-001
+FR-APP-002
 
-ANA-FR-001
+FR-APP-001
 ```
 
 Jira issues use the project's Jira key:
@@ -116,7 +116,7 @@ The two identifiers serve different purposes:
 
 | Identifier                              | Purpose                         |
 | --------------------------------------- | ------------------------------- |
-| `AUTH-FR-001`                           | Identifies a system requirement |
+| `FR-AUTH-001`                           | Identifies a system requirement |
 | `AMARA-101`                             | Identifies a Jira work item     |
 | `feature/AMARA-101-user-login`          | Identifies the Git branch       |
 | `feat(AMARA-101): implement user login` | Identifies the Git change       |
@@ -324,7 +324,7 @@ AMARA-101
 
 ## Requirements
 
-- AUTH-FR-001
+- FR-AUTH-001
 
 ## Changes
 
@@ -352,7 +352,7 @@ A complete traceability chain SHOULD look like:
 
 ```text
 SRS Requirement
-AUTH-FR-001
+FR-AUTH-001
        ↓
 Jira Issue
 AMARA-101
@@ -603,10 +603,10 @@ AMARA-50 Activity diagrams Epic 1
 SRS requirements remain separately identifiable through domain-specific requirement IDs such as:
 
 ```text
-AUTH-FR-001
-JOB-FR-001
-APP-FR-001
-ANA-FR-001
+FR-AUTH-001
+FR-JOB-001
+FR-APP-001
+FR-ANA-001
 ```
 
 This separation ensures that **SRS IDs identify requirements while Jira keys identify work items**.

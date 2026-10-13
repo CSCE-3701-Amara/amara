@@ -66,7 +66,7 @@ Then the application is created with status "Submitted" and I receive a confirma
 
 | MoSCoW | Meaning | Jira priority |
 |---|---|---|
-| Must | Required for the system to be useful, in the MVP | Highest |
+| Shall | Required for the system to be useful, in the MVP | Highest |
 | Should | Important, in scope if time allows | High |
 | Could | Nice to have | Medium |
 | Won't | Out of this release, kept for future expansion | Low |
