@@ -124,24 +124,22 @@ Handle Candidate and Company personal data lawfully for an Egypt launch, and kee
 | NFR-PRIV-009 | At the identity-reveal point, the same hiring views *SHALL* show the Candidate's identity fields and *SHALL NOT* hide them again (FR-INVW-073). | TBD |
 | NFR-PRIV-010 | An integration test *SHALL* fail if a pre-reveal hiring response contains a Candidate identity field. | TBD |
 | NFR-PRIV-011 | An integration test *SHALL* fail if pipeline anonymity removes a Candidate identity field from the stored account record. | TBD |
-| NFR-PRIV-012 | When an automated rule rejects or screens out a Candidate, the system *SHALL* tell the Candidate that the outcome was automatic and let them request human review (FR-INVW-055). | TBD |
-| NFR-PRIV-013 | The system *SHALL* record a human review decision within 5 business days of the Candidate's request. | TBD |
-| NFR-PRIV-014 | Within 72 hours of confirming a personal-data breach, the system *SHALL* produce a notice stating what happened, which data was affected, and how many people were affected. | TBD |
-| NFR-PRIV-015 | A personal-data breach notice *SHALL* be deliverable to the team lead and, where required by law, to affected people. | TBD |
-| NFR-PRIV-016 | Production personal data *SHALL* be stored in one selected region (see `NFR-ENV-002`). | TBD |
-| NFR-PRIV-017 | Before personal data is transferred outside the selected region, a written decision *SHALL* name the recipient, purpose, and safeguard. | TBD |
-| NFR-PRIV-018 | Before a third-party processor is enabled in production, a register *SHALL* identify the data that processor receives. | TBD |
-| NFR-PRIV-019 | AI prompts *SHALL NOT* include Candidate identity data, including name, photo, email, phone, personal links, date of birth, gender, nationality, address, or national ID. | TBD |
-| NFR-PRIV-020 | A vendor that will not agree to the personal-data training restriction in `NFR-PRIV-026` *SHALL NOT* receive Candidate or Company personal data. | TBD |
-| NFR-PRIV-021 | Logs and traces *SHALL NOT* contain session tokens, national IDs, or full resumes. | TBD |
-| NFR-PRIV-022 | A log scrubber *SHALL* redact email-address and phone-number patterns. | TBD |
-| NFR-PRIV-023 | A test *SHALL* fail if a fixture secret appears in a captured log line. | TBD |
-| NFR-PRIV-024 | The system *SHALL* delete personal data for an application with final status Rejected, Withdrawn, Screened Out, Offer Declined, or Offer Expired 24 months after the status was set, unless a legal hold is recorded. | TBD |
-| NFR-PRIV-025 | A scheduled job *SHALL* delete application personal data that has reached the retention period in `NFR-PRIV-024`. | TBD |
-| NFR-PRIV-026 | A third-party processor that receives Candidate or Company personal data *SHALL* agree not to use it to train models. | TBD |
-| NFR-PRIV-027 | A field inventory *SHALL* list each personal-data field stored by the system, its purpose, and its retention period. | TBD |
-| NFR-PRIV-028 | Account creation *SHALL* require an explicit consent action, stored with a timestamp and the privacy-notice version. | TBD |
-| NFR-PRIV-029 | A Candidate data download *SHALL* be completed in the product and *SHALL NOT* be emailed in a file that contains another person's data. | TBD |
+| NFR-PRIV-012 | Within 72 hours of confirming a personal-data breach, the system *SHALL* produce a notice stating what happened, which data was affected, and how many people were affected. | TBD |
+| NFR-PRIV-013 | A personal-data breach notice *SHALL* be deliverable to the team lead and, where required by law, to affected people. | TBD |
+| NFR-PRIV-014 | Production personal data *SHALL* be stored in one selected region (see `NFR-ENV-002`). | TBD |
+| NFR-PRIV-015 | Before personal data is transferred outside the selected region, a written decision *SHALL* name the recipient, purpose, and safeguard. | TBD |
+| NFR-PRIV-016 | Before a third-party processor is enabled in production, a register *SHALL* identify the data that processor receives. | TBD |
+| NFR-PRIV-017 | AI prompts *SHALL NOT* include Candidate identity data, including name, photo, email, phone, personal links, date of birth, gender, nationality, address, or national ID. | TBD |
+| NFR-PRIV-018 | A vendor that will not agree to the personal-data training restriction in `NFR-PRIV-026` *SHALL NOT* receive Candidate or Company personal data. | TBD |
+| NFR-PRIV-019 | Logs and traces *SHALL NOT* contain session tokens, national IDs, or full resumes. | TBD |
+| NFR-PRIV-020 | A log scrubber *SHALL* redact email-address and phone-number patterns. | TBD |
+| NFR-PRIV-021 | A test *SHALL* fail if a fixture secret appears in a captured log line. | TBD |
+| NFR-PRIV-022 | The system *SHALL* delete personal data for an application with final status Rejected, Withdrawn, Screened Out, Offer Declined, or Offer Expired 24 months after the status was set, unless a legal hold is recorded. | TBD |
+| NFR-PRIV-023 | A scheduled job *SHALL* delete application personal data that has reached the retention period. | TBD |
+| NFR-PRIV-024 | A third-party processor that receives Candidate or Company personal data *SHALL* agree not to use it to train models. | TBD |
+| NFR-PRIV-025 | A field inventory *SHALL* list each personal-data field stored by the system, its purpose, and its retention period. | TBD |
+| NFR-PRIV-026 | Account creation *SHALL* require an explicit consent action, stored with a timestamp and the privacy-notice version. | TBD |
+| NFR-PRIV-027 | A Candidate data download *SHALL* be completed in the product and *SHALL NOT* be emailed in a file that contains another person's data. | TBD |
 
 **Drives:** account identity fields, a hiring-view mapper that substitutes the anonymous identifier before the reveal point, erasure job, processor register, and log redaction.
 
