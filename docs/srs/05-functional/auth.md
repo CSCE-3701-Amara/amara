@@ -24,8 +24,7 @@ This subsystem offers the following functionality:
 | FR-AUTH-003 | The system **SHALL** display an appropriate error message when authentation, validation, or verification fail. | UC-AUTH-01 to UC-AUTH-20 | TBD |
 | FR-AUTH-004 | The system **SHALL** implement a Role-Based Access Control (RBAC) system to avoid unauthorized access to resources and services. | UC-AUTH-03 to UC-AUTH-14, UC-AUTH-16 to UC-AUTH-20 | TBD |
 | FR-AUTH-005 | The system **SHALL** validate passwords according to the defined password policy. | UC-AUTH-01, UC-AUTH-13, UC-AUTH-16 | TBD |
-| FR-AUTH-006 | The system **SHALL** allow all users to logout at any time. | UC-AUTH-14 | TBD |
-| FR-AUTH-007 | The system **SHALL** terminate the user's authenticated session upon logout. | UC-AUTH-14 | TBD |
+| FR-AUTH-006 | The system **SHALL** allow all users to log out at any time, upon which their authenticated session **SHALL** be terminated. | UC-AUTH-14 | TBD |
 
 #### 5.1.3.2 Candidate Registration
 |     ID      | Requirement | Related Use Case(s) | Jira |

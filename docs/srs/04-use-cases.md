@@ -10,7 +10,7 @@ Owner: Hazem Nasr | Status: Draft | Last updated: 2026-10-09 | Jira: AMARA-30
 |**Trigger**| A user opens the candidate registration page. |
 | **Main Flow** | 1. The user enters their personal infromation, email address, and password.<br>2. The user clicks **Register**.<br>3. The system validates the password according to the set password policy.<br>4. The system validates that the email address is in the correct format and is not already registered.<br>5. The system creates an account with the collected data.<br>6. The system sends a verification code to the user via email, and redirect the user to the verification page.<br>7. The user enters the verification code.<br>8. The user clicks **Verify**.<br>9. The system checks the code and activates the account.|
 |**Alternative Flows**|**MFA setup**: After activation, the candidate chooses to set up MFA, and the system associates the MFA method with the account.|
-|**Exception Flows**|**Invalid email/password**: The system displays an error message.<br>**The user does not recieve the code**: The user clicks *Resend Verification Code*, and the system sends a new code. The user then continues from Step 7.|
+|**Exception Flows**|**Invalid email/password**: The system displays an error message.<br>**The user does not recieve the code**: The user clicks *Resend Verification Code*, and the system sends a new code. The user then continues from Step 7.<br>**Invalid verification code**: The system displays an error message and allows the user to re-enter the code or request a new verification code.|
 |**Postconditions**|The user has an active account and can login at any time.|
 
 ### UC-AUTH-02: Company Registration
