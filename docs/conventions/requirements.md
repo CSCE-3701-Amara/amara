@@ -1,28 +1,35 @@
 # Requirements and User Stories
 
-Owner: Ziad Eliwa | Status: Draft | Last updated: 2026-10-08 | Jira: AMARA-59
+Owner: Ziad Eliwa | Status: Draft | Last updated: 2026-10-10 | Jira: AMARA-59
 
 ## 1. Identifiers
 
 | Type | Format | Example |
 |---|---|---|
-| User story | `US-<EPIC>-nn` | `US-APP-02` |
-| Functional requirement | `FR-<EPIC>-nn` | `FR-APP-02` |
-| Non-functional requirement | `NFR-<AREA>-nn` | `NFR-SEC-01` |
-| Use case | `UC-<EPIC>-nn` (same number as its story) | `UC-APP-02` |
-| External interface | `EXT-nn` | `EXT-03` |
-| Data / database | `DB-nn` | `DB-05` |
-| Legal / regulatory | `LEG-nn` | `LEG-02` |
-| Internationalization | `I18N-nn` | `I18N-01` |
-| Risk / FMEA row | `RISK-nn` | `RISK-07` |
-| Test case | `TC-<EPIC>-nn` | `TC-APP-04` |
+| User story | `US-<EPIC>-nnn` | `US-INVW-002` |
+| Functional requirement | `FR-<EPIC>-nnn` | `FR-JOB-002` |
+| Non-functional requirement | `NFR-<AREA>-nnn` | `NFR-SEC-001` |
+| Use case | `UC-<EPIC>-nnn` | `UC-JOB-001` |
+| Constraint | `CON-nnn` | `CON-004` |
+| Assumption | `ASM-nnn` | `ASM-001` |
+| Dependency | `DEP-nnn` | `DEP-001` |
+| External interface | `EXT-nnn` | `EXT-003` |
+| Data / database | `DB-nnn` | `DB-005` |
+| Legal / regulatory | `LEG-nnn` | `LEG-002` |
+| Internationalization | `I18N-nnn` | `I18N-001` |
+| Risk / FMEA row | `RISK-nnn` | `RISK-007` |
 
-Epic prefixes: `AUTH`, `CAND`, `JOB`, `APP`, `ANA`. NFR areas: `PERF`, `SEC`, `PRIV`, `USAB`, `ACC`, `REL`, `AVAIL`, `MAINT`, `PORT`, `SCAL`.
+Epic prefixes: `AUTH`, `CAND`, `JOB`, `INVW`, `ANA`. NFR areas used in `docs/srs/07-nfr.md`: `SEC`, `PRIV`, `CAP`, `COMP`, `REL`, `MAINT`, `PORT`, `SCAL`, `USAB`, `ACC`, `PERF`, `ENV`. Availability is part of `REL`. There is no `AVAIL` prefix in the SRS.
+
+Every identifier uses three digits, as in `FR-JOB-001` and `CON-001`. Do not mix widths.
+
+The SRS does not assign a separate test-case ID. A required check is written in the requirement that needs it, usually in `docs/srs/07-nfr.md`: an automated test, an integration test that fails on a stated condition, a load test whose result is stored, or a moderated test. Do not add a `TC-` ID until the SRS does.
 
 Rules:
 - IDs are assigned by the epic owner, in order, and **never reused or renumbered**.
 - A removed requirement stays in the document marked `Withdrawn`, with the reason.
-- The ID goes at the start of the Jira title: `US-APP-02: Apply with saved profile`.
+- The ID goes at the start of the Jira title: `US-INVW-002: Apply with saved profile`.
+- Several functional requirements may cite one use case. `FR-JOB-001` through `FR-JOB-012` all cite `UC-JOB-001`. A use case number is not required to match a user-story number. The filled SRS has no `US-` IDs.
 
 ## 2. User stories
 
@@ -44,16 +51,18 @@ Then the application is created with status "Submitted" and I receive a confirma
 
 ## 3. Functional requirements
 
-- Wording: "The system shall ...", one testable statement per requirement.
+- Wording in functional requirements and NFRs: "The system *SHALL* ...", one testable statement per requirement. This is the wording in `docs/srs/05-functional/invw.md` and `docs/srs/07-nfr.md`. Constraints use "The platform shall" and are not rewritten here.
 - Describe the need, not the design. Write "store user data persistently", not "use PostgreSQL". Technology goes in constraints or the design specification.
-- Every functional requirement traces to at least one story. Every story has at least one requirement.
+- A functional requirement in a filled epic file cites a related use case. It does not cite a `US-` ID. Do not invent a story ID to fill a trace.
 - Refer to another requirement by ID. Do not restate it.
+- Epic functional-requirement tables use: ID | Requirement | Related Use Case.
+- NFR tables use: ID | Requirement | Priority | Status | Source story | Jira. The Source story cell is an FR ID, another NFR ID, `cross-cutting`, or `TBD (<EPIC>)`. It is not a `US-` ID.
 
 ## 4. Non-functional requirements
 
 - Must be **measurable**: a number, a condition, or a standard.
-- Bad: "The system shall be fast." Good: "Search results shall load within 2 seconds for 95% of requests under 500 concurrent users."
-- Each important NFR names the component or design decision it drives (filled in the SRS and the design specification).
+- Bad: "The system shall be fast." Good: the wording of `NFR-PERF-003` in `docs/srs/07-nfr.md`.
+- Each important NFR names the component or design decision it drives (the **Drives:** line in `docs/srs/07-nfr.md`).
 - NFRs are tracked in Jira as Story or Task with the label `nfr`.
 
 ## 5. Terms
@@ -71,6 +80,8 @@ Then the application is created with status "Submitted" and I receive a confirma
 | Could | Nice to have | Medium |
 | Won't | Out of this release, kept for future expansion | Low |
 
+Functional requirements in `docs/srs/05-functional/invw.md` have no Priority column. NFR priority is Shall, Should, or Could. In `docs/srs/07-nfr.md`, Shall is the T1 bar, Should is T2, and Could is T3.
+
 Stories planned for full implementation also carry the label `mvp`.
 
 ## 7. Lifecycle
@@ -87,20 +98,20 @@ Changing an Approved requirement means a pull request that updates the text, the
 ## 8. Review checklist
 
 - [ ] ID follows the format and is unique
-- [ ] Wording is "shall", one statement, testable
+- [ ] Wording is "*SHALL*" for a functional requirement or NFR, one statement, testable
 - [ ] No ambiguous words ("fast", "easy", "user-friendly", "etc.") without a measure
 - [ ] Describes the need, not the implementation
 - [ ] Terms match the glossary
 - [ ] Priority and status set
-- [ ] Linked to a story, a Jira key, and (if it applies) an NFR or use case
+- [ ] A functional requirement is linked to a use case. An NFR names its source requirement, `cross-cutting`, or `TBD (<EPIC>)`. Do not invent a story ID.
 - [ ] No conflict with another epic, especially at boundaries: statuses, roles, notifications, permissions
 
 ## 9. Boundary ownership
 
 | Topic | Owned by | Others |
 |---|---|---|
-| Application status values and transitions | APP | Reference by ID |
-| Notifications | APP | Reference by ID |
+| Application status values and transitions | INVW | Reference by ID |
+| Notifications | INVW | Reference by ID |
 | Roles and permission matrix | AUTH | Reference by ID |
 | Reading data for analytics | ANA | Reads only, never writes other epics' data |
 
