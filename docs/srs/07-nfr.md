@@ -22,18 +22,18 @@ Stack these requirements assume, and that the design must not fight: Go backend,
 <!-- Template for a category -->
 <!-- ### n. <Category> Requirements
 
-Objective:  one sentence — what this category means for Amara.
-Standards/refs:  OWASP ASVS §2 | GDPR Art.17 | WCAG 2.2 | ...
-Key questions (from research):  2-4 bullets.
+Objective: one sentence — what this category means for Amara.
+Standards/refs: OWASP ASVS §2 | GDPR Art.17 | WCAG 2.2 | ...
+Key questions (from research): 2-4 bullets.
 
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-...-001 | The system shall ... | Shall | Draft | FR-...-... | AMARA-.. | -->
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-...-001 | The system *SHALL* ... | TBD | -->
 ### 1. Security Requirements
 
 #### Objective
 
-Stop unauthorized access, data theft, and tampering of company, Interviewee, and pipeline data, at a bar a student team can test in CI.
+Stop unauthorized access, data theft, and tampering of Company, Candidate, and pipeline data at a level a student team can test in CI.
 
 #### Standards/Refs
 
@@ -42,33 +42,62 @@ OWASP Top 10:2021 (A01–A10). OWASP ASVS 4.0 Level 1 for the product, Level 2 f
 #### Key Questions
 
 - Which Top 10 item does this requirement close, and how do we fail a build if it regresses?
-- Who is allowed to see an Interviewee's identity, and when (`FR-INVW-071`, `FR-INVW-073`)?
-- What do we log when access is denied, and who can delete those logs?
-- Which outbound calls accept a URL we did not choose (`FR-INVW-026`, job-board integrations)?
+- Who is allowed to see a Candidate's identity, and when (`FR-INVW-071`, `FR-INVW-073`)?
+- What limits protect sign-in from repeated failed attempts?
+- Which automated security checks must pass before release?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-SEC-001 | The system *SHALL* deny access by default. Every API route *SHALL* check the caller's role against the AUTH permission matrix before returning data, and an automated test *SHALL* cover each route with an anonymous caller, a wrong-role caller, and a correct-role caller. A release *SHALL* have zero confirmed A01 (Broken Access Control) findings. | Shall | Draft | FR-INVW-033, FR-INVW-053, FR-INVW-071 | TBD |
-| NFR-SEC-002 | The system *SHALL* serve all browser and API traffic over TLS 1.2 or later, *SHALL* reject plaintext HTTP except for a redirect to HTTPS, and *SHALL* encrypt Interviewee PII and secrets at rest with AES-256 or the cloud provider's equivalent. Passwords *SHALL* be hashed with Argon2id (memory at least 64 MiB, iterations at least 3, parallelism 1) and *SHALL* never be logged or stored reversible. | Shall | Draft | TBD (AUTH) | TBD |
-| NFR-SEC-003 | The system *SHALL* use parameterized queries for all database access and *SHALL* reject or encode untrusted input before it reaches a query, a shell, or HTML. A release *SHALL* have zero confirmed A03 (Injection) findings from the SAST and DAST checks in CI. | Shall | Draft | FR-JOB-011, FR-INVW-017 | TBD |
-| NFR-SEC-004 | Each epic *SHALL* have a written threat model (assets, actors, abuse cases, and the NFR that closes each abuse case) before its first production deploy. The anonymity path, the offer path, and sign-in *SHALL* each have at least one abuse-case test. | Shall | Draft | FR-INVW-071, REMOVED-FR-119 | TBD |
-| NFR-SEC-005 | Production containers *SHALL* run as non-root, *SHALL* ship no default credentials, and *SHALL* send `Strict-Transport-Security`, `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, and `Referrer-Policy`. A header check in CI *SHALL* fail the build if any of these is missing on the public origin. | Shall | Draft | cross-cutting | TBD |
-| NFR-SEC-006 | CI *SHALL* run `govulncheck` on the Go module and `npm audit` at high severity on the frontend. A dependency with a known high or critical CVE *SHALL* be patched or explicitly waived, with a written reason and an owner, within 14 days of the advisory. | Shall | Draft | cross-cutting | TBD |
-| NFR-SEC-007 | The system *SHALL* lock an account for 15 minutes after 5 failed sign-in attempts from that account, *SHALL* rate-limit sign-in to 10 attempts per IP per minute, and *SHALL* end a Hiring Manager session after 30 minutes idle or 12 hours absolute, whichever comes first. Session identifiers *SHALL* be regenerated on sign-in. | Shall | Draft | TBD (AUTH) | TBD |
-| NFR-SEC-008 | Container images *SHALL* be built only in CI from a lockfile (`go.sum`, `package-lock.json`), *SHALL* be tagged with the git commit, and *SHALL* not be deployable from a laptop. The system *SHALL* not deserialize untrusted data into Go objects with a decoder that executes code. | Shall | Draft | cross-cutting | TBD |
-| NFR-SEC-009 | The system *SHALL* write an append-only audit record for sign-in success and failure, role change, identity reveal, denied access to an anonymized field, offer create/withdraw, and permission override. The application database role *SHALL* not be able to update or delete audit records. Audit records *SHALL* be kept for at least 90 days. | Shall | Draft | FR-INVW-058, FR-INVW-071, FR-INVW-073 | TBD |
-| NFR-SEC-010 | The server *SHALL* not fetch a URL supplied by a user unless that URL's host is on an allowlist for that feature (meeting provider, job board). Requests to link-local, loopback, and private address ranges *SHALL* be refused. A test *SHALL* cover a private-IP and a metadata-IP payload. | Shall | Draft | FR-INVW-026 | TBD |
-| NFR-SEC-011 | Secrets (database passwords, API keys, signing keys) *SHALL* live only in the cloud secret store or in local env files that are gitignored. A CI secret scan *SHALL* fail the pull request if a secret pattern is committed. | Shall | Draft | cross-cutting | TBD |
-| NFR-SEC-012 | Hiring Manager accounts *SHALL* support a second factor (TOTP or the provider's equivalent). T1 may ship with it optional; from T2 it *SHALL* be required for every Hiring Manager account. | Should | Draft | TBD (AUTH) | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-SEC-001 | The system *SHALL* deny access by default. | TBD |
+| NFR-SEC-002 | The system *SHALL* serve all browser and API traffic over TLS 1.2 or later. | TBD |
+| NFR-SEC-003 | The system *SHALL* use parameterized queries for all database access. | TBD |
+| NFR-SEC-004 | Each epic *SHALL* have a written threat model covering its assets, actors, abuse cases, and the NFR that addresses each abuse case before its first production deployment. | TBD |
+| NFR-SEC-005 | Production containers *SHALL* run as non-root. | TBD |
+| NFR-SEC-006 | CI *SHALL* run `govulncheck` on the Go module. | TBD |
+| NFR-SEC-007 | The system *SHALL* lock an account for 15 minutes after 5 failed sign-in attempts from that account. | TBD |
+| NFR-SEC-008 | Container images *SHALL* be built only in CI from the Go and frontend lockfiles (`go.sum`, `package-lock.json`). | TBD |
+| NFR-SEC-013 | The system *SHALL* check every API caller's role against the AUTH permission matrix before returning protected data. | TBD |
+| NFR-SEC-014 | An automated test *SHALL* exercise every API route with an anonymous caller, a caller with the wrong role, and a caller with the correct role. | TBD |
+| NFR-SEC-015 | A release *SHALL* have zero confirmed OWASP A01 (Broken Access Control) findings. | TBD |
+| NFR-SEC-016 | The system *SHALL* reject plaintext HTTP requests, except to redirect them to HTTPS. | TBD |
+| NFR-SEC-017 | The system *SHALL* encrypt Candidate personal data and secrets at rest using AES-256 or the cloud provider's equivalent. | TBD |
+| NFR-SEC-018 | The system *SHALL* hash passwords with Argon2id using at least 64 MiB of memory, at least 3 iterations, and parallelism 1. | TBD |
+| NFR-SEC-019 | The system *SHALL* store passwords in a non-reversible form. | TBD |
+| NFR-SEC-020 | The system *SHALL NOT* interpolate untrusted input into a shell command string. | TBD |
+| NFR-SEC-021 | The system *SHALL* contextually encode untrusted input before rendering it as HTML. | TBD |
+| NFR-SEC-022 | A release *SHALL* have zero confirmed OWASP A03 (Injection) findings from SAST and DAST scans run in CI. | TBD |
+| NFR-SEC-023 | The sign-in flow *SHALL* be covered by at least one abuse-case test before the first production deployment. | TBD |
+| NFR-SEC-024 | Production containers *SHALL NOT* include default credentials. | TBD |
+| NFR-SEC-025 | The public origin *SHALL* send the `Strict-Transport-Security` response header. | TBD |
+| NFR-SEC-026 | The public origin *SHALL* send the `Content-Security-Policy` response header. | TBD |
+| NFR-SEC-027 | The public origin *SHALL* send the `X-Content-Type-Options: nosniff` response header. | TBD |
+| NFR-SEC-028 | The public origin *SHALL* send the `Referrer-Policy` response header. | TBD |
+| NFR-SEC-029 | A CI header check *SHALL* fail when any required security header is missing from the public origin. | TBD |
+| NFR-SEC-030 | CI *SHALL* run `npm audit` against the frontend dependencies and report high- and critical-severity findings. | TBD |
+| NFR-SEC-031 | A dependency with a known high- or critical-severity CVE *SHALL* be patched or explicitly waived within 14 days of the advisory. | TBD |
+| NFR-SEC-032 | A waiver for a high- or critical-severity dependency CVE *SHALL* name an owner and include a written reason. | TBD |
+| NFR-SEC-033 | The system *SHALL* rate-limit sign-in to 10 attempts per IP address per minute. | TBD |
+| NFR-SEC-034 | An authenticated Hiring Manager session *SHALL* end after 30 minutes of inactivity. | TBD |
+| NFR-SEC-035 | An authenticated Hiring Manager session *SHALL* end after 12 hours, regardless of activity. | TBD |
+| NFR-SEC-036 | The system *SHALL* regenerate session identifiers when a user signs in. | TBD |
+| NFR-SEC-037 | CI *SHALL* tag each container image with the Git commit that produced it. | TBD |
+| NFR-SEC-038 | The deployment process *SHALL NOT* deploy a container image built outside CI. | TBD |
+| NFR-SEC-039 | The system *SHALL NOT* deserialize untrusted data using a Go decoder that executes code. | TBD |
+| NFR-SEC-040 | CI *SHALL* run SAST and DAST scans. | TBD |
+| NFR-SEC-041 | The pipeline anonymity flow *SHALL* be covered by at least one abuse-case test before the first production deployment. | TBD |
+| NFR-SEC-042 | The offer flow *SHALL* be covered by at least one abuse-case test before the first production deployment. | TBD |
+| NFR-SEC-043 | Passwords *SHALL NOT* be written to logs. | TBD |
+| NFR-SEC-044 | Each API route that returns company-scoped data *SHALL* enforce the caller's company scope defined by AUTH. | TBD |
+| NFR-SEC-045 | An automated test *SHALL* verify that a user associated with one company cannot access company-scoped data belonging to another company. | TBD |
 
-**Drives:** AUTH permission middleware, Argon2id hasher, CI security jobs, audit table with a restricted DB role, outbound HTTP allowlist.
+**Drives:** AUTH permission middleware, Argon2id hasher, sign-in rate limiter, CI security jobs, secure container configuration, and security-header checks.
 
 ### 2. Privacy Requirements
 
 #### Objective
 
-Handle Interviewee and company personal data lawfully for an Egypt launch, and keep a path to stricter rules if the product later serves users abroad. Anonymity is a disclosure rule on a pipeline, not a reason to omit identity from the account. Photo, gender, and the other identity fields are stored on the account and stay in the system. Before the reveal point they are hidden from Hiring Managers and Interviewers only (`CON-004`, `CON-010`, `FR-INVW-071`).
+Handle Candidate and Company personal data lawfully for an Egypt launch, and keep a path to stricter rules if the product later serves users abroad. Anonymity is a disclosure rule on a pipeline, not a reason to omit identity from the account. Photo, gender, and the other identity fields are stored on the account and stay in the system. Before the reveal point, they are hidden from Hiring Managers and Interviewers (`CON-004`, `CON-010`, `FR-INVW-071`).
 
 #### Standards/Refs
 
@@ -77,26 +106,44 @@ Handle Interviewee and company personal data lawfully for an Egypt launch, and k
 #### Key Questions
 
 - Which identity fields does every account store, and which views must hide them before the reveal point?
-- How long do we keep a rejected Interviewee, and who can order deletion?
+- How long do we keep a rejected Candidate, and who can order deletion?
 - Can a Hiring Manager or Interviewer see stored identity fields in a pipeline view, export, or scorecard before the reveal point?
 - Which third parties (email, meeting, LLM) receive personal data, and may they train on it?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-PRIV-001 | The system *SHALL* store identity fields on the account, including name, photo, email, phone, date of birth, gender, nationality, and address, and *SHALL* keep them after anonymity is enabled. Ranking and insight generation *SHALL* not use name, photo, gender, age, nationality, or contact details as inputs (`FR-INVW-065`). A field inventory *SHALL* list every stored personal field, its purpose, and its retention. | Shall | Draft | FR-INVW-065, FR-INVW-071 | TBD |
-| NFR-PRIV-002 | Before creating an account, the system *SHALL* show a privacy notice stating what is collected, why, who it is shared with, and how long it is kept, in Arabic and English. Account creation *SHALL* require an explicit consent action, stored with a timestamp and the notice version. | Shall | Draft | TBD (AUTH) | TBD |
-| NFR-PRIV-003 | The system *SHALL* let an Interviewee download their profile, applications, and released feedback as JSON within 7 days of the request, and *SHALL* complete the download in the product without emailing a file that contains another person's data. | Shall | Draft | REMOVED-FR-110, TBD (CAND) | TBD |
-| NFR-PRIV-004 | The system *SHALL* delete an Interviewee's personal data within 30 days of a verified erasure request, except records the company must keep to show a hiring decision was made. Those exception records *SHALL* drop name, contact details, photo, and free-text answers, and *SHALL* keep only the decision, time, and role of the decider. This deletion is not pipeline anonymity. | Shall | Draft | REMOVED-FR-015, FR-INVW-058 | TBD |
-| NFR-PRIV-005 | The system *SHALL* delete personal data of an application whose final status is Rejected, Withdrawn, Screened Out, or Offer Declined 24 months after that status was set, unless a legal hold is recorded. A scheduled job *SHALL* do this. Pipeline anonymity *SHALL* not count as this deletion, and *SHALL* not remove the stored account fields. | Shall | Draft | REMOVED-FR-019, REMOVED-FR-021, FR-INVW-060 | TBD |
-| NFR-PRIV-006 | When anonymity is enabled, the system *SHALL* keep the identity fields stored and *SHALL* hide them from Hiring Managers and Interviewers until the reveal point. Hiring views, exports, resume copies, the dashboard, scorecards, and notes *SHALL* show the anonymous identifier instead of name, photo, email, phone, personal links, date of birth, gender, nationality, and address (`FR-INVW-071`). The Interviewee's own account view *SHALL* still show the stored fields. At the reveal point the same hiring views *SHALL* show the stored fields, and *SHALL* not hide them again (`FR-INVW-073`). An integration test *SHALL* fail if a pre-reveal hiring response contains those fields, and *SHALL* fail if the stored account record no longer has them. | Shall | Draft | FR-INVW-070, FR-INVW-071, FR-INVW-073 | TBD |
-| NFR-PRIV-007 | Where a rule can reject or screen out an Interviewee without a person deciding (`REMOVED-FR-021`, `FR-INVW-055`), the system *SHALL* tell the Interviewee that the outcome was automatic, *SHALL* let them request a human review, and *SHALL* record the human decision within 5 business days. The request path *SHALL* exist even when the default is automatic rejection. | Shall | Draft | REMOVED-FR-021, REMOVED-FR-027, FR-INVW-055 | TBD |
-| NFR-PRIV-008 | The system *SHALL* detect a personal-data breach (confirmed unauthorized access to PII or to pre-reveal identity) and *SHALL* produce a notice containing what happened, which data, and how many people, within 72 hours of confirmation. The notice *SHALL* be deliverable to the team lead and, where the law requires it, to the affected person. | Shall | Draft | NFR-SEC-009 | TBD |
-| NFR-PRIV-009 | Production personal data *SHALL* stay in one chosen region (see `NFR-ENV-002`). A transfer of personal data outside that region *SHALL* require a written decision naming the recipient, the purpose, and the safeguard, before the transfer is enabled. | Shall | Draft | cross-cutting | TBD |
-| NFR-PRIV-010 | A third-party processor (email, meeting, object storage, LLM) *SHALL* not be enabled in production until a record names what data it receives and states that the vendor will not train models on Amara personal data. AI prompts *SHALL* not include name, email, phone, or national ID. If a vendor cannot accept that term, that vendor *SHALL* not receive those fields. | Shall | Draft | FR-INVW-018, FR-INVW-064, FR-INVW-078 | TBD |
-| NFR-PRIV-011 | Logs and traces *SHALL* not contain passwords, session tokens, national IDs, or full resumes. A log scrubber *SHALL* redact email and phone patterns. A test *SHALL* fail if a fixture secret appears in a captured log line. | Shall | Draft | NFR-SEC-009 | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-PRIV-001 | The system *SHALL* store account identity fields, including name, photo, email, phone, date of birth, gender, nationality, and address, and *SHALL* keep them when pipeline anonymity is enabled. | TBD |
+| NFR-PRIV-002 | Before account creation, the system *SHALL* show a privacy notice in Arabic and English that states what personal data is collected, why it is collected, who receives it, and how long it is retained. | TBD |
+| NFR-PRIV-003 | The system *SHALL* let a Candidate download their profile, applications, and released feedback as JSON within 7 days of the request. | TBD |
+| NFR-PRIV-004 | The system *SHALL* delete a Candidate's personal data within 30 days of a verified erasure request, except records subject to a recorded legal hold or records the Company is required to retain to document a hiring decision. | TBD |
+| NFR-PRIV-005 | Records retained to document a hiring decision *SHALL* omit the Candidate's name, contact details, photo, and free-text answers, and *SHALL* retain only the decision, time, and decider role. | TBD |
+| NFR-PRIV-006 | Pipeline anonymity *SHALL NOT* be treated as deletion of the Candidate's stored account identity fields. | TBD |
+| NFR-PRIV-007 | When anonymity is enabled, hiring views, exports, resume copies, dashboards, scorecards, and notes *SHALL* show the anonymous identifier instead of the Candidate's identity fields before the reveal point (FR-INVW-071). | TBD |
+| NFR-PRIV-008 | The Candidate's own account view *SHALL* continue to show the Candidate's stored identity fields while pipeline anonymity is enabled. | TBD |
+| NFR-PRIV-009 | At the identity-reveal point, the same hiring views *SHALL* show the Candidate's identity fields and *SHALL NOT* hide them again (FR-INVW-073). | TBD |
+| NFR-PRIV-010 | An integration test *SHALL* fail if a pre-reveal hiring response contains a Candidate identity field. | TBD |
+| NFR-PRIV-011 | An integration test *SHALL* fail if pipeline anonymity removes a Candidate identity field from the stored account record. | TBD |
+| NFR-PRIV-012 | When an automated rule rejects or screens out a Candidate, the system *SHALL* tell the Candidate that the outcome was automatic and let them request human review (FR-INVW-055). | TBD |
+| NFR-PRIV-013 | The system *SHALL* record a human review decision within 5 business days of the Candidate's request. | TBD |
+| NFR-PRIV-014 | Within 72 hours of confirming a personal-data breach, the system *SHALL* produce a notice stating what happened, which data was affected, and how many people were affected. | TBD |
+| NFR-PRIV-015 | A personal-data breach notice *SHALL* be deliverable to the team lead and, where required by law, to affected people. | TBD |
+| NFR-PRIV-016 | Production personal data *SHALL* be stored in one selected region (see `NFR-ENV-002`). | TBD |
+| NFR-PRIV-017 | Before personal data is transferred outside the selected region, a written decision *SHALL* name the recipient, purpose, and safeguard. | TBD |
+| NFR-PRIV-018 | Before a third-party processor is enabled in production, a register *SHALL* identify the data that processor receives. | TBD |
+| NFR-PRIV-019 | AI prompts *SHALL NOT* include Candidate identity data, including name, photo, email, phone, personal links, date of birth, gender, nationality, address, or national ID. | TBD |
+| NFR-PRIV-020 | A vendor that will not agree to the personal-data training restriction in `NFR-PRIV-026` *SHALL NOT* receive Candidate or Company personal data. | TBD |
+| NFR-PRIV-021 | Logs and traces *SHALL NOT* contain session tokens, national IDs, or full resumes. | TBD |
+| NFR-PRIV-022 | A log scrubber *SHALL* redact email-address and phone-number patterns. | TBD |
+| NFR-PRIV-023 | A test *SHALL* fail if a fixture secret appears in a captured log line. | TBD |
+| NFR-PRIV-024 | The system *SHALL* delete personal data for an application with final status Rejected, Withdrawn, Screened Out, Offer Declined, or Offer Expired 24 months after the status was set, unless a legal hold is recorded. | TBD |
+| NFR-PRIV-025 | A scheduled job *SHALL* delete application personal data that has reached the retention period in `NFR-PRIV-024`. | TBD |
+| NFR-PRIV-026 | A third-party processor that receives Candidate or Company personal data *SHALL* agree not to use it to train models. | TBD |
+| NFR-PRIV-027 | A field inventory *SHALL* list each personal-data field stored by the system, its purpose, and its retention period. | TBD |
+| NFR-PRIV-028 | Account creation *SHALL* require an explicit consent action, stored with a timestamp and the privacy-notice version. | TBD |
+| NFR-PRIV-029 | A Candidate data download *SHALL* be completed in the product and *SHALL NOT* be emailed in a file that contains another person's data. | TBD |
 
-**Drives:** account profile that always stores identity fields, a hiring-view mapper that substitutes the anonymous identifier before the reveal point, erasure job, processor register, log redaction.
+**Drives:** account identity fields, a hiring-view mapper that substitutes the anonymous identifier before the reveal point, erasure job, processor register, and log redaction.
 
 ### 3. Capacity Requirements
 
@@ -106,28 +153,40 @@ Hold the data and the concurrent use of an Egypt-wide hiring product, from a pil
 
 #### Standards/Refs
 
-Planning targets below. Egypt launch context: formal private-sector employers plus startups, candidates mostly on phones, deadline-day bursts (`FR-JOB-003`, `FR-JOB-005`). Video-recorded responses (`FR-INVW-008`) dominate storage cost and are called out separately.
+Planning targets below. Egypt launch context: formal private-sector employers plus startups, Candidates mostly on phones, and deadline-day bursts. Posting deadlines and application caps are configured by JOB. Video-recorded responses (`FR-INVW-008`) dominate storage cost and are called out separately.
 
 #### Key Questions
 
 - What is the T1 number we must load-test before Milestone delivery, and what is only a growth target?
 - Which feature blows the student budget if we store it naively (video)?
-- How many applications must one posting be able to store, separate from the cap the Hiring Manager chooses (`FR-JOB-005`)?
+- How many applications must one posting be able to store, separate from the cap the Hiring Manager configures in JOB?
 - What happens to screening and email when a deadline lands on the hour?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-CAP-001 | At T1 the system *SHALL* store, without manual sharding, at least 50 companies, 250 Hiring Manager and Interviewer accounts, 25,000 Interviewee accounts, 500 active postings, and 250,000 applications, on a relational database of at most 50 GB. | Shall | Draft | REMOVED-FR-013, REMOVED-FR-015 | TBD |
-| NFR-CAP-002 | The data model and tenant key *SHALL* allow growth to T2 (1,000 companies, 500,000 Interviewee accounts, 10,000,000 applications) and T3 (10,000 companies, 2,000,000 Interviewee accounts, 100,000,000 applications) by adding capacity, not by changing identifiers or dropping tenant isolation. | Shall | Draft | cross-cutting | TBD |
-| NFR-CAP-003 | The system *SHALL* store at least 2,000 applications on one posting at T1, 10,000 at T2, and 25,000 at T3, including each retained resume copy. This is a storage ceiling. It is not the application cap in `FR-JOB-005`. That cap is a number the Hiring Manager chooses, and it may be any integer of at least 1, including a number below this ceiling. | Shall | Draft | FR-JOB-005, REMOVED-FR-015 | TBD |
-| NFR-CAP-004 | The system *SHALL* keep a pipeline of at least 50 stages and 100 links per posting at T1, and *SHALL* render and validate it (`FR-INVW-005`, `FR-INVW-006`) without timing out the request. | Shall | Draft | FR-INVW-001, FR-INVW-005 | TBD |
-| NFR-CAP-005 | Object storage *SHALL* hold retained resume copies and video responses for the retention window in `NFR-PRIV-005`. T1 planning size is 5 TB. Video objects older than 30 days *SHALL* move to a cheaper storage tier, and objects past retention *SHALL* be deleted by the same job as `NFR-PRIV-005`. | Shall | Draft | REMOVED-FR-015, FR-INVW-008 | TBD |
-| NFR-CAP-006 | At T1 the system *SHALL* sustain 500 concurrent signed-in users and a burst of 10 application submissions per second for 15 minutes, with no lost submission and with the latency in `NFR-PERF-004`. | Shall | Draft | REMOVED-FR-013 | TBD |
-| NFR-CAP-007 | The notification sender *SHALL* absorb T1 volume of 100,000 emails per month, and *SHALL* queue rather than drop when the provider is slow, so that the 10-minute delivery rules (`REMOVED-FR-018`, `REMOVED-FR-025`, `FR-INVW-027`) still have a recorded attempt. | Shall | Draft | REMOVED-FR-018, REMOVED-FR-025 | TBD |
-| NFR-CAP-008 | Hot logs and traces *SHALL* be kept 14 days at T1. A cost cap *SHALL* stop ingest, rather than the product, if a day exceeds 2 GB. Searchable archive beyond 14 days is not required at T1. | Shall | Draft | NFR-SEC-009 | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-CAP-001 | At T1, the system *SHALL* store data for at least 50 companies without manual sharding. | TBD |
+| NFR-CAP-002 | The data model and tenant key *SHALL* allow growth to T2 (1,000 companies, 500,000 Candidate accounts, 10,000,000 applications) and T3 (10,000 companies, 2,000,000 Candidate accounts, 100,000,000 applications) by adding capacity, without changing identifiers or dropping tenant isolation. | TBD |
+| NFR-CAP-003 | The system *SHALL* store at least 2,000 applications on one posting at T1, 10,000 at T2, and 25,000 at T3, including each retained resume copy. This is a storage ceiling, not the Hiring Manager's application cap configured by JOB. | TBD |
+| NFR-CAP-004 | The system *SHALL* support a pipeline of at least 50 stages and 100 links per posting at T1. | TBD |
+| NFR-CAP-005 | At T1, object storage *SHALL* hold retained resume copies and video responses for the retention window in `NFR-PRIV-024`; the planning size is 5 TB. | TBD |
+| NFR-CAP-006 | At T1, the system *SHALL* sustain 500 concurrent signed-in users. | TBD |
+| NFR-CAP-007 | The notification sender *SHALL* support a T1 volume of 100,000 emails per month. | TBD |
+| NFR-CAP-008 | At T1, hot logs and traces *SHALL* be retained for 14 days. | TBD |
+| NFR-CAP-009 | At T1, the system *SHALL* store at least 250 Hiring Manager and Interviewer accounts. | TBD |
+| NFR-CAP-010 | At T1, the system *SHALL* store at least 25,000 Candidate accounts. | TBD |
+| NFR-CAP-011 | At T1, the system *SHALL* store at least 500 active postings. | TBD |
+| NFR-CAP-012 | At T1, the system *SHALL* store at least 250,000 applications. | TBD |
+| NFR-CAP-013 | At T1, the relational database *SHALL* store the required data within 50 GB. | TBD |
+| NFR-CAP-014 | At T1, the system *SHALL* render and validate a pipeline at the capacity in `NFR-CAP-004` without timing out the request (FR-INVW-005, FR-INVW-006). | TBD |
+| NFR-CAP-015 | At T1, video objects older than 30 days *SHALL* move to a lower-cost storage tier. | TBD |
+| NFR-CAP-016 | Objects past the retention period in `NFR-PRIV-024` *SHALL* be deleted by a scheduled job. | TBD |
+| NFR-CAP-017 | At T1, the system *SHALL* sustain a burst of 10 application submissions per second for 15 minutes. | TBD |
+| NFR-CAP-018 | The system *SHALL NOT* lose an application submission during the T1 burst in `NFR-CAP-017`. | TBD |
+| NFR-CAP-019 | The notification sender *SHALL* queue messages rather than drop them when the provider is slow, so bounded INVW notifications still receive a recorded delivery attempt. | TBD |
+| NFR-CAP-020 | At T1, a log-ingest cost cap *SHALL* stop additional log ingestion, rather than stop the product, if a day's ingest exceeds 2 GB. | TBD |
 
-**Drives:** tenant-keyed tables, object-storage lifecycle rules, submission queue, email queue, log sampling or a hard ingest cap.
+**Drives:** tenant-keyed tables, object-storage lifecycle rules, submission and email queues, and a log-ingest cap.
 
 ### 4. Compatibility Requirements
 
@@ -147,15 +206,28 @@ Browser support: current and previous major version, matching common SaaS practi
 - How long do we keep an old API version alive for a mobile client we already shipped?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-COMP-001 | The apply flow, sign-in, and the Hiring Manager posting form *SHALL* work on the current and previous major versions of Chrome, Edge, Firefox, and Safari, and on Chrome for Android and Safari for iOS. Internet Explorer *SHALL* not be supported. A browser matrix *SHALL* be re-run before each milestone. | Shall | Draft | REMOVED-FR-013 | TBD |
-| NFR-COMP-002 | Those flows *SHALL* be usable from a viewport width of 360 px to 1920 px. The apply flow *SHALL* not require hover or a horizontal scroll at 360 px. | Shall | Draft | REMOVED-FR-013, REMOVED-FR-115 | TBD |
-| NFR-COMP-003 | The apply flow *SHALL* become usable (form visible and submittable) within 8 seconds on a throttled profile of 1.5 Mbps down, 750 Kbps up, and 300 ms round trip. Features that need a fast link (live video, large uploads) *SHALL* fail with a named reason, not a blank page. | Shall | Draft | REMOVED-FR-013 | TBD |
-| NFR-COMP-004 | The UI *SHALL* ship Arabic (`ar-EG`, right to left) and English (`en`). Dates, times, and numbers *SHALL* follow the viewer's locale. Stored timestamps *SHALL* be UTC. Display *SHALL* use the viewer's time zone, defaulting to `Africa/Cairo` (`FR-INVW-029`). | Shall | Draft | FR-INVW-029 | TBD |
-| NFR-COMP-005 | The HTTP API *SHALL* be JSON under a version prefix (`/v1`). A breaking change *SHALL* increment the version. The previous version *SHALL* keep working for at least 6 months after the new version is announced. | Shall | Draft | cross-cutting | TBD |
-| NFR-COMP-006 | Failure of the meeting provider or the email provider *SHALL* not block application submission, screening, or a Hiring Manager decision. The system *SHALL* retry as specified in the INVW error-handling rules and *SHALL* show the in-product notification even when email fails. | Shall | Draft | FR-INVW-026, FR-INVW-027 | TBD |
-| NFR-COMP-007 | The system *SHALL* accept a resume upload as PDF or DOCX up to 10 MB, and *SHALL* reject other types with a message that names the allowed types. | Should | Draft | TBD (CAND) | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-COMP-001 | The apply flow, sign-in, and Hiring Manager posting form *SHALL* work on the current and previous major versions of Chrome, Edge, Firefox, and Safari, plus Chrome for Android and Safari for iOS. | TBD |
+| NFR-COMP-002 | The apply flow, sign-in, and Hiring Manager posting form *SHALL* be usable at viewport widths from 360 px to 1920 px. | TBD |
+| NFR-COMP-003 | On a throttled profile of 1.5 Mbps down, 750 Kbps up, and 300 ms round-trip latency, the apply form *SHALL* be visible and submittable within 8 seconds. | TBD |
+| NFR-COMP-004 | The UI *SHALL* be available in Arabic (`ar-EG`, right to left) and English (`en`). | TBD |
+| NFR-COMP-005 | The HTTP API *SHALL* return JSON under a version prefix (`/v1`). | TBD |
+| NFR-COMP-006 | Failure of the meeting or email provider *SHALL NOT* block application submission, screening, or a Hiring Manager decision. | TBD |
+| NFR-COMP-007 | The system *SHOULD* accept resume uploads as PDF or DOCX files up to 10 MB. | TBD |
+| NFR-COMP-008 | Internet Explorer *SHALL NOT* be supported. | TBD |
+| NFR-COMP-009 | A browser compatibility matrix *SHALL* be rerun before each milestone. | TBD |
+| NFR-COMP-010 | The apply flow *SHALL NOT* require hover interactions at a viewport width of 360 px. | TBD |
+| NFR-COMP-011 | The apply flow *SHALL NOT* require horizontal scrolling at a viewport width of 360 px. | TBD |
+| NFR-COMP-012 | A feature that requires a faster network connection than the profile in `NFR-COMP-003` (such as live video or a large upload) *SHALL* show a named error instead of a blank page. | TBD |
+| NFR-COMP-013 | Dates, times, and numbers *SHALL* follow the viewer's locale. | TBD |
+| NFR-COMP-014 | The system *SHALL* store timestamps in UTC. | TBD |
+| NFR-COMP-015 | The UI *SHALL* display timestamps in the viewer's time zone, defaulting to `Africa/Cairo` (FR-INVW-029). | TBD |
+| NFR-COMP-016 | A breaking HTTP API change *SHALL* increment the API version. | TBD |
+| NFR-COMP-017 | The previous HTTP API version *SHALL* remain available for at least 6 months after a new version is announced. | TBD |
+| NFR-COMP-018 | The system *SHALL* retry meeting-provider and email-provider failures according to the INVW error-handling rules. | TBD |
+| NFR-COMP-019 | The system *SHALL* show in-product notifications even when email delivery fails. | TBD |
+| NFR-COMP-020 | The system *SHALL* reject resume uploads in unsupported formats and show a message naming the allowed formats. | TBD |
 
 **Drives:** browser test matrix in CI, locale middleware, `/v1` router, provider interfaces with a timeout and a fallback.
 
@@ -177,19 +249,37 @@ Availability is monthly, measured by an external check, excluding a maintenance 
 - Which dependency may fail without taking submissions down?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-REL-001 | At T1 the apply path and the sign-in path *SHALL* be available 99.0% of each calendar month (at most about 7.3 hours unavailable), measured by an external HTTPS check every 60 seconds from outside the hosting account. A failed check is three consecutive failures. | Shall | Draft | REMOVED-FR-013 | TBD |
-| NFR-REL-002 | At T2 those paths *SHALL* be available 99.5% of each calendar month. At T3 they *SHALL* be available 99.9%. The measurement method *SHALL* stay the one in `NFR-REL-001`. | Should | Draft | REMOVED-FR-013 | TBD |
-| NFR-REL-003 | At T1 the system *SHALL* recover the apply and sign-in paths within 24 hours of a confirmed outage (RTO 24 h) and *SHALL* lose at most 24 hours of data (RPO 24 h), using an automated daily backup of the database and of object storage. | Shall | Draft | REMOVED-FR-015 | TBD |
-| NFR-REL-004 | At T2 the system *SHALL* meet RPO 1 hour and RTO 4 hours, using a standby database in a second availability zone and continuous backup. At T3 the system *SHALL* meet RPO 5 minutes and RTO 1 hour. | Should | Draft | cross-cutting | TBD |
-| NFR-REL-005 | A restore from backup *SHALL* be executed and timed at least once per academic term at T1, once every 6 months at T2, and once per quarter at T3. The run *SHALL* record the time to a working sign-in and one readable application. A backup that has not been restored does not satisfy `NFR-REL-003`. | Shall | Draft | NFR-REL-003 | TBD |
-| NFR-REL-006 | Every production container *SHALL* expose a health check. The platform *SHALL* restart a container that fails 3 consecutive checks. A deploy *SHALL* not send traffic to a container that is not healthy. | Shall | Draft | cross-cutting | TBD |
-| NFR-REL-007 | The system *SHALL* acknowledge an application submission only after the application row and the retained resume copy are committed. A retry of the same submission *SHALL* not create a second application (`REMOVED-FR-016`). A client retry after a timeout *SHALL* be safe. | Shall | Draft | REMOVED-FR-013, REMOVED-FR-015, REMOVED-FR-016 | TBD |
-| NFR-REL-008 | Module answers *SHALL* be saved at least every 30 seconds and on a connectivity drop. After a reconnect, the Interviewee *SHALL* resume with the last saved answers. An expired time limit *SHALL* still submit saved answers (`FR-INVW-012`) even if the browser has closed. | Shall | Draft | FR-INVW-011, FR-INVW-012 | TBD |
-| NFR-REL-009 | If the screening queue is older than 60 seconds, the system *SHALL* keep accepting submissions, *SHALL* not drop queued work, and *SHALL* show the Hiring Manager a delayed-screening state. The 60-second rule in `REMOVED-FR-020` *SHALL* hold for 95% of submissions at T1 load (`NFR-CAP-006`); the rest *SHALL* complete, late, and be counted. | Shall | Draft | REMOVED-FR-020 | TBD |
-| NFR-REL-010 | Planned maintenance *SHALL* fall in Friday 22:00–Saturday 06:00 `Africa/Cairo`, *SHALL* be announced in the product at least 72 hours ahead, and *SHALL* not be scheduled across a posting deadline that is already stored. | Shall | Draft | FR-JOB-003 | TBD |
-| NFR-REL-011 | At T1 a Sev-1 incident (apply or sign-in down) *SHALL* be acknowledged within 4 business hours. At T2, within 30 minutes during Sunday–Thursday 09:00–18:00 `Africa/Cairo`. An incident note *SHALL* record start, detection, mitigation, and data loss. | Shall | Draft | NFR-REL-001 | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-REL-001 | At T1, the apply and sign-in paths *SHALL* be available 99.0% of each calendar month, measured by an external HTTPS check every 60 seconds from outside the hosting account. Three consecutive failed checks count as an outage. | TBD |
+| NFR-REL-002 | At T2, the apply and sign-in paths *SHOULD* be available 99.5% of each calendar month; at T3 they *SHOULD* be available 99.9%, measured as in `NFR-REL-001`. | TBD |
+| NFR-REL-003 | At T1, the system *SHALL* recover the apply and sign-in paths within 24 hours of a confirmed outage (RTO 24 h). | TBD |
+| NFR-REL-004 | At T2, the system *SHOULD* meet an RPO of 1 hour. | TBD |
+| NFR-REL-005 | A restore from backup *SHALL* be executed and timed at least once per academic term at T1, once every 6 months at T2, and once per quarter at T3. The run *SHALL* record the time to a working sign-in and one readable application. | TBD |
+| NFR-REL-006 | Every production container *SHALL* expose a health check. | TBD |
+| NFR-REL-007 | The system *SHALL* acknowledge an application submission only after the application row and retained resume copy are committed. | TBD |
+| NFR-REL-008 | Module answers *SHALL* be saved at least every 30 seconds and when connectivity drops. | TBD |
+| NFR-REL-009 | If the screening queue is older than 60 seconds, the system *SHALL* continue accepting submissions and *SHALL NOT* drop queued work. | TBD |
+| NFR-REL-010 | Planned maintenance *SHALL* occur Friday 22:00–Saturday 06:00 `Africa/Cairo`. | TBD |
+| NFR-REL-011 | At T1, a Sev-1 incident that takes down the apply or sign-in path *SHALL* be acknowledged within 4 business hours. | TBD |
+| NFR-REL-012 | At T1, the system *SHALL* have an RPO of no more than 24 hours. | TBD |
+| NFR-REL-013 | At T1, the system *SHALL* make automated daily backups of the database and object storage. | TBD |
+| NFR-REL-014 | At T2, the system *SHOULD* recover the apply and sign-in paths within 4 hours (RTO 4 h). | TBD |
+| NFR-REL-015 | At T2, the system *SHOULD* use a standby database in a second availability zone and continuous backup. | TBD |
+| NFR-REL-016 | At T3, the system *SHOULD* have an RPO of no more than 5 minutes. | TBD |
+| NFR-REL-017 | At T3, the system *SHOULD* recover the apply and sign-in paths within 1 hour (RTO 1 h). | TBD |
+| NFR-REL-018 | The platform *SHALL* restart a production container after it fails 3 consecutive health checks. | TBD |
+| NFR-REL-019 | A deployment *SHALL NOT* send traffic to a container that has not passed its health check. | TBD |
+| NFR-REL-020 | A retry of the same application submission *SHALL NOT* create a second application. | TBD |
+| NFR-REL-021 | A client retry after an application-submission timeout *SHALL* be safe. | TBD |
+| NFR-REL-022 | After reconnecting, a Candidate *SHALL* be able to resume an assessment with the last saved answers. | TBD |
+| NFR-REL-023 | When an assessment time limit expires, the system *SHALL* submit saved answers even if the browser has closed (FR-INVW-012). | TBD |
+| NFR-REL-024 | If the screening queue is older than 60 seconds, the system *SHALL* show the Hiring Manager a delayed-screening state. | TBD |
+| NFR-REL-025 | The system *SHALL* record the completion time for every screening job, including jobs completed after the target in `NFR-PERF-005` or `NFR-PERF-011`. | TBD |
+| NFR-REL-026 | Planned maintenance *SHALL* be announced in the product at least 72 hours in advance. | TBD |
+| NFR-REL-027 | Planned maintenance *SHALL NOT* overlap a stored posting deadline. | TBD |
+| NFR-REL-028 | At T2, a Sev-1 incident that takes down the apply or sign-in path *SHALL* be acknowledged within 30 minutes during Sunday–Thursday, 09:00–18:00 `Africa/Cairo`. | TBD |
+| NFR-REL-029 | An incident note *SHALL* record the incident start, detection time, mitigation, and any data loss. | TBD |
 
 **Drives:** external uptime check, daily backup job, health checks on the container platform, idempotency key on submit, answer autosave, screening queue.
 
@@ -211,19 +301,32 @@ Go and TypeScript community defaults (`gofmt`, `golangci-lint`, ESLint, Prettier
 - Can we diagnose a failed submission from logs alone?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-MAINT-001 | A new developer *SHALL* be able to run the backend, frontend, and database with one documented command (`docker compose`) and sign in to a seeded local account within 30 minutes of a clean clone, on an 8 GB RAM laptop, with no cloud account. | Shall | Draft | cross-cutting | TBD |
-| NFR-MAINT-002 | CI *SHALL* run format, lint, typecheck, and tests on every pull request. A pull request with a failing check *SHALL* not be merged. The CI run *SHALL* finish within 15 minutes on the student runner quota. | Shall | Draft | cross-cutting | TBD |
-| NFR-MAINT-003 | Automated tests *SHALL* cover at least 70% of statements in backend packages overall, and at least 85% in the packages that implement screening, scoring, anonymity, and offer state. Coverage *SHALL* be reported in CI. A drop below the threshold *SHALL* fail the pull request. | Shall | Draft | REMOVED-FR-020, FR-INVW-016, FR-INVW-071 | TBD |
-| NFR-MAINT-004 | Schema changes *SHALL* be versioned migration files, applied by the deploy, and reversible by one down migration for one release. A production change *SHALL* not depend on a person running SQL by hand. | Shall | Draft | cross-cutting | TBD |
-| NFR-MAINT-005 | Every HTTP request *SHALL* carry a trace identifier, returned in the response header and written on every log line for that request. Logs *SHALL* be structured JSON. Given a submission id, an operator *SHALL* be able to find the request, the decision, and any provider error without reading source code. | Shall | Draft | REMOVED-FR-018, NFR-SEC-009 | TBD |
-| NFR-MAINT-006 | The HTTP API *SHALL* have an OpenAPI description checked into the repo. A pull request that changes a request or response shape *SHALL* update that description in the same pull request. | Shall | Draft | NFR-COMP-005 | TBD |
-| NFR-MAINT-007 | A significant design choice (datastore, queue, auth mechanism, hosting) *SHALL* have a short architecture decision record in the repo before the code that depends on it is merged. The record *SHALL* name the options considered and why the chosen one fits a student budget. | Shall | Draft | cross-cutting | TBD |
-| NFR-MAINT-008 | Production config *SHALL* come from environment variables, not from values compiled into an image. The same image *SHALL* run in local, CI, staging, and production. | Shall | Draft | cross-cutting | TBD |
-| NFR-MAINT-009 | ANA code *SHALL* not write AUTH, CAND, JOB, or INVW tables. A review check or an import rule *SHALL* fail if an analytics package imports a write repository of another epic. | Shall | Draft | TBD (ANA) | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-MAINT-001 | A new developer *SHALL* be able to run the backend, frontend, and database with one documented command (`docker compose`) and sign in to a seeded local account within 30 minutes of a clean clone, on an 8 GB RAM laptop without a cloud account. | TBD |
+| NFR-MAINT-002 | CI *SHALL* run formatting, lint, type checks, and tests on every pull request. | TBD |
+| NFR-MAINT-003 | Automated tests *SHALL* cover at least 70% of statements in backend packages overall. | TBD |
+| NFR-MAINT-004 | Schema changes *SHALL* be stored as versioned migration files. | TBD |
+| NFR-MAINT-005 | Every HTTP request *SHALL* carry a trace identifier that is returned in the response header and written on every log line for that request. | TBD |
+| NFR-MAINT-006 | The HTTP API *SHALL* have an OpenAPI description checked into the repository. | TBD |
+| NFR-MAINT-007 | A significant design choice (datastore, queue, authentication mechanism, or hosting) *SHALL* have an architecture decision record in the repository before dependent code is merged. | TBD |
+| NFR-MAINT-008 | Production configuration *SHALL* come from environment variables rather than values compiled into a container image. | TBD |
+| NFR-MAINT-009 | ANA code *SHALL NOT* write AUTH, CAND, JOB, or INVW tables. | TBD |
+| NFR-MAINT-010 | A pull request with a failing CI check *SHALL NOT* be merged. | TBD |
+| NFR-MAINT-011 | A CI run *SHALL* finish within 15 minutes on the student runner quota. | TBD |
+| NFR-MAINT-012 | Automated tests *SHALL* cover at least 85% of statements in backend packages that implement scoring, anonymity, and offer state. | TBD |
+| NFR-MAINT-013 | CI *SHALL* report backend test coverage and fail a pull request if either coverage threshold in `NFR-MAINT-003` or `NFR-MAINT-012` is missed. | TBD |
+| NFR-MAINT-014 | The deployment process *SHALL* apply versioned schema migrations. | TBD |
+| NFR-MAINT-015 | Each schema migration *SHALL* be reversible by one down migration for one release. | TBD |
+| NFR-MAINT-016 | A production schema change *SHALL NOT* depend on a person running SQL by hand. | TBD |
+| NFR-MAINT-017 | Logs *SHALL* be structured JSON. | TBD |
+| NFR-MAINT-018 | Given a submission ID, an operator *SHALL* be able to find its request, decision, and provider errors without reading source code. | TBD |
+| NFR-MAINT-019 | A pull request that changes an HTTP request or response shape *SHALL* update the OpenAPI description in the same pull request. | TBD |
+| NFR-MAINT-020 | An architecture decision record *SHALL* name the options considered and explain why the selected choice fits the student budget. | TBD |
+| NFR-MAINT-021 | The same container image *SHALL* run in local, CI, staging, and production environments. | TBD |
+| NFR-MAINT-022 | A review check or import rule *SHALL* fail if an analytics package imports another epic's write repository. | TBD |
 
-**Drives:** `docker-compose` dev stack, CI workflow, coverage gate, migration tool, OpenTelemetry middleware, OpenAPI file, ADR folder.
+**Drives:** `docker-compose` dev stack, CI workflow, coverage gate, migration tool, OpenTelemetry middleware, OpenAPI file, and ADR folder.
 
 ### 7. Portability Requirements
 
@@ -242,16 +345,26 @@ OCI container images. Twelve-factor app. Terraform (or an equivalent that target
 - How hard is it to swap the LLM vendor if the first one is too expensive or refuses the privacy term?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-PORT-001 | The backend and the frontend *SHALL* ship as OCI images that run unmodified on the local Docker engine, in CI, and on the chosen cloud container service. Images *SHALL* not depend on a host path or a host-installed toolchain. | Shall | Draft | cross-cutting | TBD |
-| NFR-PORT-002 | Cloud resources *SHALL* be described as code that can target AWS or Azure. A resource created only in a cloud console, with no code equivalent, *SHALL* not be required for production. | Shall | Draft | cross-cutting | TBD |
-| NFR-PORT-003 | Object storage, email, the meeting provider, and the LLM *SHALL* sit behind an interface in the Go module. Switching provider *SHALL* be a configuration change plus an adapter, not a change to screening, pipeline, or offer code. | Shall | Draft | FR-INVW-026, FR-INVW-018 | TBD |
-| NFR-PORT-004 | A full logical export of one tenant (company, postings, applications, decisions, files) *SHALL* be producible as SQL or JSON plus object files, within 7 days of a request, so a company can leave. The export *SHALL* not include another tenant's rows. | Shall | Draft | NFR-PRIV-003 | TBD |
-| NFR-PORT-005 | Images *SHALL* be built for `linux/amd64` and `linux/arm64`, so they run on student ARM laptops and on cheaper ARM cloud instances. | Should | Draft | cross-cutting | TBD |
-| NFR-PORT-006 | Replacing the LLM vendor *SHALL* not require a schema change. Prompts and model names *SHALL* live in configuration. A second adapter *SHALL* be demonstrable in one sprint if the privacy term in `NFR-PRIV-010` fails. | Should | Draft | FR-INVW-018, FR-INVW-078 | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-PORT-001 | The backend and frontend *SHALL* ship as OCI container images. | TBD |
+| NFR-PORT-002 | Cloud resources *SHALL* be described as code that can target AWS or Azure. | TBD |
+| NFR-PORT-003 | Object storage *SHALL* be accessed through an interface in the Go module. | TBD |
+| NFR-PORT-004 | A full logical export of one tenant (company, postings, applications, decisions, and files) *SHALL* be producible as SQL or JSON plus object files within 7 days of a request. | TBD |
+| NFR-PORT-005 | Container images *SHOULD* be built for `linux/amd64` and `linux/arm64`. | TBD |
+| NFR-PORT-006 | Replacing the LLM vendor *SHOULD NOT* require a schema change. | TBD |
+| NFR-PORT-007 | OCI images *SHALL* run unmodified on the local Docker engine, in CI, and on the chosen cloud container service. | TBD |
+| NFR-PORT-008 | OCI images *SHALL NOT* depend on a host path or a host-installed toolchain. | TBD |
+| NFR-PORT-009 | A production cloud resource *SHALL NOT* require manual creation in a cloud console without an equivalent infrastructure-as-code definition. | TBD |
+| NFR-PORT-010 | Email delivery *SHALL* be accessed through an interface in the Go module. | TBD |
+| NFR-PORT-011 | The meeting provider *SHALL* be accessed through an interface in the Go module. | TBD |
+| NFR-PORT-012 | The LLM provider *SHALL* be accessed through an interface in the Go module. | TBD |
+| NFR-PORT-013 | Replacing an external provider *SHALL* require only a configuration change and an adapter, without changes to application, pipeline, or offer logic. | TBD |
+| NFR-PORT-014 | A tenant export *SHALL NOT* contain rows or files belonging to another tenant. | TBD |
+| NFR-PORT-015 | LLM prompts and model names *SHALL* be stored in configuration. | TBD |
+| NFR-PORT-016 | A second LLM adapter *SHOULD* be demonstrable in one sprint if a vendor fails the privacy requirement in `NFR-PRIV-026`. | TBD |
 
-**Drives:** Dockerfiles, Terraform modules with an AWS and an Azure target, provider interfaces, tenant export job, multi-arch CI build.
+**Drives:** Dockerfiles, Terraform modules with AWS and Azure targets, provider interfaces, tenant export job, and multi-architecture CI build.
 
 ### 8. Scalability Requirements
 
@@ -270,15 +383,30 @@ Stateless app tier. Horizontal scaling. Queue for work that has a deadline measu
 - What is the monthly cost ceiling at T1, and what do we turn off first if we hit it?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-SCAL-001 | The app tier *SHALL* be stateless. Session state *SHALL* not live in process memory. Adding a second instance *SHALL* not require a code change and *SHALL* not break sign-in or submission. | Shall | Draft | cross-cutting | TBD |
-| NFR-SCAL-002 | Screening, email, and AI feedback generation *SHALL* run on workers fed by a queue. The web process *SHALL* not perform those jobs inline. Worker count *SHALL* be raisable without redeploying the web process. | Shall | Draft | REMOVED-FR-020, FR-INVW-076 | TBD |
-| NFR-SCAL-003 | The system *SHALL* absorb 10 times the trailing-hour submission rate for 60 minutes by queueing, without dropping a committed submission and without taking sign-in down. Excess *SHALL* wait in the queue, not fail the HTTP call that already committed. | Shall | Draft | FR-JOB-005, NFR-CAP-006 | TBD |
-| NFR-SCAL-004 | Analytics and dashboard reads *SHALL* be able to use a read replica or a read model. An analytics query *SHALL* not take a write lock on the application submission path. | Should | Draft | FR-INVW-061, TBD (ANA) | TBD |
-| NFR-SCAL-005 | At T1, monthly cloud spend for production *SHALL* stay within US$150, or within the student-credit balance if that is lower, unless an ADR records the overrun and what was turned off or resized. Video lifecycle (`NFR-CAP-005`) and log ingest cap (`NFR-CAP-008`) are the first levers. | Shall | Draft | NFR-CAP-005, NFR-CAP-008 | TBD |
-| NFR-SCAL-006 | Before each milestone that claims a capacity target, a load test at that target's concurrency *SHALL* be run and its result stored in the repo. A missed latency target *SHALL* be either fixed or written down as a known gap with an owner. | Shall | Draft | NFR-CAP-006, NFR-PERF-001 | TBD |
-| NFR-SCAL-007 | At T2 the web tier *SHALL* add an instance within 3 minutes of CPU above 70% for 5 minutes, and *SHALL* scale in when CPU stays below 30% for 15 minutes. Scale-in *SHALL* not drop an in-flight request. | Should | Draft | NFR-SCAL-001 | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-SCAL-001 | The application tier *SHALL* be stateless. | TBD |
+| NFR-SCAL-002 | Screening work *SHALL* run on workers fed by a queue. | TBD |
+| NFR-SCAL-003 | The system *SHALL* absorb 10 times the trailing-hour submission rate for 60 minutes. | TBD |
+| NFR-SCAL-004 | Analytics and dashboard reads *SHOULD* be able to use a read replica or a read model. | TBD |
+| NFR-SCAL-005 | At T1, monthly cloud spend for production *SHALL* stay within US$150 or within the student-credit balance if that is lower. | TBD |
+| NFR-SCAL-006 | Before each milestone that claims a capacity target, a load test at that target's concurrency *SHALL* be run and its result stored in the repository. | TBD |
+| NFR-SCAL-007 | At T2, the web tier *SHOULD* add an instance within 3 minutes after CPU usage exceeds 70% for 5 minutes. | TBD |
+| NFR-SCAL-008 | Session state *SHALL NOT* live in application-process memory. | TBD |
+| NFR-SCAL-009 | Adding a second application instance *SHALL NOT* require a code change or break sign-in or submission. | TBD |
+| NFR-SCAL-010 | Email delivery *SHALL* run on workers fed by a queue. | TBD |
+| NFR-SCAL-011 | AI feedback generation *SHALL* run on workers fed by a queue. | TBD |
+| NFR-SCAL-012 | The web process *SHALL NOT* perform screening, email delivery, or AI feedback generation inline. | TBD |
+| NFR-SCAL-013 | Worker count *SHALL* be raisable without redeploying the web process. | TBD |
+| NFR-SCAL-014 | The system *SHALL NOT* drop a committed application submission during the load in `NFR-SCAL-003`. | TBD |
+| NFR-SCAL-015 | Sign-in *SHALL* remain available during the load in `NFR-SCAL-003`. | TBD |
+| NFR-SCAL-016 | Excess application submissions *SHALL* wait in a queue rather than fail an HTTP request that has already committed the submission. | TBD |
+| NFR-SCAL-017 | An analytics query *SHALL NOT* take a write lock on the application-submission path. | TBD |
+| NFR-SCAL-018 | If the T1 production cloud-spend limit in `NFR-SCAL-005` is exceeded, an ADR *SHALL* record the overrun and the resources turned off or resized. | TBD |
+| NFR-SCAL-019 | Video lifecycle management (`NFR-CAP-015`) and log-ingest limits (`NFR-CAP-020`) *SHALL* be the first cost-reduction levers. | TBD |
+| NFR-SCAL-020 | A missed latency target *SHALL* be fixed or documented as a known gap with an owner. | TBD |
+| NFR-SCAL-021 | At T2, the web tier *SHOULD* scale in when CPU usage stays below 30% for 15 minutes. | TBD |
+| NFR-SCAL-022 | Scale-in *SHALL NOT* drop an in-flight request. | TBD |
 
 **Drives:** JWT or shared session store, queue and worker process, read replica for ANA, budget alarm, load-test script in CI or a documented manual run.
 
@@ -286,7 +414,7 @@ Stateless app tier. Horizontal scaling. Queue for work that has a deadline measu
 
 #### Objective
 
-Let a first-time Interviewee apply, and a first-time Hiring Manager post and build a short pipeline, without training and on a phone.
+Let a first-time Candidate apply, and a first-time Hiring Manager post and build a short pipeline, without training and on a phone.
 
 #### Standards/Refs
 
@@ -296,22 +424,29 @@ ISO 9241-11 (effectiveness, efficiency, satisfaction). System Usability Scale (S
 
 - How long does a first application take when the resume is already on the platform?
 - Can the Hiring Manager undo a bad drag on the pipeline canvas?
-- Are status words the same in email, dashboard, and the Interviewee view?
+- Are status words the same in email, dashboard, and the Candidate view?
 - What does the empty state tell a new company to do next?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-USAB-001 | A first-time Interviewee with a complete profile *SHALL* be able to submit an application in 5 minutes or less in a moderated test of at least 5 people. At least 4 of the 5 *SHALL* finish without help from the facilitator. | Shall | Draft | REMOVED-FR-013 | TBD |
-| NFR-USAB-002 | A first-time Hiring Manager *SHALL* be able to create a posting with title, description, deadline, and one Must-have criterion in 10 minutes or less, in a moderated test of at least 5 people. | Shall | Draft | FR-JOB-001, FR-JOB-003, FR-JOB-007 | TBD |
-| NFR-USAB-003 | A Hiring Manager *SHALL* be able to build a 5-stage pipeline, connect it, and reach a publishable state in 10 minutes or less. The canvas *SHALL* support undo of at least 10 editing actions and *SHALL* offer a non-drag way to add and connect a stage. | Shall | Draft | FR-INVW-001, FR-INVW-039 | TBD |
-| NFR-USAB-004 | Every destructive action (reject, withdraw, override, publish a migration) *SHALL* ask for confirmation and *SHALL* name the consequence. Every error *SHALL* state what failed and the next action, in the same words as the INVW error-handling list. | Shall | Draft | REMOVED-FR-017, REMOVED-FR-019, FR-INVW-057 | TBD |
-| NFR-USAB-005 | Status labels shown to an Interviewee, a Hiring Manager, and in email *SHALL* be the glossary status values. A pull request that introduces a new status string *SHALL* fail review unless the glossary changes in the same pull request. | Shall | Draft | REMOVED-FR-013, REMOVED-FR-110 | TBD |
-| NFR-USAB-006 | Any user action *SHALL* show a visible acknowledgement within 100 ms. An operation that takes more than 1 second *SHALL* show progress or a busy state and *SHALL* not look frozen. | Shall | Draft | cross-cutting | TBD |
-| NFR-USAB-007 | A moderated SUS test, at least 5 Interviewees and 5 Hiring Managers, *SHALL* score at least 68 on each role before the milestone that declares the apply and posting flows done. | Should | Draft | NFR-USAB-001, NFR-USAB-002 | TBD |
-| NFR-USAB-008 | An empty company account *SHALL* show the next required action (verify company, create a posting, publish a pipeline) and *SHALL* not show an empty chart as the only content. | Should | Draft | REMOVED-FR-023 | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-USAB-001 | A first-time Candidate with a complete profile *SHALL* be able to submit an application in 5 minutes or less in a moderated usability test. | TBD |
+| NFR-USAB-002 | A first-time Hiring Manager *SHALL* be able to create a posting with a title, description, deadline, and one Must-have criterion in 10 minutes or less. | TBD |
+| NFR-USAB-003 | A Hiring Manager *SHALL* be able to build a 5-stage pipeline, connect it, and reach a publishable state in 10 minutes or less. | TBD |
+| NFR-USAB-004 | Each destructive action (reject, withdraw, override, or publish a migration) *SHALL* ask for confirmation and name its consequence. | TBD |
+| NFR-USAB-005 | Status labels shown to a Candidate, a Hiring Manager, and in email *SHALL* match the status values defined by INVW. | TBD |
+| NFR-USAB-006 | A user action *SHALL* show a visible acknowledgement within 100 ms. | TBD |
+| NFR-USAB-007 | A System Usability Scale (SUS) test with at least 5 Candidates and 5 Hiring Managers *SHOULD* score at least 68 for each role before the milestone that declares the apply and posting flows complete. | TBD |
+| NFR-USAB-008 | An empty Company account *SHOULD* show the next required action (verify Company, create a posting, or publish a pipeline) instead of only an empty chart. | TBD |
+| NFR-USAB-009 | Each error *SHALL* state what failed and the next action, using terminology consistent with the INVW error-handling rules. | TBD |
+| NFR-USAB-010 | A pull request that introduces an application status *SHALL* update the status definitions in INVW and the glossary in the same pull request. | TBD |
+| NFR-USAB-011 | An operation that takes more than 1 second *SHALL* show progress or a busy state. | TBD |
+| NFR-USAB-012 | An operation that takes more than 1 second *SHALL NOT* appear frozen. | TBD |
+| NFR-USAB-013 | At least 4 of 5 first-time Candidates in a moderated application test *SHALL* complete the test without facilitator assistance. | TBD |
+| NFR-USAB-014 | The pipeline canvas *SHALL* support undo for at least 10 editing actions. | TBD |
+| NFR-USAB-015 | The pipeline canvas *SHALL* provide a non-drag method to add and connect a stage. | TBD |
 
-**Drives:** usability test script before the milestone, canvas undo stack, shared status enum with the glossary, empty-state components.
+**Drives:** usability test script before the milestone, canvas undo stack, shared status enum with the glossary, and empty-state components.
 
 ### 10. Accessibility Requirements
 
@@ -327,20 +462,29 @@ WCAG 2.2 Level AA. axe-core for the automated slice. Egypt Law No. 10 of 2018 on
 
 - Can every canvas action be done from the keyboard?
 - Is pass/reject/current stage visible without color?
-- Can an Interviewee extend a timed module, and are they warned before it ends?
+- Can a Candidate use a time-limited module with a keyboard and screen reader?
 - What do we run in CI, and what still needs a person with a screen reader?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-ACC-001 | The apply flow, sign-in, posting form, dashboard, and Interviewee application view *SHALL* conform to WCAG 2.2 Level AA. An axe-core (or equivalent) scan in CI *SHALL* report zero critical or serious violations on those routes. A manual pass with a keyboard and one screen reader (NVDA or VoiceOver) *SHALL* be recorded before each milestone. | Should | Draft | REMOVED-FR-013, REMOVED-FR-110 | TBD |
-| NFR-ACC-002 | Every action, including adding, connecting, and deleting a pipeline stage, *SHALL* be operable by keyboard alone. Focus *SHALL* be visible. There *SHALL* be no keyboard trap. Drag and drop *SHALL* have the non-drag alternative required by `NFR-USAB-003`. | Should | Draft | FR-INVW-001 | TBD |
-| NFR-ACC-003 | Text *SHALL* have a contrast ratio of at least 4.5:1, and large text and UI components at least 3:1. Pipeline state (passed, rejected, current, held) *SHALL* use an icon or text as well as color. | Should | Draft | FR-INVW-061, REMOVED-FR-112 | TBD |
-| NFR-ACC-004 | Pages *SHALL* remain usable at 200% text zoom and *SHALL* reflow at a 320 px width without a two-dimensional scroll for the apply flow. | Could | Draft | NFR-COMP-002 | TBD |
-| NFR-ACC-005 | A module time limit *SHALL* be extendable by the Interviewee at least once before it expires, unless the Hiring Manager has marked the module as non-extendable for integrity, in which case the Interviewee *SHALL* be told the limit before they start. The system *SHALL* warn at least 60 seconds before an in-session limit expires. | Could | Draft | FR-INVW-011, FR-INVW-015 | TBD |
-| NFR-ACC-006 | The UI *SHALL* honor `prefers-reduced-motion` and *SHALL* not play motion longer than 5 seconds without a pause control. | Could | Draft | cross-cutting | TBD |
-| NFR-ACC-007 | Interactive controls *SHALL* have an accessible name. Status changes that happen without a page load (stage advance, notification arrival, screening result) *SHALL* be announced to assistive technology. The page language *SHALL* be set, and *SHALL* switch with the locale, including `dir="rtl"` for Arabic. | Should | Draft | FR-INVW-079, NFR-COMP-004 | TBD |
-| NFR-ACC-008 | Touch and click targets on the apply flow *SHALL* be at least 24 by 24 CSS pixels. | Could | Draft | NFR-COMP-002 | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-ACC-001 | The apply flow, sign-in, posting form, dashboard, and Candidate application view *SHOULD* conform to WCAG 2.2 Level AA. | TBD |
+| NFR-ACC-002 | Every action, including adding, connecting, and deleting a pipeline stage, *SHOULD* be operable by keyboard alone. | TBD |
+| NFR-ACC-003 | Text *SHOULD* have a contrast ratio of at least 4.5:1; large text and UI components *SHOULD* have a contrast ratio of at least 3:1. | TBD |
+| NFR-ACC-004 | Pages *COULD* remain usable at 200% text zoom. | TBD |
+| NFR-ACC-006 | The UI *COULD* honor `prefers-reduced-motion`. | TBD |
+| NFR-ACC-007 | Interactive controls *SHOULD* have an accessible name. | TBD |
+| NFR-ACC-008 | Touch and click targets on the apply flow *COULD* be at least 24 by 24 CSS pixels. | TBD |
+| NFR-ACC-009 | An axe-core (or equivalent) scan in CI *SHOULD* report zero critical or serious accessibility violations on the routes in `NFR-ACC-001`. | TBD |
+| NFR-ACC-010 | A manual accessibility test using a keyboard and one screen reader (NVDA or VoiceOver) *SHOULD* be recorded before each milestone. | TBD |
+| NFR-ACC-011 | Focus *SHOULD* be visible for all keyboard-operable controls. | TBD |
+| NFR-ACC-012 | The user interface *SHOULD NOT* contain a keyboard trap. | TBD |
+| NFR-ACC-013 | The pipeline canvas *SHOULD* provide the non-drag alternative in `NFR-USAB-015`. | TBD |
+| NFR-ACC-014 | The apply flow *COULD* reflow at a 320 px width without requiring two-dimensional scrolling. | TBD |
+| NFR-ACC-015 | Motion that plays longer than 5 seconds *COULD* include a pause control. | TBD |
+| NFR-ACC-016 | Status changes that occur without a page load, including stage advances, offer responses, and notification arrivals, *SHOULD* be announced to assistive technology. | TBD |
+| NFR-ACC-017 | The page language *SHOULD* match the selected locale and include `dir="rtl"` for Arabic. | TBD |
+| NFR-ACC-018 | Pipeline state (passed, rejected, current, and held) *SHOULD* use an icon or text as well as color. | TBD |
 
 **Drives:** axe-core CI job, keyboard stage editor, status icon set, locale `lang` and `dir` on the document.
 
@@ -352,7 +496,7 @@ Keep the apply and hiring flows fast on a phone in Egypt, and keep the deadlines
 
 #### Standards/Refs
 
-Core Web Vitals (LCP, INP, CLS). Latency is server time plus network, at the percentile stated, at the load in `NFR-CAP-006` unless a row says otherwise. Functional deadlines already fixed: screening 60 seconds (`REMOVED-FR-020`), several notifications 10 minutes.
+Core Web Vitals (LCP, INP, CLS). Latency is server time plus network, at the percentile stated, at the load in `NFR-CAP-006` and `NFR-CAP-017` unless a row says otherwise. Functional deadlines already set in INVW include 10-minute notifications (for example, FR-INVW-027, FR-INVW-076, and FR-INVW-112).
 
 #### Key Questions
 
@@ -362,17 +506,21 @@ Core Web Vitals (LCP, INP, CLS). Latency is server time plus network, at the per
 - How do we stop a regression shipping?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-PERF-001 | On the apply page and the sign-in page, the 75th percentile of field loads *SHALL* meet LCP at most 2.5 s, INP at most 200 ms, and CLS at most 0.1, on desktop broadband. The same pages *SHALL* meet the 8-second usable-time rule in `NFR-COMP-003` on the slow profile. | Shall | Draft | REMOVED-FR-013 | TBD |
-| NFR-PERF-002 | Read APIs used by the posting form and the Interviewee application view *SHALL* respond in at most 300 ms for 95% of requests and at most 800 ms for 99%, at T1 concurrency, excluding the client's network. | Shall | Draft | REMOVED-FR-110, REMOVED-FR-115 | TBD |
-| NFR-PERF-003 | Job search *SHALL* return the first page of results within 2 seconds for 95% of requests at 500 concurrent users. | Shall | Draft | TBD (JOB) | TBD |
-| NFR-PERF-004 | Application submission *SHALL* return an acknowledgement within 1 second for 95% of requests at the burst in `NFR-CAP-006`, after the durable write in `NFR-REL-007`. | Shall | Draft | REMOVED-FR-013, REMOVED-FR-018 | TBD |
-| NFR-PERF-005 | Must-have screening *SHALL* finish within 30 seconds for 95% of submissions at T1 load, and within 60 seconds for 100% when the queue is not in the delayed state of `NFR-REL-009`. | Shall | Draft | REMOVED-FR-020 | TBD |
-| NFR-PERF-006 | Email and in-product notifications that the functional requirements bound by 10 minutes *SHALL* be attempted within 2 minutes for 95% of events at T1 volume, and within 10 minutes for 100%, provider outage excepted and then retried per the INVW error-handling rules. | Shall | Draft | REMOVED-FR-018, REMOVED-FR-025, FR-INVW-027 | TBD |
-| NFR-PERF-007 | The Hiring Manager dashboard *SHALL* show stage counts for a posting of 1,000 applications within 3 seconds for 95% of loads. The pipeline canvas *SHALL* render 50 stages within 2 seconds. | Shall | Draft | FR-INVW-061, NFR-CAP-004 | TBD |
-| NFR-PERF-008 | The gzipped JavaScript for the apply route *SHALL* be at most 200 KB. List endpoints *SHALL* be paginated, default page size at most 50, and *SHALL* not return an unbounded collection. | Shall | Draft | REMOVED-FR-026, FR-INVW-062 | TBD |
-| NFR-PERF-009 | A Lighthouse performance run on the apply route *SHALL* be stored each milestone. A drop of more than 5 points from the previous milestone *SHALL* be fixed or accepted in writing by the epic owner before release. | Should | Draft | NFR-PERF-001 | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-PERF-001 | On the apply page and sign-in page, the 75th percentile of field loads *SHALL* meet LCP of at most 2.5 s, INP of at most 200 ms, and CLS of at most 0.1 on desktop broadband. | TBD |
+| NFR-PERF-002 | Read APIs used by the posting form and Candidate application view *SHALL* respond within 300 ms for 95% of requests and within 800 ms for 99% of requests at T1 concurrency, excluding the client's network. | TBD |
+| NFR-PERF-003 | Job search *SHALL* return the first page of results within 2 seconds for 95% of requests at 500 concurrent users. | TBD |
+| NFR-PERF-004 | Application submission *SHALL* return an acknowledgement within 1 second for 95% of requests at the burst in `NFR-CAP-017`, after the durable write in `NFR-REL-007`. | TBD |
+| NFR-PERF-005 | Must-have screening *SHALL* finish within 30 seconds for 95% of submissions at T1 load. | TBD |
+| NFR-PERF-006 | Email and in-product notifications with a 10-minute functional deadline *SHALL* be attempted within 2 minutes for 95% of events at T1 volume. | TBD |
+| NFR-PERF-007 | The Hiring Manager dashboard *SHALL* show stage counts for a posting of 1,000 applications within 3 seconds for 95% of loads. | TBD |
+| NFR-PERF-008 | The gzipped JavaScript for the apply route *SHALL* be at most 200 KB. | TBD |
+| NFR-PERF-009 | A Lighthouse performance run on the apply route *SHOULD* be stored each milestone. A drop of more than 5 points from the previous milestone *SHOULD* be fixed or accepted in writing by the epic owner before release. | TBD |
+| NFR-PERF-011 | Must-have screening *SHALL* finish within 60 seconds for 100% of submissions when its queue is not delayed (NFR-REL-009). | TBD |
+| NFR-PERF-012 | Email and in-product notifications with a 10-minute functional deadline *SHALL* be attempted within 10 minutes for 100% of events, except during a provider outage; failed attempts *SHALL* be retried per the INVW error-handling rules. | TBD |
+| NFR-PERF-013 | The pipeline canvas *SHALL* render 50 stages within 2 seconds. | TBD |
+| NFR-PERF-014 | List endpoints *SHALL* be paginated with a default page size of at most 50 and *SHALL NOT* return an unbounded collection. | TBD |
 
 **Drives:** CDN or static hosting for Next.js assets, pagination on list queries, screening worker pool sized for T1, bundle-size check.
 
@@ -386,7 +534,7 @@ Pin the runtimes, the region, and the cost envelope so the team can build, deplo
 
 #### Standards/Refs
 
-Go and Node.js release lines current as of this draft. Container platform on AWS or Azure. Region chosen for latency from Cairo and for the residency rule in `NFR-PRIV-009`. Browser and network bar from section 4.
+Go and Node.js release lines current as of this draft. Container platform on AWS or Azure. Region chosen for latency from Cairo and for the residency rules in `NFR-PRIV-016` and `NFR-PRIV-017`. Browser and network bar from section 4.
 
 #### Key Questions
 
@@ -396,21 +544,26 @@ Go and Node.js release lines current as of this draft. Container platform on AWS
 - What must the client do when the network drops mid-module?
 
 #### Requirements
-| ID | Requirement | Priority | Status | Source story | Jira |
-|----|-------------|----------|--------|--------------|------|
-| NFR-ENV-001 | CI *SHALL* build the backend with a pinned Go 1.23 or later patch, and the frontend with a pinned Node.js 22 LTS. A version bump *SHALL* be a pull request that also updates the Dockerfiles and the CI image. Local development *SHALL* use the same major versions. | Shall | Draft | cross-cutting | TBD |
-| NFR-ENV-002 | Production *SHALL* run in one region chosen for Cairo users, on AWS or Azure container hosting. The region *SHALL* show a median HTTPS round trip from Cairo of at most 100 ms in a pre-deploy measurement. Candidates to measure: Azure UAE North, Azure Qatar Central, AWS `me-central-1`, AWS `me-south-1`. Personal data *SHALL* not be replicated to a second region at T1. | Shall | Draft | NFR-PRIV-009 | TBD |
-| NFR-ENV-003 | Production *SHALL* run only as containers. There *SHALL* be no manually configured virtual machine that the deploy does not recreate from code. Base images *SHALL* be pinned by digest in the Dockerfile. | Shall | Draft | NFR-PORT-001, NFR-PORT-002 | TBD |
-| NFR-ENV-004 | The repo *SHALL* define four environments with the same image: local, CI, staging, production. Staging *SHALL* use synthetic data only. Production personal data *SHALL* not be copied to local or CI. | Shall | Draft | NFR-MAINT-008, NFR-PRIV-011 | TBD |
-| NFR-ENV-005 | The client *SHALL* keep working through a dropped connection on the module-answer flow by the autosave rule in `NFR-REL-008`, and *SHALL* show an offline state within 5 seconds of a failed request rather than spinning with no message. | Shall | Draft | FR-INVW-012, NFR-REL-008 | TBD |
-| NFR-ENV-006 | T1 production *SHALL* be sized to the spend cap in `NFR-SCAL-005`. AI inference *SHALL* be an external API. No developer machine and no T1 server *SHALL* be required to host a GPU. | Shall | Draft | FR-INVW-018, NFR-SCAL-005 | TBD |
-| NFR-ENV-007 | All timestamps *SHALL* be stored in UTC. The default display zone *SHALL* be `Africa/Cairo`. A future change of Egypt's daylight-saving rule *SHALL* be picked up from the platform zone database, not from a hardcoded offset. | Shall | Draft | FR-INVW-029, NFR-COMP-004 | TBD |
+| ID | Requirement | Jira |
+|----|-------------|------|
+| NFR-ENV-001 | CI *SHALL* build the backend with a pinned Go 1.23 or later patch release. | TBD |
+| NFR-ENV-002 | Production *SHALL* run in one region selected for Cairo users, on AWS or Azure container hosting. | TBD |
+| NFR-ENV-003 | Production *SHALL* run only as containers. | TBD |
+| NFR-ENV-004 | The repository *SHALL* define local, CI, staging, and production environments that use the same container image. | TBD |
+| NFR-ENV-005 | The client *SHALL* preserve module answers through a dropped connection using the autosave rule in `NFR-REL-008`. | TBD |
+| NFR-ENV-006 | T1 production *SHALL* be sized to the spend cap in `NFR-SCAL-005`. | TBD |
+| NFR-ENV-008 | CI *SHALL* build the frontend with a pinned Node.js 22 LTS release. | TBD |
+| NFR-ENV-009 | A runtime version bump *SHALL* update the Dockerfiles and CI image in the same pull request. | TBD |
+| NFR-ENV-010 | Local development *SHALL* use the same major Go and Node.js versions as CI. | TBD |
+| NFR-ENV-011 | A pre-deployment measurement *SHALL* confirm the selected production region has a median HTTPS round trip from Cairo of at most 100 ms. | TBD |
+| NFR-ENV-012 | At T1, production personal data *SHALL NOT* be replicated to a second region. | TBD |
+| NFR-ENV-013 | Production *SHALL NOT* depend on a manually configured virtual machine that deployment does not recreate from code. | TBD |
+| NFR-ENV-014 | Base container images *SHALL* be pinned by digest in the Dockerfile. | TBD |
+| NFR-ENV-015 | Staging *SHALL* use synthetic data only. | TBD |
+| NFR-ENV-016 | Production personal data *SHALL NOT* be copied to local or CI environments. | TBD |
+| NFR-ENV-017 | The client *SHALL* show an offline state within 5 seconds of a failed request. | TBD |
+| NFR-ENV-018 | AI inference *SHALL* use an external API. | TBD |
+| NFR-ENV-019 | A developer machine or T1 server *SHALL NOT* be required to host a GPU. | TBD |
+| NFR-ENV-020 | A future change to Egypt's daylight-saving rule *SHALL* be picked up from the platform time-zone database rather than a hardcoded offset. | TBD |
 
-**Drives:** pinned Dockerfiles, one-region Terraform stack, staging project with seed data, offline banner, zone-database time formatting.
-
-### 13. Per-Epic NF Requirements 
-#### 13.1 AUTH
-#### 13.2 CAND
-#### 13.3 JOB
-#### 13.4 INVW
-#### 13.5 ANA
+**Drives:** pinned Dockerfiles, a one-region Terraform stack, a staging project with synthetic data, an offline banner, and zone-database time formatting.
