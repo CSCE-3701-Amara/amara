@@ -142,26 +142,17 @@ The Candidate Subsystem includes the following functional areas:
 | **FR-CAND-037** | The system **SHALL** display the candidate's verified skills. | UC-CAND-012 — View Dynamic Resume | TBD |
 | **FR-CAND-038** | The system **SHALL** display the candidate's earned Crests. | UC-CAND-012 — View Dynamic Resume | TBD |
 
-#### 5.2.3.13 Receive Application Notifications
-
-| ID | Requirement | Use Case | Jira |
-|---|---|---|---|
-| **FR-CAND-039** | The system **SHOULD** notify candidates when they advance to a new applicable hiring pipeline stage. | UC-CAND-013 — Receive Application Notifications | TBD |
-| **FR-CAND-040** | The system **SHOULD** notify candidates when an assessment becomes available. | UC-CAND-013 — Receive Application Notifications | TBD |
-| **FR-CAND-041** | The system **SHOULD** notify candidates when an assessment result becomes available. | UC-CAND-013 — Receive Application Notifications | TBD |
-| **FR-CAND-042** | The system **SHOULD** notify candidates when a final hiring decision becomes available. | UC-CAND-013 — Receive Application Notifications | TBD |
-
-#### 5.2.3.14 Following Company
+#### 5.2.3.13 Following Company
 
 | ID | Requirement | Use Case | Related Functional Requirement | Jira |
 |---|---|---|---|---|
-| **FR-CAND-043** | The candidate **SHOULD** be able to follow a company for later postings. | UC-CAND-014 — Following Company | FR-JOP-### | TBD |
+| **FR-CAND-043** | The candidate **SHOULD** be able to follow a company for later postings. | UC-CAND-013 — Following Company | FR-JOP-### | TBD |
 
-#### 5.2.3.15 Saving Posting
+#### 5.2.3.14 Saving Posting
 
 | ID | Requirement | Use Case | Related Functional Requirement | Jira |
 |---|---|---|---|---|
-| **FR-CAND-044** | The candidate **SHOULD** be able save a posting for later application. | UC-CAND-015 — Save Jop Posting | FR-JOP-### | TBD |
+| **FR-CAND-044** | The candidate **SHOULD** be able save a posting for later application. | UC-CAND-014 — Save Jop Posting | FR-JOP-### | TBD |
 
 ---
 
