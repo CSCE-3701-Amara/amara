@@ -189,7 +189,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 | FR-INVW-071 | The system *SHALL*, before a Candidate reaches the reveal point, replace the Candidate's name, photo, email, phone number, personal links, date of birth, gender, nationality, and address with a system-assigned anonymous identifier for Hiring Managers and Interviewers in every view, including resume copies, the dashboard, scorecards, and notes. | UC-INVW-008 |
 | FR-INVW-072 | The system *SHALL* mark the video-recorded response module and live interviews as incompatible with anonymity, and *SHALL* treat a pipeline as invalid if any path can reach an incompatible module before the reveal point. | UC-INVW-008 |
 | FR-INVW-073 | The system *SHALL* reveal a Candidate's identity when the Candidate reaches the reveal point, *SHALL* not hide it again, and *SHALL* record the time of the reveal. | UC-INVW-008 |
-| FR-INVW-074 | The system *SHALL* tell the Candidate, in the application view, that identity is hidden from the employer in the early stages, without naming the reveal point. | UC-INVW-008 |
+| FR-INVW-074 | The system *SHALL* tell the Candidate, in the application view, that identity is hidden from the employer in the early stages, with naming the reveal point. | UC-INVW-008 |
 
 ### 3.8 Feedback and Notifications
 
@@ -239,13 +239,15 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 | FR-INVW-096 | The system *SHALL* let the Hiring Manager apply a new score threshold, including the suggested cut-off in FR-INVW-068, to a threshold-based stage from the dashboard after reviewing Candidate performance insights; the system *SHALL* preview the affected Candidates, record the previous and new threshold and change time, and recalculate outcomes for Candidates still waiting at that stage. The system *SHALL NOT* reverse a previously granted pass or reopen a terminal decision. | UC-INVW-006, UC-INVW-007 |
 
 ---
-
 ## 4. Business Rules
 
-* Must-have criteria cannot change after the first application arrives (FR-JOB-***).
-* Application status values and their transitions are defined once, in the glossary and the application state machine, not in this section.
-* The Hiring Manager is the only human role responsible for configuring and administering the pipeline and recording manual advancement decisions; permissions are governed by AUTH and FR-INVW-053.
-* Assessment scoring and advancement are separate: closed questions are auto-scored against answer keys (FR-INVW-020), coding submissions use external provider test-case results (FR-INVW-087), and open-ended, video, and live-interview responses use human grading or scorecards (FR-INVW-021, FR-INVW-034, FR-INVW-093). AI question drafting, insights, and feedback do not assign assessment scores (FR-INVW-018, FR-INVW-064, FR-INVW-076). Advancement is manual, threshold-based, or on completion (FR-INVW-051, FR-INVW-052, FR-INVW-054, FR-INVW-055, FR-INVW-056). |
+* **Pipeline responsibility:** The Hiring Manager configures and administers the pipeline and makes manual advancement decisions. Interviewers provide assigned notes and scorecards but do not decide advancement (AUTH; FR-INVW-032, FR-INVW-034, FR-INVW-053).
+* **Ownership boundaries:** JOB owns posting criteria (FR-JOB-010). Initial screening and pipeline admission belong to the separate screening epic. Application status names and transitions are defined in the glossary and application state machine.
+* **Scoring and advancement:** They are separate decisions. Closed questions use answer keys (FR-INVW-020); coding uses the external evaluator (FR-INVW-087); open-ended responses, video responses, and live interviews use human grading or scorecards (FR-INVW-021, FR-INVW-034, FR-INVW-093). AI drafting, insights, and feedback do not score Candidates or decide outcomes (FR-INVW-018, FR-INVW-064, FR-INVW-076). Advancement uses the rule configured for the stage (FR-INVW-051, FR-INVW-052, FR-INVW-054, FR-INVW-055, FR-INVW-056).
+* **Assessment dates:** Each assessment stage has a valid scheduled start/end interval; the first exam on every pipeline path starts after the posting deadline (FR-INVW-039, FR-INVW-094, FR-INVW-095).
+* **Pipeline versions:** Exactly one version is published at a time. Migration and preservation of Candidate progress follow FR-INVW-038, FR-INVW-045, FR-INVW-046, FR-INVW-047, and FR-INVW-048.
+* **Identity and feedback:** Identity visibility follows the anonymity and reveal rules (FR-INVW-071, FR-INVW-072, FR-INVW-073). Feedback uses the configured mode and respects its content restrictions (FR-INVW-075, FR-INVW-077, FR-INVW-078, FR-INVW-081).
+This removes the vague “criteria cannot change to resolve a change” wording and avoids repeating the full behaviors already specified in the FRs. I have not applied this replacement yet.
 
 ## 5. Error Handling
 
