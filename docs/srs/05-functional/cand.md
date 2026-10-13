@@ -199,6 +199,11 @@ The Candidate Subsystem includes the following functional areas:
 | ID | Requirement | Use Case | Related Functional Requirement | Jira |
 |---|---|---|---|
 | **FR-CAND-067** | The candidate **SHOULD** be able to follow a company for later postings. | UC-CAND-18 — Following Company | FR-JOP-### | TBD |
+
+#### 5.2.3.18 Saving Posting
+
+| ID | Requirement | Use Case | Related Functional Requirement | Jira |
+|---|---|---|---|
 | **FR-CAND-068** | The candidate **SHOULD** be able save a posting for later application. | UC-CAND-19 — Save Jop Posting | FR-JOP-### | TBD |
 
 ---
