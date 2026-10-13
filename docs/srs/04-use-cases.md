@@ -1,6 +1,8 @@
 ## 4. Use cases
 
-Owner: ALL | Status: Draft | Last updated: 2026-10-13 | Jira: PLACEHOLDER
+Owner: ALL | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
+
+---
 
 ### UC-AUTH-001: Candidate or Interviewer Registration
 |Field|Description|
@@ -180,3 +182,95 @@ Owner: ALL | Status: Draft | Last updated: 2026-10-13 | Jira: PLACEHOLDER
 | **Main Flow** | 1. The system admin selects a report or statistics view.<br>2. The system retrieves aggregate data related to job postings.<br>3. The system displays the aggregate data and reporting results.<br>4. The system admin reviews the results for platform improvement or research.|
 |**Exception Flows**|**Unauthorized access**: The system denies access to administrative reports.<br>**Data unavailable**: The system displays an error message and indicates that the report cannot currently be generated.<br>**Report generation fails**: The system displays an error message and does not display incomplete results.|
 |**Postconditions**|The system admin has viewed the requested aggregate job-posting data, or no incomplete report is presented.|
+
+---
+
+## 4.6 ANA Use Cases
+
+### Use Case 1: Stream & Ingest IDE Telemetry
+
+| Field | Description |
+| --- | --- |
+| **Use Case ID** | UC-ANA-01 |
+| **Use Case Name** | Stream & Ingest IDE Telemetry |
+| **Actor(s)** | Candidate, System |
+| **Description** | Stream and analyze telemetry data coming from the IDE that the candidate is using. |
+| **Preconditions** | Candidate active session in the IDE environment; telemetry endpoint is established. |
+| **Trigger** | An action is triggered through the IDE. |
+| **Main Flow** | 1. The IDE captures interaction events in real-time.<br>2. Events are buffered and streamed to the telemetry endpoint. |
+| **Alternative Flows** | None. |
+| **Exception Flows** | Telemetry connection drops -> IDE plugin queues events locally in buffer until connection is restored. |
+| **Postconditions** | Telemetry events successfully connected to the candidate record. |
+| **Business Rules** | The telemetry streaming must run flawlessly and not affect the candidate’s experience. |
+
+---
+
+### Use Case 2: Calculate Execution Efficiency Metrics
+
+| Field | Description |
+| --- | --- |
+| **Use Case ID** | UC-ANA-02 |
+| **Use Case Name** | Calculate Efficiency Metrics |
+| **Actor(s)** | Candidate, System |
+| **Description** | Measures the performance related metrics such as Run Time, Memory Consumption, and complexity. |
+| **Preconditions** | Code submitted to the sandbox environment. |
+| **Trigger** | The candidate submits code solutions to the sandbox. |
+| **Main Flow** | 1. Sandbox executes submitted code against test suites.<br>2. Analytics subsystem calculates execution runtime and peak memory usage.<br>3. Subsystem calculates O-complexity approximation.<br>4. Execution metrics are saved to the candidate record. |
+| **Alternative Flows** | None. |
+| **Exception Flows** | Execution timeout -> System records partial diagnostic telemetry and returns failure flags. |
+| **Postconditions** | The metrics are saved to the candidate’s records. |
+| **Business Rules** | Metrics must be computed in an isolated execution sandbox environment. |
+
+---
+
+### Use Case 3: Calculate Technical Pass Rate Score
+
+| Field | Description |
+| --- | --- |
+| **Use Case ID** | UC-ANA-03 |
+| **Use Case Name** | Calculate Technical Pass Rate Score |
+| **Actor(s)** | System |
+| **Description** | Compute candidate technical Pass Rate Score based on automated test suite outcomes. |
+| **Preconditions** | Test suite execution completed in a sandbox environment. |
+| **Trigger** | Code execution finishes in the sandbox. |
+| **Main Flow** | 1. Subsystem retrieves passed and failed test case counts.<br>2. Computes the Pass Rate Score percentage.<br>3. Updates technical scorecard record. |
+| **Alternative Flows** | None. |
+| **Exception Flows** | Unhandled code runtime crash -> Pass Rate Score recorded as 0% with diagnostic failure details. |
+| **Postconditions** | Technical Pass Rate Score updated on candidate evaluation scorecard. |
+| **Business Rules** | A zero pass rate score is not an auto rejection. |
+
+---
+
+### Use Case 4: Evaluate Integrity Risk 
+
+| Field | Description |
+| --- | --- |
+| **Use Case ID** | UC-ANA-04 |
+| **Use Case Name** | Evaluate Integrity Risk |
+| **Actor(s)** | System |
+| **Description** | Analyzing the telemetry events, sequence, and frequency and generating an integrity score based on it. |
+| **Preconditions** | Telemetry streaming active and integrity threshold rules configured. |
+| **Trigger** | There is detected focus loss or paste action in the telemetry stream. |
+| **Main Flow** | 1. Subsystem detects violation in incoming stream.<br>2. Calculates/updates Integrity Risk Score (0–100).<br>3. Attaches evidence log. |
+| **Alternative Flows** | No violation is detected. |
+| **Exception Flows** | Issues with the telemetry stream. |
+| **Postconditions** | Evidence logs attached and candidate Integrity Risk Score updated. |
+| **Business Rules** | A high integrity score requires human revision to avoid auto rejection. |
+
+---
+
+### Use Case 5: Export Candidate Evaluation Report
+
+| Field | Description |
+| --- | --- |
+| **Use Case ID** | UC-ANA-05 |
+| **Use Case Name** | Export Candidate Evaluation Report |
+| **Actor(s)** | Hiring Manager, System |
+| **Description** | Consolidate technical, behavioral, and integrity metrics into a unified exportable candidate report (PDF). |
+| **Preconditions** | Technical, behavioral, and integrity score calculations completed. |
+| **Trigger** | Hiring Manager requests report export. |
+| **Main Flow** | 1. Subsystem aggregates technical pass rate, execution metrics, and integrity risk score.<br>2. Renders report in requested export format (PDF).<br>3. Delivers file for download or platform display. |
+| **Alternative Flows** | None. |
+| **Exception Flows** | PDF Generation failure -> System retries up to 3 times before queuing error notification. |
+| **Postconditions** | Exported PDF candidate evaluation report generated. |
+| **Business Rules** | None |
