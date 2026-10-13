@@ -6,7 +6,7 @@
 
 ## 1. Overview
 
-The INVW epic covers how Hiring Managers design and run a multi-stage interview pipeline shaped as a directed acyclic graph (DAG), and how Candidates are assessed, advanced, given feedback, or rejected. Its actors are the **Candidate**, **Interviewer**, **Hiring Manager**, and **System**. The Hiring Manager is the only human role that configures and administers the pipeline and records manual advancement decisions; Interviewers conduct assigned interviews and provide scorecards. This epic owns application status values and transitions and all notifications (see the boundary table in `requirements.md`).
+The INVW epic covers how Hiring Managers design and run a multi-stage interview pipeline shaped as a directed acyclic graph (DAG), and how Candidates are assessed, advanced, given feedback, rejected, or considered for a job offer after completing the pipeline. Its actors are the **Candidate**, **Interviewer**, **Hiring Manager**, and **System**. The Hiring Manager is the only human role that configures and administers the pipeline and records manual advancement decisions; Interviewers conduct assigned interviews and provide scorecards. This epic owns application status values and transitions and all notifications (see the boundary table in `requirements.md`).
 
 ## 2. Scope
 
@@ -17,6 +17,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 - Assessment test execution and scoring (3.9)
 - Candidate-facing pipeline progress view (3.10)
 - Amara and Amarat skill crests (3.11)
+- Finalist selection, offers, and post-pipeline decisions (3.13)
 
 **Out of scope (owned elsewhere)**
 - Company registration and verification, roles, and the permission matrix (AUTH)
@@ -24,7 +25,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 - Initial Candidate screening and the decision to admit a Candidate to the interview pipeline; a separate epic owns this stage. INVW begins after that epic passes a Candidate to the published pipeline.
 - Hiring configuration of a job posting: deadlines, capacity, Must-have and Nice-to-have criteria, finalist target (3.1-JOB)
 - Cross-posting and company-level analytics (ANA reads INVW data and never writes it)
-- Contracts, onboarding, and payroll after an offer is accepted (Won't, future release)
+- Legal contract execution, onboarding, and payroll after an offer is accepted (Won't, future release)
 
 ---
 
@@ -271,6 +272,32 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 | FR-INVW-105 | If the same Amara is awarded more than once, the system *SHOULD* show the highest earned level and preserve the history of all awards. It *SHOULD* retain the definition/level-scale version used for each award and not retroactively change prior award details when a custom definition is edited. | UC-INVW-016 |
 | FR-INVW-106 | The system *SHALL* associate every custom Amara definition and every Amara award with the Company that owns the assessment's posting. Candidate views *SHALL* identify the Company for each Amara award, and Company Hiring Managers *SHALL* only access Amara awards for Candidates/applications they are authorized to manage (AUTH). | UC-INVW-015, UC-INVW-016 |
 
+### 3.12 Finalists and Offers
+
+**Feature Description:** Candidates who pass every assessment stage in the published pipeline become Finalists. The Hiring Manager reviews the Finalist list, makes offers against the posting's open positions, and rejects Finalists who will not receive an offer. Candidates accept or decline offers in the platform.
+
+**Preconditions:**
+* A pipeline is published for the posting.
+* At least one Candidate has passed every assessment stage in that pipeline.
+* The posting's open-position capacity is available from JOB.
+
+#### Functional Requirements
+
+| ID | Requirement | Related Use Case |
+|---|---|---|
+| FR-INVW-107 | When a Candidate has passed every assessment stage on every path of the Candidate's published pipeline, the system *SHALL* set the application status to "Finalist" and add the Candidate to the posting's Finalist list. | UC-INVW-017 |
+| FR-INVW-108 | The system *SHALL* order the Finalist list by descending mean score across each Finalist's completed assessment modules and live interviews with numeric scores, show the Candidate insights defined in FR-INVW-064, and allow ordering by the score of any individual completed stage. A Finalist with no numeric stage scores *SHALL* be shown without a mean score and ordered after Finalists with numeric scores. | UC-INVW-017 |
+| FR-INVW-109 | The system *SHALL* allow the Hiring Manager to create an offer for a Finalist containing the job title from the posting, a compensation summary, a proposed start date, a response deadline later than the offer-creation time, and an optional message; on creation, the system *SHALL* set the offer and application status to "Offer Pending". | UC-INVW-017 |
+| FR-INVW-110 | The system *SHALL* deliver each offer to the Candidate by email and in the platform. | UC-INVW-017 |
+| FR-INVW-111 | The system *SHALL* allow a Candidate to accept or decline a pending offer in the platform before its response deadline. | UC-INVW-017 |
+| FR-INVW-112 | The system *SHALL* record the Candidate's offer response and timestamp, set the offer and application status to "Offer Accepted" or "Offer Declined", and notify the Hiring Manager within 10 minutes. | UC-INVW-017 |
+| FR-INVW-113 | When a pending offer reaches its response deadline without a response, the system *SHALL* set the offer and application status to "Offer Expired" and notify the Candidate and Hiring Manager. | UC-INVW-017 |
+| FR-INVW-114 | The system *SHALL* allow the Hiring Manager to extend the response deadline of a pending offer to a later time, provided the current response deadline has not passed. | UC-INVW-017 |
+| FR-INVW-115 | The system *SHALL* allow the Hiring Manager to withdraw a pending offer, set the offer status to "Withdrawn", return the application status to "Finalist", and notify the Candidate. | UC-INVW-017 |
+| FR-INVW-116 | Before an offer is sent, the system *SHALL* compare the number of pending and accepted offers for the posting, including the proposed offer, with the posting's open-position capacity; if the offer would cause the count to exceed capacity, the system *SHALL* warn the Hiring Manager and require explicit confirmation to proceed. | UC-INVW-017 |
+| FR-INVW-117 | The system *SHALL* allow the Hiring Manager to reject Finalists individually or in bulk, set each affected application status to "Rejected", and start rejection feedback according to FR-INVW-080 and FR-INVW-081. | UC-INVW-017 |
+| FR-INVW-118 | The system *SHALL* allow at most one pending offer per Candidate per posting. | UC-INVW-017 |
+
 ---
 ## 4. Business Rules
 
@@ -280,6 +307,11 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 * **Assessment dates:** Each assessment stage has a valid scheduled start/end interval; the first exam on every pipeline path starts after the posting deadline (FR-INVW-039, FR-INVW-094, FR-INVW-095).
 * **Pipeline versions:** Exactly one version is published at a time. Migration and preservation of Candidate progress follow FR-INVW-038, FR-INVW-045, FR-INVW-046, FR-INVW-047, and FR-INVW-048.
 * **Identity and feedback:** Identity visibility follows the anonymity and reveal rules (FR-INVW-071, FR-INVW-072, FR-INVW-073). Feedback uses the configured mode and respects its content restrictions (FR-INVW-075, FR-INVW-077, FR-INVW-078, FR-INVW-081).
+* **Finalist qualification:** A Candidate becomes a Finalist only after passing every assessment stage on every path in the Candidate's published pipeline (FR-INVW-107). The JOB finalist target is a planning target and does not limit the number of Candidates added to the Finalist list.
+* **Posting capacity and offers:** JOB owns the posting's open-position capacity; INVW reads that value and does not configure it. Capacity checks count pending and accepted offers, not declined, expired, or withdrawn offers (FR-INVW-109, FR-INVW-113, FR-INVW-115, FR-INVW-116). An over-capacity offer may proceed only after the Hiring Manager explicitly confirms the warning.
+* **Finalist and offer status transitions:** Passing every stage sets the application to Finalist; issuing an offer sets it to Offer Pending; acceptance, decline, or expiry sets it to Offer Accepted, Offer Declined, or Offer Expired, respectively. Withdrawing a pending offer sets the offer status to Withdrawn and returns the application to Finalist. The Hiring Manager may separately set a Finalist's application to Rejected (FR-INVW-107, FR-INVW-109, FR-INVW-112, FR-INVW-113, FR-INVW-115, FR-INVW-117).
+* **Finalist ranking:** The default mean is calculated from completed assessment modules and live interviews with numeric scores; unscored stages are omitted, and Candidates with no numeric scores have no mean (FR-INVW-108). This ranking and the insights support, but do not replace, the Hiring Manager's offer and rejection decisions.
+* **Offer eligibility:** Only a Candidate with Finalist application status may receive a new offer. A Candidate may have no more than one pending offer for the same posting (FR-INVW-118).
 
 ## 5. Error Handling
 
@@ -288,6 +320,10 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 * **Meeting creation failure:** retry 3 times within 15 minutes. If it still fails, keep the slot unconfirmed and notify the Candidate and Interviewer to pick another time.
 * **Code-evaluation provider failure:** retain submitted code and keep the assessment pending; do not interpret an unavailable or invalid provider result as a failed test case (FR-INVW-087; provider details in `docs/srs/06-external-interfaces.md`).
 * **Email delivery failure:** retry up to 3 times, show the notification in the platform regardless, and flag the failure to the Hiring Manager when the email concerns a decision.
+* **Offer notification failure:** retain the offer and response/expiry state, retry failed email delivery up to 3 times, and show offer notices and responses in the platform. A failure to notify the Hiring Manager about a response or the Candidate/Hiring Manager about expiry is flagged for retry; it does not reverse the recorded state (FR-INVW-110, FR-INVW-112, FR-INVW-113, FR-INVW-115).
+* **Offer deadline elapsed:** reject an accept, decline, extension, or withdrawal request submitted at or after the response deadline; expire the pending offer and apply the expiry notifications and statuses (FR-INVW-111, FR-INVW-113, FR-INVW-114, FR-INVW-115).
+* **Offer already pending:** do not create a second pending offer for the same Candidate and posting; show the Hiring Manager the existing offer and its status (FR-INVW-118).
+* **Posting capacity unavailable:** do not send an offer if the posting's open-position capacity cannot be read; identify the posting and report that its capacity is unavailable.
 * **AI generation failure (feedback, insights, design-studio drafts):** do not release partial output. Hold the item and notify the Hiring Manager to write it manually.
 * **Two simultaneous decisions on the same Candidate and stage:** record the first, reject the second, and show the second decider the recorded decision.
 * **Access to identity before the reveal point:** deny the request and log the attempt (FR-INVW-071).
