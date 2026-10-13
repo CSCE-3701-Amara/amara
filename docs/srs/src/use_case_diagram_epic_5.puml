@@ -1,0 +1,61 @@
+```plantuml
+@startuml
+
+' Diagram Configuration
+left to right direction
+skinparam ranksep 500
+skinparam shadowing false
+
+' Defining Actors
+actor Candidate
+actor Employer
+
+' Defining CAND Use Cases
+rectangle "CAND" {
+
+    package "Job Discovery" {
+        usecase "Browse Job Postings" as UC_CAND_001
+        usecase "Filter Job Postings" as UC_CAND_002
+        usecase "Follow Company" as UC_CAND_013
+        usecase "Save Job Posting" as UC_CAND_014
+    }
+
+    package "Applications and Hiring" {
+        usecase "View Application History" as UC_CAND_003
+        usecase "View Application Status" as UC_CAND_006
+        usecase "Receive Final Hiring Decision" as UC_CAND_007
+        usecase "Accept Offer" as UC_CAND_008
+    }
+
+    package "Assessments and Credentials" {
+        usecase "Track Assessment Progress" as UC_CAND_004
+        usecase "View Assessment Result and Feedback" as UC_CAND_005
+        usecase "View Earned Crests" as UC_CAND_009
+        usecase "Maintain Verified Skills" as UC_CAND_010
+    }
+
+    package "Dynamic Resume" {
+        usecase "Generate Dynamic Resume" as UC_CAND_011
+        usecase "View Dynamic Resume" as UC_CAND_012
+    }
+}
+
+' Candidate Associations
+Candidate -- UC_CAND_001
+Candidate -- UC_CAND_002
+Candidate -- UC_CAND_003
+Candidate -- UC_CAND_004
+Candidate -- UC_CAND_005
+Candidate -- UC_CAND_006
+Candidate -- UC_CAND_007
+Candidate -- UC_CAND_008
+Candidate -- UC_CAND_009
+Candidate -- UC_CAND_012
+Candidate -- UC_CAND_013
+Candidate -- UC_CAND_014
+
+' Employer Associations
+Employer -- UC_CAND_007
+
+@enduml
+```

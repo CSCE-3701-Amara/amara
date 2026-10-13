@@ -47,7 +47,7 @@ The Candidate Subsystem includes the following functional areas:
 #### 5.2.3.1 Browse Job Postings
 
 | ID | Requirement | Use Case | Related Functional Requirement | Jira |
-|---|---|---|---|
+|---|---|---|---|---|
 | **FR-CAND-001** | The system **SHALL** display currently available job postings to candidates. | UC-CAND-001 — Browse Job Postings | FR-JOP-### | TBD |
 | **FR-CAND-002** | The system **SHALL** display the essential information associated with each job posting. | UC-CAND-001 — Browse Job Postings | FR-JOP-### | TBD |
 | **FR-CAND-003** | The system **SHALL** exclude job postings that are no longer available for application. | UC-CAND-001 — Browse Job Postings | FR-JOP-### | TBD |
@@ -55,7 +55,7 @@ The Candidate Subsystem includes the following functional areas:
 #### 5.2.3.2 Filter Job Postings
 
 | ID | Requirement | Use Case | Related Function Requirement | Jira |
-|---|---|---|---|
+|---|---|---|---|---|
 | **FR-CAND-004** | The system **SHALL** allow candidates to filter postings by offered compensation. | UC-CAND-002 — Filter Job Postings | FR-JOP-### | TBD |
 | **FR-CAND-005** | The system **SHALL** allow candidates to filter postings by position. | UC-CAND-002 — Filter Job Postings | FR-JOP-### | TBD |
 | **FR-CAND-006** | The system **SHALL** allow candidates to filter postings by job grade. | UC-CAND-002 — Filter Job Postings | FR-JOP-### | TBD |
