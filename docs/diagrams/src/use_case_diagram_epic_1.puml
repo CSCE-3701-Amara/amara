@@ -1,0 +1,88 @@
+@startuml
+
+' Digram Configuration
+left to right direction
+skinparam ranksep 500
+skinparam shadowing false
+
+' Defining Actors
+actor Candidate
+actor Interviewer
+actor Guest
+actor "Hiring Manager" as HM
+actor "System Administrator" as SA
+
+' Defining AUTH Use Cases
+rectangle "AUTH" {
+    package "Registration" {
+        usecase "Candidate or Interviewer Registration" as UC_AUTH_001
+        usecase "Company Registration" as UC_AUTH_002
+        usecase "Review Company Registration Requests" as UC_AUTH_015
+    }
+    
+    package "Profiles and Documents" {
+        usecase "Modify Profile" as UC_AUTH_005
+        usecase "Deactivate/Delete Profile" as UC_AUTH_006
+        usecase "Share Profile" as UC_AUTH_007
+        usecase "Upload Supporting Documents" as UC_AUTH_008
+        usecase "View Public Company Profile" as UC_AUTH_012
+    }
+
+    package "Authentication" {
+        usecase "User Login" as UC_AUTH_003
+        usecase "Reset Password" as UC_AUTH_010
+        usecase "Logout" as UC_AUTH_011
+    }
+
+
+    package "Administration" {
+        usecase "Manage Users and Accounts" as UC_AUTH_013
+        usecase "Manage System Entities" as UC_AUTH_014
+        usecase "Manage System Taxonomies and Constants" as UC_AUTH_016
+        usecase "View Administrative Reports" as UC_AUTH_017
+    }
+
+    package "Feedback and Reports" {
+        usecase "Submit Report" as UC_AUTH_004
+        usecase "Submit Rating" as UC_AUTH_009
+    }
+
+}
+
+' AUTH use case associations
+UC_AUTH_001 -- Guest
+UC_AUTH_002 -- Guest
+UC_AUTH_012 -- Guest
+UC_AUTH_003 -- Candidate
+UC_AUTH_004 -- Candidate
+UC_AUTH_005 -- Candidate
+UC_AUTH_006 -- Candidate
+UC_AUTH_007 -- Candidate
+UC_AUTH_008 -- Candidate
+UC_AUTH_009 -- Candidate
+UC_AUTH_010 -- Candidate
+UC_AUTH_011 -- Candidate
+UC_AUTH_012 -- Candidate
+HM -- UC_AUTH_001 
+HM -- UC_AUTH_002
+HM -- UC_AUTH_003
+HM -- UC_AUTH_004
+HM -- UC_AUTH_008
+HM -- UC_AUTH_009
+HM -- UC_AUTH_010
+HM -- UC_AUTH_011
+HM -- UC_AUTH_012
+HM -- UC_AUTH_015
+UC_AUTH_003 -- Interviewer
+UC_AUTH_008 -- Interviewer
+UC_AUTH_010 -- Interviewer
+UC_AUTH_011 -- Interviewer
+SA -- UC_AUTH_002
+SA -- UC_AUTH_004
+SA -- UC_AUTH_013
+SA -- UC_AUTH_014
+SA -- UC_AUTH_015
+SA -- UC_AUTH_016
+SA -- UC_AUTH_017
+
+@enduml
