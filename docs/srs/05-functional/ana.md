@@ -22,9 +22,6 @@ The following functionality is out-of-scope:
 ### 5.4.3 Requirements
 
 #### 5.4.3.1 Telemetry Ingestion & Real-Time Streaming
-**Preconditions:**
-- Candidate active session in the web or desktop IDE environment.
-- Telemetry streaming endpoint is established.
 
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
