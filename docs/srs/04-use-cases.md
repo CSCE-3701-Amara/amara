@@ -85,9 +85,9 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
 | **Actor(s)** | System |
 | **Description** | Analyzing the telemetry events, sequence, and frequency and generating an integrity score based on it. |
 | **Preconditions** | Telemetry streaming active and integrity threshold rules configured. |
-| **Trigger** | Telemetry events exceed certain limits (e.g., massive paste size, focus loss). |
+| **Trigger** | There is detected focus loss or paste action in the telemetry stream. |
 | **Main Flow** | 1. Subsystem detects violation in incoming stream.<br>2. Calculates/updates Integrity Risk Score (0–100).<br>3. Attaches evidence log. |
-| **Alternative Flows** | None. |
+| **Alternative Flows** |No violation is detected. |
 | **Exception Flows** | Issues with the telemetry stream. |
 | **Postconditions** | Evidence logs attached and candidate Integrity Risk Score updated. |
 | **Business Rules** | A high integrity score requires human revision to avoid auto rejection. |
@@ -105,7 +105,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
 | **Preconditions** | Technical, behavioral, and integrity score calculations completed. |
 | **Trigger** | Hiring Manager requests report export. |
 | **Main Flow** | 1. Subsystem aggregates technical pass rate, execution metrics, and integrity risk score.<br>2. Renders report in requested export format (PDF).<br>3. Delivers file for download or platform display. |
-| **Alternative Flows** | Automated report generation triggered upon assessment completion. |
+| **Alternative Flows** | None. |
 | **Exception Flows** | PDF Generation failure -> System retries up to 3 times before queuing error notification. |
 | **Postconditions** | Exported PDF candidate evaluation report generated. |
 | **Business Rules** | None |
