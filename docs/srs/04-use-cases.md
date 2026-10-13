@@ -61,7 +61,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
 
 | Field | Description |
 |---|---|
-| Actor(s) | Candidate, System |
+| Actor(s) | Candidate |
 | Description | Allows candidates to check the completion status of their assessments and resume their progress when supported. |
 | Preconditions | The candidate is authenticated and has an assessment associated with an application. |
 | Trigger | The candidate opens an assessment or checks its status. |
@@ -75,7 +75,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
 
 | Field | Description |
 |---|---|
-| Actor(s) | Candidate, System |
+| Actor(s) | Candidate |
 | Description | Allows candidates to view assessment results and any available constructive feedback. |
 | Preconditions | The candidate is authenticated and has submitted an assessment. The result or feedback is available for disclosure. |
 | Trigger | The candidate opens the assessment results or feedback section of an application. |
@@ -103,7 +103,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
 
 | Field | Description |
 |---|---|
-| Actor(s) | Candidate, Employer, System |
+| Actor(s) | Candidate, Employer |
 | Description | Allows candidates to view the final hiring decision submitted by the employer and any accompanying employer feedback or AI-generated feedback in case of rejection. |
 | Preconditions | The candidate is authenticated and has an application associated with an employer. |
 | Trigger | The employer submits a final hiring decision for the application. |
@@ -117,7 +117,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
 
 | Field | Description |
 |---|---|
-| Actor(s) | Candidate, Employer, System |
+| Actor(s) | Candidate |
 | Description | Allows candidates to accept or refuse an offer associated with an application. |
 | Preconditions | The candidate is authenticated and has received an offer associated with an application. |
 | Trigger | The candidate opens the offer details for an application. |
@@ -173,7 +173,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
 
 | Field | Description |
 |---|---|
-| Actor(s) | Candidate, System |
+| Actor(s) | Candidate |
 | Description | Allows candidates to view their dynamic resume and review their verified professional competencies. |
 | Preconditions | The candidate is authenticated and has access to their professional profile. |
 | Trigger | The candidate opens the dynamic resume section of their profile. |
@@ -187,7 +187,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
 
 | Field | Description |
 |---|---|
-| Actor(s) | Candidate, System |
+| Actor(s) | Candidate |
 | Description | Allows candidates to follow a company to keep track of its later job postings. |
 | Preconditions | The candidate is authenticated and the company is available on the platform. |
 | Trigger | The candidate chooses to follow a company. |
@@ -201,7 +201,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
 
 | Field | Description |
 |---|---|
-| Actor(s) | Candidate, System |
+| Actor(s) | Candidate |
 | Description | Allows candidates to save a job posting for later application. |
 | Preconditions | The candidate is authenticated and the job posting is available for viewing. |
 | Trigger | The candidate chooses to save a job posting. |
