@@ -5,8 +5,6 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 ---
 
 ### 4.1 Actors
-
-// This is only an example.
 - Candidate
 - System Administrator
 - Interviewer
