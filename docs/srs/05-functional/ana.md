@@ -25,43 +25,43 @@ The following functionality is out-of-scope:
 
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
-| FR-ANA-01 | The subsystem **SHALL** stream and ingest keystrokes at sub-second intervals. | UC-ANA-01 | AMARA-33 |
-| FR-ANA-02 | The subsystem **SHALL** stream and ingest pastes at sub-second intervals. | UC-ANA-01 | AMARA-33 |
-| FR-ANA-03 | The subsystem **SHALL** stream and ingest focus events at sub-second intervals. | UC-ANA-01 | AMARA-33 |
+| FR-ANA-01 | The system **SHALL** stream and ingest keystrokes at sub-second intervals. | UC-ANA-01 | AMARA-33 |
+| FR-ANA-02 | The system **SHALL** stream and ingest pastes at sub-second intervals. | UC-ANA-01 | AMARA-33 |
+| FR-ANA-03 | The system **SHALL** stream and ingest focus events at sub-second intervals. | UC-ANA-01 | AMARA-33 |
 
 #### 5.4.3.2 Technical Execution & Code Analysis
 
 
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
-| FR-ANA-04 | The subsystem **SHALL** calculate runtime upon code submission to the sandbox. | UC-ANA-02| AMARA-33 |
-| FR-ANA-05 | The subsystem **SHALL** calculate peak memory usage upon code submission to the sandbox. | UC-ANA-02| AMARA-33 |
-| FR-ANA-06 | The subsystem **SHALL** calculate O-complexity approximation upon code submission to the sandbox. | UC-ANA-02| AMARA-33 |
-| FR-ANA-07 | The subsystem **SHALL** calculate a Pass Rate Score based on the tests passed. | UC-ANA-03 | AMARA-33 |
+| FR-ANA-04 | The system **SHALL** calculate runtime upon code submission to the sandbox. | UC-ANA-02| AMARA-33 |
+| FR-ANA-05 | The system **SHALL** calculate peak memory usage upon code submission to the sandbox. | UC-ANA-02| AMARA-33 |
+| FR-ANA-06 | The system **SHALL** calculate O-complexity approximation upon code submission to the sandbox. | UC-ANA-02| AMARA-33 |
+| FR-ANA-07 | The system **SHALL** calculate a Pass Rate Score based on the tests passed. | UC-ANA-03 | AMARA-33 |
 
 #### 5.4.3.3 Behavioral & Integrity Scoring
 
 
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
-| FR-ANA-08 | The subsystem **COULD** compute a Behavioral Score based on peer review surveys, PR interactions, and task-board allocation metrics. | UC-ANA-03 | AMARA-33 |
-| FR-ANA-09 | The subsystem **SHOULD** generate an Integrity Risk Score (0−100) and attach evidence logs (paste size, focus loss timestamps) whenever threshold is exceeded. | UC-ANA-04 | AMARA-33 |
+| FR-ANA-08 | The system **COULD** compute a Behavioral Score based on peer review surveys, PR interactions, and task-board allocation metrics. | UC-ANA-03 | AMARA-33 |
+| FR-ANA-09 | The system **SHOULD** generate an Integrity Risk Score (0−100) and attach evidence logs (paste size, focus loss timestamps) whenever threshold is exceeded. | UC-ANA-04 | AMARA-33 |
 
 #### 5.4.3.4 Candidate Reporting
 
 
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
-| FR-ANA-10 | The subsystem **COULD** aggregate technical, behavioral, and integrity metrics into a single exportable candidate report (PDF/JSON). | UC-ANA-05 | AMARA-33 |
+| FR-ANA-10 | The system **COULD** aggregate technical, behavioral, and integrity metrics into a single exportable candidate report (PDF/JSON). | UC-ANA-05 | AMARA-33 |
 
 #### 5.4.3.5 Business Rules
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
-| BR-ANA-11 | Candidates with an Integrity Risk Score exceeding 70 **MUST** be flagged for manual review before final report generation. | UC-ANA-04 | AMARA-33 |
+| BR-ANA-11 | Candidates with an Integrity Risk Score exceeding 70 **SHALL** be flagged for manual review before final report generation. | UC-ANA-04 | AMARA-33 |
 
 #### 5.4.3.6 Error Handling
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
-| ERR-ANA-12 | Telemetry connection drops **MUST** cause local event queuing in the IDE buffer without interrupting developer code input. | UC-ANA-01 | AMARA-33 |
-| ERR-ANA-13 | Sandbox timeouts or memory exceptions during code submission **MUST** record partial diagnostic telemetry and return execution failure flags. | UC-ANA-01 | AMARA-33 |
-| ERR-ANA-14 | Report generation failures during PDF rendering **MUST** trigger up to 3 automatic retries. | UC-ANA-05 | AMARA-33 |
+| ERR-ANA-12 | Telemetry connection drops **SHALL** cause local event queuing in the IDE buffer without interrupting developer code input. | UC-ANA-01 | AMARA-33 |
+| ERR-ANA-13 | Sandbox timeouts or memory exceptions during code submission **SHALL** record partial diagnostic telemetry and return execution failure flags. | UC-ANA-01 | AMARA-33 |
+| ERR-ANA-14 | Report generation failures during PDF rendering **SHALL** trigger up to 3 automatic retries. | UC-ANA-05 | AMARA-33 |
