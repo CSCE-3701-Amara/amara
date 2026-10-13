@@ -34,3 +34,6 @@ go.work.sum
 
 # Local planning notes (not part of the shared repository)
 /local-plans/
+
+# Windows zone identifier metadata
+*:Zone.Identifier
