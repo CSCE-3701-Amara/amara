@@ -6,7 +6,7 @@
 
 ## 1. Overview
 
-The INVW epic covers how Hiring Managers design and run a multi-stage interview pipeline shaped as a directed acyclic graph (DAG), and how Candidates (called Candidates in these requirements) are assessed, advanced, given feedback, or rejected. Its actors are the **Candidate**, **Interviewer**, **Hiring Manager**, and **System**. A **System Administrator** is not an actor in INVW. The Hiring Manager is the only human role that configures and administers the pipeline and records manual advancement decisions; Interviewers conduct assigned interviews and provide scorecards. This epic owns application status values and transitions and all notifications (see the boundary table in `requirements.md`).
+The INVW epic covers how Hiring Managers design and run a multi-stage interview pipeline shaped as a directed acyclic graph (DAG), and how Candidates are assessed, advanced, given feedback, or rejected. Its actors are the **Candidate**, **Interviewer**, **Hiring Manager**, and **System**. A **System Administrator** is not an actor in INVW. The Hiring Manager is the only human role that configures and administers the pipeline and records manual advancement decisions; Interviewers conduct assigned interviews and provide scorecards. This epic owns application status values and transitions and all notifications (see the boundary table in `requirements.md`).
 
 ## 2. Scope
 
@@ -15,12 +15,13 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 - Stage advancement, dashboard and insights, anonymity (3.5 to 3.7)
 - Feedback and notifications (3.8)
 - Assessment test execution and scoring (3.9)
+- Candidate-facing pipeline progress view (3.10)
 
 **Out of scope (owned elsewhere)**
 - Company registration and verification, roles, and the permission matrix (AUTH)
 - The Candidate's platform resume and profile (CAND)
 - Initial Candidate screening and the decision to admit a Candidate to the interview pipeline; a separate epic owns this stage. INVW begins after that epic passes a Candidate to the published pipeline.
-- Hiring configuration of a job posting: deadlines, capacity, Must-have and Nice-to-have criteria, finalist target (3.JOB)
+- Hiring configuration of a job posting: deadlines, capacity, Must-have and Nice-to-have criteria, finalist target (3.1-JOB)
 - Cross-posting and company-level analytics (ANA reads INVW data and never writes it)
 - Contracts, onboarding, and payroll after an offer is accepted (Won't, future release)
 
@@ -170,7 +171,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 | FR-INVW-064 | The system *SHALL* generate for each Candidate a summary of strengths and weaknesses based on performance across the sequence of completed modules, labelled as system-generated and shown with the scores it is based on. | UC-INVW-007 |
 | FR-INVW-065 | The system *SHALL* exclude name, photo, gender, age, nationality, and contact details from the data used to rank Candidates and generate insights. | UC-INVW-007 |
 | FR-INVW-066 | The system *SHALL* allow the Hiring Manager to record pass and reject decisions (FR-INVW-052) directly from the dashboard. | UC-INVW-007 |
-| FR-INVW-067 | The system *SHALL* show the number of Candidates still active against the finalist target (FR-JOB-***). | UC-INVW-007 |
+| FR-INVW-067 | The system *SHALL* show the number of Candidates still active against the finalist target (FR-JOB-012). | UC-INVW-007 |
 | FR-INVW-068 | The system *SHALL* suggest, for a selected stage, a cut-off score expected to bring the number of active Candidates to the finalist target, and show how many would pass at that cut-off. | UC-INVW-007 |
 | FR-INVW-069 | The system *SHALL* allow the Hiring Manager to compare up to 4 selected Candidates side by side. | UC-INVW-007 |
 
@@ -187,9 +188,9 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 |---|---|---|
 | FR-INVW-070 | The system *SHALL* allow the Hiring Manager to enable anonymity for a pipeline and to select an identity-reveal point: a stage of the pipeline or the Finalist list. | UC-INVW-008 |
 | FR-INVW-071 | The system *SHALL*, before a Candidate reaches the reveal point, replace the Candidate's name, photo, email, phone number, personal links, date of birth, gender, nationality, and address with a system-assigned anonymous identifier for Hiring Managers and Interviewers in every view, including resume copies, the dashboard, scorecards, and notes. | UC-INVW-008 |
-| FR-INVW-072 | The system *SHALL* mark the video-recorded response module and live interviews as incompatible with anonymity, and *SHALL* treat a pipeline as invalid if any path can reach an incompatible module before the reveal point. | UC-INVW-008 |
+| FR-INVW-072 | When anonymity is enabled, the system *SHALL* require the identity-reveal point to occur strictly before every live-interview or video-recorded response stage on every path, and *SHALL* reject a pipeline if any path reaches an incompatible stage at or before the reveal point. | UC-INVW-008 |
 | FR-INVW-073 | The system *SHALL* reveal a Candidate's identity when the Candidate reaches the reveal point, *SHALL* not hide it again, and *SHALL* record the time of the reveal. | UC-INVW-008 |
-| FR-INVW-074 | The system *SHALL* tell the Candidate, in the application view, that identity is hidden from the employer in the early stages, with naming the reveal point. | UC-INVW-008 |
+| FR-INVW-074 | The system *SHALL* tell the Candidate, in the application view, that identity is hidden from the employer in the early stages, without naming the reveal point. | UC-INVW-008 |
 
 ### 3.8 Feedback and Notifications
 
@@ -235,8 +236,21 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 | FR-INVW-092 | The system *COULD* provide an LLM-paired programming module that presents a configured coding task, lets the Candidate exchange text with the LLM during the active time limit, and saves the conversation and final code with the test instance. The LLM supports the Candidate and does not determine the assessment score. | UC-INVW-014 |
 | FR-INVW-093 | For a video-recorded response module, the system *SHALL* present each configured prompt, let the Candidate record and submit a video response for each prompt within the time limits, and attach each recording to the test instance for assigned human grading. | UC-INVW-002, UC-INVW-010 |
 | FR-INVW-094 | The system *SHALL* require the Hiring Manager to set a scheduled start and end time for every assessment stage, including live-interview stages, and *SHALL* require the end time to be later than the start time. Candidates may start an assessment or select a live-interview slot only within this interval; a started individual test may finish under its Candidate-specific deadline or an extension recorded under FR-INVW-015. | UC-INVW-001, UC-INVW-004, UC-INVW-005, UC-INVW-010 |
-| FR-INVW-095 | The system *SHALL* prevent pipeline publication unless the scheduled start time of each first individual assessment stage on every path through the pipeline is later than the posting's application deadline (FR-JOB-). Live-interview stages are not individual assessment stages for this check. | UC-INVW-005 |
+| FR-INVW-095 | The system *SHALL* prevent pipeline publication unless the scheduled start time of each first individual assessment stage on every path through the pipeline is later than the posting's application deadline (FR-JOB-003). Live-interview stages are not individual assessment stages for this check. | UC-INVW-005 |
 | FR-INVW-096 | The system *SHALL* let the Hiring Manager apply a new score threshold, including the suggested cut-off in FR-INVW-068, to a threshold-based stage from the dashboard after reviewing Candidate performance insights; the system *SHALL* preview the affected Candidates, record the previous and new threshold and change time, and recalculate outcomes for Candidates still waiting at that stage. The system *SHALL NOT* reverse a previously granted pass or reopen a terminal decision. | UC-INVW-006, UC-INVW-007 |
+
+### 3.10 Candidate Pipeline Progress View
+
+**Feature Description:** Each Candidate can see the full published pipeline and their own progress through it, including the stage or stages they are currently in.
+
+**Preconditions:**
+* The Candidate's application has been passed from the separate initial-screening epic into a published INVW pipeline.
+
+#### Functional Requirements
+
+| ID | Requirement | Related Use Case |
+|---|---|---|
+| FR-INVW-097 | The system *SHALL* show each Candidate the complete stage graph for the published pipeline version their application is running on, identify their current stage or stages, and distinguish their completed, active, and upcoming/locked stages. The view *SHALL* show only that Candidate's progress and *SHALL NOT* expose other Candidates' data, Hiring Manager notes, or advancement thresholds. | UC-INVW-015 |
 
 ---
 ## 4. Business Rules
@@ -247,7 +261,6 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 * **Assessment dates:** Each assessment stage has a valid scheduled start/end interval; the first exam on every pipeline path starts after the posting deadline (FR-INVW-039, FR-INVW-094, FR-INVW-095).
 * **Pipeline versions:** Exactly one version is published at a time. Migration and preservation of Candidate progress follow FR-INVW-038, FR-INVW-045, FR-INVW-046, FR-INVW-047, and FR-INVW-048.
 * **Identity and feedback:** Identity visibility follows the anonymity and reveal rules (FR-INVW-071, FR-INVW-072, FR-INVW-073). Feedback uses the configured mode and respects its content restrictions (FR-INVW-075, FR-INVW-077, FR-INVW-078, FR-INVW-081).
-This removes the vague “criteria cannot change to resolve a change” wording and avoids repeating the full behaviors already specified in the FRs. I have not applied this replacement yet.
 
 ## 5. Error Handling
 

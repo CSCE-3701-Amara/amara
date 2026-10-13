@@ -65,7 +65,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | ----------------- | -------------------------------------------- |
 | Actor(s)          | Hiring Manager, Interviewer, Candidate, System |
 | Description       | The System schedules a live-interview stage through the external meeting provider and records its outcome, notes, and scorecards. |
-| Preconditions     | The stage is configured as a live interview with scheduled start/end times and at least one assigned Interviewer or Hiring Manager. The external provider is reachable (EXT). The Candidate has reached the stage during its scheduled interval (FR-INVW-094). |
+| Preconditions     | The stage is configured as a live interview with scheduled start/end times and at least one assigned Interviewer or Hiring Manager. The external provider is reachable (EXT). The Candidate has reached the stage during its scheduled interval (FR-INVW-094). If anonymity is enabled, the Candidate's identity-reveal point is strictly before this stage (FR-INVW-072). |
 | Trigger           | An assigned Interviewer publishes available time slots within the stage's scheduled interval. |
 | Main Flow         | 1. The assigned Interviewer publishes available time slots within the stage's scheduled start/end times (FR-INVW-094).<br>2. The Candidate selects a slot that starts and ends within that interval; the System creates and confirms the online meeting through the external provider (FR-INVW-026).<br>3. The System sends the meeting time and join link to the Candidate and assigned Interviewers within 10 minutes (FR-INVW-027).<br>4. The System reminds the Candidate and each assigned Interviewer 24 hours and 1 hour before the interview (FR-INVW-028).<br>5. After the meeting, the System records the assigned Interviewers, scheduled start/end, and outcome (held, Candidate absent, or Interviewer absent) (FR-INVW-031).<br>6. Each assigned Interviewer saves timestamped notes and submits ratings for every rubric criterion and a written recommendation within 48 hours; the System tracks missing scorecards and reminds the Interviewer (FR-INVW-032, FR-INVW-034).<br>7. The System calculates the interview score after all assigned scorecards are submitted or a missing card is waived with a recorded reason; if none are submitted, it leaves the score unset and holds the Candidate for a Hiring Manager decision (FR-INVW-034, FR-INVW-035). |
 | Alternative Flows | 2a. The Candidate reschedules up to 2 times, no later than 24 hours before the interview (FR-INVW-030).<br>5a. The Candidate or an assigned Interviewer is absent: the System records the outcome, notifies the Hiring Manager, and holds the Candidate for a decision (FR-INVW-036).<br>6a. A scorecard remains missing at 48 hours: the System notifies the Hiring Manager, who may waive it with a recorded reason (FR-INVW-034).<br>6b. No scorecard is submitted after the Hiring Manager's waiver: the System leaves the module score unset and holds the Candidate for a decision (FR-INVW-035). |
@@ -125,9 +125,9 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Trigger           | The Hiring Manager enables anonymity on a pipeline. |
 | Main Flow         | 1. The Hiring Manager enables anonymity and selects an identity-reveal point (a pipeline stage or the Finalist list) (FR-INVW-070).<br>2. Before that point, the System substitutes the anonymous identifier for identity fields in every Hiring Manager and Interviewer view (FR-INVW-071).<br>3. The System tells the Candidate that identity is hidden from the employer during early stages without naming the reveal point (FR-INVW-074).<br>4. When the Candidate reaches the reveal point, the System reveals identity permanently and records the reveal time (FR-INVW-073). |
 | Alternative Flows | None. |
-| Exception Flows   | E1. A path can reach a video-recorded response or live-interview stage before the reveal point: the System marks the pipeline invalid (FR-INVW-072).<br>E2. A Hiring Manager or Interviewer requests identity before the reveal point: the System denies access and logs the attempt (FR-INVW-071). |
+| Exception Flows   | E1. A path can reach a video-recorded response or live-interview stage at or before the reveal point: the System marks the pipeline invalid (FR-INVW-072).<br>E2. A Hiring Manager or Interviewer requests identity before the reveal point: the System denies access and logs the attempt (FR-INVW-071). |
 | Postconditions    | Anonymity is active up to the reveal point; reveal is permanent and recorded. |
-| Business Rules    | Identity reveal is permanent (FR-INVW-073). Anonymity is incompatible with video-recorded response and live-interview modules before the reveal point (FR-INVW-072). |
+| Business Rules    | Identity reveal is permanent (FR-INVW-073). In an anonymous pipeline, every live-interview and video-recorded response stage must follow the reveal point (FR-INVW-072). |
 
 ### UC-INVW-009: Provide Feedback and Notifications
 
@@ -201,6 +201,20 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Exception Flows   | E1. The LLM service is unavailable: the System preserves the Candidate's existing code and reports that the LLM partner is unavailable.<br>E2. The external code-evaluation provider is unavailable or returns an invalid result: the System preserves the final code and leaves the instance pending without assigning a score (FR-INVW-087). |
 | Postconditions    | The conversation and final code are saved; the code is scored by the external provider, not by the LLM. |
 | Business Rules    | The LLM assists the Candidate and does not make a pass/reject decision or produce the assessment score. |
+
+### UC-INVW-015: View Candidate Pipeline Progress
+
+| Field             | Description                                  |
+| ----------------- | -------------------------------------------- |
+| Actor(s)          | Candidate, System |
+| Description       | The Candidate views the complete published pipeline and their own progress, including their current stage or stages. |
+| Preconditions     | The Candidate's application is assigned to a published INVW pipeline after initial screening by the separate screening epic. |
+| Trigger           | The Candidate opens the pipeline progress view for their application. |
+| Main Flow         | 1. The System loads the published pipeline version assigned to the Candidate's application (FR-INVW-041).<br>2. The System displays the full stage graph, including every stage name and directed link in that version.<br>3. The System highlights the Candidate's current stage or stages and marks the Candidate's other stages as completed, active, or upcoming/locked (FR-INVW-097). |
+| Alternative Flows | 1a. After a pipeline migration, the System shows the version the Candidate is now running and preserves completed-stage progress (FR-INVW-041, FR-INVW-045). |
+| Exception Flows   | None. |
+| Postconditions    | The Candidate can identify their current position and the remaining stages in the published pipeline. |
+| Business Rules    | The view contains only the Candidate's own progress; it does not show other Candidates' data, Hiring Manager notes, or advancement thresholds (FR-INVW-097). |
 
 ## 4.5 JOB Use Cases
 
