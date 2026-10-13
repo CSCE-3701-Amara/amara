@@ -1,6 +1,6 @@
 ## 4. Use cases
 
-Owner: Hazem Nasr | Status: Draft | Last updated: 2026-10-09 | Jira: AMARA-30
+Owner: ALL | Status: Draft | Last updated: 2026-10-13 | Jira: PLACEHOLDER
 
 ### UC-AUTH-001: Candidate or Interviewer Registration
 |Field|Description|
