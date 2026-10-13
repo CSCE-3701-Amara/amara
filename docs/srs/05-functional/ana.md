@@ -44,6 +44,7 @@ The following functionality is out-of-scope:
 
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
+| FR-ANA-08 | The system **COULD** compute a Behavioral Score based on peer review surveys, PR interactions, and task-board allocation metrics. | UC-ANA-03 | AMARA-33 |
 | FR-ANA-09 | The system **SHOULD** generate an Integrity Risk Score (0−100) and attach evidence logs (paste size, focus loss timestamps) whenever threshold is exceeded. | UC-ANA-04 | AMARA-33 |
 
 #### 5.4.3.4 Candidate Reporting

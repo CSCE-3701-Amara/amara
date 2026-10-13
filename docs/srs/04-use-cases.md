@@ -1,6 +1,6 @@
 ## 4. Use cases
 
-Owner: ALL | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
+Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 
 ---
 
