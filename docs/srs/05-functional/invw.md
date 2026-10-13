@@ -6,7 +6,7 @@
 
 ## 1. Overview
 
-The INVW epic covers how Hiring Managers design and run a multi-stage interview pipeline shaped as a directed acyclic graph (DAG), and how Candidates are assessed, advanced, given feedback, or rejected. Its actors are the **Candidate**, **Interviewer**, **Hiring Manager**, and **System**. A **System Administrator** is not an actor in INVW. The Hiring Manager is the only human role that configures and administers the pipeline and records manual advancement decisions; Interviewers conduct assigned interviews and provide scorecards. This epic owns application status values and transitions and all notifications (see the boundary table in `requirements.md`).
+The INVW epic covers how Hiring Managers design and run a multi-stage interview pipeline shaped as a directed acyclic graph (DAG), and how Candidates are assessed, advanced, given feedback, or rejected. Its actors are the **Candidate**, **Interviewer**, **Hiring Manager**, and **System**. The Hiring Manager is the only human role that configures and administers the pipeline and records manual advancement decisions; Interviewers conduct assigned interviews and provide scorecards. This epic owns application status values and transitions and all notifications (see the boundary table in `requirements.md`).
 
 ## 2. Scope
 
@@ -16,6 +16,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 - Feedback and notifications (3.8)
 - Assessment test execution and scoring (3.9)
 - Candidate-facing pipeline progress view (3.10)
+- Amara and Amarat skill crests (3.11)
 
 **Out of scope (owned elsewhere)**
 - Company registration and verification, roles, and the permission matrix (AUTH)
@@ -233,7 +234,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 | FR-INVW-089 | A test instance with open-ended written answers *SHALL* remain pending human grading until every answer has been graded; the system *SHALL NOT* mark it fully scored or evaluate an automatic advancement rule before grading is complete. | UC-INVW-010 |
 | FR-INVW-090 | The system *SHALL* accept one final submission per test instance and make its responses uneditable after submission or automatic submission. | UC-INVW-010 |
 | FR-INVW-091 | The system *SHALL* let the Hiring Manager configure question-based English, programming-language, asynchronous behavioral, and aptitude modules by setting the question count and selecting or authoring each question, its response format, and its scoring method. | UC-INVW-002, UC-INVW-010 |
-| FR-INVW-092 | The system *COULD* provide an LLM-paired programming module that presents a configured coding task, lets the Candidate exchange text with the LLM during the active time limit, and saves the conversation and final code with the test instance. The LLM supports the Candidate and does not determine the assessment score. | UC-INVW-014 |
+| FR-INVW-092 | The system *COULD* provide an LLM-paired programming module that presents a configured coding task, lets the Candidate exchange text with the LLM during the active time limit, and saves the conversation and final code with the test instance. The LLM supports the Candidate and does not determine the assessment score. | UC-INVW-013 |
 | FR-INVW-093 | For a video-recorded response module, the system *SHALL* present each configured prompt, let the Candidate record and submit a video response for each prompt within the time limits, and attach each recording to the test instance for assigned human grading. | UC-INVW-002, UC-INVW-010 |
 | FR-INVW-094 | The system *SHALL* require the Hiring Manager to set a scheduled start and end time for every assessment stage, including live-interview stages, and *SHALL* require the end time to be later than the start time. Candidates may start an assessment or select a live-interview slot only within this interval; a started individual test may finish under its Candidate-specific deadline or an extension recorded under FR-INVW-015. | UC-INVW-001, UC-INVW-004, UC-INVW-005, UC-INVW-010 |
 | FR-INVW-095 | The system *SHALL* prevent pipeline publication unless the scheduled start time of each first individual assessment stage on every path through the pipeline is later than the posting's application deadline (FR-JOB-***). Live-interview stages are not individual assessment stages for this check. | UC-INVW-005 |
@@ -250,13 +251,31 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 
 | ID | Requirement | Related Use Case |
 |---|---|---|
-| FR-INVW-097 | The system *SHALL* show each Candidate the complete stage graph for the published pipeline version their application is running on, identify their current stage or stages, and distinguish their completed, active, and upcoming/locked stages. The view *SHALL* show only that Candidate's progress and *SHALL NOT* expose other Candidates' data, Hiring Manager notes, or advancement thresholds. | UC-INVW-015 |
+| FR-INVW-097 | The system *SHALL* show each Candidate the complete stage graph for the published pipeline version their application is running on, identify their current stage or stages, distinguish their completed, active, and upcoming/locked stages, and identify Amarat awarded for passed stages (FR-INVW-103). The view *SHALL* show only that Candidate's progress and *SHALL NOT* expose other Candidates' data, Hiring Manager notes, or advancement thresholds. | UC-INVW-014 |
+
+### 3.11 Amara and Amarat Skill Crests
+
+**Feature Description:** An Amara is a named, personified crest for a defined skill; Amarat are the crests earned by a Candidate on passing an associated assessment stage. Each crest has configurable proficiency levels and evidence-based descriptions of strengths and areas for development.
+
+#### Functional Requirements
+
+| ID | Requirement | Related Use Case |
+|---|---|---|
+| FR-INVW-098 | The system *SHALL* associate every predefined individual assessment-module type with one or more built-in Amara definitions, each with a unique name, crest representation, skill domain, and description. | UC-INVW-002, UC-INVW-015 |
+| FR-INVW-099 | For every custom test module and live-interview rubric, the system *SHALL* let the Hiring Manager select built-in Amarat or create custom Amara definitions with a unique name, crest representation, skill domain, and description; map each scored question or rubric criterion to exactly one selected Amara; require each assigned Amara to have at least one mapped item; and block publication if any mapping is missing. | UC-INVW-003, UC-INVW-004, UC-INVW-005, UC-INVW-015 |
+| FR-INVW-100 | For each Amara, the system *SHOULD* provide at least two ordered levels with unique labels and non-overlapping score ranges that cover all scores from 0 to 100; each level *SHOULD* have a skill-specific description, strengths, and areas for development. Built-in level scales are system-defined; the Hiring Manager may configure the number, labels, ranges, and descriptions of levels for custom Amarat. Amara level bands are separate from stage advancement thresholds (FR-INVW-051, FR-INVW-054). | UC-INVW-015 |
+| FR-INVW-101 | The system *SHOULD* calculate a separate 0–100 score for each Amara from only its mapped evidence, using earned/available points for point-scored items and the normalized ratings for mapped live-interview criteria (FR-INVW-035, FR-INVW-086), and assign the level whose configured band contains that score. | UC-INVW-016 |
+| FR-INVW-102 | When a Candidate passes an assessment stage, the system *SHALL* award each Amara assigned to that stage; it *SHALL NOT* award Amarat for a failed or held stage. If no numeric level is available, the Candidate still receives the Amara crest without a level. | UC-INVW-006, UC-INVW-016 |
+| FR-INVW-103 | The system *SHOULD* show each awarded Amara's crest, name, skill domain, level, level description, Candidate-specific strengths and areas for development, and the mapped assessment evidence supporting them. Descriptions *SHOULD* concern assessed skills and *SHOULD NOT* assert unsupported personality traits. | UC-INVW-014, UC-INVW-016 |
+| FR-INVW-104 | The system *SHALL* retain each Amara award event with the Candidate, Amara definition, source stage, pass decision, and award time, even when the Candidate earns the same Amara again. | UC-INVW-016 |
+| FR-INVW-105 | If the same Amara is awarded more than once, the system *SHOULD* show the highest earned level and preserve the history of all awards. It *SHOULD* retain the definition/level-scale version used for each award and not retroactively change prior award details when a custom definition is edited. | UC-INVW-016 |
+| FR-INVW-106 | The system *SHALL* associate every custom Amara definition and every Amara award with the Company that owns the assessment's posting. Candidate views *SHALL* identify the Company for each Amara award, and Company Hiring Managers *SHALL* only access Amara awards for Candidates/applications they are authorized to manage (AUTH). | UC-INVW-015, UC-INVW-016 |
 
 ---
 ## 4. Business Rules
 
 * **Pipeline responsibility:** The Hiring Manager configures and administers the pipeline and makes manual advancement decisions. Interviewers provide assigned notes and scorecards but do not decide advancement (AUTH; FR-INVW-032, FR-INVW-034, FR-INVW-053).
-* **Ownership boundaries:** JOB owns posting criteria (FR-JOB-***). Initial screening and pipeline admission belong to the separate screening epic. Application status names and transitions are defined in the glossary and application state machine.
+* **Ownership boundaries:** JOB owns posting criteria, including Must-have criterion freeze after the first application (FR-JOB-***). Initial screening and pipeline admission belong to the separate screening epic. Application status names and transitions are defined in the glossary and application state machine.
 * **Scoring and advancement:** They are separate decisions. Closed questions use answer keys (FR-INVW-020); coding uses the external evaluator (FR-INVW-087); open-ended responses, video responses, and live interviews use human grading or scorecards (FR-INVW-021, FR-INVW-034, FR-INVW-093). AI drafting, insights, and feedback do not score Candidates or decide outcomes (FR-INVW-018, FR-INVW-064, FR-INVW-076). Advancement uses the rule configured for the stage (FR-INVW-051, FR-INVW-052, FR-INVW-054, FR-INVW-055, FR-INVW-056).
 * **Assessment dates:** Each assessment stage has a valid scheduled start/end interval; the first exam on every pipeline path starts after the posting deadline (FR-INVW-039, FR-INVW-094, FR-INVW-095).
 * **Pipeline versions:** Exactly one version is published at a time. Migration and preservation of Candidate progress follow FR-INVW-038, FR-INVW-045, FR-INVW-046, FR-INVW-047, and FR-INVW-048.

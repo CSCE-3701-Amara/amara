@@ -39,11 +39,11 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Description       | The Hiring Manager configures an individual assessment module, its content, scoring method, and timing. Live interviews are configured through UC-INVW-004. |
 | Preconditions     | A pipeline design exists for the posting (UC-INVW-001). For library modules, the problem library contains matching problems. |
 | Trigger           | The Hiring Manager selects and configures a module for a stage. |
-| Main Flow         | 1. The Hiring Manager selects an individual assessment type from FR-INVW-008.<br>2. The Hiring Manager selects or creates its content and configures the supported response mode and scoring method required for that type (FR-INVW-082). For coding problems, they also configure count, difficulty, point values, and selection mode (FR-INVW-009).<br>3. The Hiring Manager sets the active time limit and Candidate completion window (FR-INVW-011).<br>4. The System validates and saves the module configuration. |
+| Main Flow         | 1. The Hiring Manager selects an individual assessment type from FR-INVW-008; the System attaches that predefined type's built-in Amara definition (FR-INVW-098).<br>2. The Hiring Manager selects or creates its content and configures the supported response mode and scoring method required for that type (FR-INVW-082). For coding problems, they also configure count, difficulty, point values, and selection mode (FR-INVW-009).<br>3. The Hiring Manager sets the active time limit and Candidate completion window (FR-INVW-011).<br>4. The System validates and saves the module configuration. |
 | Alternative Flows | 2a. For random coding-problem selection, the Hiring Manager sets the problem count and difficulty mix; the System selects matching problems when it creates the test instance (FR-INVW-009, FR-INVW-010).<br>2b. For question-based English, programming-language, behavioral, or aptitude modules, the Hiring Manager sets the question count and selects or authors each question, response format, and scoring method (FR-INVW-091).<br>2c. For a video-recorded response module, the Hiring Manager configures each prompt and assigns a grader (FR-INVW-093). |
 | Exception Flows   | E1. Required content, response mode, scoring method, active time limit, or Candidate completion window is missing: the System identifies the missing item and marks the module incomplete for publication (FR-INVW-011, FR-INVW-082).<br>E2. The problem library has no problems matching the configured count and difficulty mix: the System reports the mismatch and marks the module incomplete for publication. |
 | Postconditions    | A complete individual assessment module is saved and available for pipeline publication (FR-INVW-082). |
-| Business Rules    | Live interviews use the separate scheduling and scorecard flow in UC-INVW-004; LLM-paired programming is a future Could feature (UC-INVW-014); current test-instance execution is covered by UC-INVW-010. |
+| Business Rules    | Live interviews use the separate scheduling and scorecard flow in UC-INVW-004; LLM-paired programming is a future Could feature (UC-INVW-013); custom Amara mapping is configured through UC-INVW-015; test-instance execution is covered by UC-INVW-010. |
 
 ### UC-INVW-003: Build Custom Test Module with AI Assistance
 
@@ -53,7 +53,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Description       | The Hiring Manager builds a custom test module in the Design Studio, optionally using AI to draft questions, and saves it for reuse. |
 | Preconditions     | A pipeline design exists for the posting (UC-INVW-001). |
 | Trigger           | The Hiring Manager opens the Design Studio to create a custom test module. |
-| Main Flow         | 1. The Hiring Manager adds one or more multiple-choice, short-text, long-text, or code questions.<br>2. The System may draft questions from the Hiring Manager's skill and difficulty description.<br>3. The Hiring Manager reviews and approves every AI-drafted question before saving it (FR-INVW-018, FR-INVW-019).<br>4. The Hiring Manager assigns maximum points and an answer key to closed questions; for open-ended questions, the Hiring Manager assigns themselves or a stage-assigned Interviewer to grade (FR-INVW-020, FR-INVW-021).<br>5. The Hiring Manager optionally saves the complete module to the company library (FR-INVW-022). |
+| Main Flow         | 1. The Hiring Manager adds one or more multiple-choice, short-text, long-text, or code questions.<br>2. The System may draft questions from the Hiring Manager's skill and difficulty description.<br>3. The Hiring Manager reviews and approves every AI-drafted question before saving it (FR-INVW-018, FR-INVW-019).<br>4. The Hiring Manager assigns maximum points and an answer key to closed questions; for open-ended questions, the Hiring Manager assigns themselves or a stage-assigned Interviewer to grade (FR-INVW-020, FR-INVW-021).<br>5. The Hiring Manager assigns one or more Amarat to the module and maps every scored question to an Amara (UC-INVW-015, FR-INVW-099).<br>6. The Hiring Manager optionally saves the complete module to the company library (FR-INVW-022). |
 | Alternative Flows | None. |
 | Exception Flows   | E1. AI generation fails: the System discards partial output and notifies the Hiring Manager to write the questions manually. |
 | Postconditions    | A custom module is configured and, optionally, saved to the company library. |
@@ -65,7 +65,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | ----------------- | -------------------------------------------- |
 | Actor(s)          | Hiring Manager, Interviewer, Candidate, System |
 | Description       | The System schedules a live-interview stage through the external meeting provider and records its outcome, notes, and scorecards. |
-| Preconditions     | The stage is configured as a live interview with scheduled start/end times and at least one assigned Interviewer or Hiring Manager. The external provider is reachable (EXT). The Candidate has reached the stage during its scheduled interval (FR-INVW-094). If anonymity is enabled, the Candidate's identity-reveal point is strictly before this stage (FR-INVW-072). |
+| Preconditions     | The stage is configured as a live interview with scheduled start/end times, an Amara mapping for every rubric criterion (UC-INVW-015, FR-INVW-099), and at least one assigned Interviewer or Hiring Manager. The external provider is reachable (EXT). The Candidate has reached the stage during its scheduled interval (FR-INVW-094). If anonymity is enabled, the Candidate's identity-reveal point is strictly before this stage (FR-INVW-072). |
 | Trigger           | An assigned Interviewer publishes available time slots within the stage's scheduled interval. |
 | Main Flow         | 1. The assigned Interviewer publishes available time slots within the stage's scheduled start/end times (FR-INVW-094).<br>2. The Candidate selects a slot that starts and ends within that interval; the System creates and confirms the online meeting through the external provider (FR-INVW-026).<br>3. The System sends the meeting time and join link to the Candidate and assigned Interviewers within 10 minutes (FR-INVW-027).<br>4. The System reminds the Candidate and each assigned Interviewer 24 hours and 1 hour before the interview (FR-INVW-028).<br>5. After the meeting, the System records the assigned Interviewers, scheduled start/end, and outcome (held, Candidate absent, or Interviewer absent) (FR-INVW-031).<br>6. Each assigned Interviewer saves timestamped notes and submits ratings for every rubric criterion and a written recommendation within 48 hours; the System tracks missing scorecards and reminds the Interviewer (FR-INVW-032, FR-INVW-034).<br>7. The System calculates the interview score after all assigned scorecards are submitted or a missing card is waived with a recorded reason; if none are submitted, it leaves the score unset and holds the Candidate for a Hiring Manager decision (FR-INVW-034, FR-INVW-035). |
 | Alternative Flows | 2a. The Candidate reschedules up to 2 times, no later than 24 hours before the interview (FR-INVW-030).<br>5a. The Candidate or an assigned Interviewer is absent: the System records the outcome, notifies the Hiring Manager, and holds the Candidate for a decision (FR-INVW-036).<br>6a. A scorecard remains missing at 48 hours: the System notifies the Hiring Manager, who may waive it with a recorded reason (FR-INVW-034).<br>6b. No scorecard is submitted after the Hiring Manager's waiver: the System leaves the module score unset and holds the Candidate for a decision (FR-INVW-035). |
@@ -95,7 +95,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Description       | The System applies the stage's configured rule to decide whether a Candidate passes, is rejected, or remains held for a Hiring Manager decision. |
 | Preconditions     | A pipeline is published and the Candidate is active in at least one stage. |
 | Trigger           | An assessment is fully scored, a live-interview outcome is recorded, or the Hiring Manager records a manual decision. |
-| Main Flow         | 1. The System applies the stage's configured advancement rule (FR-INVW-051).<br>2. The System records the decision type, decider, time, and score (FR-INVW-058).<br>3. On pass, the System makes linked stages available only when all incoming stages have passed; on rejection, it marks the application Rejected, removes the Candidate from all active stages, and starts rejection feedback (FR-INVW-002, FR-INVW-003, FR-INVW-060). |
+| Main Flow         | 1. The System applies the stage's configured advancement rule (FR-INVW-051).<br>2. The System records the decision type, decider, time, and score (FR-INVW-058).<br>3. On pass, the System makes linked stages available only when all incoming stages have passed and awards the Amarat associated with the completed assessment (FR-INVW-002, FR-INVW-003, FR-INVW-102).<br>4. On rejection, the System marks the application Rejected, removes the Candidate from all active stages, and starts rejection feedback (FR-INVW-060). |
 | Alternative Flows | 1a. Manual rule: the Hiring Manager records pass or reject (FR-INVW-052, FR-INVW-053).<br>1b. Threshold rule: the System passes at or above the stage's current threshold; below-threshold handling is automatic rejection or hold, with hold as the default. Threshold changes from the dashboard are handled as defined in UC-INVW-007 (FR-INVW-054, FR-INVW-055, FR-INVW-096).<br>1c. Completion rule: the System passes when the module is complete, regardless of score (FR-INVW-056).<br>2a. The Hiring Manager overrides an automatic result with a written reason (FR-INVW-057).<br>2b. The Hiring Manager passes or rejects several selected Candidates at the same stage in one action (FR-INVW-059). |
 | Exception Flows   | E1. Two simultaneous decisions concern the same Candidate and stage: the System records the first and rejects the second, showing the recorded decision. |
 | Postconditions    | The decision is recorded and the Candidate is advanced, rejected, or held for a Hiring Manager decision. |
@@ -127,7 +127,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Alternative Flows | None. |
 | Exception Flows   | E1. A path can reach a video-recorded response or live-interview stage at or before the reveal point: the System marks the pipeline invalid (FR-INVW-072).<br>E2. A Hiring Manager or Interviewer requests identity before the reveal point: the System denies access and logs the attempt (FR-INVW-071). |
 | Postconditions    | Anonymity is active up to the reveal point; reveal is permanent and recorded. |
-| Business Rules    | Identity reveal is permanent (FR-INVW-073). In an anonymous pipeline, every live-interview and video-recorded response stage must follow the reveal point (FR-INVW-072). |
+| Business Rules    | Identity reveal is permanent (FR-INVW-073). In an anonymous pipeline, every live-interview and video-recorded response stage must follow the reveal point strictly (FR-INVW-072). |
 
 ### UC-INVW-009: Provide Feedback and Notifications
 
@@ -185,9 +185,9 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Alternative Flows | 1. Pair type: groups of two.<br>2. Team type: groups of the configured size, optionally with a team-level result in addition to the individual scores. |
 | Exception Flows   | E1. A group member never joins or drops out: the session continues for the remaining members, and the absent member is held for the Hiring Manager's decision.<br>E2. The time limit expires: the System auto-submits the group's answers (FR-INVW-012).<br>E3. Not enough Candidates remain to complete a group: the System holds the ungrouped Candidates for the Hiring Manager's decision. |
 | Postconditions    | Each group member has a completed module score or a held status; advancement follows UC-INVW-006. |
-| Business Rules    | Multi-person modules are incompatible with anonymity before the reveal point. They pair Candidates with one another and are distinct from the future LLM-paired programming module (UC-INVW-014). Functional requirements for this long-term goal are to be added when it is scheduled. |
+| Business Rules    | Multi-person modules are incompatible with anonymity before the reveal point. They pair Candidates with one another and are distinct from the future LLM-paired programming module (UC-INVW-013). Functional requirements for this long-term goal are to be added when it is scheduled. |
 
-### UC-INVW-014: Use LLM-Paired Programming Module
+### UC-INVW-013: Use LLM-Paired Programming Module
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -202,7 +202,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Postconditions    | The conversation and final code are saved; the code is scored by the external provider, not by the LLM. |
 | Business Rules    | The LLM assists the Candidate and does not make a pass/reject decision or produce the assessment score. |
 
-### UC-INVW-015: View Candidate Pipeline Progress
+### UC-INVW-014: View Candidate Pipeline Progress
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -210,11 +210,39 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Description       | The Candidate views the complete published pipeline and their own progress, including their current stage or stages. |
 | Preconditions     | The Candidate's application is assigned to a published INVW pipeline after initial screening by the separate screening epic. |
 | Trigger           | The Candidate opens the pipeline progress view for their application. |
-| Main Flow         | 1. The System loads the published pipeline version assigned to the Candidate's application (FR-INVW-041).<br>2. The System displays the full stage graph, including every stage name and directed link in that version.<br>3. The System highlights the Candidate's current stage or stages and marks the Candidate's other stages as completed, active, or upcoming/locked (FR-INVW-097). |
+| Main Flow         | 1. The System loads the published pipeline version assigned to the Candidate's application (FR-INVW-041).<br>2. The System displays the full stage graph, including every stage name and directed link in that version.<br>3. The System highlights the Candidate's current stage or stages and marks the Candidate's other stages as completed, active, or upcoming/locked (FR-INVW-097).<br>4. The System displays the Amarat earned at passed stages and identifies the Company associated with each Amara award (FR-INVW-103, FR-INVW-106). The Candidate may open a detailed skill card when that SHOULD capability is available (FR-INVW-103). |
 | Alternative Flows | 1a. After a pipeline migration, the System shows the version the Candidate is now running and preserves completed-stage progress (FR-INVW-041, FR-INVW-045). |
 | Exception Flows   | None. |
 | Postconditions    | The Candidate can identify their current position and the remaining stages in the published pipeline. |
 | Business Rules    | The view contains only the Candidate's own progress; it does not show other Candidates' data, Hiring Manager notes, or advancement thresholds (FR-INVW-097). |
+
+### UC-INVW-015: Configure Amara Mappings and Levels
+
+| Field             | Description                                  |
+| ----------------- | -------------------------------------------- |
+| Actor(s)          | Hiring Manager, System |
+| Description       | The Hiring Manager associates a skill crest, called an Amara (plural: Amarat), with the scored questions or rubric criteria of an assessment owned by the posting's Company. |
+| Preconditions     | An assessment module or live-interview rubric is being configured for a posting owned by the Hiring Manager's Company. |
+| Trigger           | The Hiring Manager opens Amara configuration for an assessment. |
+| Main Flow         | 1. For a predefined assessment module, the System supplies its built-in Amara definition (FR-INVW-098).<br>2. For a custom test or live-interview rubric, the Hiring Manager selects a built-in Amara or creates a custom one with a unique name, crest, skill domain, and description; each custom definition is associated with the posting's Company (FR-INVW-099, FR-INVW-106).<br>3. The Hiring Manager maps every scored question or rubric criterion to exactly one Amara and ensures each selected Amara has at least one mapped item (FR-INVW-099).<br>4. The System saves the Amara mappings with the assessment configuration. The Hiring Manager may configure levels for custom Amarat (FR-INVW-100). |
+| Alternative Flows | 4a. When level scoring is configured, the Hiring Manager defines ordered levels, score ranges, descriptions, strengths, and areas for development; the System validates that ranges do not overlap and cover 0–100 (FR-INVW-100). |
+| Exception Flows   | E1. A scored item or rubric criterion is unmapped, or an Amara has no mapped item: the System identifies the problem and blocks publication (FR-INVW-099).<br>E2. A configured level scale overlaps or does not cover 0–100: the System identifies the problem and does not save the invalid scale (FR-INVW-100). |
+| Postconditions    | The assessment is saved with Amara definitions associated with the Company and with complete evidence mappings; any configured level scale is valid. |
+| Business Rules    | Amara score bands are distinct from stage pass thresholds (FR-INVW-100, FR-INVW-054). Level configuration is optional; a Candidate may earn an Amara without a numeric level (FR-INVW-102). |
+
+### UC-INVW-016: Award and Review Amarat
+
+| Field             | Description                                  |
+| ----------------- | -------------------------------------------- |
+| Actor(s)          | Candidate, Hiring Manager, System |
+| Description       | When a Candidate passes an assessment, the System awards the associated Amarat, retains their Company association, and makes them available for review. |
+| Preconditions     | The Candidate has passed a stage with Amara mappings, and the pass decision is recorded. Numeric Amara scoring may be unavailable. |
+| Trigger           | The System records a Candidate's pass decision for an Amara-mapped assessment stage (UC-INVW-006). |
+| Main Flow         | 1. If numeric Amara scoring and levels are configured, the System may calculate a separate score for each Amara from only its mapped evidence and assign the matching level (FR-INVW-101).<br>2. The System awards each Amara assigned to the passed stage and retains the Candidate, Amara definition, source stage, pass decision, and award time (FR-INVW-102, FR-INVW-104). Each award is associated with the Company that owns the assessment posting (FR-INVW-106).<br>3. The Candidate can see the awarded crest and its Company. When detailed skill-card functionality is available, the Candidate can view its level, description, strengths, areas for development, and mapped results (FR-INVW-103).<br>4. If the Candidate earns the same Amara again, the System retains a separate award history entry; it may show the highest earned level and preserve the definition/level-scale version for each award (FR-INVW-104, FR-INVW-105). |
+| Alternative Flows | 1a. No numeric Amara score or level is available: the System still awards the Amara without a level (FR-INVW-102).<br>4a. A later award is at a lower level: the System retains the new award event; if highest-level display is supported, it continues to show the highest earned level (FR-INVW-104, FR-INVW-105). |
+| Exception Flows   | E1. The Candidate is held, rejected, or still awaiting required grading: the System does not issue an Amara award (FR-INVW-089, FR-INVW-102). |
+| Postconditions    | The Amara award and its evidence are recorded and available to the Candidate in the progress view and Amara Dynamic Resume profile. |
+| Business Rules    | Amara descriptions refer only to assessed skills and mapped evidence, not inferred personality traits (FR-INVW-103). A Company Hiring Manager can access awards only for Candidates/applications they are authorized to manage (FR-INVW-106, AUTH). |
 
 ## 4.5 JOB Use Cases
 
