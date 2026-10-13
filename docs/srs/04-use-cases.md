@@ -4,7 +4,18 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 
 ---
 
-### UC-AUTH-001: Candidate or Interviewer Registration
+### 4.1 Actors
+
+// This is only an example.
+- Candidate
+- System Administrator
+- Interviewer
+- Hiring Manager
+- System
+
+### 4.2 AUTH Use Cases
+
+#### UC-AUTH-001: Candidate or Interviewer Registration
 |Field|Description|
 |-----|-----------|
 |**Actor(s)**| Guest, System, Company Representative (optional) |
@@ -15,7 +26,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 |**Exception Flows**|**Invalid registration information**: The system displays an error message.<br>**Company association cannot be verified**: The system does not activate the interviewer account and informs the user of the required next step.<br>**The user does not receive the code**: The user requests a new verification code, and the system sends it to the registered email address.<br>**Invalid verification code**: The system displays an error message and allows the user to re-enter the code or request a new verification code.|
 |**Postconditions**|The user has an active candidate or interviewer account and can login.|
 
-### UC-AUTH-002: Company Registration
+#### UC-AUTH-002: Company Registration
 |Field|Description|
 |-----|-----------|
 |**Actor(s)**| Guest, System, System Admin |
@@ -25,7 +36,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 |**Exception Flows**|**Invalid company or requester information**: The system displays an error message and asks the user to correct the information.<br>**Company not found in official registries**: The system rejects the request and notifies the user.<br>**Manual review required**: The system keeps the request pending until a system admin accepts or rejects it.<br>**Request rejected**: The system notifies the user and does not create an active company account.<br>**The user does not receive the activation code**: The user requests a new code, and the system sends it to the registered email address.|
 |**Postconditions**|The company has an activated account with MFA configured and can login.|
 
-### UC-AUTH-003: User Login
+#### UC-AUTH-003: User Login
 |Field|Description|
 |-----|-----------|
 |**Actor(s)**| Candidate, Company Representative, Interviewer, System |
@@ -36,7 +47,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 |**Exception Flows**|**Invalid credentials**: The system displays an error message and does not create a session.<br>**Account is not activated**: The system informs the user that activation is required and offers to resend the activation code.<br>**Invalid MFA code**: The system displays an error message and allows the user to try again.<br>**Company association is no longer valid**: The system prevents interviewer login and informs the interviewer that access must be reviewed.<br>**Forgotten password**: The user requests a password reset, verifies their identity through email, and sets a new password before trying again.|
 |**Postconditions**|The user has an authenticated session and can access resources permitted by their role and associated company.|
 
-### UC-AUTH-004: Submit Report
+#### UC-AUTH-004: Submit Report
 |Field|Description|
 |-----|-----------|
 |**Actor(s)**| Candidate, Company Representative, System Admin, System |
@@ -47,7 +58,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 |**Exception Flows**|**Missing report details**: The system displays an error message and asks the user to complete the report.<br>**Report cannot be submitted**: The system displays an error message and allows the user to retry.|
 |**Postconditions**|The report is stored for system-admin review, or the user is informed that the report was not submitted.|
 
-### UC-AUTH-005: Modify Profile
+#### UC-AUTH-005: Modify Profile
 |Field|Description|
 |-----|-----------|
 |**Actor(s)**| Candidate, System |
@@ -57,7 +68,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 |**Exception Flows**|**Invalid profile information**: The system displays an error message and identifies the fields that need correction.<br>**Unauthorized access**: The system denies the action and does not change the profile.<br>**The changes cannot be saved**: The system displays an error message and preserves the current profile information.|
 |**Postconditions**|The candidate's profile contains the validated changes, or remains unchanged if validation or saving fails.|
 
-### UC-AUTH-006: Deactivate/Delete Profile
+#### UC-AUTH-006: Deactivate/Delete Profile
 |Field|Description|
 |-----|-----------|
 |**Actor(s)**| Candidate, System |
@@ -67,7 +78,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 |**Exception Flows**|**The candidate cancels**: The system keeps the profile active and returns to account settings.<br>**Unauthorized or expired session**: The system denies the action and requests authentication.<br>**The action cannot be completed**: The system displays an error message and leaves the profile unchanged.|
 |**Postconditions**|The profile is deactivated or deleted, and the candidate no longer has an active authenticated session.|
 
-### UC-AUTH-007: Share Profile
+#### UC-AUTH-007: Share Profile
 |Field|Description|
 |-----|-----------|
 |**Actor(s)**| Candidate, System |
@@ -77,7 +88,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 |**Exception Flows**|**Profile is inactive**: The system prevents creation of a shareable link or QR code and displays an error message.<br>**The shareable representation cannot be created**: The system displays an error message and allows the candidate to retry.|
 |**Postconditions**|The candidate has a shareable link or QR code for their active profile, or no shareable representation is created.|
 
-### UC-AUTH-008: Upload Supporting Documents
+#### UC-AUTH-008: Upload Supporting Documents
 |Field|Description|
 |-----|-----------|
 |**Actor(s)**| Candidate, Company Representative, Interviewer, System |
@@ -88,7 +99,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 |**Exception Flows**|**Unsupported file format**: The system rejects the document and displays an error message listing the accepted formats.<br>**Document exceeds size limit**: The system rejects the document and displays an error message stating that the maximum size is 10 MB.<br>**Upload fails**: The system displays an error message and allows the user to retry.<br>**Information extraction fails**: The system stores the document but does not change the profile, and informs the user that the fields must be completed manually.<br>**Unauthorized access**: The system denies the upload and does not store the document.|
 |**Postconditions**|The valid document is associated with the user's account, and any extracted profile information is saved only after the user confirms it.|
 
-### UC-AUTH-009: Submit Rating
+#### UC-AUTH-009: Submit Rating
 |Field|Description|
 |-----|-----------|
 |**Actor(s)**| Candidate, Company Representative, System |
@@ -99,7 +110,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 |**Exception Flows**|**User is not eligible**: The system prevents the rating and displays an error message.<br>**Invalid rating**: The system displays an error message and asks the user to provide a valid rating.<br>**Rating cannot be submitted**: The system displays an error message and allows the user to retry.|
 |**Postconditions**|The eligible user's rating is recorded for the target, or no rating is recorded if validation or submission fails.|
 
-### UC-AUTH-010: Reset Password
+#### UC-AUTH-010: Reset Password
 |Field|Description|
 |-----|-----------|
 |**Actor(s)**| Candidate, Company Representative, Interviewer, System |
@@ -110,7 +121,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 |**Exception Flows**|**Unknown email address**: The system displays an error message and does not send a reset message.<br>**Invalid or expired reset code**: The system displays an error message and allows the user to request a new reset message.<br>**Invalid new password**: The system displays an error message and asks the user to enter a password that satisfies the password policy.<br>**Password reset cannot be completed**: The system displays an error message and does not change the existing password.|
 |**Postconditions**|The user has a new valid password and any previous authenticated sessions have been terminated, or the existing password remains unchanged if the reset fails.|
 
-### UC-AUTH-011: Logout
+#### UC-AUTH-011: Logout
 |Field|Description|
 |-----|-----------|
 |**Actor(s)**| Candidate, Company Representative, Interviewer, System |
@@ -120,7 +131,74 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 |**Exception Flows**|**Session has already expired**: The system redirects the user to the login page and does not create a new session.|
 |**Postconditions**|The user's authenticated session is terminated and the user cannot access protected resources without logging in again.|
 
-## 4.3.1 UC-CAND-001 — Browse Job Postings
+#### UC-AUTH-012: View Public Company Profile
+|Field|Description|
+|-----|-----------|
+|**Actor(s)**| Guest, Candidate, Company Representative, System |
+|**Preconditions**| The company has a public profile. |
+|**Trigger**| A visitor opens a company's public profile page. |
+|**Main Flow**| 1. The visitor opens the company profile link.<br>2. The system retrieves the company's public information.<br>3. The system displays the company information and its job postings.<br>4. The visitor selects a job posting to view its details.|
+|*Exception Flows|Company profile does not exist: The system displays an error message or not-found page.<br>Company profile is unavailable*: The system displays an error message and does not expose private company information.|
+|**Postconditions**|The visitor can view the company's public information and available job postings.|
+
+#### UC-AUTH-013: Manage Users and Accounts
+|Field|Description|
+|-----|-----------|
+|**Actor(s)**| System Admin, System |
+|**Preconditions**| The system admin is authenticated and authorized to manage user accounts. |
+|**Trigger**| The system admin opens the user management interface. |
+| **Main Flow** | 1. The system admin searches for or selects a user account, or chooses to create an account.<br>2. The system displays the account information and current status, or collects the information required for the new account.<br>3. The system admin chooses an account management action.<br>4. The system admin confirms the action.<br>5. The system validates the account information, applies the action, and displays a confirmation.|
+|**Alternative Flows**|**Create account**: The system admin enters the account information, confirms creation, and the system creates the account according to the applicable activation and verification rules.<br>**View account**: The system admin views the account information without changing it.<br>**Ban or deactivate account**: The system admin selects the action, and the system prevents the account from accessing the system.<br>**Reset credentials**: The system admin initiates a credential reset for the selected account.|
+|**Exception Flows**|**Unauthorized access**: The system denies access to the user management interface.<br>**Account not found**: The system displays an error message and does not apply an action.<br>**Action cannot be completed**: The system displays an error message and leaves the account unchanged.|
+|**Postconditions**|The selected account is viewed or has the confirmed management action applied.|
+
+#### UC-AUTH-014: Manage System Entities
+|Field|Description|
+|-----|-----------|
+|**Actor(s)**| System Admin, System |
+|**Preconditions**| The system admin is authenticated and authorized to manage system entities. |
+|**Trigger**| The system admin opens an entity management interface. |
+| **Main Flow** | 1. The system admin selects an entity type, such as a candidate, company, job position, or test.<br>2. The system admin selects an existing entity or chooses to create one.<br>3. The system admin enters or edits the entity information.<br>4. The system validates the information.<br>5. The system admin confirms the action.<br>6. The system adds or updates the entity and displays a confirmation.|
+|**Alternative Flows**|**Delete entity**: The system admin selects an existing entity, confirms deletion, and the system deletes it according to the platform's data-retention rules.|
+|**Exception Flows**|**Unauthorized access**: The system denies the action.<br>**Invalid entity information**: The system displays an error message and asks the system admin to correct the information.<br>**Entity not found**: The system displays an error message and does not apply the action.<br>**Action cannot be completed**: The system displays an error message and preserves the existing entity.|
+|**Postconditions**|The selected entity is added, edited, or deleted as confirmed by the system admin.|
+
+#### UC-AUTH-015: Review Company Registration Requests
+|Field|Description|
+|-----|-----------|
+|**Actor(s)**| System Admin, System, Company Representative (optional)|
+|**Preconditions**| The system admin is authenticated and authorized to review company registration requests. |
+|**Trigger**| The system admin opens the company registration request queue. |
+| **Main Flow** | 1. The system displays pending company registration requests.<br>2. The system admin selects a request.<br>3. The system displays the submitted company and requester information, including verification results.<br>4. The system admin reviews the request.<br>5. The system admin accepts or rejects the request.<br>6. The system records the decision and notifies the requester.|
+|**Alternative Flows**|**Request requires more information**: The system admin marks the request as pending and requests additional information from the requester.|
+|**Exception Flows**|**Unauthorized access**: The system denies access to the request queue.<br>**Request not found**: The system displays an error message and returns to the request queue.<br>**Decision cannot be recorded**: The system displays an error message and leaves the request pending.|
+|**Postconditions**|The request is accepted, rejected, or remains pending with a recorded request for more information.|
+
+#### UC-AUTH-016: Manage System Taxonomies and Constants
+|Field|Description|
+|-----|-----------|
+|**Actor(s)**| System Admin, System |
+|**Preconditions**| The system admin is authenticated and authorized to manage system reference values. |
+|**Trigger**| The system admin opens the taxonomy and platform-configuration interface. |
+| **Main Flow** | 1. The system admin selects a taxonomy, platform constant, or reference value.<br>2. The system displays its current values.<br>3. The system admin adds, edits, or removes a value.<br>4. The system validates the change.<br>5. The system admin confirms the change.<br>6. The system saves the change and displays a confirmation.|
+|**Exception Flows**|**Unauthorized access**: The system denies access to the configuration interface.<br>**Invalid or conflicting value**: The system displays an error message and does not save the change.<br>**Change cannot be saved**: The system displays an error message and preserves the existing values.|
+|**Postconditions**|The selected taxonomy, constant, or reference value is updated, or remains unchanged if the operation fails.|
+
+#### UC-AUTH-017: View Administrative Reports
+|Field|Description|
+|-----|-----------|
+|**Actor(s)**| System Admin, System |
+|**Preconditions**| The system admin is authenticated and authorized to view administrative reports. |
+|**Trigger**| The system admin opens the statistics and reporting interface. |
+| **Main Flow** | 1. The system admin selects a report or statistics view.<br>2. The system retrieves aggregate data related to job postings.<br>3. The system displays the aggregate data and reporting results.<br>4. The system admin reviews the results for platform improvement or research.|
+|**Exception Flows**|**Unauthorized access**: The system denies access to administrative reports.<br>**Data unavailable**: The system displays an error message and indicates that the report cannot currently be generated.<br>**Report generation fails**: The system displays an error message and does not display incomplete results.|
+|**Postconditions**|The system admin has viewed the requested aggregate job-posting data, or no incomplete report is presented.|
+
+---
+
+### 4.3 CAND Use Cases
+
+#### 4.3.1 UC-CAND-001 — Browse Job Postings
 
 | Field | Description |
 |---|---|
@@ -134,7 +212,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Postconditions | Available job postings are displayed to the candidate, or the candidate is informed that none are available. |
 | Business Rules | Only job postings available for application shall be displayed as available opportunities. |
 
-## 4.3.2 UC-CAND-002 — Filter Job Postings
+#### 4.3.2 UC-CAND-002 — Filter Job Postings
 
 | Field | Description |
 |---|---|
@@ -148,7 +226,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Postconditions | Job postings matching the selected criteria are displayed, or the candidate is informed that no matching postings are available. |
 | Business Rules | The system shall support combining multiple filtering criteria. Only available job postings shall be displayed. |
 
-## 4.3.3 UC-CAND-003 — View Application History
+#### 4.3.3 UC-CAND-003 — View Application History
 
 | Field | Description |
 |---|---|
@@ -162,7 +240,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Postconditions | The candidate can view their application history and access the details of their applications. |
 | Business Rules | Candidates shall only be able to access their own application information. |
 
-## 4.3.4 UC-CAND-004 — Track Assessment Progress
+#### 4.3.4 UC-CAND-004 — Track Assessment Progress
 
 | Field | Description |
 |---|---|
@@ -176,7 +254,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Postconditions | The candidate can view the recorded assessment status and resume the assessment when permitted. |
 | Business Rules | Assessment progress shall be preserved where the assessment permits interruption. |
 
-## 4.3.5 UC-CAND-005 — View Assessment Result and Feedback
+#### 4.3.5 UC-CAND-005 — View Assessment Result and Feedback
 
 | Field | Description |
 |---|---|
@@ -190,7 +268,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Postconditions | The candidate can view the assessment outcome and any feedback they are permitted to access. |
 | Business Rules | Assessment results and feedback shall only be visible when disclosure is permitted by the assessment configuration. Feedback shall be associated with its corresponding assessment. |
 
-## 4.3.6 UC-CAND-006 — View Application Status
+#### 4.3.6 UC-CAND-006 — View Application Status
 
 | Field | Description |
 |---|---|
@@ -204,7 +282,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Postconditions | The candidate can view the latest recorded status of the selected application. |
 | Business Rules | Application status shall reflect the recorded progress of the application through the hiring process. |
 
-## 4.3.7 UC-CAND-007 — Receive Final Hiring Decision
+#### 4.3.7 UC-CAND-007 — Receive Final Hiring Decision
 
 | Field | Description |
 |---|---|
@@ -218,7 +296,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Postconditions | The candidate can access the final hiring decision and any accompanying employer feedback or AI-generated rejection feedback. |
 | Business Rules | The final decision shall be associated with the corresponding application and shall only be displayed once submitted by the employer. AI-generated feedback shall be provided in case of rejection. Employer-provided final feedback shall be displayed when available. |
 
-## 4.3.8 UC-CAND-008 — Accept Offer
+#### 4.3.8 UC-CAND-008 — Accept Offer
 
 | Field | Description |
 |---|---|
@@ -232,7 +310,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Postconditions | The candidate's offer response is recorded and the candidate's profile reflects acceptance when applicable. |
 | Business Rules | The system shall associate the candidate's response with the corresponding offer and application. |
 
-## 4.3.9 UC-CAND-009 — View Earned Crests
+#### 4.3.9 UC-CAND-009 — View Earned Crests
 
 | Field | Description |
 |---|---|
@@ -246,22 +324,8 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Postconditions | The candidate can view their earned Crests and associated verification information. |
 | Business Rules | A Crest shall only be awarded when the candidate satisfies the criteria defined for the corresponding assessment. |
 
-## 4.3.10 UC-CAND-010 — Maintain Verified Skills
+#### 4.3.10 UC-CAND-010 — Maintain Verified Skills
 
-Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
----
-
-## 4.1 Actors
-
-// This is only an example.
-- Candidate
-- System Administrator
-- Interviewer
-- Hiring Manager
-- Visitor (a person who is not signed in)
-- Hiring Manager (the employer)
-- Admin
-- System
 | Field | Description |
 |---|---|
 | Actor(s) | System |
@@ -274,7 +338,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions | The verified skill is associated with the candidate and retained across eligible hiring processes. |
 | Business Rules | Verified skills shall remain associated with the candidate after the hiring process in which they were earned has ended. Skills shall only be verified when the applicable assessment criteria are satisfied. |
 
-## 4.3.11 UC-CAND-011 — Generate Dynamic Resume
+#### 4.3.11 UC-CAND-011 — Generate Dynamic Resume
 
 | Field | Description |
 |---|---|
@@ -288,7 +352,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions | A dynamic resume is generated or updated using the candidate's available relevant information. |
 | Business Rules | The dynamic resume shall include verified skills and earned Crests. The system shall update the resume when relevant candidate information changes. |
 
-## 4.3.12 UC-CAND-012 — View Dynamic Resume
+#### 4.3.12 UC-CAND-012 — View Dynamic Resume
 
 | Field | Description |
 |---|---|
@@ -302,7 +366,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions | The candidate can view the latest available dynamic resume and its verified professional information. |
 | Business Rules | The displayed verified skills and Crests shall correspond to the candidate's recorded achievements. |
 
-## 4.3.14 UC-CAND-013 — Follow Company
+#### 4.3.13 UC-CAND-013 — Follow Company
 
 | Field | Description |
 |---|---|
@@ -316,7 +380,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions | The company is recorded as followed by the candidate. |
 | Business Rules | The system SHOULD allow candidates to follow companies for later job postings. |
 
-## 4.3.15 UC-CAND-014 — Save Job Posting
+#### 4.3.14 UC-CAND-014 — Save Job Posting
 
 | Field | Description |
 |---|---|
@@ -330,8 +394,10 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions | The job posting is recorded as saved by the candidate for later reference or application. |
 | Business Rules | The system SHOULD allow candidates to save job postings for later application. |
 
-## 4.4 INVW Use Cases
-### UC-INVW-001: Design Interview Pipeline
+---
+
+### 4.4 INVW Use Cases
+#### UC-INVW-001: Design Interview Pipeline
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -345,7 +411,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | The draft pipeline version and its validation result are saved; a draft with failed checks cannot be published until corrected (FR-INVW-039). |
 | Business Rules    | A draft is not available to Candidates until published through UC-INVW-005. |
 
-### UC-INVW-002: Configure Assessment Module
+#### UC-INVW-002: Configure Assessment Module
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -359,7 +425,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | A complete individual assessment module is saved and available for pipeline publication (FR-INVW-082). |
 | Business Rules    | Live interviews use the separate scheduling and scorecard flow in UC-INVW-004; LLM-paired programming is a future Could feature (UC-INVW-013); custom Amara mapping is configured through UC-INVW-015; test-instance execution is covered by UC-INVW-010. |
 
-### UC-INVW-003: Build Custom Test Module with AI Assistance
+#### UC-INVW-003: Build Custom Test Module with AI Assistance
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -373,7 +439,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | A custom module is configured and, optionally, saved to the company library. |
 | Business Rules    | None. |
 
-### UC-INVW-004: Schedule and Conduct Live Interview
+#### UC-INVW-004: Schedule and Conduct Live Interview
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -387,7 +453,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | The interview outcome and attendance are recorded; notes and submitted scorecards are stored; a score is calculated when scorecards are complete or waived. |
 | Business Rules    | Interviewer notes are visible only to the Hiring Manager and Interviewers assigned to the stage (FR-INVW-033). Meeting times use the viewer's time zone (FR-INVW-029). |
 
-### UC-INVW-005: Publish and Migrate Pipeline Version
+#### UC-INVW-005: Publish and Migrate Pipeline Version
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -401,7 +467,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | Exactly one version is published; in-progress Candidates are migrated with completed results preserved; publication and placements are recorded. |
 | Business Rules    | A stage with unchanged module and configuration is not repeated during migration (FR-INVW-045). |
 
-### UC-INVW-006: Advance Candidate Between Stages
+#### UC-INVW-006: Advance Candidate Between Stages
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -415,7 +481,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | The decision is recorded and the Candidate is advanced, rejected, or held for a Hiring Manager decision. |
 | Business Rules    | Only the Hiring Manager records manual decisions; Interviewers submit scorecards but do not make advancement decisions (FR-INVW-053). Stage advancement is independently configured as manual, threshold-based, or on completion (FR-INVW-051). |
 
-### UC-INVW-007: Review Pipeline Dashboard and Insights
+#### UC-INVW-007: Review Pipeline Dashboard and Insights
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -429,7 +495,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | The Hiring Manager has an updated pipeline view. |
 | Business Rules    | Ranking and insight inputs exclude identity and demographic attributes (FR-INVW-065). Insights support but do not replace human decisions except where an automatic advancement rule is configured (FR-INVW-051). |
 
-### UC-INVW-008: Enable Anonymous Hiring
+#### UC-INVW-008: Enable Anonymous Hiring
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -443,7 +509,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | Anonymity is active up to the reveal point; reveal is permanent and recorded. |
 | Business Rules    | Identity reveal is permanent (FR-INVW-073). In an anonymous pipeline, every live-interview and video-recorded response stage must follow the reveal point strictly (FR-INVW-072). |
 
-### UC-INVW-009: Provide Feedback and Notifications
+#### UC-INVW-009: Provide Feedback and Notifications
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -457,7 +523,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | Feedback and notifications are delivered by email and in the platform. |
 | Business Rules    | Feedback excludes questions, answer keys, thresholds, and other Candidates' data (FR-INVW-077); AI-generated feedback is labelled (FR-INVW-078). The Hiring Manager configures the feedback modes in FR-INVW-075 and FR-INVW-081. |
 
-### UC-INVW-010: Spawn Test Instance
+#### UC-INVW-010: Spawn Test Instance
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -471,7 +537,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | The instance is fully scored and ready for advancement, remains pending manual grading, or is marked missed; advancement and feedback follow UC-INVW-006 and UC-INVW-009. |
 | Business Rules    | Scoring and advancement are distinct: answer-key questions are auto-scored (FR-INVW-020), coding tests use external provider results (FR-INVW-087), and open-ended/video/live-interview responses use human grading or scorecards (FR-INVW-021, FR-INVW-034, FR-INVW-093). No assessment score or pass/reject decision is assigned by AI; AI question drafting, insights, and feedback do not assign scores (FR-INVW-018, FR-INVW-064, FR-INVW-076). The System withholds answer keys and rubrics from the active Candidate view (FR-INVW-088). A test instance is individual to one Candidate and stage assignment (FR-INVW-083). |
 
-### UC-INVW-011: Detect Cheating on Test Instances
+#### UC-INVW-011: Detect Cheating on Test Instances
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -486,7 +552,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | Suspicious instances carry their flags and evidence; only a Hiring Manager decision changes a Candidate's status (UC-INVW-006). |
 | Business Rules    | Flags support but never replace human decisions; only the Hiring Manager records manual decisions (FR-INVW-053). Flags and evidence are shown only to the Hiring Manager. Functional requirements for this long-term goal are to be added when it is scheduled. |
 
-### UC-INVW-012: Run Multi-Person Tests
+#### UC-INVW-012: Run Multi-Person Tests
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -501,7 +567,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | Each group member has a completed module score or a held status; advancement follows UC-INVW-006. |
 | Business Rules    | Multi-person modules are incompatible with anonymity before the reveal point. They pair Candidates with one another and are distinct from the future LLM-paired programming module (UC-INVW-013). Functional requirements for this long-term goal are to be added when it is scheduled. |
 
-### UC-INVW-013: Use LLM-Paired Programming Module
+#### UC-INVW-013: Use LLM-Paired Programming Module
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -516,7 +582,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | The conversation and final code are saved; the code is scored by the external provider, not by the LLM. |
 | Business Rules    | The LLM assists the Candidate and does not make a pass/reject decision or produce the assessment score. |
 
-### UC-INVW-014: View Candidate Pipeline Progress
+#### UC-INVW-014: View Candidate Pipeline Progress
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -530,7 +596,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | The Candidate can identify their current position and the remaining stages in the published pipeline. |
 | Business Rules    | The view contains only the Candidate's own progress; it does not show other Candidates' data, Hiring Manager notes, or advancement thresholds (FR-INVW-097). |
 
-### UC-INVW-015: Configure Amara Mappings and Levels
+#### UC-INVW-015: Configure Amara Mappings and Levels
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -544,7 +610,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | The assessment is saved with Amara definitions associated with the Company and with complete evidence mappings; any configured level scale is valid. |
 | Business Rules    | Amara score bands are distinct from stage pass thresholds (FR-INVW-100, FR-INVW-054). Level configuration is optional; a Candidate may earn an Amara without a numeric level (FR-INVW-102). |
 
-### UC-INVW-016: Award and Review Amarat
+#### UC-INVW-016: Award and Review Amarat
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -558,7 +624,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | The Amara award and its evidence are recorded and available to the Candidate in the progress view and Amara Dynamic Resume profile. |
 | Business Rules    | Amara descriptions refer only to assessed skills and mapped evidence, not inferred personality traits (FR-INVW-103). A Company Hiring Manager can access awards only for Candidates/applications they are authorized to manage (FR-INVW-106, AUTH). |
 
-### UC-INVW-017: Manage Finalists and Offers
+#### UC-INVW-017: Manage Finalists and Offers
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -572,64 +638,11 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Postconditions    | Each application reflects the Candidate's finalist, offer, or rejection state. Offer content, delivery, deadline, response or expiry, and any withdrawal are recorded. Rejected Finalists enter the configured rejection-feedback flow. |
 | Business Rules    | Only Candidates who pass every assessment stage on every path qualify as Finalists (FR-INVW-107). The JOB finalist target is not a cap on the Finalist list. Capacity is configured by JOB and read by INVW. The default Finalist mean uses available numeric scores from completed assessment modules and live interviews; Candidates with no numeric scores are shown without a mean (FR-INVW-108). A Candidate may have at most one pending offer per posting (FR-INVW-118). An over-capacity offer proceeds only after explicit Hiring Manager confirmation (FR-INVW-116). |
 
-### UC-AUTH-013: Manage Users and Accounts
-|Field|Description|
-|-----|-----------|
-|**Actor(s)**| System Admin, System |
-|**Preconditions**| The system admin is authenticated and authorized to manage user accounts. |
-|**Trigger**| The system admin opens the user management interface. |
-| **Main Flow** | 1. The system admin searches for or selects a user account, or chooses to create an account.<br>2. The system displays the account information and current status, or collects the information required for the new account.<br>3. The system admin chooses an account management action.<br>4. The system admin confirms the action.<br>5. The system validates the account information, applies the action, and displays a confirmation.|
-|**Alternative Flows**|**Create account**: The system admin enters the account information, confirms creation, and the system creates the account according to the applicable activation and verification rules.<br>**View account**: The system admin views the account information without changing it.<br>**Ban or deactivate account**: The system admin selects the action, and the system prevents the account from accessing the system.<br>**Reset credentials**: The system admin initiates a credential reset for the selected account.|
-|**Exception Flows**|**Unauthorized access**: The system denies access to the user management interface.<br>**Account not found**: The system displays an error message and does not apply an action.<br>**Action cannot be completed**: The system displays an error message and leaves the account unchanged.|
-|**Postconditions**|The selected account is viewed or has the confirmed management action applied.|
-
-### UC-AUTH-014: Manage System Entities
-|Field|Description|
-|-----|-----------|
-|**Actor(s)**| System Admin, System |
-|**Preconditions**| The system admin is authenticated and authorized to manage system entities. |
-|**Trigger**| The system admin opens an entity management interface. |
-| **Main Flow** | 1. The system admin selects an entity type, such as a candidate, company, job position, or test.<br>2. The system admin selects an existing entity or chooses to create one.<br>3. The system admin enters or edits the entity information.<br>4. The system validates the information.<br>5. The system admin confirms the action.<br>6. The system adds or updates the entity and displays a confirmation.|
-|**Alternative Flows**|**Delete entity**: The system admin selects an existing entity, confirms deletion, and the system deletes it according to the platform's data-retention rules.|
-|**Exception Flows**|**Unauthorized access**: The system denies the action.<br>**Invalid entity information**: The system displays an error message and asks the system admin to correct the information.<br>**Entity not found**: The system displays an error message and does not apply the action.<br>**Action cannot be completed**: The system displays an error message and preserves the existing entity.|
-|**Postconditions**|The selected entity is added, edited, or deleted as confirmed by the system admin.|
-
-### UC-AUTH-015: Review Company Registration Requests
-|Field|Description|
-|-----|-----------|
-|**Actor(s)**| System Admin, System, Company Representative (optional)|
-|**Preconditions**| The system admin is authenticated and authorized to review company registration requests. |
-|**Trigger**| The system admin opens the company registration request queue. |
-| **Main Flow** | 1. The system displays pending company registration requests.<br>2. The system admin selects a request.<br>3. The system displays the submitted company and requester information, including verification results.<br>4. The system admin reviews the request.<br>5. The system admin accepts or rejects the request.<br>6. The system records the decision and notifies the requester.|
-|**Alternative Flows**|**Request requires more information**: The system admin marks the request as pending and requests additional information from the requester.|
-|**Exception Flows**|**Unauthorized access**: The system denies access to the request queue.<br>**Request not found**: The system displays an error message and returns to the request queue.<br>**Decision cannot be recorded**: The system displays an error message and leaves the request pending.|
-|**Postconditions**|The request is accepted, rejected, or remains pending with a recorded request for more information.|
-
-### UC-AUTH-016: Manage System Taxonomies and Constants
-|Field|Description|
-|-----|-----------|
-|**Actor(s)**| System Admin, System |
-|**Preconditions**| The system admin is authenticated and authorized to manage system reference values. |
-|**Trigger**| The system admin opens the taxonomy and platform-configuration interface. |
-| **Main Flow** | 1. The system admin selects a taxonomy, platform constant, or reference value.<br>2. The system displays its current values.<br>3. The system admin adds, edits, or removes a value.<br>4. The system validates the change.<br>5. The system admin confirms the change.<br>6. The system saves the change and displays a confirmation.|
-|**Exception Flows**|**Unauthorized access**: The system denies access to the configuration interface.<br>**Invalid or conflicting value**: The system displays an error message and does not save the change.<br>**Change cannot be saved**: The system displays an error message and preserves the existing values.|
-|**Postconditions**|The selected taxonomy, constant, or reference value is updated, or remains unchanged if the operation fails.|
-
-### UC-AUTH-017: View Administrative Reports
-|Field|Description|
-|-----|-----------|
-|**Actor(s)**| System Admin, System |
-|**Preconditions**| The system admin is authenticated and authorized to view administrative reports. |
-|**Trigger**| The system admin opens the statistics and reporting interface. |
-| **Main Flow** | 1. The system admin selects a report or statistics view.<br>2. The system retrieves aggregate data related to job postings.<br>3. The system displays the aggregate data and reporting results.<br>4. The system admin reviews the results for platform improvement or research.|
-|**Exception Flows**|**Unauthorized access**: The system denies access to administrative reports.<br>**Data unavailable**: The system displays an error message and indicates that the report cannot currently be generated.<br>**Report generation fails**: The system displays an error message and does not display incomplete results.|
-|**Postconditions**|The system admin has viewed the requested aggregate job-posting data, or no incomplete report is presented.|
-
 ---
 
-## 4.2 AUTH Use Cases
-## 4.5 JOB Use Cases
-### Use Case Index
+### 4.5 JOB Use Cases
+
+#### Use Case Index
 
 | Use Case | Actor(s) | Related Requirements |
 | --- | --- | --- |
@@ -651,7 +664,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | UC-JOB-16: Apply to Posting | Candidate, System | FR-JOB-099 to FR-JOB-109, FR-JOB-111 |
 | UC-JOB-17: Screen and Admit Applications | System, Hiring Manager, Candidate (informed) | FR-JOB-025, FR-JOB-105, FR-JOB-107 to FR-JOB-111 |
 
-### UC-JOB-01: Create, Configure and Edit Job Posting
+#### UC-JOB-01: Create, Configure and Edit Job Posting
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -668,7 +681,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Autosave applies to Drafts only. Every criterion is exactly one of Must-have or Nice-to-have; Must-have criteria are checkable conditions on structured resume fields and are locked after the first application. A deadline can be extended only before it passes. A posting has at most 10 tags, taken only from the Admin taxonomy. A salary range that is not shown is never revealed to candidates. Only Hiring Managers permitted to manage postings, and Admins, can create or edit a posting. |
 | Related Requirements | FR-JOB-001 to FR-JOB-004, FR-JOB-005 to FR-JOB-013, FR-JOB-014, FR-JOB-015, FR-JOB-018, FR-JOB-045, FR-JOB-046, FR-JOB-089 to FR-JOB-098 |
 
-### UC-JOB-02: Preview Posting
+#### UC-JOB-02: Preview Posting
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -685,7 +698,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Previewing never changes data or notifies anyone. |
 | Related Requirements | FR-JOB-016, FR-JOB-017 |
 
-### UC-JOB-03: Publish Job Posting
+#### UC-JOB-03: Publish Job Posting
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -702,7 +715,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Only the transitions Draft to Published, Published to Archived, and Archived to Published exist. A posting can be published before a pipeline is published. Only accepted submissions count toward the cap. |
 | Related Requirements | FR-JOB-011, FR-JOB-012, FR-JOB-023 to FR-JOB-026, FR-JOB-035, FR-JOB-069, FR-JOB-089, FR-JOB-091, FR-JOB-093, FR-JOB-102, FR-JOB-103 |
 
-### UC-JOB-04: Archive and Republish Posting
+#### UC-JOB-04: Archive and Republish Posting
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -719,7 +732,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Archiving suspends applications but never deletes or decides them. An Archived posting is shown only to candidates who applied to or saved it. A posting can be reopened to new applications only before its deadline passes. A withdrawn application blocks a new one to the same posting. |
 | Related Requirements | FR-JOB-027 to FR-JOB-035, FR-JOB-039 |
 
-### UC-JOB-05: Delete Posting and Manage Postings as Admin
+#### UC-JOB-05: Delete Posting and Manage Postings as Admin
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -736,7 +749,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | A Hiring Manager permitted to manage postings may delete any posting of their company. An Admin may delete any posting. |
 | Related Requirements | FR-JOB-018, FR-JOB-040, FR-JOB-041, FR-JOB-042 |
 
-### UC-JOB-06: Handle Postings of a Banned Company
+#### UC-JOB-06: Handle Postings of a Banned Company
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -753,7 +766,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | While a company is banned, its postings stay archived and nothing can be published. The reason for a ban is never disclosed to candidates. The Hiring Manager decides on applications after the ban is resolved. |
 | Related Requirements | FR-JOB-036 to FR-JOB-039 |
 
-### UC-JOB-07: Manage Company Posting List
+#### UC-JOB-07: Manage Company Posting List
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -770,7 +783,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | The list includes Draft, Published, and Archived postings. Filtering and searching the list are recommended (SHOULD). |
 | Related Requirements | FR-JOB-043, FR-JOB-044 |
 
-### UC-JOB-08: Switch Employer Interface Language
+#### UC-JOB-08: Switch Employer Interface Language
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -787,7 +800,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Switching the interface language never changes posting content. |
 | Related Requirements | FR-JOB-019 to FR-JOB-022 |
 
-### UC-JOB-09: Browse, Filter, Sort, and Search Jobs and Companies
+#### UC-JOB-09: Browse, Filter, Sort, and Search Jobs and Companies
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -804,7 +817,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Only Published postings appear in the feed and search. Every user must be signed in to browse. The system never converts amounts between currencies or reveals a hidden salary range through filters or search. |
 | Related Requirements | FR-JOB-047 to FR-JOB-050, FR-JOB-053 to FR-JOB-067 |
 
-### UC-JOB-10: View Posting Details and Company Profile
+#### UC-JOB-10: View Posting Details and Company Profile
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -821,7 +834,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | The salary range is shown only where the Hiring Manager chose to show it. Draft and Archived postings never appear on the company profile. |
 | Related Requirements | FR-JOB-026, FR-JOB-068 to FR-JOB-072 |
 
-### UC-JOB-11: Share and Open Posting Link
+#### UC-JOB-11: Share and Open Posting Link
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -838,7 +851,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Sharing never bypasses sign-in. |
 | Related Requirements | FR-JOB-047, FR-JOB-088 |
 
-### UC-JOB-12: Manage Saved Postings
+#### UC-JOB-12: Manage Saved Postings
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -855,7 +868,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Saved postings belong to the candidate; Hiring Managers and Admins never see who saved a posting. |
 | Related Requirements | FR-JOB-073 to FR-JOB-076 |
 
-### UC-JOB-13: Follow and Manage Companies
+#### UC-JOB-13: Follow and Manage Companies
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -872,7 +885,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Followed companies belong to the candidate; Hiring Managers and Admins never see who follows a company. Showing the followed list and email notifications are recommended (SHOULD). |
 | Related Requirements | FR-JOB-077 to FR-JOB-080 |
 
-### UC-JOB-14: Get Recommendations
+#### UC-JOB-14: Get Recommendations
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -889,7 +902,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Recommendations use only structured posting data and job preferences, never name, photo, gender, age, or nationality. |
 | Related Requirements | FR-JOB-051, FR-JOB-052, FR-JOB-081 to FR-JOB-084 |
 
-### UC-JOB-15: Manage Saved Searches and New-Jobs Tracker
+#### UC-JOB-15: Manage Saved Searches and New-Jobs Tracker
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -906,7 +919,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Saved searches belong to the candidate. This use case is optional (COULD). |
 | Related Requirements | FR-JOB-085 to FR-JOB-087 |
 
-### UC-JOB-16: Apply to Posting
+#### UC-JOB-16: Apply to Posting
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -923,7 +936,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | A candidate has at most one application per posting; a rejected or withdrawn application also blocks a new one. The submitted resume and answers never change after submission. Only accepted submissions count toward the cap. The Must-have warning does not block submission. |
 | Related Requirements | FR-JOB-099 to FR-JOB-109, FR-JOB-111 |
 
-### UC-JOB-17: Screen and Admit Applications
+#### UC-JOB-17: Screen and Admit Applications
 
 | Field             | Description                                  |
 | ----------------- | -------------------------------------------- |
@@ -940,9 +953,9 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | Business Rules    | Only Must-have criteria decide admission; Nice-to-have criteria never exclude a candidate. A screened-out application is never admitted. A posting can be published before a pipeline is published. |
 | Related Requirements | FR-JOB-025, FR-JOB-105, FR-JOB-107 to FR-JOB-111 |
 
-## 4.6 ANA Use Cases
+### 4.6 ANA Use Cases
 
-### Use Case 1: Stream & Ingest IDE Telemetry
+#### Use Case 1: Stream & Ingest IDE Telemetry
 
 | Field | Description |
 | --- | --- |
@@ -958,9 +971,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | **Postconditions** | Telemetry events successfully connected to the candidate record. |
 | **Business Rules** | The telemetry streaming must run flawlessly and not affect the candidate’s experience. |
 
----
-
-### Use Case 2: Calculate Execution Efficiency Metrics
+#### Use Case 2: Calculate Execution Efficiency Metrics
 
 | Field | Description |
 | --- | --- |
@@ -976,9 +987,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | **Postconditions** | The metrics are saved to the candidate’s records. |
 | **Business Rules** | Metrics must be computed in an isolated execution sandbox environment. |
 
----
-
-### Use Case 3: Calculate Technical Pass Rate Score
+#### Use Case 3: Calculate Technical Pass Rate Score
 
 | Field | Description |
 | --- | --- |
@@ -994,9 +1003,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | **Postconditions** | Technical Pass Rate Score updated on candidate evaluation scorecard. |
 | **Business Rules** | A zero pass rate score is not an auto rejection. |
 
----
-
-### Use Case 4: Evaluate Integrity Risk 
+#### Use Case 4: Evaluate Integrity Risk 
 
 | Field | Description |
 | --- | --- |
@@ -1012,9 +1019,7 @@ Owner: TBD | Status: Draft | Last updated: 2026-10-13 | Jira: HIRE-n
 | **Postconditions** | Evidence logs attached and candidate Integrity Risk Score updated. |
 | **Business Rules** | A high integrity score requires human revision to avoid auto rejection. |
 
----
-
-### Use Case 5: Export Candidate Evaluation Report
+#### Use Case 5: Export Candidate Evaluation Report
 
 | Field | Description |
 | --- | --- |
