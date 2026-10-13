@@ -194,6 +194,13 @@ The Candidate Subsystem includes the following functional areas:
 | **FR-CAND-065** | The system **SHOULD** notify candidates when an assessment result becomes available. | UC-CAND-17 — Receive Application Notifications | TBD |
 | **FR-CAND-066** | The system **SHOULD** notify candidates when a final hiring decision becomes available. | UC-CAND-17 — Receive Application Notifications | TBD |
 
+#### 5.2.3.18 Following Company
+
+| ID | Requirement | Use Case | Related Functional Requirement | Jira |
+|---|---|---|---|
+| **FR-CAND-067** | The candidate **SHOULD** be able to follow a company for later postings. | UC-CAND-18 — Following Company | FR-JOP-### | TBD |
+| **FR-CAND-068** | The candidate **SHOULD** be able save a posting for later application. | UC-CAND-19 — Save Jop Posting | FR-JOP-### | TBD |
+
 ---
 
 ### 5.2.4 Business Rules
