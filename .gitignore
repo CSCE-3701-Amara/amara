@@ -36,3 +36,19 @@ go.work.sum
 /local-plans/
 # Windows zone identifier metadata
 *:Zone.Identifier
+
+# Frontend dependencies and build output
+web/node_modules/
+web/dist/
+
+# TypeScript/Vite generated files
+*.tsbuildinfo
+web/vite.config.js
+web/vite.config.d.ts
+
+# Local environment variants
+.env.*
+!.env.example
+
+# Package manager logs
+npm-debug.log*
