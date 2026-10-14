@@ -1,6 +1,6 @@
-## 5.5 CAND: Candidates & Dynamic Resume
+## 5.2 CAND: Candidates & Dynamic Resume
 
-Owner: Ali Mohammed | Status: Draft | Last updated: 2026-10-08 | Jira: AMARA-34
+Owner: Ali Mohammed | Status: Draft | Last updated: 2026-10-14 | Jira: AMARA-34
 
 ### 5.2.1 Overview
 
@@ -34,7 +34,7 @@ The Candidate Subsystem includes the following functional areas:
 4. Assessment Progress Tracking
 5. Assessment Results and Feedback
 6. Application Status and Final Hiring Decisions
-7. Offer Acceptance or Refusal
+7. Offer Response
 8. Company Following and Job Posting Bookmarks
 9. Verified Skills and Crests
 10. Dynamic Resume Generation and Viewing
@@ -48,20 +48,20 @@ The Candidate Subsystem includes the following functional areas:
 
 | ID | Requirement | Use Case | Related Functional Requirement | Jira |
 |---|---|---|---|---|
-| **FR-CAND-001** | The system **SHALL** display currently available job postings to candidates. | UC-CAND-001 — Browse Job Postings | FR-JOP-### | TBD |
-| **FR-CAND-002** | The system **SHALL** display the essential information associated with each job posting. | UC-CAND-001 — Browse Job Postings | FR-JOP-### | TBD |
-| **FR-CAND-003** | The system **SHALL** exclude job postings that are no longer available for application. | UC-CAND-001 — Browse Job Postings | FR-JOP-### | TBD |
+| **FR-CAND-001** | The system **SHALL** display currently available job postings to candidates. | UC-CAND-001 — Browse Job Postings | FR-JOB-048 | TBD |
+| **FR-CAND-002** | The system **SHALL** display the essential information associated with each job posting. | UC-CAND-001 — Browse Job Postings | FR-JOB-049 | TBD |
+| **FR-CAND-003** | The system **SHALL** exclude job postings that are no longer available for application. | UC-CAND-001 — Browse Job Postings | FR-JOB-048 | TBD |
 
 #### 5.2.3.2 Filter Job Postings
 
 | ID | Requirement | Use Case | Related Function Requirement | Jira |
 |---|---|---|---|---|
-| **FR-CAND-004** | The system **SHALL** allow candidates to filter postings by offered compensation. | UC-CAND-002 — Filter Job Postings | FR-JOP-### | TBD |
-| **FR-CAND-005** | The system **SHALL** allow candidates to filter postings by position. | UC-CAND-002 — Filter Job Postings | FR-JOP-### | TBD |
-| **FR-CAND-006** | The system **SHALL** allow candidates to filter postings by job grade. | UC-CAND-002 — Filter Job Postings | FR-JOP-### | TBD |
-| **FR-CAND-007** | The system **SHALL** allow candidates to filter postings by company. | UC-CAND-002 — Filter Job Postings | FR-JOP-### | TBD |
-| **FR-CAND-008** | The system **SHALL** allow candidates to combine multiple filter criteria. | UC-CAND-002 — Filter Job Postings | FR-JOP-### | TBD |
-| **FR-CAND-009** | The system **SHALL** update the displayed postings according to the selected criteria. | UC-CAND-002 — Filter Job Postings | FR-JOP-### | TBD |
+| **FR-CAND-004** | The system **SHALL** allow candidates to filter postings by offered compensation. | UC-CAND-002 — Filter Job Postings | FR-JOB-055, FR-JOB-057 | TBD |
+| **FR-CAND-005** | The system **SHALL** allow candidates to filter postings by position. | UC-CAND-002 — Filter Job Postings | FR-JOB-055 | TBD |
+| **FR-CAND-006** | The system **SHALL** allow candidates to filter postings by job grade. | UC-CAND-002 — Filter Job Postings | FR-JOB-055 | TBD |
+| **FR-CAND-007** | The system **SHALL** allow candidates to filter postings by company. | UC-CAND-002 — Filter Job Postings | FR-JOB-055 | TBD |
+| **FR-CAND-008** | The system **SHALL** allow candidates to combine multiple filter criteria. | UC-CAND-002 — Filter Job Postings | — | TBD |
+| **FR-CAND-009** | The system **SHALL** update the displayed postings according to the selected criteria. | UC-CAND-002 — Filter Job Postings | — | TBD |
 
 #### 5.2.3.3 View Application History
 
@@ -94,7 +94,7 @@ The Candidate Subsystem includes the following functional areas:
 | ID | Requirement | Use Case | Jira |
 |---|---|---|---|
 | **FR-CAND-021** | The system **SHALL** display the current status of each active application. | UC-CAND-006 — View Application Status | TBD |
-| **FR-CAND-022** | The system **SHALL** update the application status when the application progresses through the hiring pipeline. | UC-CAND-006 — View Application Status | TBD |
+| **FR-CAND-022** | The system **SHALL** display the latest application status supplied by the owning workflow epic as the application progresses through screening and the hiring pipeline. | UC-CAND-006 — View Application Status | TBD |
 | **FR-CAND-023** | The system **SHALL** indicate when an application has reached a final decision. | UC-CAND-006 — View Application Status | TBD |
 
 #### 5.2.3.7 Receive Final Hiring Decision
@@ -109,8 +109,8 @@ The Candidate Subsystem includes the following functional areas:
 
 | ID | Requirement | Use Case | Jira |
 |---|---|---|---|
-| **FR-CAND-027** | The candidate **SHALL** accept or refuse offer. | UC-CAND-008 — Accept Offer | TBD |
-| **FR-CAND-028** | The system **SHALL** reflect accepting the offer in the candidate's profile. | UC-CAND-008 — Accept Offer | TBD |
+| **FR-CAND-027** | The Candidate **SHALL** be able to submit an accept or decline response to a pending offer in the platform; INVW validates the deadline and owns response recording and status transitions. | UC-CAND-008 — Accept Offer | TBD |
+| **FR-CAND-028** | The system **SHALL** display the accepted-offer status in the Candidate's profile using the status supplied by INVW. | UC-CAND-008 — Accept Offer | TBD |
 
 #### 5.2.3.9 View Earned Crests
 
@@ -146,13 +146,13 @@ The Candidate Subsystem includes the following functional areas:
 
 | ID | Requirement | Use Case | Related Functional Requirement | Jira |
 |---|---|---|---|---|
-| **FR-CAND-043** | The candidate **SHOULD** be able to follow a company for later postings. | UC-CAND-013 — Following Company | FR-JOP-### | TBD |
+| **FR-CAND-043** | The Candidate **SHOULD** be able to follow a company for later postings. | UC-CAND-013 — Following Company | FR-JOB-077 | TBD |
 
 #### 5.2.3.14 Saving Posting
 
 | ID | Requirement | Use Case | Related Functional Requirement | Jira |
 |---|---|---|---|---|
-| **FR-CAND-044** | The candidate **SHOULD** be able save a posting for later application. | UC-CAND-014 — Save Jop Posting | FR-JOP-### | TBD |
+| **FR-CAND-044** | The Candidate **SHOULD** be able to save a posting for later application. | UC-CAND-014 — Save Job Posting | FR-JOB-073 | TBD |
 
 ---
 
@@ -167,7 +167,7 @@ The following business rules govern the behavior of the Candidate Subsystem:
 - Personally identifiable candidate information shall remain hidden during pipeline stages configured for anonymous evaluation.
 - Candidate identity shall only become available to authorized employer users at the configured identity-disclosure stage.
 - Assessment results and feedback shall only be visible to candidates when disclosure is permitted by the assessment configuration.
-- A candidate shall not have more than one active application for the same job posting.
+- A Candidate cannot submit another application for a posting when an application is already active or an existing application has status Rejected or Withdrawn; JOB validates this rule (FR-JOB-101).
 
 ---
 
@@ -176,7 +176,7 @@ The following business rules govern the behavior of the Candidate Subsystem:
 The system shall provide appropriate feedback when:
 
 - A candidate attempts to apply to an unavailable job posting.
-- A candidate attempts to submit a duplicate active application.
+- A Candidate attempts to submit another application when an application is already active or an existing application has status Rejected or Withdrawn for that posting (FR-JOB-101).
 - A candidate attempts to access an assessment that is not yet available.
 - A candidate attempts to submit an incomplete assessment where completion is required.
 - An uploaded professional document does not meet the supported file requirements.

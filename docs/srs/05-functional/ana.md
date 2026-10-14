@@ -1,11 +1,11 @@
-## 5.4 ANA: Candidate Analytics & Evaluation Subsystem
+## 5.5 ANA: Candidate Analytics & Evaluation Subsystem
 
-Owner: Ali Mohamed | Status: Final | Last updated: 2026-10-13 | Jira: AMARA-33
+Owner: Ali Mohamed | Status: Final | Last updated: 2026-10-14 | Jira: AMARA-33
 
-### 5.4.1 Overview
+### 5.5.1 Overview
 This section defines the functional requirements related to **AMARA-33 ANA: Candidate Analytics & Evaluation Subsystem**. The Analytics Subsystem is concerned with receiving real-time telemetry data, code execution metrics, and behavioural statistics to produce technical and behavioural insights, logs, and scorecards for the candidate to be displayed on our platform Amara.
 
-### 5.4.2 Scope
+### 5.5.2 Scope
 This subsystem offers the following functionality:
 - IDE telemetry ingestion and real-time event streaming.
 - Sandbox execution metrics (runtime, memory, O-complexity approximation) and test pass rate scoring.
@@ -19,9 +19,9 @@ The following functionality is out-of-scope:
 - Candidate scheduling and communications.
 - The nature of tests taken by the candidate.
 
-### 5.4.3 Requirements
+### 5.5.3 Requirements
 
-#### 5.4.3.1 Telemetry Ingestion & Real-Time Streaming
+#### 5.5.3.1 Telemetry Ingestion & Real-Time Streaming
 
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
@@ -29,7 +29,7 @@ The following functionality is out-of-scope:
 | FR-ANA-02 | The system **SHALL** stream and ingest pastes at sub-second intervals. | UC-ANA-01 | AMARA-33 |
 | FR-ANA-03 | The system **SHALL** stream and ingest focus events at sub-second intervals. | UC-ANA-01 | AMARA-33 |
 
-#### 5.4.3.2 Technical Execution & Code Analysis
+#### 5.5.3.2 Technical Execution & Code Analysis
 
 
 |     ID      | Requirement | Related Use Case(s) | Jira |
@@ -39,7 +39,7 @@ The following functionality is out-of-scope:
 | FR-ANA-06 | The system **SHALL** calculate O-complexity approximation upon code submission to the sandbox. | UC-ANA-02| AMARA-33 |
 | FR-ANA-07 | The system **SHALL** calculate a Pass Rate Score based on the tests passed. | UC-ANA-03 | AMARA-33 |
 
-#### 5.4.3.3 Behavioral & Integrity Scoring
+#### 5.5.3.3 Behavioral & Integrity Scoring
 
 
 |     ID      | Requirement | Related Use Case(s) | Jira |
@@ -47,19 +47,19 @@ The following functionality is out-of-scope:
 | FR-ANA-08 | The system **COULD** compute a Behavioral Score based on peer review surveys, PR interactions, and task-board allocation metrics. | UC-ANA-03 | AMARA-33 |
 | FR-ANA-09 | The system **SHOULD** generate an Integrity Risk Score (0−100) and attach evidence logs (paste size, focus loss timestamps) whenever threshold is exceeded. | UC-ANA-04 | AMARA-33 |
 
-#### 5.4.3.4 Candidate Reporting
+#### 5.5.3.4 Candidate Reporting
 
 
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
 | FR-ANA-10 | The system **COULD** aggregate technical, behavioral, and integrity metrics into a single exportable candidate report (PDF/JSON). | UC-ANA-05 | AMARA-33 |
 
-#### 5.4.3.5 Business Rules
+#### 5.5.3.5 Business Rules
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
 | BR-ANA-11 | Candidates with an Integrity Risk Score exceeding 70 **SHALL** be flagged for manual review before final report generation. | UC-ANA-04 | AMARA-33 |
 
-#### 5.4.3.6 Error Handling
+#### 5.5.3.6 Error Handling
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
 | ERR-ANA-12 | Telemetry connection drops **SHALL** cause local event queuing in the IDE buffer without interrupting developer code input. | UC-ANA-01 | AMARA-33 |

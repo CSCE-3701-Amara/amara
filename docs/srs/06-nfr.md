@@ -1,6 +1,6 @@
 ## 6. Non-functional requirements
 
-Owner: Ziad Eliwa | Status: Draft | Last updated: 2026-10-10 | Jira: AMARA-17 
+Owner: Ziad Eliwa | Status: Draft | Last updated: 2026-10-10 | Jira: AMARA-17
 
 Each NFR *SHALL* be measurable (a number, a condition, or a standard) and is identified by `NFR-<AREA>-nnn` (see `docs/conventions/requirements.md`).
 
@@ -18,7 +18,7 @@ A *Shall* is required for T1. A *Should* is the T2 bar. A *Could* is the T3 bar.
 
 Stack these requirements assume, and that the design must not fight: Go backend, React.js and Next.js frontend, Docker, AWS or Azure, structured logs and distributed traces.
 
---- 
+---
 <!-- Template for a category -->
 <!-- ### n. <Category> Requirements
 
@@ -194,7 +194,7 @@ Work in the browsers, networks, and languages an Egyptian candidate and a Hiring
 
 #### Standards/Refs
 
-Browser support: current and previous major version, matching common SaaS practice. Core Web Vitals and a 3G-class profile for the apply flow. Arabic and English per `docs/srs/10-i18n.md`. HTTP APIs as JSON, versioned.
+Browser support: current and previous major version, matching common SaaS practice. Core Web Vitals and a 3G-class profile for the apply flow. Arabic and English per `NFR-COMP-004`; detailed locale rules are tracked in `docs/srs/TBD.md` (TBD-006). HTTP APIs as JSON, versioned.
 
 #### Key Questions
 
@@ -486,7 +486,7 @@ WCAG 2.2 Level AA. axe-core for the automated slice. Egypt Law No. 10 of 2018 on
 
 **Drives:** axe-core CI job, keyboard stage editor, status icon set, locale `lang` and `dir` on the document.
 
-### 11. Performance Requirements 
+### 11. Performance Requirements
 
 #### Objective
 
@@ -522,9 +522,9 @@ Core Web Vitals (LCP, INP, CLS). Latency is server time plus network, at the per
 
 **Drives:** CDN or static hosting for Next.js assets, pagination on list queries, screening worker pool sized for T1, bundle-size check.
 
-### 12. Environmental Requirements 
+### 12. Environmental Requirements
 
-Operating/deployment environment (platforms, browsers, runtime). Sustainability concerns live in `docs/srs/11-global-considerations.md`.
+Operating/deployment environment (platforms, browsers, runtime). Sustainability concerns live in `docs/srs/07-global-considerations.md`.
 
 #### Objective
 
