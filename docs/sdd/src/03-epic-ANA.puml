@@ -1,0 +1,65 @@
+@startuml
+title 3/10 - Epic ANA: Candidate Analytics & Evaluation
+skinparam componentStyle rectangle
+left to right direction
+skinparam component {
+  BackgroundColor<<foreign>> #EEEEEE
+  BorderColor<<foreign>> #999999
+  FontColor<<foreign>> #555555
+}
+
+component "Candidate Analytics & Evaluation" as ANA {
+  component "Telemetry Ingestion Service" as TIS
+  component "Execution Metrics Calculator" as EMC
+  component "Pass Rate Scorer" as PRS
+  component "Behavioral Scorer" as BHS
+  component "Integrity Risk Evaluator" as IRE
+  component "Candidate Report Generator" as RG
+  component "Bias Auditor" as BIA
+}
+
+' ---------- External systems ----------
+component "Candidate IDE\n(telemetry plugin)" as IDE <<external>>
+component "Execution Sandbox" as SBX <<external>>
+component "Peer Reviews, PRs &\nTask-Board Sources" as CSRC <<external>>
+
+' ---------- Other epics (stubs, grey) ----------
+component "Accounts, Identity & Trust (AUTH)" as AUTH <<foreign>> {
+  component "Profile Management" as PRF <<foreign>>
+  component "Access Control (RBAC)" as RBAC <<foreign>>
+}
+component "Pipeline & Interviews & Tests (INVW)" as INVW <<foreign>> {
+  component "Stage Advancement Engine" as SAE <<foreign>>
+  component "Pipeline Dashboard & Insights" as PDI <<foreign>>
+}
+
+interface "ICandidateScorecard" as ICS
+interface "IPipelineData" as IPD
+interface "IAccessControl" as IAC
+RG -- ICS
+SAE -- IPD
+RBAC -- IAC
+
+' ---------- ANA internal dependencies ----------
+IRE ..> TIS : consumes telemetry stream
+EMC ..> TIS : partial diagnostics on failure
+RG ..> EMC : runtime, memory, complexity
+RG ..> PRS : pass rate score
+RG ..> BHS : behavioral score
+RG ..> IRE : integrity score, evidence & >70 review flag
+BIA ..> PRS : audits scores
+BIA ..> BHS : audits scores
+BIA ..> IRE : audits scores
+
+' ---------- ANA to external systems ----------
+IDE ..> TIS : streams keystrokes, pastes, focus events
+EMC ..> SBX : reads execution results
+PRS ..> SBX : reads test outcomes
+BHS ..> CSRC : reads peer reviews, PRs, task board
+
+' ---------- Cross-epic ----------
+BIA ..> PRF : demographic attributes (audit only)
+ANA ..> IPD : reads (never writes)
+PDI ..> ICS : candidate evaluation report (Hiring Manager)
+ANA ..> IAC : roles & permissions
+@enduml

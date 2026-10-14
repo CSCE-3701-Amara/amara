@@ -1,0 +1,120 @@
+@startuml
+title 4/10 - Epic AUTH: Accounts, Identity & Trust
+skinparam componentStyle rectangle
+left to right direction
+skinparam component {
+  BackgroundColor<<foreign>> #EEEEEE
+  BorderColor<<foreign>> #999999
+  FontColor<<foreign>> #555555
+}
+
+component "Accounts, Identity & Trust" as AUTH {
+  component "Registration Service" as REG
+  component "Account Activation" as ACT
+  component "Company Registration & Verification" as CRV
+  component "Authentication & Session Manager" as LGN
+  component "MFA Manager" as MFA
+  component "Password Manager" as PWD
+  component "Access Control (RBAC)" as RBAC
+  component "Profile Management" as PRF
+  component "Document Upload & Extraction" as DOC
+  component "Public Company Profile" as PCP
+  component "Reporting & Rating" as RPT
+  component "User & Account Administration" as UMG
+  component "Entity Administration" as EMG
+  component "Taxonomy & Constants Manager" as TAX
+  component "Admin Reports & Statistics" as ARP
+}
+
+' ---------- External systems ----------
+component "Email Service" as ES <<external>>
+component "Official Company Registries" as CREG <<external>>
+component "Social Login Providers\n(Google, GitHub, LinkedIn)" as SIP <<external>>
+
+' ---------- Other epics (stubs, grey) ----------
+component "Candidates (CAND)" as CAND <<foreign>> {
+  component "Hiring Decision & Offer View" as HDO <<foreign>>
+  component "Dynamic Resume Generator" as DRG <<foreign>>
+  component "Company Follow Manager" as CFL <<foreign>>
+}
+component "Jobs, Search & Integrations (JOB)" as JOB <<foreign>> {
+  component "Posting Editor" as PED <<foreign>>
+  component "Posting Tags" as TAG <<foreign>>
+  component "Banned Company Handler" as BCH <<foreign>>
+  component "Posting Lifecycle Manager" as PLM <<foreign>>
+  component "Jobs Feed" as FED <<foreign>>
+  component "Posting Sharing" as SHR <<foreign>>
+  component "Filtering, Sorting & Search" as FSS <<foreign>>
+  component "Recommendations" as RCM <<foreign>>
+  component "Company Following" as CFM <<foreign>>
+}
+component "Candidate Analytics (ANA)" as ANA <<foreign>> {
+  component "Bias Auditor" as BIA <<foreign>>
+}
+component "Pipeline & Interviews & Tests (INVW)" as INVW <<foreign>> {
+  component "Anonymity Manager" as ANM <<foreign>>
+  component "Assessment Module Configurator" as AMC <<foreign>>
+  component "Test Execution & Scoring" as TES <<foreign>>
+}
+
+interface "IAccessControl" as IAC
+RBAC -- IAC
+
+' ---------- AUTH internal dependencies ----------
+REG ..> PWD : validates password policy
+REG ..> CRV : validates interviewer's company
+REG ..> ACT : requests activation
+REG ..> MFA : MFA setup
+CRV ..> ACT : activates approved company
+CRV ..> MFA : forces MFA setup
+LGN ..> ACT : checks account activated
+LGN ..> MFA : verifies MFA code
+LGN ..> RBAC : role & company scoped session
+PWD ..> LGN : terminates old sessions
+PRF ..> LGN : ends session on deactivate/delete
+DOC ..> PRF : fills confirmed fields
+RPT ..> UMG : reports reviewed by admins
+UMG ..> ACT : activation rules for new accounts
+UMG ..> PWD : reset credentials
+UMG ..> LGN : ban / deactivate access
+
+' ---------- AUTH to external systems ----------
+ACT ..> ES : activation codes
+PWD ..> ES : reset codes
+CRV ..> ES : notify requester
+RPT ..> ES : notify admins
+CRV ..> CREG : verify company
+LGN ..> SIP : candidate social login
+
+' ---------- Admin / entity management reaching other epics ----------
+EMG ..> PRF : manage candidate profiles
+EMG ..> PED : admin edits postings
+EMG ..> PLM : admin archive / republish / delete
+EMG ..> AMC : manage tests
+ARP ..> PLM : aggregate posting data
+RPT ..> TES : completed testing interaction (rating eligibility)
+PCP ..> PLM : Published postings of company
+PCP ..> CFM : follow from company profile
+
+' ---------- Incoming from other epics ----------
+PED ..> CRV : verified company required
+PED ..> TAX : standard languages & currencies
+TAG ..> TAX : tag taxonomy
+BCH ..> UMG : ban / ban-resolved events
+PLM ..> UMG : company deactivated status
+FED ..> LGN : sign-in gate (FR-JOB-047)
+SHR ..> LGN : sign-in redirect
+FSS ..> PCP : company search results
+RCM ..> PRF : job preferences
+CFL ..> PCP : company profile
+HDO ..> PRF : accepted offer on profile (FR-CAND-028)
+DRG ..> PRF : professional profile data
+ANM ..> PRF : identity fields
+BIA ..> PRF : demographic attributes (audit only)
+
+' ---------- Consumers of access control ----------
+note right of IAC
+  Required by CAND, JOB, ANA and INVW
+  (see view 10 - Security & Access)
+end note
+@enduml

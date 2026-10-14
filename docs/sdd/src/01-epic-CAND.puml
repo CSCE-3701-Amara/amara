@@ -1,0 +1,88 @@
+@startuml
+title 1/10 - Epic CAND: Candidates & Dynamic Resume
+skinparam componentStyle rectangle
+left to right direction
+skinparam component {
+  BackgroundColor<<foreign>> #EEEEEE
+  BorderColor<<foreign>> #999999
+  FontColor<<foreign>> #555555
+}
+
+component "Candidates & Dynamic Resume" as CAND {
+  component "Job Discovery & Filtering" as JDF
+  component "Saved Postings" as SVP
+  component "Company Follow Manager" as CFL
+  component "Application History & Status" as APH
+  component "Assessment Progress Tracker" as ATP
+  component "Assessment Results & Feedback" as ARF
+  component "Hiring Decision & Offer View" as HDO
+  component "Crest Viewer" as CST
+  component "Verified Skills Manager" as VSM
+  component "Dynamic Resume Generator" as DRG
+  component "Dynamic Resume Viewer" as DRV
+  component "Candidate Notifications" as NTF
+}
+
+' ---------- Neighbouring epics (stubs, grey) ----------
+component "Jobs, Search & Integrations (JOB)" as JOB <<foreign>> {
+  component "Jobs Feed" as FED <<foreign>>
+  component "Filtering, Sorting & Search" as FSS <<foreign>>
+  component "Saved Jobs" as SVJ <<foreign>>
+  component "Company Following" as CFM <<foreign>>
+  component "Application Submission" as APP <<foreign>>
+}
+component "Accounts, Identity & Trust (AUTH)" as AUTH <<foreign>> {
+  component "Public Company Profile" as PCP <<foreign>>
+  component "Profile Management" as PRF <<foreign>>
+  component "Access Control (RBAC)" as RBAC <<foreign>>
+}
+component "Pipeline & Interviews & Tests (INVW)" as INVW <<foreign>> {
+  component "Stage Advancement Engine" as SAE <<foreign>>
+  component "Test Execution & Scoring" as TES <<foreign>>
+  component "Feedback & Notification Service" as FNS <<foreign>>
+  component "Amara Crest Manager" as ACM <<foreign>>
+  component "Finalists & Offers Manager" as FOM <<foreign>>
+  component "Anonymity Manager" as ANM <<foreign>>
+}
+
+interface "IAmaraAwards" as IAA
+interface "IOffersAndDecisions" as IOD
+interface "IAccessControl" as IAC
+ACM -- IAA
+FOM -- IOD
+RBAC -- IAC
+
+' ---------- CAND internal dependencies ----------
+SVP ..> JDF : saved from browsing
+APH ..> JDF : applied postings
+ARF ..> APH : results per application
+HDO ..> APH : decision per application
+DRG ..> VSM : verified skills
+DRG ..> CST : earned crests
+DRV ..> DRG : latest resume (generates if missing)
+
+' ---------- CAND to other epics ----------
+JDF ..> FED : feed & posting essentials
+JDF ..> FSS : filtering & search
+SVP ..> SVJ : saved postings
+CFL ..> CFM : follow / unfollow, followed list
+CFL ..> PCP : company profile
+APH ..> APP : submitted applications
+APH ..> SAE : application status & progress
+ATP ..> TES : test instance state & saved answers
+ARF ..> TES : assessment score
+ARF ..> FNS : feedback & areas of improvement
+HDO ..> FNS : AI rejection feedback
+HDO ..> IOD : final decision, offer & status (display only)
+HDO ..> PRF : accepted offer on profile (FR-CAND-028)
+NTF ..> FNS : candidate notifications
+CST ..> IAA : earned Amarat (crests)
+VSM ..> IAA : verified skills from awards
+DRG ..> PRF : professional profile data
+
+' ---------- Incoming from other epics ----------
+APP ..> DRG : resume completeness & snapshot
+ANM ..> DRG : masks resume copies
+
+CAND ..> IAC : roles & permissions
+@enduml
