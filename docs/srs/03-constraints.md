@@ -1,6 +1,6 @@
 ## 3. Constraints, assumptions, dependencies
 
-Owner: Ali Mohammed | Status: Draft | Last updated: 2026-10-08 | Jira: HIRE-n
+Owner: Ali Mohammed | Status: Draft | Last updated: 2026-10-14 | Jira: TBD
 
 ### 3.1 Constraints
 

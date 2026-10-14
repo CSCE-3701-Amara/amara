@@ -1,6 +1,6 @@
 ## 5.4 JOB: Jobs, Search & Integrations
 
-Owner: Yousef Abood | Status: In Review | Last updated: 2026-10-13 | Jira: AMARA-31
+Owner: Yousef Abood | Status: In Review | Last updated: 2026-10-14 | Jira: AMARA-31
 
 ### 5.4.1 Overview
 
@@ -56,7 +56,7 @@ JOB ends at the admission decision. What happens to an admitted application (pip
 | FR-JOB-016 | The system **SHALL** allow the Hiring Manager to preview a posting, including a Draft and unsaved edits, as a candidate will see it in the jobs feed (FR-JOB-049) and on the detail page (FR-JOB-068). | UC-JOB-02 | TBD |
 | FR-JOB-017 | The system **SHALL** not change any posting, application, or notification data, and **SHALL** not notify anyone, when a posting is previewed. | UC-JOB-02 | TBD |
 | FR-JOB-018 | The system **SHALL** allow only Hiring Manager accounts permitted to manage postings, and Admins, to create, edit, archive, republish, or delete a posting of a company. | UC-JOB-01, UC-JOB-05 | TBD |
-| FR-JOB-019 | The system **COULD** allow the Hiring Manager to switch the language of the employer-side interface at any time, among the interface languages defined in `10-i18n.md`. | UC-JOB-08 | TBD |
+| FR-JOB-019 | The system **COULD** allow the Hiring Manager to switch the language of the employer-side interface at any time among the supported interface languages (NFR-COMP-004; detailed locale rules are tracked in `docs/srs/TBD.md` (TBD-006)). | UC-JOB-08 | TBD |
 | FR-JOB-020 | When employer interface language switching is available, the system **SHALL** apply the chosen language immediately, without requiring the Hiring Manager to sign in again and without losing unsaved changes. | UC-JOB-08 | TBD |
 | FR-JOB-021 | The system **SHOULD** keep the chosen language for the Hiring Manager's later sessions. | UC-JOB-08 | TBD |
 | FR-JOB-022 | When employer interface language switching is available, the system **SHALL** not change the content of any posting when the interface language is switched. | UC-JOB-08 | TBD |
@@ -260,7 +260,7 @@ JOB ends at the admission decision. What happens to an admitted application (pip
 |---|---|---|---|
 | FR-JOB-099 | The system **SHALL** require answers to all required application questions before accepting a submission, and **SHALL** list the questions left unanswered. | UC-JOB-16 | TBD |
 | FR-JOB-100 | The system **SHALL** retain an unchangeable copy of the resume and answers as submitted, so that later resume edits do not alter the application. | UC-JOB-16 | TBD |
-| FR-JOB-101 | The system **SHALL** reject a submission from a candidate who already has an active application for the same posting; application status transitions are owned by INVW. | UC-JOB-16 | TBD |
+| FR-JOB-101 | The system **SHALL** reject a submission from a Candidate who already has an active application, or an application with status Rejected or Withdrawn, for the same posting; application status transitions are owned by INVW. | UC-JOB-16 | TBD |
 | FR-JOB-102 | The system **SHALL** reject a submission made before the opening date, after the deadline, after the application cap is reached, or while the posting is Archived, **SHALL** tell the candidate which reason applies, and **SHALL** keep nothing partial. | UC-JOB-03, UC-JOB-16 | TBD |
 | FR-JOB-103 | The system **SHALL** count a submission toward the application cap (FR-JOB-093) only once it has been accepted. | UC-JOB-03, UC-JOB-16 | TBD |
 | FR-JOB-104 | The system **SHALL** show the candidate a confirmation with an application reference after a submission is accepted; notification delivery is owned by INVW. | UC-JOB-16 | TBD |
@@ -304,7 +304,7 @@ JOB ends at the admission decision. What happens to an admitted application (pip
 * Drafts are saved automatically. Changes to a Published posting are saved only on request, and the Hiring Manager is warned before leaving with unsaved changes, before leaving an unsaved new posting, and before deleting a posting (FR-JOB-003 to FR-JOB-007, FR-JOB-042).
 * Every criterion is exactly one of Must-have or Nice-to-have. Must-have criteria are checkable conditions on structured resume fields, never free text, and are locked after the first application (FR-JOB-094, FR-JOB-095, FR-JOB-097).
 * Only Must-have criteria decide admission. Nice-to-have criteria never exclude a candidate (FR-JOB-096, FR-JOB-107, FR-JOB-108).
-* A candidate cannot submit another application while an active application exists for the same posting (FR-JOB-101).
+* A Candidate cannot submit another application for the same posting when an application is already active or an existing application has status Rejected or Withdrawn (FR-JOB-101).
 * The submitted resume and answers never change after submission (FR-JOB-100).
 * A deadline can be extended only before it passes, and the application cap closes the posting to new applications once reached (FR-JOB-092, FR-JOB-093, FR-JOB-102).
 
@@ -316,7 +316,7 @@ JOB ends at the admission decision. What happens to an admitted application (pip
 * **Visitor who is not signed in opens a link:** send the visitor to sign-in or registration and open the requested page afterwards (FR-JOB-047).
 * **Submission to a posting archived, closed, not yet open, or at its application cap, including one that changes state while the candidate is filling the form:** reject with the specific reason and keep nothing partial (FR-JOB-102).
 * **Submission with unanswered required questions:** reject and list the missing answers (FR-JOB-099).
-* **Submission by a candidate who already has an active application to the posting:** reject and state that an application already exists (FR-JOB-101).
+* **Submission by a candidate with an active application or an application with status Rejected or Withdrawn for the posting:** reject and state that an application already exists (FR-JOB-101).
 * **Two submissions racing for the last place under the application cap:** accept the first, reject the second with the cap reason (FR-JOB-093, FR-JOB-102).
 * **Hiring Manager changes Must-have criteria after the first application:** refuse and state that the criteria are locked (FR-JOB-097).
 * **Hiring Manager extends a deadline that has already passed, or sets a deadline not later than the opening date:** refuse and identify the invalid date (FR-JOB-091, FR-JOB-092).

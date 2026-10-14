@@ -1,0 +1,99 @@
+@startuml
+title 8/10 - Employer / Hiring-Team View (post -> design pipeline -> evaluate -> offer)
+skinparam componentStyle rectangle
+left to right direction
+
+package "1. Company & Posting" {
+  component "Company Registration & Verification" as CRV
+  component "Public Company Profile" as PCP
+  component "Posting Editor" as PED
+  component "Hiring Configuration" as HCF
+  component "Posting Tags" as TAG
+  component "Posting Lifecycle Manager" as PLM
+  component "Company Posting List" as CPL
+  component "Taxonomy & Constants Manager" as TAX
+  component "Banned Company Handler" as BCH
+}
+
+package "2. Intake" {
+  component "Application Submission" as APP
+  component "Screening & Admission" as SCR
+}
+
+package "3. Design the Pipeline" {
+  component "Pipeline Designer" as PD
+  component "Assessment Module Configurator" as AMC
+  component "Design Studio" as DS
+  component "Pipeline Versioning & Migration" as PVM
+}
+
+package "4. Run & Evaluate" {
+  component "Test Execution & Scoring" as TES
+  component "Live Interview Manager" as LIM
+  component "Stage Advancement Engine" as SAE
+  component "Anonymity Manager" as ANM
+  component "Pipeline Dashboard & Insights" as PDI
+  component "Candidate Report Generator" as RG
+  component "Integrity Risk Evaluator" as IRE
+  component "Pass Rate Scorer" as PRS
+  component "Behavioral Scorer" as BHS
+  component "Execution Metrics Calculator" as EMC
+}
+
+package "5. Decide & Offer" {
+  component "Finalists & Offers Manager" as FOM
+  component "Feedback & Notification Service" as FNS
+}
+
+' ---------- 1. Company & Posting ----------
+PED ..> CRV : verified company required
+PED ..> HCF : content & hiring configuration
+PED ..> TAG : tags
+PED ..> TAX : languages & currencies
+TAG ..> TAX : tag taxonomy
+PLM ..> PED : draft content checks
+PLM ..> HCF : mandatory fields & dates
+BCH --> PLM : archive / resume postings
+CPL ..> PLM : all company postings
+PCP ..> PLM : Published postings of company
+
+' ---------- 2. Intake ----------
+APP ..> HCF : questions, dates, application cap
+APP ..> PLM : posting state
+SCR ..> APP : accepted submissions
+SCR ..> HCF : Must-have criteria
+SCR --> PVM : admitted applications
+
+' ---------- 3. Design the pipeline ----------
+AMC ..> PD : attaches modules to stages
+DS ..> AMC : custom modules
+PVM ..> PD : publishes versions of
+PVM ..> SAE : re-evaluates waiting candidates
+PVM ..> HCF : application deadline (via IPostingData)
+PD ..> ANM : validates reveal point
+
+' ---------- 4. Run & evaluate ----------
+TES ..> AMC : instantiates from config
+TES --> SAE : module score
+LIM --> SAE : outcome & score
+LIM ..> ANM : identity masking
+PDI ..> ANM : identity masking
+PDI --> SAE : decisions & thresholds
+PDI ..> HCF : finalist target (via IPostingData; not yet defined)
+PDI ..> RG : candidate evaluation report (via ICandidateScorecard)
+RG ..> EMC : runtime, memory, complexity
+RG ..> PRS : pass rate score
+RG ..> BHS : behavioral score
+RG ..> IRE : integrity score & review flag
+TES ..> PLM : archived posting suspends tests
+LIM ..> PLM : archived posting blocks booking
+SAE ..> PLM : archived posting blocks decisions
+
+' ---------- 5. Decide & offer ----------
+SAE --> FNS : pass / reject events
+FOM --> SAE : finalist list & scores; offer status changes
+FOM ..> PDI : candidate insights
+FOM ..> ANM : reveal at Finalist list
+FOM ..> HCF : job title & open-position capacity (via IPostingData)
+FOM --> FNS : offer delivery, responses, expiry, rejection feedback
+@enduml

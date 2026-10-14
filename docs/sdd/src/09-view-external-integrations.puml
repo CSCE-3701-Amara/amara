@@ -1,0 +1,81 @@
+@startuml
+title 9/10 - External Integrations View
+skinparam componentStyle rectangle
+left to right direction
+
+' ---------- External systems ----------
+component "Email Service" as ES <<external>>
+component "Official Company Registries" as CREG <<external>>
+component "Social Login Providers\n(Google, GitHub, LinkedIn)" as SIP <<external>>
+component "Video Meeting Provider" as VMP <<external>>
+component "Code Evaluation Provider" as CEP <<external>>
+component "AI / LLM Service" as AIS <<external>>
+component "Candidate IDE\n(telemetry plugin)" as IDE <<external>>
+component "Execution Sandbox" as SBX <<external>>
+component "Peer Reviews, PRs &\nTask-Board Sources" as CSRC <<external>>
+
+' ---------- Email: grouped by epic ----------
+package "Email senders" {
+  package "JOB" {
+    component "Posting Editor" as PED
+    component "Posting Lifecycle Manager" as PLM
+    component "Banned Company Handler" as BCH
+    component "Company Following" as CFM
+    component "Saved Searches &\nNew-Jobs Tracker" as SST
+    component "Saved Jobs" as SVJ
+    component "Application Submission" as APP
+    component "Screening & Admission" as SCR
+  }
+  package "AUTH" {
+    component "Account Activation" as ACT
+    component "Password Manager" as PWD
+    component "Company Registration &\nVerification" as CRV
+    component "Reporting & Rating" as RPT
+  }
+  package "INVW" {
+    component "Feedback & Notification Service" as FNS
+  }
+}
+
+PED ..> ES : posting-change emails
+PLM ..> ES : archive / republish emails
+BCH ..> ES : ban emails (no reason stated)
+CFM ..> ES : new-posting emails
+SST ..> ES : tracker emails
+SVJ ..> ES : deadline reminders
+APP ..> ES : confirmation email
+SCR ..> ES : screened-out notice
+ACT ..> ES : activation codes
+PWD ..> ES : reset codes
+CRV ..> ES : notify requester
+RPT ..> ES : notify admins
+FNS ..> ES : send emails
+
+' ---------- Identity & trust integrations ----------
+component "Authentication & Session Manager" as LGN
+LGN ..> SIP : candidate social login
+CRV ..> CREG : verify company
+
+' ---------- Interview & assessment integrations ----------
+component "Live Interview Manager" as LIM
+component "Test Execution & Scoring" as TES
+component "Design Studio" as DS
+component "Pipeline Dashboard & Insights" as PDI
+LIM ..> VMP : create meetings
+TES ..> CEP : evaluate code
+DS ..> AIS : draft questions
+PDI ..> AIS : insights
+FNS ..> AIS : generate feedback
+
+' ---------- Analytics integrations ----------
+package "ANA" {
+  component "Telemetry Ingestion Service" as TIS
+  component "Execution Metrics Calculator" as EMC
+  component "Pass Rate Scorer" as PRS
+  component "Behavioral Scorer" as BHS
+}
+IDE ..> TIS : streams keystrokes, pastes, focus events
+EMC ..> SBX : reads execution results
+PRS ..> SBX : reads test outcomes
+BHS ..> CSRC : reads peer reviews, PRs, task board
+@enduml

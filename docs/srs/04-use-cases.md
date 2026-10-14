@@ -1,6 +1,6 @@
 ## 4. Use cases
 
-Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
+Owner: All | Status: Draft | Last updated: 2026-10-14 | Jira: AMARA-32
 
 ---
 
@@ -284,29 +284,29 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 
 | Field | Description |
 |---|---|
-| Actor(s) | Candidate, Employer |
-| Description | Allows candidates to view the final hiring decision submitted by the employer and any accompanying employer feedback or AI-generated feedback in case of rejection. |
-| Preconditions | The candidate is authenticated and has an application associated with an employer. |
-| Trigger | The employer submits a final hiring decision for the application. |
-| Main Flow | 1. The employer submits the final hiring decision.<br>2. The system associates the decision with the corresponding application.<br>3. If the decision is a rejection, the system generates brief AI feedback for the candidate.<br>4. The system makes the decision and any applicable feedback available to the candidate.<br>5. The candidate opens the application.<br>6. The system displays the final hiring decision.<br>7. The system displays any final feedback provided by the employer.<br>8. If the candidate was rejected, the system displays the AI-generated feedback. |
-| Alternative Flows | 1. If the employer submits a decision without additional feedback, the system displays the decision alone, along with AI-generated feedback if the decision is a rejection.<br>2. If the candidate does not immediately open the application, the decision and its available feedback remain accessible for later viewing. |
-| Exception Flows | 1. If the employer has not submitted a final decision, the system continues to display the current application status.<br>2. If the decision or its associated feedback cannot be retrieved, the system displays an appropriate error message. |
-| Postconditions | The candidate can access the final hiring decision and any accompanying employer feedback or AI-generated rejection feedback. |
-| Business Rules | The final decision shall be associated with the corresponding application and shall only be displayed once submitted by the employer. AI-generated feedback shall be provided in case of rejection. Employer-provided final feedback shall be displayed when available. |
+| Actor(s) | Candidate, Hiring Manager, System |
+| Description | Allows a Candidate to view the final hiring decision and any feedback released by INVW according to the configured feedback mode. |
+| Preconditions | The Candidate is authenticated and has an application with a final decision recorded by INVW. |
+| Trigger | INVW releases a final hiring decision for the application. |
+| Main Flow | 1. The Hiring Manager submits the final hiring decision through INVW.<br>2. INVW associates the decision with the corresponding application and applies the configured rejection-feedback mode (UC-INVW-009).<br>3. When INVW releases the decision and any permitted feedback, CAND makes them available to the Candidate.<br>4. The Candidate opens the application.<br>5. The system displays the final hiring decision and any released feedback. |
+| Alternative Flows | 1. If feedback has not yet been released under the configured mode, the system displays the decision and current application status until feedback becomes available.<br>2. If the Candidate does not immediately open the application, the decision and released feedback remain accessible for later viewing. |
+| Exception Flows | 1. If INVW has not recorded a final decision, the system continues to display the current application status.<br>2. If the decision or its associated feedback cannot be retrieved, the system displays an appropriate error message. |
+| Postconditions | The Candidate can access the final hiring decision and any feedback released for that application. |
+| Business Rules | INVW owns the final decision, application status, and configured rejection-feedback mode. CAND displays a decision and feedback only after INVW releases them (FR-INVW-080, FR-INVW-081). |
 
 #### 4.3.8 UC-CAND-008 — Accept Offer
 
 | Field | Description |
 |---|---|
 | Actor(s) | Candidate |
-| Description | Allows candidates to accept or refuse an offer associated with an application. |
-| Preconditions | The candidate is authenticated and has received an offer associated with an application. |
+| Description | Allows a Candidate to accept or decline a pending offer associated with an application. |
+| Preconditions | The Candidate is authenticated and has a pending offer associated with an application. |
 | Trigger | The candidate opens the offer details for an application. |
-| Main Flow | 1. The candidate opens the application containing the offer.<br>2. The system displays the offer and the available response options.<br>3. The candidate chooses to accept or refuse the offer.<br>4. The system records the candidate's response.<br>5. The system reflects acceptance of the offer in the candidate's profile when the offer is accepted. |
-| Alternative Flows | 1. If the candidate refuses the offer, the system records the refusal and updates the relevant application information. |
-| Exception Flows | 1. If the response cannot be recorded, the system displays an appropriate error message. |
-| Postconditions | The candidate's offer response is recorded and the candidate's profile reflects acceptance when applicable. |
-| Business Rules | The system shall associate the candidate's response with the corresponding offer and application. |
+| Main Flow | 1. The Candidate opens the application containing the pending offer.<br>2. The system displays the offer, response deadline, and available response options.<br>3. Before the response deadline, the Candidate chooses to accept or decline the offer.<br>4. The system submits the response to INVW, which validates and records it and updates the authoritative offer/application status (UC-INVW-017).<br>5. CAND displays the updated application status and reflects acceptance in the Candidate's profile when the offer is accepted. |
+| Alternative Flows | 1. If the Candidate declines the offer, INVW records the decline and updates the application status (UC-INVW-017). |
+| Exception Flows | 1. If the response deadline has passed, INVW expires the offer and the system does not accept a late response (UC-INVW-017).<br>2. If the response cannot be recorded, the system displays an appropriate error message. |
+| Postconditions | INVW has recorded a valid offer response; CAND displays the updated application state and reflects acceptance when applicable. |
+| Business Rules | The response is associated with its offer and application. INVW owns response-deadline validation, response recording, and offer/application status transitions (FR-INVW-111–114). |
 
 #### 4.3.9 UC-CAND-009 — View Earned Crests
 
@@ -529,7 +529,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Description       | The System creates and times an individual assessment instance; the Candidate submits responses and the System scores it after any required manual grading. |
 | Preconditions     | The Candidate has reached an individual assessment stage in the published pipeline and its scheduled interval has begun; its module content and scoring method are valid (UC-INVW-002, UC-INVW-003, FR-INVW-082, FR-INVW-094). Live interviews and multi-person tests use UC-INVW-004 and UC-INVW-012, respectively. |
 | Trigger           | The scheduled start time has arrived and the Candidate is eligible for the assessment stage (FR-INVW-094). |
-| Main Flow         | 1. The System creates the Candidate's instance from the published module configuration and preserves its selected content for subsequent opens (FR-INVW-083); random-selection stages give every Candidate the same problem count and difficulty mix (FR-INVW-010).<br>2. The Candidate's completion window starts when the stage becomes available; the active timer starts when the Candidate first opens the instance, displays remaining time, and continues across navigation or disconnection (FR-INVW-011, FR-INVW-084). Responses are saved and restored according to NFR-REL-008.<br>3. If the instance remains unfinished, the System sends reminders 48, 24, 12, 6, and 1 hours before the applicable deadline—the earlier of the completion-window deadline and assessment end time, as extended for the Candidate under FR-INVW-015 when applicable (FR-INVW-013).<br>4. The Candidate submits responses once; the System locks them and also locks the latest saved responses when auto-submitting at the active time limit or applicable deadline (FR-INVW-012, FR-INVW-085, FR-INVW-090).<br>5. The System automatically scores closed questions from answer keys (FR-INVW-020), sends coding solutions and test cases to the configured external code-evaluation provider (FR-INVW-087; see `docs/srs/06-external-interfaces.md`), and routes open-ended written answers and video responses to assigned human graders (FR-INVW-021, FR-INVW-093). AI-assisted question drafting does not score Candidate responses (FR-INVW-018, FR-INVW-019).<br>6. The System keeps the instance pending until all required human grading is complete, then records the final 0–100 score (FR-INVW-016, FR-INVW-086, FR-INVW-089).<br>7. Once fully scored, stage advancement follows UC-INVW-006 and module feedback follows UC-INVW-009. |
+| Main Flow         | 1. The System creates the Candidate's instance from the published module configuration and preserves its selected content for subsequent opens (FR-INVW-083); random-selection stages give every Candidate the same problem count and difficulty mix (FR-INVW-010).<br>2. The Candidate's completion window starts when the stage becomes available; the active timer starts when the Candidate first opens the instance, displays remaining time, and continues across navigation or disconnection (FR-INVW-011, FR-INVW-084). Responses are saved and restored according to NFR-REL-008.<br>3. If the instance remains unfinished, the System sends reminders 48, 24, 12, 6, and 1 hours before the applicable deadline—the earlier of the completion-window deadline and assessment end time, as extended for the Candidate under FR-INVW-015 when applicable (FR-INVW-013).<br>4. The Candidate submits responses once; the System locks them and also locks the latest saved responses when auto-submitting at the active time limit or applicable deadline (FR-INVW-012, FR-INVW-085, FR-INVW-090).<br>5. The System automatically scores closed questions from answer keys (FR-INVW-020), sends coding solutions and test cases to the configured external code-evaluation provider (FR-INVW-087; provider interface details are tracked in `docs/srs/TBD.md`, TBD-004), and routes open-ended written answers and video responses to assigned human graders (FR-INVW-021, FR-INVW-093). AI-assisted question drafting does not score Candidate responses (FR-INVW-018, FR-INVW-019).<br>6. The System keeps the instance pending until all required human grading is complete, then records the final 0–100 score (FR-INVW-016, FR-INVW-086, FR-INVW-089).<br>7. Once fully scored, stage advancement follows UC-INVW-006 and module feedback follows UC-INVW-009. |
 | Alternative Flows | 2a. The Candidate leaves and resumes the same instance; saved answers are restored and the active timer continues (FR-INVW-083, FR-INVW-084, NFR-REL-008).<br>2b. The Hiring Manager grants additional active time or a later individual completion deadline, including beyond the scheduled stage end for this started instance, and records the change and reason (FR-INVW-015).<br>4a. In a question-based module, the System presents each configured question using its response format and scoring method (FR-INVW-091).<br>4b. In a video-recorded response module, the Candidate records and submits a video response for each prompt; the System attaches each recording to the instance for human grading (FR-INVW-093). |
 | Exception Flows   | E1. The earlier of the completion-window deadline and scheduled assessment end time arrives before an attempt has started or been submitted: the System marks the instance missed, notifies the Hiring Manager, and holds the Candidate for a decision (FR-INVW-014).<br>E2. The external code-evaluation provider is unavailable or returns an invalid result: the System preserves the code submission, leaves the instance pending, and does not assign a zero score (FR-INVW-087). |
 | Postconditions    | The instance is fully scored and ready for advancement, remains pending manual grading, or is marked missed; advancement and feedback follow UC-INVW-006 and UC-INVW-009. |
@@ -574,7 +574,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | Description       | The Candidate works on a configured coding task with an LLM partner; the LLM assists during the session but does not assess or score the Candidate. |
 | Preconditions     | The pipeline includes a configured LLM-paired programming module (FR-INVW-092), and the Candidate has reached the stage. |
 | Trigger           | The Candidate opens the LLM-paired programming test instance. |
-| Main Flow         | 1. The System presents the configured coding task and starts the active time limit.<br>2. The Candidate exchanges text with the LLM and edits a code solution during the session.<br>3. The System saves the conversation and final code with the test instance (FR-INVW-092).<br>4. The System sends the final code to the external code-evaluation provider specified in `docs/srs/06-external-interfaces.md`; scoring uses its valid test-case results (FR-INVW-087). |
+| Main Flow         | 1. The System presents the configured coding task and starts the active time limit.<br>2. The Candidate exchanges text with the LLM and edits a code solution during the session.<br>3. The System saves the conversation and final code with the test instance (FR-INVW-092).<br>4. The System sends the final code to the configured external code-evaluation provider; scoring uses its valid test-case results (FR-INVW-087). Provider interface details are tracked in `docs/srs/TBD.md` (TBD-004). |
 | Alternative Flows | None. |
 | Exception Flows   | E1. The LLM service is unavailable: the System preserves the Candidate's existing code and reports that the LLM partner is unavailable.<br>E2. The external code-evaluation provider is unavailable or returns an invalid result: the System preserves the final code and leaves the instance pending without assigning a score (FR-INVW-087). |
 | Postconditions    | The conversation and final code are saved; the code is scored by the external provider, not by the LLM. |
@@ -1001,7 +1001,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-13 | Jira: AMARA-32
 | **Postconditions** | Technical Pass Rate Score updated on candidate evaluation scorecard. |
 | **Business Rules** | A zero pass rate score is not an auto rejection. |
 
-#### Use Case 4: Evaluate Integrity Risk 
+#### Use Case 4: Evaluate Integrity Risk
 
 | Field | Description |
 | --- | --- |

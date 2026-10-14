@@ -1,4 +1,3 @@
-```plantuml
 @startuml
 
 ' Diagram Configuration
@@ -58,4 +57,3 @@ Candidate -- UC_CAND_014
 Employer -- UC_CAND_007
 
 @enduml
-```
