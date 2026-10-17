@@ -107,23 +107,23 @@ JOB ends at the admission decision. What happens to an admitted application (pip
 
 | ID | Requirement | Related Use Case | Jira |
 |---|---|---|---|
-| FR-JOB-041 | The system **SHALL** require answers to all required application questions before accepting a submission, and **SHALL** list the questions left unanswered. | UC-JOB-16 | TBD |
-| FR-JOB-042 | The system **SHALL** retain an unchangeable copy of the resume and answers as submitted, so that later resume edits do not alter the application. | UC-JOB-16 | TBD |
-| FR-JOB-043 | The system **SHALL** reject a submission from a Candidate who already has an active application, or an application with status Rejected or Withdrawn, for the same posting; application status transitions are owned by INVW. | UC-JOB-16 | TBD |
-| FR-JOB-044 | The system **SHALL** reject a submission made before the opening date, after the deadline, after the application cap is reached, or while the posting is Archived, **SHALL** tell the candidate which reason applies, and **SHALL** keep nothing partial. | UC-JOB-03, UC-JOB-16 | TBD |
-| FR-JOB-045 | The system **SHOULD** show the candidate a confirmation with an application reference after a submission is accepted; notification delivery is owned by INVW. | UC-JOB-16 | TBD |
+| FR-JOB-041 | The system **SHALL** require answers to all required application questions before accepting a submission, and **SHALL** list the questions left unanswered. | UC-JOB-09 | TBD |
+| FR-JOB-042 | The system **SHALL** retain an unchangeable copy of the resume and answers as submitted, so that later resume edits do not alter the application. | UC-JOB-09 | TBD |
+| FR-JOB-043 | The system **SHALL** reject a submission from a Candidate who already has an active application, or an application with status Rejected or Withdrawn, for the same posting; application status transitions are owned by INVW. | UC-JOB-09 | TBD |
+| FR-JOB-044 | The system **SHALL** reject a submission made before the opening date, after the deadline, after the application cap is reached, or while the posting is Archived, **SHALL** tell the candidate which reason applies, and **SHALL** keep nothing partial. | UC-JOB-03, UC-JOB-09 | TBD |
+| FR-JOB-045 | The system **SHOULD** show the candidate a confirmation with an application reference after a submission is accepted; notification delivery is owned by INVW. | UC-JOB-09 | TBD |
 
 #### 5.4.3.14 Screening and Admission
 
 | ID | Requirement | Related Use Case | Jira |
 |---|---|---|---|
-| FR-JOB-046 | The system **SHALL** evaluate every accepted submission against each Must-have criterion of the posting, using the structured resume fields as submitted. | UC-JOB-16, UC-JOB-17 | TBD |
-| FR-JOB-047 | The system **COULD** show the candidate, before the application is submitted, which Must-have criteria their resume does not currently satisfy. | UC-JOB-16 | TBD |
-| FR-JOB-048 | The system **SHALL** admit to the pipeline an application that satisfies all Must-have criteria. | UC-JOB-16, UC-JOB-17 | TBD |
-| FR-JOB-049 | The system **SHALL** screen out an application that fails any Must-have criterion, **SHALL** not admit it to the pipeline, and **SHALL** record each failed criterion. | UC-JOB-16, UC-JOB-17 | TBD |
-| FR-JOB-050 | The system **SHALL** hand an admitted application to INVW, which starts the candidate at every entry stage when a pipeline is published. | UC-JOB-16, UC-JOB-17 | TBD |
-| FR-JOB-051 | The system **SHOULD** allow the Hiring Manager to view all screened-out applications of a posting together with their failed criteria. | UC-JOB-17 | TBD |
-| FR-JOB-052 | The system **COULD** tell a candidate whose application was screened out which Must-have criteria were not satisfied. | UC-JOB-16, UC-JOB-17 | TBD |
+| FR-JOB-046 | The system **SHALL** evaluate every accepted submission against each Must-have criterion of the posting, using the structured resume fields as submitted. | UC-JOB-09, UC-JOB-10 | TBD |
+| FR-JOB-047 | The system **COULD** show the candidate, before the application is submitted, which Must-have criteria their resume does not currently satisfy. | UC-JOB-09 | TBD |
+| FR-JOB-048 | The system **SHALL** admit to the pipeline an application that satisfies all Must-have criteria. | UC-JOB-09, UC-JOB-10 | TBD |
+| FR-JOB-049 | The system **SHALL** screen out an application that fails any Must-have criterion, **SHALL** not admit it to the pipeline, and **SHALL** record each failed criterion. | UC-JOB-09, UC-JOB-10 | TBD |
+| FR-JOB-050 | The system **SHALL** hand an admitted application to INVW, which starts the candidate at every entry stage when a pipeline is published. | UC-JOB-09, UC-JOB-10 | TBD |
+| FR-JOB-051 | The system **SHOULD** allow the Hiring Manager to view all screened-out applications of a posting together with their failed criteria. | UC-JOB-10 | TBD |
+| FR-JOB-052 | The system **COULD** tell a candidate whose application was screened out which Must-have criteria were not satisfied. | UC-JOB-09, UC-JOB-10 | TBD |
 
 ### 5.4.4 Business Rules
 
