@@ -1,0 +1,94 @@
+@startuml
+title 10/10 - Security, Access & Trust View
+skinparam componentStyle rectangle
+left to right direction
+
+package "Sign-up & Sign-in (AUTH)" {
+  component "Registration Service" as REG
+  component "Account Activation" as ACT
+  component "Company Registration & Verification" as CRV
+  component "Authentication & Session Manager" as LGN
+  component "MFA Manager" as MFA
+  component "Password Manager" as PWD
+  component "Access Control (RBAC)" as RBAC
+}
+
+package "Administration & Moderation (AUTH)" {
+  component "User & Account Administration" as UMG
+  component "Entity Administration" as EMG
+  component "Reporting & Rating" as RPT
+  component "Admin Reports & Statistics" as ARP
+}
+
+package "Fairness & Privacy" {
+  component "Anonymity Manager" as ANM
+  component "Bias Auditor" as BIA
+  component "Integrity Risk Evaluator" as IRE
+  component "Profile Management" as PRF
+}
+
+package "Enforcement points in other epics" {
+  component "Banned Company Handler" as BCH
+  component "Posting Lifecycle Manager" as PLM
+  component "Jobs Feed" as FED
+  component "Posting Sharing" as SHR
+  component "Posting Editor" as PED
+  component "Assessment Module Configurator" as AMC
+  component "Test Execution & Scoring" as TES
+}
+
+component "Official Company Registries" as CREG <<external>>
+component "Social Login Providers" as SIP <<external>>
+
+interface "IAccessControl" as IAC
+RBAC -- IAC
+
+component "CAND epic" as CAND
+component "JOB epic" as JOB
+component "ANA epic" as ANA
+component "INVW epic" as INVW
+CAND ..> IAC : roles & permissions
+JOB ..> IAC : roles & permissions
+ANA ..> IAC : roles & permissions
+INVW ..> IAC : roles & permissions
+
+' ---------- Sign-up & sign-in ----------
+REG ..> PWD : validates password policy
+REG ..> CRV : validates interviewer's company
+REG ..> ACT : requests activation
+REG ..> MFA : MFA setup
+CRV ..> ACT : activates approved company
+CRV ..> MFA : forces MFA setup
+CRV ..> CREG : verify company
+LGN ..> ACT : checks account activated
+LGN ..> MFA : verifies MFA code
+LGN ..> RBAC : role & company scoped session
+LGN ..> SIP : candidate social login
+PWD ..> LGN : terminates old sessions
+PRF ..> LGN : ends session on deactivate/delete
+
+' ---------- Administration & moderation ----------
+RPT ..> UMG : reports reviewed by admins
+UMG ..> ACT : activation rules for new accounts
+UMG ..> PWD : reset credentials
+UMG ..> LGN : ban / deactivate access
+EMG ..> PRF : manage candidate profiles
+EMG ..> PED : admin edits postings
+EMG ..> PLM : admin archive / republish / delete
+EMG ..> AMC : manage tests
+ARP ..> PLM : aggregate posting data
+RPT ..> TES : completed testing interaction (rating eligibility)
+
+' ---------- Bans & deactivation propagate to JOB ----------
+BCH ..> UMG : ban / ban-resolved events
+PLM ..> UMG : company deactivated status
+BCH --> PLM : archive / resume postings of banned company
+PED ..> CRV : verified company required
+FED ..> LGN : sign-in gate (FR-JOB-047)
+SHR ..> LGN : sign-in redirect
+
+' ---------- Fairness & privacy ----------
+ANM ..> PRF : identity fields
+BIA ..> PRF : demographic attributes (audit only)
+BIA ..> IRE : audits scores
+@enduml

@@ -1,0 +1,97 @@
+@startuml
+
+' Diagram Configuration
+left to right direction
+skinparam ranksep 500
+skinparam shadowing false
+
+' Defining Actors
+actor Candidate
+actor Visitor
+actor "Hiring Manager" as HM
+actor "System Administrator" as SA
+actor System
+
+' Defining JOB Use Cases
+rectangle "JOB" {
+
+	package "Employer Posting Management" {
+		usecase "Create, Configure and Edit Job Posting" as UC_JOB_01
+		usecase "Preview Posting" as UC_JOB_02
+		usecase "Publish Job Posting" as UC_JOB_03
+		usecase "Archive and Republish Posting" as UC_JOB_04
+		usecase "Delete Posting and Manage Postings as Admin" as UC_JOB_05
+		usecase "Handle Postings of a Banned Company" as UC_JOB_06
+		usecase "Manage Company Posting List" as UC_JOB_07
+		usecase "Switch Employer Interface Language" as UC_JOB_08
+	}
+
+	package "Job Discovery" {
+		usecase "Browse, Filter, Sort, and Search Jobs and Companies" as UC_JOB_09
+		usecase "View Posting Details and Company Profile" as UC_JOB_10
+		usecase "Share and Open Posting Link" as UC_JOB_11
+		usecase "Manage Saved Postings" as UC_JOB_12
+		usecase "Follow and Manage Companies" as UC_JOB_13
+		usecase "Get Recommendations" as UC_JOB_14
+		usecase "Manage Saved Searches and New-Jobs Tracker" as UC_JOB_15
+	}
+
+	package "Applications" {
+		usecase "Apply to Posting" as UC_JOB_16
+		usecase "Screen and Admit Applications" as UC_JOB_17
+	}
+}
+
+' Hiring Manager Associations
+HM -- UC_JOB_01
+HM -- UC_JOB_02
+HM -- UC_JOB_03
+HM -- UC_JOB_04
+HM -- UC_JOB_05
+HM -- UC_JOB_06
+HM -- UC_JOB_07
+HM -- UC_JOB_08
+HM -- UC_JOB_17
+
+' System Administrator Associations
+UC_JOB_05 -- SA
+UC_JOB_06 -- SA
+
+' Candidate Associations
+Candidate -- UC_JOB_03
+Candidate -- UC_JOB_04
+Candidate -- UC_JOB_06
+Candidate -- UC_JOB_09
+Candidate -- UC_JOB_10
+Candidate -- UC_JOB_11
+Candidate -- UC_JOB_12
+Candidate -- UC_JOB_13
+Candidate -- UC_JOB_14
+Candidate -- UC_JOB_15
+Candidate -- UC_JOB_16
+Candidate -- UC_JOB_17
+
+' Visitor Associations
+UC_JOB_09 -- Visitor
+UC_JOB_11 -- Visitor
+
+' System Associations
+UC_JOB_01 -- System
+UC_JOB_02 -- System
+UC_JOB_03 -- System
+UC_JOB_04 -- System
+UC_JOB_05 -- System
+UC_JOB_06 -- System
+UC_JOB_07 -- System
+UC_JOB_08 -- System
+UC_JOB_09 -- System
+UC_JOB_10 -- System
+UC_JOB_11 -- System
+UC_JOB_12 -- System
+UC_JOB_13 -- System
+UC_JOB_14 -- System
+UC_JOB_15 -- System
+UC_JOB_16 -- System
+UC_JOB_17 -- System
+
+@enduml

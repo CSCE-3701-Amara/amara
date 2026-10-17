@@ -1,6 +1,6 @@
-# 5.3 INVW: Pipeline & Interviews 
+# 5.3 INVW: Pipeline & Interviews
 
-**Owner:** Ziad Eliwa | **Status:** In Review | **Last updated:** 2026-10-13 | **Jira:** AMARA-32
+**Owner:** Ziad Eliwa | **Status:** In Review | **Last updated:** 2026-10-14 | **Jira:** AMARA-32
 
 ---
 
@@ -17,7 +17,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 - Assessment test execution and scoring (3.9)
 - Candidate-facing pipeline progress view (3.10)
 - Amara and Amarat skill crests (3.11)
-- Finalist selection, offers, and post-pipeline decisions (3.13)
+- Finalist selection, offers, and post-pipeline decisions (3.12)
 
 **Out of scope (owned elsewhere)**
 - Company registration and verification, roles, and the permission matrix (AUTH)
@@ -173,7 +173,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 | FR-INVW-064 | The system *SHALL* generate for each Candidate a summary of strengths and weaknesses based on performance across the sequence of completed modules, labelled as system-generated and shown with the scores it is based on. | UC-INVW-007 |
 | FR-INVW-065 | The system *SHALL* exclude name, photo, gender, age, nationality, and contact details from the data used to rank Candidates and generate insights. | UC-INVW-007 |
 | FR-INVW-066 | The system *SHALL* allow the Hiring Manager to record pass and reject decisions (FR-INVW-052) directly from the dashboard. | UC-INVW-007 |
-| FR-INVW-067 | The system *SHALL* show the number of Candidates still active against the finalist target (FR-JOB-***). | UC-INVW-007 |
+| FR-INVW-067 | The system *SHALL* show the Hiring Manager the number of active Candidates compared with the posting's finalist target when that target is configured in JOB. | UC-INVW-007 |
 | FR-INVW-068 | The system *SHALL* suggest, for a selected stage, a cut-off score expected to bring the number of active Candidates to the finalist target, and show how many would pass at that cut-off. | UC-INVW-007 |
 | FR-INVW-069 | The system *SHALL* allow the Hiring Manager to compare up to 4 selected Candidates side by side. | UC-INVW-007 |
 
@@ -230,7 +230,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 | FR-INVW-084 | For a timed test instance, the system *SHALL* start the active time limit when the Candidate first opens the instance, display the remaining time, and continue the timer while the Candidate navigates away or disconnects. | UC-INVW-010 |
 | FR-INVW-085 | When a test instance's active time limit expires or its applicable completion deadline is reached while the instance is in progress and unsubmitted, the system *SHALL* submit the latest saved answers automatically. The applicable deadline is the earlier of the Candidate's completion-window deadline and the scheduled assessment end time, as modified by any individual extension recorded under FR-INVW-015. | UC-INVW-010 |
 | FR-INVW-086 | For a point-based assessment module, the system *SHALL* calculate the module score as 100 multiplied by total points earned divided by total points available, rounded to the nearest whole number. | UC-INVW-010 |
-| FR-INVW-087 | For each coding-problem answer, the system *SHALL* submit the Candidate's code and the problem's test cases to a configured external code-evaluation provider and use valid test-case outcomes to determine points under the problem's scoring method. If no valid result is returned, the system *SHALL* keep the instance pending and not assign a zero score. The provider interface and failure handling are specified in `docs/srs/06-external-interfaces.md`. | UC-INVW-010 |
+| FR-INVW-087 | For each coding-problem answer, the system *SHALL* submit the Candidate's code and the problem's test cases to a configured external code-evaluation provider and use valid test-case outcomes to determine points under the problem's scoring method. If no valid result is returned, the system *SHALL* keep the instance pending and not assign a zero score. Provider interface details are an open item in `docs/srs/TBD.md` (TBD-004). | UC-INVW-010 |
 | FR-INVW-088 | The system *SHALL* withhold answer keys, coding test cases, and grading rubrics from the Candidate's assessment view while the Candidate can still submit answers. | UC-INVW-010 |
 | FR-INVW-089 | A test instance with open-ended written answers *SHALL* remain pending human grading until every answer has been graded; the system *SHALL NOT* mark it fully scored or evaluate an automatic advancement rule before grading is complete. | UC-INVW-010 |
 | FR-INVW-090 | The system *SHALL* accept one final submission per test instance and make its responses uneditable after submission or automatic submission. | UC-INVW-010 |
@@ -238,7 +238,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 | FR-INVW-092 | The system *COULD* provide an LLM-paired programming module that presents a configured coding task, lets the Candidate exchange text with the LLM during the active time limit, and saves the conversation and final code with the test instance. The LLM supports the Candidate and does not determine the assessment score. | UC-INVW-013 |
 | FR-INVW-093 | For a video-recorded response module, the system *SHALL* present each configured prompt, let the Candidate record and submit a video response for each prompt within the time limits, and attach each recording to the test instance for assigned human grading. | UC-INVW-002, UC-INVW-010 |
 | FR-INVW-094 | The system *SHALL* require the Hiring Manager to set a scheduled start and end time for every assessment stage, including live-interview stages, and *SHALL* require the end time to be later than the start time. Candidates may start an assessment or select a live-interview slot only within this interval; a started individual test may finish under its Candidate-specific deadline or an extension recorded under FR-INVW-015. | UC-INVW-001, UC-INVW-004, UC-INVW-005, UC-INVW-010 |
-| FR-INVW-095 | The system *SHALL* prevent pipeline publication unless the scheduled start time of each first individual assessment stage on every path through the pipeline is later than the posting's application deadline (FR-JOB-***). Live-interview stages are not individual assessment stages for this check. | UC-INVW-005 |
+| FR-INVW-095 | The system *SHALL* prevent pipeline publication unless the scheduled start time of each first individual assessment stage on every path through the pipeline is later than the posting's application deadline (FR-JOB-091). Live-interview stages are not individual assessment stages for this check. | UC-INVW-005 |
 | FR-INVW-096 | The system *SHALL* let the Hiring Manager apply a new score threshold, including the suggested cut-off in FR-INVW-068, to a threshold-based stage from the dashboard after reviewing Candidate performance insights; the system *SHALL* preview the affected Candidates, record the previous and new threshold and change time, and recalculate outcomes for Candidates still waiting at that stage. The system *SHALL NOT* reverse a previously granted pass or reopen a terminal decision. | UC-INVW-006, UC-INVW-007 |
 
 ### 3.10 Candidate Pipeline Progress View
@@ -302,7 +302,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 ## 4. Business Rules
 
 * **Pipeline responsibility:** The Hiring Manager configures and administers the pipeline and makes manual advancement decisions. Interviewers provide assigned notes and scorecards but do not decide advancement (AUTH; FR-INVW-032, FR-INVW-034, FR-INVW-053).
-* **Ownership boundaries:** JOB owns posting criteria, including Must-have criterion freeze after the first application (FR-JOB-***). Initial screening and pipeline admission belong to the separate screening epic. Application status names and transitions are defined in the glossary and application state machine.
+* **Ownership boundaries:** JOB owns posting criteria, including locking Must-have criteria after the first application (FR-JOB-097). Initial screening and pipeline admission belong to JOB. INVW begins after JOB admits a Candidate to the published pipeline. Application status names and transitions are owned by INVW.
 * **Scoring and advancement:** They are separate decisions. Closed questions use answer keys (FR-INVW-020); coding uses the external evaluator (FR-INVW-087); open-ended responses, video responses, and live interviews use human grading or scorecards (FR-INVW-021, FR-INVW-034, FR-INVW-093). AI drafting, insights, and feedback do not score Candidates or decide outcomes (FR-INVW-018, FR-INVW-064, FR-INVW-076). Advancement uses the rule configured for the stage (FR-INVW-051, FR-INVW-052, FR-INVW-054, FR-INVW-055, FR-INVW-056).
 * **Assessment dates:** Each assessment stage has a valid scheduled start/end interval; the first exam on every pipeline path starts after the posting deadline (FR-INVW-039, FR-INVW-094, FR-INVW-095).
 * **Pipeline versions:** Exactly one version is published at a time. Migration and preservation of Candidate progress follow FR-INVW-038, FR-INVW-045, FR-INVW-046, FR-INVW-047, and FR-INVW-048.
@@ -318,7 +318,7 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 * **Invalid pipeline:** block publication and list every failed check with the stage or link concerned (FR-INVW-039).
 * **Migration conflict:** block publication until every removed stage has a destination and every added stage has a decision (FR-INVW-046, FR-INVW-047).
 * **Meeting creation failure:** retry 3 times within 15 minutes. If it still fails, keep the slot unconfirmed and notify the Candidate and Interviewer to pick another time.
-* **Code-evaluation provider failure:** retain submitted code and keep the assessment pending; do not interpret an unavailable or invalid provider result as a failed test case (FR-INVW-087; provider details in `docs/srs/06-external-interfaces.md`).
+* **Code-evaluation provider failure:** retain submitted code and keep the assessment pending; do not interpret an unavailable or invalid provider result as a failed test case (FR-INVW-087; provider interface details are tracked in `docs/srs/TBD.md` (TBD-004)).
 * **Email delivery failure:** retry up to 3 times, show the notification in the platform regardless, and flag the failure to the Hiring Manager when the email concerns a decision.
 * **Offer notification failure:** retain the offer and response/expiry state, retry failed email delivery up to 3 times, and show offer notices and responses in the platform. A failure to notify the Hiring Manager about a response or the Candidate/Hiring Manager about expiry is flagged for retry; it does not reverse the recorded state (FR-INVW-110, FR-INVW-112, FR-INVW-113, FR-INVW-115).
 * **Offer deadline elapsed:** reject an accept, decline, extension, or withdrawal request submitted at or after the response deadline; expire the pending offer and apply the expiry notifications and statuses (FR-INVW-111, FR-INVW-113, FR-INVW-114, FR-INVW-115).

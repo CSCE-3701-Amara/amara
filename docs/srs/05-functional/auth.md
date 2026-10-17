@@ -77,7 +77,7 @@ This subsystem offers the following functionality:
 | FR-AUTH-027 | The system **SHOULD** allow users to reset their passwords. | UC-AUTH-010, UC-AUTH-013 | TBD |
 | FR-AUTH-028 | The system **SHALL** provide a public company profile page that shows the information related to the company and their job postings. | UC-AUTH-012 | TBD |
 | FR-AUTH-029 | The system **COULD** allow candidates to set job preferences that the system can use to recommend job positions. | UC-AUTH-005 | TBD |
- 
+
 #### 5.1.3.9 Account Activation
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|

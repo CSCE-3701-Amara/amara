@@ -1,0 +1,124 @@
+@startuml
+title 5/10 - Epic INVW: Pipeline & Interviews & Tests
+skinparam componentStyle rectangle
+left to right direction
+skinparam component {
+  BackgroundColor<<foreign>> #EEEEEE
+  BorderColor<<foreign>> #999999
+  FontColor<<foreign>> #555555
+}
+
+component "Pipeline & Interviews & Tests" as INVW {
+  component "Pipeline Designer" as PD
+  component "Assessment Module Configurator" as AMC
+  component "Design Studio" as DS
+  component "Live Interview Manager" as LIM
+  component "Pipeline Versioning & Migration" as PVM
+  component "Test Execution & Scoring" as TES
+  component "Stage Advancement Engine" as SAE
+  component "Pipeline Dashboard & Insights" as PDI
+  component "Anonymity Manager" as ANM
+  component "Feedback & Notification Service" as FNS
+  component "Candidate Progress View" as CPV
+  component "Amara Crest Manager" as ACM
+  component "Finalists & Offers Manager" as FOM
+}
+
+' ---------- External systems ----------
+component "Video Meeting Provider" as VMP <<external>>
+component "Code Evaluation Provider" as CEP <<external>>
+component "AI / LLM Service" as AIS <<external>>
+component "Email Service" as ES <<external>>
+
+' ---------- Other epics (stubs, grey) ----------
+component "Candidates (CAND)" as CAND <<foreign>> {
+  component "Application History & Status" as APH <<foreign>>
+  component "Assessment Progress Tracker" as ATP <<foreign>>
+  component "Assessment Results & Feedback" as ARF <<foreign>>
+  component "Hiring Decision & Offer View" as HDO <<foreign>>
+  component "Candidate Notifications" as NTF <<foreign>>
+  component "Crest Viewer" as CST <<foreign>>
+  component "Verified Skills Manager" as VSM <<foreign>>
+  component "Dynamic Resume Generator" as DRG <<foreign>>
+}
+component "Jobs, Search & Integrations (JOB)" as JOB <<foreign>> {
+  component "Posting Lifecycle Manager" as PLM <<foreign>>
+  component "Application Submission" as APP <<foreign>>
+  component "Screening & Admission" as SCR <<foreign>>
+}
+component "Candidate Analytics (ANA)" as ANA <<foreign>>
+component "Accounts, Identity & Trust (AUTH)" as AUTH <<foreign>> {
+  component "Profile Management" as PRF <<foreign>>
+  component "Entity Administration" as EMG <<foreign>>
+  component "Reporting & Rating" as RPT <<foreign>>
+  component "Access Control (RBAC)" as RBAC <<foreign>>
+}
+
+interface "IPipelineData" as IPD
+interface "IAmaraAwards" as IAA
+interface "IOffersAndDecisions" as IOD
+interface "IPostingData" as IPO
+interface "ICandidateScorecard" as ICS
+interface "IAccessControl" as IAC
+SAE -- IPD
+ACM -- IAA
+FOM -- IOD
+RBAC -- IAC
+
+' ---------- INVW internal dependencies ----------
+AMC ..> PD : attaches modules to stages
+DS ..> AMC : custom modules
+PVM ..> PD : publishes versions of
+PVM ..> SAE : re-evaluates waiting candidates
+PD ..> ANM : validates reveal point
+TES ..> AMC : instantiates from config
+TES --> SAE : module score
+LIM --> SAE : outcome & score
+LIM ..> ANM : identity masking
+PDI ..> ANM : identity masking
+PDI --> SAE : decisions & thresholds
+SAE --> FNS : pass / reject events
+SAE --> ACM : award on pass
+FOM --> SAE : finalist list & scores; offer / rejection status changes
+FOM ..> PDI : candidate insights
+FOM ..> ANM : reveal at Finalist list
+FOM --> FNS : offer delivery, responses, expiry, rejection feedback
+CPV ..> PVM : pipeline version
+CPV ..> ACM : earned Amarat
+
+' ---------- INVW to external systems ----------
+LIM ..> VMP : create meetings
+TES ..> CEP : evaluate code
+DS ..> AIS : draft questions
+PDI ..> AIS : insights
+FNS ..> AIS : generate feedback
+FNS ..> ES : send emails
+
+' ---------- INVW to other epics ----------
+PVM ..> IPO : application deadline
+PDI ..> IPO : finalist target (not yet defined in JOB)
+FOM ..> IPO : job title & open-position capacity
+TES ..> PLM : archived posting suspends tests
+LIM ..> PLM : archived posting blocks booking
+SAE ..> PLM : archived posting blocks decisions
+ANM ..> PRF : identity fields
+ANM ..> DRG : masks resume copies
+ANM ..> APP : masks submitted resume copies (assumed)
+PDI ..> ICS : candidate evaluation report (Hiring Manager)
+INVW ..> IAC : roles & permissions
+
+' ---------- Incoming from other epics ----------
+SCR --> PVM : admitted applications (start at entry stages)
+APH ..> SAE : application status & progress
+ATP ..> TES : test instance state & saved answers
+ARF ..> TES : assessment score
+ARF ..> FNS : feedback & areas of improvement
+HDO ..> FNS : AI rejection feedback
+HDO ..> IOD : final decision, offer & status (display only)
+NTF ..> FNS : candidate notifications
+CST ..> IAA : earned Amarat (crests)
+VSM ..> IAA : verified skills from awards
+ANA ..> IPD : reads (never writes)
+EMG ..> AMC : manage tests
+RPT ..> TES : completed testing interaction (rating eligibility)
+@enduml

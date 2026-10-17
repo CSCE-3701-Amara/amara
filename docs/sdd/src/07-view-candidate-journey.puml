@@ -1,0 +1,94 @@
+@startuml
+title 7/10 - Candidate Journey View (discover -> apply -> assess -> decision)
+skinparam componentStyle rectangle
+left to right direction
+
+package "1. Discover" {
+  component "Jobs Feed" as FED
+  component "Filtering, Sorting & Search" as FSS
+  component "Recommendations" as RCM
+  component "Posting Details" as PDT
+  component "Saved Jobs" as SVJ
+  component "Company Following" as CFM
+  component "Saved Searches &\nNew-Jobs Tracker" as SST
+  component "Job Discovery & Filtering" as JDF
+  component "Saved Postings" as SVP
+  component "Company Follow Manager" as CFL
+}
+
+package "2. Apply & Screen" {
+  component "Dynamic Resume Generator" as DRG
+  component "Verified Skills Manager" as VSM
+  component "Crest Viewer" as CST
+  component "Application Submission" as APP
+  component "Screening & Admission" as SCR
+  component "Application History & Status" as APH
+}
+
+package "3. Pipeline & Assessment" {
+  component "Pipeline Versioning & Migration" as PVM
+  component "Stage Advancement Engine" as SAE
+  component "Test Execution & Scoring" as TES
+  component "Live Interview Manager" as LIM
+  component "Assessment Progress Tracker" as ATP
+  component "Candidate Progress View" as CPV
+  component "Amara Crest Manager" as ACM
+}
+
+package "4. Outcome" {
+  component "Feedback & Notification Service" as FNS
+  component "Assessment Results & Feedback" as ARF
+  component "Hiring Decision & Offer View" as HDO
+  component "Finalists & Offers Manager" as FOM
+  component "Candidate Notifications" as NTF
+}
+
+' ---------- 1. Discover ----------
+JDF ..> FED : feed & posting essentials
+JDF ..> FSS : filtering & search
+FED ..> FSS : same filters & sorting
+FED ..> RCM : Recommended ordering
+FED ..> SVJ : saved marks
+FED ..> APP : applied marks
+FED ..> CFM : followed-companies limit
+PDT ..> APP : can the candidate apply
+PDT ..> SVJ : save action
+PDT ..> CFM : follow action
+SVP ..> JDF : saved from browsing
+SVP ..> SVJ : saved postings
+CFL ..> CFM : follow / unfollow
+SST ..> FSS : saved filters
+
+' ---------- 2. Apply & Screen ----------
+DRG ..> VSM : verified skills
+DRG ..> CST : earned crests
+APP ..> DRG : resume completeness & snapshot
+SCR ..> APP : accepted submissions
+APH ..> APP : submitted applications
+APH ..> JDF : applied postings
+SCR --> PVM : admitted applications
+
+' ---------- 3. Pipeline & Assessment ----------
+PVM ..> SAE : re-evaluates waiting candidates
+TES --> SAE : module score
+LIM --> SAE : outcome & score
+SAE --> ACM : award on pass
+APH ..> SAE : application status & progress
+ATP ..> TES : test state & saved answers
+CPV ..> PVM : pipeline version
+CPV ..> ACM : earned Amarat
+CST ..> ACM : earned Amarat (via IAmaraAwards)
+VSM ..> ACM : verified skills (via IAmaraAwards)
+
+' ---------- 4. Outcome ----------
+SAE --> FNS : pass / reject events
+ARF ..> APH : results per application
+ARF ..> TES : assessment score
+ARF ..> FNS : feedback & areas of improvement
+HDO ..> APH : decision per application
+HDO ..> FNS : AI rejection feedback
+HDO ..> FOM : final decision, offer & status (via IOffersAndDecisions)
+FOM --> SAE : finalist list & scores
+FOM --> FNS : offer delivery & responses
+NTF ..> FNS : candidate notifications
+@enduml

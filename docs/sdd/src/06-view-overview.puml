@@ -1,0 +1,69 @@
+@startuml
+title 6/10 - System Overview (epic level)
+skinparam componentStyle rectangle
+left to right direction
+
+component "Candidates & Dynamic Resume\n(CAND)" as CAND
+component "Jobs, Search & Integrations\n(JOB)" as JOB
+component "Pipeline & Interviews & Tests\n(INVW)" as INVW
+component "Candidate Analytics & Evaluation\n(ANA)" as ANA
+component "Accounts, Identity & Trust\n(AUTH)" as AUTH
+
+component "Video Meeting Provider" as VMP <<external>>
+component "Code Evaluation Provider" as CEP <<external>>
+component "AI / LLM Service" as AIS <<external>>
+component "Email Service" as ES <<external>>
+component "Official Company Registries" as CREG <<external>>
+component "Social Login Providers" as SIP <<external>>
+component "Candidate IDE (telemetry)" as IDE <<external>>
+component "Execution Sandbox" as SBX <<external>>
+component "Peer Reviews, PRs &\nTask-Board Sources" as CSRC <<external>>
+
+interface "IAccessControl" as IAC
+interface "IPostingData" as IPO
+interface "IPipelineData" as IPD
+interface "IAmaraAwards" as IAA
+interface "IOffersAndDecisions" as IOD
+interface "ICandidateScorecard" as ICS
+
+AUTH -- IAC
+JOB -- IPO
+INVW -- IPD
+INVW -- IAA
+INVW -- IOD
+ANA -- ICS
+
+' ---------- Epic-to-epic (aggregated from component edges) ----------
+CAND ..> JOB : browse, save, follow, apply
+CAND ..> INVW : status, tests, feedback, offers, crests
+CAND ..> AUTH : company profile, profile data
+JOB ..> AUTH : verification, taxonomy, bans, sign-in, profiles
+JOB ..> CAND : resume snapshot at application
+JOB ..> INVW : admitted applications start pipeline
+INVW ..> JOB : posting data & lifecycle state
+INVW ..> CAND : resume masking
+INVW ..> AUTH : identity fields
+ANA ..> INVW : reads pipeline data (read-only)
+INVW ..> ANA : evaluation report
+ANA ..> AUTH : demographics (audit only)
+AUTH ..> JOB : admin edit / archive of postings, stats
+AUTH ..> INVW : manage tests, rating eligibility
+
+CAND ..> IAC
+JOB ..> IAC
+INVW ..> IAC
+ANA ..> IAC
+
+' ---------- External systems ----------
+JOB ..> ES
+AUTH ..> ES
+INVW ..> ES
+AUTH ..> CREG
+AUTH ..> SIP
+INVW ..> VMP
+INVW ..> CEP
+INVW ..> AIS
+IDE ..> ANA
+ANA ..> SBX
+ANA ..> CSRC
+@enduml
