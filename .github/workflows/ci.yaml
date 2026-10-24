@@ -36,7 +36,7 @@ jobs:
       - name: Install gosec
         run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
-      - name: Static security check with gosec
+      - name: Static security check with gosec      
         run: gosec ./...
 
       - name: Static security check with semgrep
@@ -44,6 +44,12 @@ jobs:
         with:
           config: p/default
   
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: Known vulnerability check with govulncheck
+        run: govulncheck ./...
+
   style:
     name: Style
     runs-on: ubuntu-latest
