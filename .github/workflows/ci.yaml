@@ -39,7 +39,10 @@ jobs:
       - name: Static security check with gosec
         run: gosec ./...
 
-
+      - name: Static security check with semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: p/default
   
   style:
     name: Style
