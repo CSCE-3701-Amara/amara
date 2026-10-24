@@ -21,3 +21,8 @@ jobs:
           fail_action: true
           allow_issue_writing: false
           artifact_name: zap-release-report
+
+      - name: Check public origin headers
+        env:
+          PUBLIC_ORIGIN: ${{ variables.PUBLIC_ORIGIN }}
+        run: bash scripts/check-security-headers.sh
