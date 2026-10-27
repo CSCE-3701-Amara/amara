@@ -1,5 +1,5 @@
 INFISICAL_ENV ?= dev
-INFISICAL_PATH ?= /
+INFISICAL_PATH ?= /backend
 
 .PHONY: run run-secrets build test vet fmt db-push db-pull db-reset
 
