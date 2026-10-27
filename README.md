@@ -43,17 +43,18 @@ shell environment when the defaults collide.
   API, so browser traffic is same-origin)
 - Worker: same image as the API
 
-Secrets follow the single Infisical path used by the rest of the project: when
-secret-backed integrations are wired, run Compose under the Infisical CLI and
-pass the values through as environment variables (`.env` stays non-secret):
+Secrets follow the single Infisical path used by the rest of the project: run
+Compose under the Infisical CLI with the backend folder — database credentials
+are required and Compose refuses to start without them:
 
 ```sh
 infisical run --env=dev --path=/backend -- docker compose up
 ```
 
-with the consuming variables interpolated in `docker-compose.yml`, for example
-`DB_PASSWORD: ${DB_PASSWORD}`. Nothing is necessary yet: the scaffold uses no
-secrets until Supabase and provider integrations are wired.
+`docker-compose.yml` interpolates consuming variables from the injected
+environment (for example `DATABASE_URL: ${DATABASE_URL}`); a local `.env` file
+stays non-secret. Future provider integrations add their variables to the
+same environment block.
 
 ## Database migrations
 
