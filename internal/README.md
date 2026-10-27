@@ -69,8 +69,10 @@ internal/integration/
 
 ## API composition
 
-`cmd/api/main.go` loads validated configuration, creates the logger, constructs
-module dependencies, and starts the HTTP server with signal handling.
+`cmd/api/main.go` and `cmd/worker/main.go` load validated configuration,
+create the logger, open the shared database pool (fail fast on unreachability),
+and run until a signal arrives. The API then starts its HTTP server; the
+worker currently has no queue consumption and exits after shutdown.
 
 - `platform/config/config.go` reads process environment variables. Infisical
   injects secrets before startup; the API does not load `.env` files.
@@ -90,6 +92,7 @@ to `httpserver.New(cfg.HTTP, logger, handler.RegisterRoutes)`. Registrars receiv
 the `/v1` group, so registering `/jobs` exposes `/v1/jobs`.
 
 The adapter must apply AUTH's authentication and authorization middleware to
-protected routes. No business routes or authentication implementation are
-included in the scaffold. Supabase connections and repositories will be wired
-when persistence work begins.
+protected routes. The shared Supabase connection pool is established in
+`internal/platform/database` and handed to module repositories as persistence
+work lands; repositories receive the concrete pool or their module-owned port,
+never raw SQL responsibilities outside their package.
