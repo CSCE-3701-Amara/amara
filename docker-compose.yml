@@ -1,0 +1,60 @@
+# Amara runtime orchestration for local and preview environments.
+#
+# Per docs/sdd/03-system-architecture.md the backend is one container image
+# with two execution roles: the API process and the worker process. The web
+# client is an OCI container served to the browser. Persistent state stays in
+# the managed Supabase PostgreSQL instance and provider-integrated object
+# storage, so no database or queue containers are declared here.
+name: amara
+
+x-backend-env: &backend-env
+  APP_ENV: ${APP_ENV:-development}
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  HTTP_ADDR: ":8080"
+
+x-backend: &backend
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: amara-backend:dev
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /tmp
+
+services:
+  api:
+    <<: *backend
+    ports:
+      - "${API_PORT:-8080}:8080"
+    environment: *backend-env
+
+  worker:
+    <<: *backend
+    command: ["/worker"]
+    environment: *backend-env
+    # The worker is a stub that exits until its queue work is implemented;
+    # enable unless-stopped alongside the queue consumer work.
+    restart: "no"
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    image: amara-web:dev
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-3000}:80"
+    depends_on:
+      - api
+
+# Secrets arrive through Infisical as process environment variables rather
+# than Docker secret files: run Compose under the Infisical CLI
+# (`infisical run --env=dev -- docker compose up`) and interpolate consuming
+# variables here when the first secret-backed integration is implemented,
+# for example:
+#
+# environment:
+#   DB_PASSWORD: ${DB_PASSWORD}
+#
+# .env files passed to Compose must contain non-secret settings only.
