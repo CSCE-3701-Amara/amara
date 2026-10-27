@@ -82,11 +82,12 @@ The API does not load `.env` files or require Infisical credentials in its code.
 See the official [CLI setup](https://infisical.com/docs/cli/usage) and
 [runtime injection example](https://infisical.com/blog/secure-secrets-management-for-cursor-cloud-agents).
 
-After installing the CLI, log in and link this checkout to your project, Make sure to select US Region: 
+After installing the CLI, log in (select the US Region) and run the API.
+The committed [.infisical.yaml](.infisical.yaml) links this checkout to the
+Amara project, so `infisical init` is only needed when creating a new project:
 
 ```sh
 infisical login
-infisical init
 make run-secrets
 ```
 
