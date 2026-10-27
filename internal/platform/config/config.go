@@ -17,6 +17,7 @@ type Config struct {
 	Environment string
 	LogLevel    slog.Level
 	HTTP        HTTPConfig
+	Database    DatabaseConfig
 }
 
 // HTTPConfig contains transport settings shared by the API server and router.
@@ -64,6 +65,12 @@ func load(lookup func(string) (string, bool)) (Config, error) {
 	default:
 		return Config{}, fmt.Errorf("APP_ENV must be development, test, staging, or production")
 	}
+
+	databaseCfg, err := newDatabaseConfig(lookup)
+	if err != nil {
+		return Config{}, err
+	}
+	cfg.Database = databaseCfg
 
 	if err := cfg.LogLevel.UnmarshalText([]byte(value("LOG_LEVEL", "info"))); err != nil {
 		return Config{}, fmt.Errorf("LOG_LEVEL must be a valid slog level, such as debug, info, warn, or error")
