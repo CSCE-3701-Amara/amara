@@ -15,6 +15,7 @@ import (
 // variables by Infisical; the application does not read local .env files.
 type Config struct {
 	Environment string
+	LogFormat   string
 	LogLevel    slog.Level
 	HTTP        HTTPConfig
 }
@@ -46,6 +47,7 @@ func load(lookup func(string) (string, bool)) (Config, error) {
 
 	cfg := Config{
 		Environment: value("APP_ENV", "development"),
+		LogFormat:   value("LOG_FORMAT", "json"),
 		HTTP: HTTPConfig{
 			Address:           value("HTTP_ADDR", ":8080"),
 			ReadHeaderTimeout: 5 * time.Second,
@@ -63,6 +65,12 @@ func load(lookup func(string) (string, bool)) (Config, error) {
 	case "development", "test", "staging", "production":
 	default:
 		return Config{}, fmt.Errorf("APP_ENV must be development, test, staging, or production")
+	}
+
+	switch cfg.LogFormat {
+	case "json", "text":
+	default:
+		return Config{}, fmt.Errorf("LOG_FORMAT must be json or text")
 	}
 
 	if err := cfg.LogLevel.UnmarshalText([]byte(value("LOG_LEVEL", "info"))); err != nil {

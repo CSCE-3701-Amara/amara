@@ -68,6 +68,7 @@ An explicitly empty origin or proxy list disables that feature.
 | --- | --- | --- |
 | `APP_ENV` | `development` | `development`, `test`, `staging`, or `production` |
 | `LOG_LEVEL` | `info` | Minimum slog level, such as `debug`, `info`, `warn`, or `error` |
+| `LOG_FORMAT` | `json` | `json` for aggregation, or `text` for readable runs such as `docker compose logs` |
 | `HTTP_ADDR` | `:8080` | Listen host and port |
 | `HTTP_READ_HEADER_TIMEOUT` | `5s` | Time allowed to read request headers |
 | `HTTP_READ_TIMEOUT` | `15s` | Time allowed to read the whole request |
@@ -81,7 +82,8 @@ Development allows `http://localhost:5173` and `http://127.0.0.1:5173`.
 Cookie credentials are disabled; cross-origin clients can send an `Authorization`
 header. Configure trusted proxies explicitly when deploying behind a load balancer.
 
-Logs are JSON. Each request receives a generated `X-Request-ID`, also available
+Logs are JSON by default; set `LOG_FORMAT=text` for a human-readable format on
+container-console runs. Each request receives a generated `X-Request-ID`, also available
 through `http.RequestID(ctx)` and in JSON error responses. Request logs include
 route templates, status, and duration; they omit bodies, headers, query strings,
 and path parameter values. Gin prints its route diagnostics in development mode.
