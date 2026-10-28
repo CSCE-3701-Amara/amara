@@ -5,7 +5,19 @@ import (
 	"log/slog"
 )
 
-// New creates a structured JSON logger with the configured minimum level.
-func New(output io.Writer, level slog.Level) *slog.Logger {
-	return slog.New(slog.NewJSONHandler(output, &slog.HandlerOptions{Level: level}))
+func New(output io.Writer, level slog.Level, format string) *slog.Logger {
+	opts := &slog.HandlerOptions{
+		Level: level,
+	}
+
+	var handler slog.Handler
+
+	switch format {
+	case "json":
+		handler = slog.NewJSONHandler(output, opts)
+	default:
+		handler = slog.NewTextHandler(output, opts)
+	}
+
+	return slog.New(handler)
 }
