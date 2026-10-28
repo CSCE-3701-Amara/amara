@@ -30,8 +30,8 @@ func TestLoadDefaults(t *testing.T) {
 	if cfg.Environment != "development" || cfg.LogLevel != slog.LevelInfo || cfg.HTTP.Address != ":8080" {
 		t.Fatalf("unexpected defaults: %+v", cfg)
 	}
-	if cfg.LogFormat != "json" {
-		t.Fatalf("LogFormat = %q, want %q", cfg.LogFormat, "json")
+	if cfg.LogFormat != "text" {
+		t.Fatalf("LogFormat = %q, want %q", cfg.LogFormat, "text")
 	}
 	if cfg.HTTP.ReadHeaderTimeout <= 0 || cfg.HTTP.ReadTimeout <= 0 ||
 		cfg.HTTP.WriteTimeout <= 0 || cfg.HTTP.IdleTimeout <= 0 || cfg.HTTP.ShutdownTimeout <= 0 {

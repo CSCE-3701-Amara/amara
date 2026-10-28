@@ -15,7 +15,7 @@ import (
 
 func main() {
 	if err := run(); err != nil {
-		logging.New(os.Stderr, slog.LevelError,"text").Error("Worker stopped", "error", err)
+		logging.New(os.Stderr, slog.LevelError, "text").Error("Worker stopped", "error", err)
 		os.Exit(1)
 	}
 }
