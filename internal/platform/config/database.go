@@ -44,12 +44,15 @@ func newDatabaseConfig(lookup func(string) (string, bool)) (DatabaseConfig, erro
 
 	// Supabase free tiers keep a small connection budget; never cannonball
 	// the pool against a shared managed instance.
-	if v, ok := lookup("DB_POOL_MAX_CONNS"); ok && strings.TrimSpace(v) != "" {
-		conns, err := strconv.Atoi(strings.TrimSpace(v))
-		if err != nil || conns < 1 || conns > 100 {
-			return DatabaseConfig{}, fmt.Errorf("DB_POOL_MAX_CONNS must be between 1 and 100")
+	if v, ok := lookup("DB_POOL_MAX_CONNS"); ok {
+		v = strings.TrimSpace(v)
+		if v != "" {
+			conns, err := strconv.ParseInt(v, 10, 32)
+			if err != nil || conns < 1 || conns > 100 {
+				return DatabaseConfig{}, fmt.Errorf("DB_POOL_MAX_CONNS must be between 1 and 100")
+			}
+			cfg.MaxConns = int32(conns)
 		}
-		cfg.MaxConns = int32(conns)
 	}
 	return cfg, nil
 }

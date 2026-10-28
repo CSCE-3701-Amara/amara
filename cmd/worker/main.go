@@ -15,7 +15,7 @@ import (
 
 func main() {
 	if err := run(); err != nil {
-		logging.New(os.Stderr, slog.LevelError).Error("Worker stopped", "error", err)
+		logging.New(os.Stderr, slog.LevelError, "text").Error("Worker stopped", "error", err)
 		os.Exit(1)
 	}
 }
@@ -26,7 +26,7 @@ func run() error {
 		return fmt.Errorf("load configuration: %w", err)
 	}
 
-	logger := logging.New(os.Stdout, cfg.LogLevel).With(
+	logger := logging.New(os.Stdout, cfg.LogLevel, cfg.LogFormat).With(
 		"service", "amara-worker",
 		"environment", cfg.Environment,
 	)
@@ -45,8 +45,6 @@ func run() error {
 	defer pool.Close()
 	logger.Info("database connection ready", "waiting_for_work", true)
 
-	select {
-	case <-ctx.Done():
-	}
+	<-ctx.Done()
 	return nil
 }
