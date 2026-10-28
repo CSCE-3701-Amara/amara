@@ -19,8 +19,6 @@ type Config struct {
 	HTTP        HTTPConfig
 	Database    DatabaseConfig
 	LogFormat   string
-	LogLevel    slog.Level
-	HTTP        HTTPConfig
 }
 
 // HTTPConfig contains transport settings shared by the API server and router.
