@@ -48,7 +48,7 @@ func load(lookup func(string) (string, bool)) (Config, error) {
 
 	cfg := Config{
 		Environment: value("APP_ENV", "development"),
-		LogFormat:   value("LOG_FORMAT", "json"),
+		LogFormat:   value("LOG_FORMAT", "text"),
 		HTTP: HTTPConfig{
 			Address:           value("HTTP_ADDR", ":8080"),
 			ReadHeaderTimeout: 5 * time.Second,
