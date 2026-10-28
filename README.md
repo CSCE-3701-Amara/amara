@@ -23,6 +23,36 @@ curl http://localhost:8080/healthz
 The scaffold runs without external services. Supabase and business endpoints
 will be added separately. `/healthz` reports process liveness only.
 
+## Docker Compose
+
+Compose builds the backend image (the API and worker are two execution roles
+of one codebase) and the web client image. No database or queue containers:
+persistent data stays in the managed Supabase PostgreSQL instance.
+
+```sh
+docker compose up --build
+```
+
+Host ports default to `API_PORT=8080` and `WEB_PORT=3000`; set them in the
+shell environment when the defaults collide.
+
+- API: `http://localhost:8080/health`
+- Web: `http://localhost:3000` (nginx serves the SPA and proxies `/v1` to the
+  API, so browser traffic is same-origin)
+- Worker: same image as the API
+
+Secrets follow the single Infisical path used by the rest of the project: when
+secret-backed integrations are wired, run Compose under the Infisical CLI and
+pass the values through as environment variables (`.env` stays non-secret):
+
+```sh
+infisical run --env=dev -- docker compose up
+```
+
+with the consuming variables interpolated in `docker-compose.yml`, for example
+`DB_PASSWORD: ${DB_PASSWORD}`. Nothing is necessary yet: the scaffold uses no
+secrets until Supabase and provider integrations are wired.
+
 ## Infisical
 
 Infisical is the secrets manager. The CLI injects configuration and secrets as
