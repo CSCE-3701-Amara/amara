@@ -18,7 +18,8 @@ import (
 
 func main() {
 	if err := run(); err != nil {
-		logging.New(os.Stderr, slog.LevelError).Error("API stopped", "error", err)
+		// Configuration may be unreadable; aggregation still parses JSON.
+		logging.New(os.Stderr, slog.LevelError, "json").Error("API stopped", "error", err)
 		os.Exit(1)
 	}
 }
@@ -29,7 +30,7 @@ func run() error {
 		return fmt.Errorf("load configuration: %w", err)
 	}
 
-	logger := logging.New(os.Stdout, cfg.LogLevel).With(
+	logger := logging.New(os.Stdout, cfg.LogLevel, cfg.LogFormat).With(
 		"service", "amara-api",
 		"environment", cfg.Environment,
 	)
@@ -56,6 +57,9 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
 	}
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
 	return server.Run(ctx)
 }

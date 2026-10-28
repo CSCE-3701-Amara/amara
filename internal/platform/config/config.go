@@ -18,6 +18,9 @@ type Config struct {
 	LogLevel    slog.Level
 	HTTP        HTTPConfig
 	Database    DatabaseConfig
+	LogFormat   string
+	LogLevel    slog.Level
+	HTTP        HTTPConfig
 }
 
 // HTTPConfig contains transport settings shared by the API server and router.
@@ -47,6 +50,7 @@ func load(lookup func(string) (string, bool)) (Config, error) {
 
 	cfg := Config{
 		Environment: value("APP_ENV", "development"),
+		LogFormat:   value("LOG_FORMAT", "json"),
 		HTTP: HTTPConfig{
 			Address:           value("HTTP_ADDR", ":8080"),
 			ReadHeaderTimeout: 5 * time.Second,
@@ -71,6 +75,11 @@ func load(lookup func(string) (string, bool)) (Config, error) {
 		return Config{}, err
 	}
 	cfg.Database = databaseCfg
+	switch cfg.LogFormat {
+	case "json", "text":
+	default:
+		return Config{}, fmt.Errorf("LOG_FORMAT must be json or text")
+	}
 
 	if err := cfg.LogLevel.UnmarshalText([]byte(value("LOG_LEVEL", "info"))); err != nil {
 		return Config{}, fmt.Errorf("LOG_LEVEL must be a valid slog level, such as debug, info, warn, or error")

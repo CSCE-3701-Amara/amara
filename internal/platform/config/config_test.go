@@ -30,6 +30,9 @@ func TestLoadDefaults(t *testing.T) {
 	if cfg.Environment != "development" || cfg.LogLevel != slog.LevelInfo || cfg.HTTP.Address != ":8080" {
 		t.Fatalf("unexpected defaults: %+v", cfg)
 	}
+	if cfg.LogFormat != "json" {
+		t.Fatalf("LogFormat = %q, want %q", cfg.LogFormat, "json")
+	}
 	if cfg.HTTP.ReadHeaderTimeout <= 0 || cfg.HTTP.ReadTimeout <= 0 ||
 		cfg.HTTP.WriteTimeout <= 0 || cfg.HTTP.IdleTimeout <= 0 || cfg.HTTP.ShutdownTimeout <= 0 {
 		t.Fatal("all HTTP timeouts must have positive defaults")
@@ -43,6 +46,7 @@ func TestLoadOverrides(t *testing.T) {
 	cfg, err := fromValues(map[string]string{
 		"APP_ENV":                  "production",
 		"LOG_LEVEL":                "debug",
+		"LOG_FORMAT":               "text",
 		"HTTP_ADDR":                "127.0.0.1:9090",
 		"HTTP_READ_HEADER_TIMEOUT": "2s",
 		"HTTP_READ_TIMEOUT":        "10s",
@@ -55,7 +59,7 @@ func TestLoadOverrides(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if cfg.Environment != "production" || cfg.LogLevel != slog.LevelDebug || cfg.HTTP.Address != "127.0.0.1:9090" {
+	if cfg.Environment != "production" || cfg.LogLevel != slog.LevelDebug || cfg.LogFormat != "text" || cfg.HTTP.Address != "127.0.0.1:9090" {
 		t.Fatalf("overrides were not loaded: %+v", cfg)
 	}
 	if cfg.HTTP.ReadHeaderTimeout != 2*time.Second || cfg.HTTP.ReadTimeout != 10*time.Second ||
@@ -91,6 +95,9 @@ func TestLoadRejectsInvalidConfiguration(t *testing.T) {
 		{"APP_ENV", "unknown"},
 		{"APP_ENV", ""},
 		{"LOG_LEVEL", "verbose"},
+		{"LOG_FORMAT", "yaml"},
+		{"LOG_FORMAT", ""},
+		{"LOG_FORMAT", "TEXT"},
 		{"HTTP_ADDR", "8080"},
 		{"HTTP_ADDR", ":65536"},
 		{"HTTP_ADDR", ":-1"},
