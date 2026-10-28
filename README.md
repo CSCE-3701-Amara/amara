@@ -20,8 +20,10 @@ curl http://localhost:8080/healthz
 # {"status":"ok"}
 ```
 
-The scaffold runs without external services. Supabase and business endpoints
-will be added separately. `/healthz` reports process liveness only.
+The API connects to the Amara Supabase PostgreSQL instance at startup and
+fails fast when the database is unreachable. `/health` reports process
+liveness only. See [the Supabase ADR](docs/sdd/adr/0001-supabase-postgres.md)
+for the connection and migration approach.
 
 ## Docker Compose
 
@@ -46,12 +48,30 @@ secret-backed integrations are wired, run Compose under the Infisical CLI and
 pass the values through as environment variables (`.env` stays non-secret):
 
 ```sh
-infisical run --env=dev -- docker compose up
+infisical run --env=dev --path=/backend -- docker compose up
 ```
 
 with the consuming variables interpolated in `docker-compose.yml`, for example
 `DB_PASSWORD: ${DB_PASSWORD}`. Nothing is necessary yet: the scaffold uses no
 secrets until Supabase and provider integrations are wired.
+
+## Database migrations
+
+Schema lives in `supabase/migrations/` and runs against the linked Supabase
+project (`amara-dev`) with the Supabase CLI. Epic schemas are `accounts`,
+`cand`, `job`, `invw`, and `ana` — the `auth` schema name is reserved by
+Supabase. See [the ADR](docs/sdd/adr/0001-supabase-postgres.md).
+
+```sh
+supabase login                      # once per machine
+make db-push                        # apply supabase/migrations to amara-dev
+supabase migration new <name>       # create the next migration file
+```
+
+`supabase link` was already run for this checkout; new checkouts need
+`supabase link --project-ref=<ref>` plus the database password. Do not apply
+schema changes through the dashboard SQL editor; they must exist as migration
+files in this repository.
 
 ## Infisical
 
@@ -69,11 +89,12 @@ infisical init
 make run-secrets
 ```
 
-Set values in the project's `dev` environment. The Makefile uses the root secret
-folder by default; select another environment or folder with:
+All API configuration and secrets live in the `backend` folder of the
+project's `dev` environment. The Makefile targets that folder by default;
+select another environment with:
 
 ```sh
-make run-secrets INFISICAL_ENV=staging INFISICAL_PATH=/backend
+make run-secrets INFISICAL_ENV=staging
 ```
 
 For CI and deployment, authenticate a machine identity outside the application,
@@ -98,7 +119,6 @@ An explicitly empty origin or proxy list disables that feature.
 | --- | --- | --- |
 | `APP_ENV` | `development` | `development`, `test`, `staging`, or `production` |
 | `LOG_LEVEL` | `info` | Minimum slog level, such as `debug`, `info`, `warn`, or `error` |
-| `LOG_FORMAT` | `json` | `json` for aggregation, or `text` for readable runs such as `docker compose logs` |
 | `HTTP_ADDR` | `:8080` | Listen host and port |
 | `HTTP_READ_HEADER_TIMEOUT` | `5s` | Time allowed to read request headers |
 | `HTTP_READ_TIMEOUT` | `15s` | Time allowed to read the whole request |
@@ -107,6 +127,8 @@ An explicitly empty origin or proxy list disables that feature.
 | `HTTP_SHUTDOWN_TIMEOUT` | `10s` | Time allowed to drain requests after SIGINT or SIGTERM |
 | `CORS_ALLOWED_ORIGINS` | Local Vite origins in development | Comma-separated exact HTTP(S) origins; empty by default in other environments |
 | `HTTP_TRUSTED_PROXIES` | Empty | Comma-separated trusted proxy IP addresses or CIDR ranges |
+| `DATABASE_URL` | Required | PostgreSQL connection string; secrets arrive through Infisical. Use the Supavisor session pooler URL for local runs |
+| `DB_POOL_MAX_CONNS` | `4` | Connection pool ceiling per process; shared Supabase plans are small |
 
 Development allows `http://localhost:5173` and `http://127.0.0.1:5173`.
 Cookie credentials are disabled; cross-origin clients can send an `Authorization`

@@ -8,8 +8,16 @@ import (
 )
 
 func fromValues(values map[string]string) (Config, error) {
+	merged := map[string]string{
+		// Every process requires a database connection, so tests carry a
+		// valid default and override it when validating the database rules.
+		"DATABASE_URL": "postgres://user:pass@localhost:5432/db",
+	}
+	for key, value := range values {
+		merged[key] = value
+	}
 	return load(func(key string) (string, bool) {
-		value, ok := values[key]
+		value, ok := merged[key]
 		return value, ok
 	})
 }

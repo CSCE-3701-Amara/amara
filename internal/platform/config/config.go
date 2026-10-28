@@ -15,6 +15,9 @@ import (
 // variables by Infisical; the application does not read local .env files.
 type Config struct {
 	Environment string
+	LogLevel    slog.Level
+	HTTP        HTTPConfig
+	Database    DatabaseConfig
 	LogFormat   string
 	LogLevel    slog.Level
 	HTTP        HTTPConfig
@@ -67,6 +70,11 @@ func load(lookup func(string) (string, bool)) (Config, error) {
 		return Config{}, fmt.Errorf("APP_ENV must be development, test, staging, or production")
 	}
 
+	databaseCfg, err := newDatabaseConfig(lookup)
+	if err != nil {
+		return Config{}, err
+	}
+	cfg.Database = databaseCfg
 	switch cfg.LogFormat {
 	case "json", "text":
 	default:
