@@ -10,8 +10,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	canddatabase "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/database"
 	candhttp "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http"
 	candapplication "github.com/CSCE-3701-Amara/amara/internal/cand/application"
+	jobdatabase "github.com/CSCE-3701-Amara/amara/internal/job/adapters/database"
+	jobapplication "github.com/CSCE-3701-Amara/amara/internal/job/application"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/config"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/database"
 	httpserver "github.com/CSCE-3701-Amara/amara/internal/platform/http"
@@ -48,15 +51,18 @@ func run() error {
 	defer stop()
 
 	// Fail fast: the API must not accept traffic it cannot serve.
-	pool, err := database.NewPool(ctx, cfg.Database)
+	dbSvc, err := database.NewService(ctx, cfg.Database)
 	if err != nil {
 		return fmt.Errorf("connect database: %w", err)
 	}
-	defer pool.Close()
+	defer dbSvc.Close()
 	logger.Info("database connection ready")
 
-	feedHandler := candhttp.NewJobFeedHandler(candapplication.NewJobFeed(pool), nil)
-	server, err := httpserver.New(cfg.HTTP, logger, feedHandler.RegisterRoutes)
+	jobLifecycleRepo := jobdatabase.NewPostingLifecycleRepository(dbSvc.Pool())
+	jobLifecycle := jobapplication.NewPostingLifecycle(jobLifecycleRepo)
+	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
+	feedHandler := candhttp.NewJobFeedHandler(candapplication.NewJobFeed(feedRepo, jobLifecycle), nil)
+	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, feedHandler.RegisterRoutes)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
 	}

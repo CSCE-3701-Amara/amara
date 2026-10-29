@@ -33,7 +33,7 @@ func testConfig() config.HTTPConfig {
 func testServer(t *testing.T, cfg config.HTTPConfig, output io.Writer, registrars ...RouteRegistrar) *Server {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
-	server, err := New(cfg, logging.New(output, slog.LevelInfo, "json"), registrars...)
+	server, err := New(cfg, logging.New(output, slog.LevelInfo, "json"), nil, registrars...)
 	if err != nil {
 		t.Fatal(err)
 	}

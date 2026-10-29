@@ -1,5 +1,3 @@
--- +goose Up
--- +goose StatementBegin
 CREATE TABLE candidate_documents (
     cand_id     UUID        REFERENCES candidates(id),
     docu_name   TEXT,
@@ -21,11 +19,3 @@ CREATE TABLE candidate_amarat (
     amara_title         TEXT    NOT NULL,
     amara_description   TEXT
 );
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-DROP TABLE candidate_documents;
-DROP TABLE candidate_certifications;
-DROP TABLE candidate_amarat;
--- +goose StatementEnd

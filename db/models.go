@@ -147,8 +147,8 @@ type JobPosting struct {
 	SalaryMax           pgtype.Int4
 	SalaryVisible       pgtype.Bool
 	OpenPositions       pgtype.Int4
-	ApplicationOpening  interface{}
-	ApplicationDeadline interface{}
+	ApplicationOpening  pgtype.Timestamp
+	ApplicationDeadline pgtype.Timestamp
 	MaxApplications     pgtype.Int4
 	Status              pgtype.Text
 	LastAutosavedAt     pgtype.Timestamp

@@ -5,13 +5,18 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // DatabaseConfig holds the shared database connection settings used by every
 // process of the backend. The URL carries credentials and is never logged.
 type DatabaseConfig struct {
-	URL      string
-	MaxConns int32
+	URL             string
+	MaxConns        int32
+	MinConns        int32
+	MaxConnLifetime time.Duration
+	MaxConnIdleTime time.Duration
+	HealthTimeout   time.Duration
 }
 
 func newDatabaseConfig(lookup func(string) (string, bool)) (DatabaseConfig, error) {
@@ -52,6 +57,38 @@ func newDatabaseConfig(lookup func(string) (string, bool)) (DatabaseConfig, erro
 				return DatabaseConfig{}, fmt.Errorf("DB_POOL_MAX_CONNS must be between 1 and 100")
 			}
 			cfg.MaxConns = int32(conns)
+		}
+	}
+	if v, ok := lookup("DB_POOL_MIN_CONNS"); ok {
+		v = strings.TrimSpace(v)
+		if v != "" {
+			conns, err := strconv.ParseInt(v, 10, 32)
+			if err != nil || conns < 0 {
+				return DatabaseConfig{}, fmt.Errorf("DB_POOL_MIN_CONNS must be a non-negative integer")
+			}
+			cfg.MinConns = int32(conns)
+		}
+	}
+	if cfg.MinConns > cfg.MaxConns {
+		return DatabaseConfig{}, fmt.Errorf("DB_POOL_MIN_CONNS must not exceed DB_POOL_MAX_CONNS")
+	}
+	for _, setting := range []struct {
+		name   string
+		target *time.Duration
+	}{
+		{"DB_POOL_MAX_CONN_LIFETIME", &cfg.MaxConnLifetime},
+		{"DB_POOL_MAX_CONN_IDLE_TIME", &cfg.MaxConnIdleTime},
+		{"DB_HEALTH_TIMEOUT", &cfg.HealthTimeout},
+	} {
+		if v, ok := lookup(setting.name); ok {
+			v = strings.TrimSpace(v)
+			if v != "" {
+				duration, err := time.ParseDuration(v)
+				if err != nil || duration <= 0 {
+					return DatabaseConfig{}, fmt.Errorf("%s must be a positive duration, such as 30m", setting.name)
+				}
+				*setting.target = duration
+			}
 		}
 	}
 	return cfg, nil

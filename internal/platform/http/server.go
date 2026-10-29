@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/CSCE-3701-Amara/amara/internal/platform/config"
+	"github.com/CSCE-3701-Amara/amara/internal/platform/database"
 )
 
 // Server owns the API transport and its shutdown lifecycle.
@@ -21,11 +22,11 @@ type Server struct {
 
 // New composes the router and HTTP server. Module dependencies are constructed
 // in cmd/api and supplied through route registrars.
-func New(cfg config.HTTPConfig, logger *slog.Logger, registrars ...RouteRegistrar) (*Server, error) {
+func New(cfg config.HTTPConfig, logger *slog.Logger, dbSvc database.Service, registrars ...RouteRegistrar) (*Server, error) {
 	if logger == nil {
 		logger = slog.Default()
 	}
-	router, err := newRouter(cfg, logger, registrars...)
+	router, err := newRouter(cfg, logger, dbSvc, registrars...)
 	if err != nil {
 		return nil, err
 	}
