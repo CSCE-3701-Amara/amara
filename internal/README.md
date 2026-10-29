@@ -70,17 +70,23 @@ internal/integration/
 ## API composition
 
 `cmd/api/main.go` and `cmd/worker/main.go` load validated configuration,
-create the logger, open the shared database pool (fail fast on unreachability),
+create the logger, initialize the database `Service` (fail fast on unreachability),
 and run until a signal arrives. The API then starts its HTTP server; the
 worker currently has no queue consumption and exits after shutdown.
 
 - `platform/config/config.go` reads process environment variables. Infisical
   injects secrets before startup; the API does not load `.env` files.
+- `platform/config/database.go` defines database pool limits, lifetimes, and
+  health check timeouts.
+- `platform/database/database.go` provides `database.Service` for lifecycle
+  management, ping connectivity, and pool stats. Repository adapters obtain
+  the underlying `*pgxpool.Pool` via `dbSvc.Pool()`.
 - `platform/logging/logging.go` creates the JSON slog logger.
 - `platform/http/server.go` configures HTTP timeouts and drains active requests
   on shutdown.
-- `platform/http/routes.go` registers `/healthz`, the `/v1` module group, and JSON
-  errors for unknown routes and unsupported methods.
+- `platform/http/routes.go` registers `/health/live` (liveness), `/health/ready`
+  (readiness checking the database), `/health` (legacy liveness alias), the
+  `/v1` module group, and JSON errors for unknown routes and unsupported methods.
 - `platform/http/middleware.go` supplies request IDs, request logging, panic
   recovery, and CORS. Forwarded client addresses are trusted only for configured
   proxy addresses.
@@ -88,11 +94,11 @@ worker currently has no queue consumption and exits after shutdown.
 To expose a new module, implement a route registration method in its HTTP
 adapter with the signature `func(*gin.RouterGroup)`. Construct the adapter and
 its application dependencies in `cmd/api`, then pass the registration method
-to `httpserver.New(cfg.HTTP, logger, handler.RegisterRoutes)`. Registrars receive
+to `httpserver.New(cfg.HTTP, logger, dbSvc, handler.RegisterRoutes)`. Registrars receive
 the `/v1` group, so registering `/jobs` exposes `/v1/jobs`.
 
 The adapter must apply AUTH's authentication and authorization middleware to
-protected routes. The shared Supabase connection pool is established in
-`internal/platform/database` and handed to module repositories as persistence
-work lands; repositories receive the concrete pool or their module-owned port,
-never raw SQL responsibilities outside their package.
+protected routes. The shared database connection pool is managed by
+`internal/platform/database.Service` and handed to module repository adapters
+(`adapters/database`) via `dbSvc.Pool()`. Business services depend strictly on
+epic-owned repository ports, never directly on `pgxpool` or database infrastructure.
