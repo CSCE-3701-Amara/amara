@@ -46,14 +46,18 @@ func run() error {
 	defer stop()
 
 	// Fail fast: the API must not accept traffic it cannot serve.
-	pool, err := database.NewPool(ctx, cfg.Database)
+	dbSvc, err := database.NewService(ctx, cfg.Database)
 	if err != nil {
 		return fmt.Errorf("connect database: %w", err)
 	}
-	defer pool.Close()
+	defer dbSvc.Close()
 	logger.Info("database connection ready")
 
-	server, err := httpserver.New(cfg.HTTP, logger)
+	// Pass dbSvc.Pool() to repository adapters as they are implemented.
+	// Business services receive repository interfaces (ports), not the pool.
+	_ = dbSvc.Pool()
+
+	server, err := httpserver.New(cfg.HTTP, logger, dbSvc)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
 	}
@@ -63,3 +67,4 @@ func run() error {
 
 	return server.Run(ctx)
 }
+
