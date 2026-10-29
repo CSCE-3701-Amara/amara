@@ -95,4 +95,3 @@ func (s *Server) serve(ctx context.Context, listener net.Listener) error {
 	s.logger.Info("HTTP server stopped")
 	return nil
 }
-

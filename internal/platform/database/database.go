@@ -53,14 +53,14 @@ type HealthStatus struct {
 
 // PoolStats is a typed snapshot of pgxpool.Stat counters.
 type PoolStats struct {
-	TotalConns       int32         `json:"total_conns"`
-	AcquiredConns    int32         `json:"acquired_conns"`
-	IdleConns        int32         `json:"idle_conns"`
-	ConstructingConns int32        `json:"constructing_conns"`
-	MaxConns         int32         `json:"max_conns"`
-	AcquireCount     int64         `json:"acquire_count"`
-	AcquireDuration  time.Duration `json:"acquire_duration_ns"`
-	EmptyAcquireCount int64        `json:"empty_acquire_count"`
+	TotalConns        int32         `json:"total_conns"`
+	AcquiredConns     int32         `json:"acquired_conns"`
+	IdleConns         int32         `json:"idle_conns"`
+	ConstructingConns int32         `json:"constructing_conns"`
+	MaxConns          int32         `json:"max_conns"`
+	AcquireCount      int64         `json:"acquire_count"`
+	AcquireDuration   time.Duration `json:"acquire_duration_ns"`
+	EmptyAcquireCount int64         `json:"empty_acquire_count"`
 }
 
 // service is the concrete implementation of Service.

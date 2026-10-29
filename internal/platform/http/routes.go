@@ -60,12 +60,12 @@ func registerRoutes(router *gin.Engine, dbSvc database.Service, registrars ...Ro
 				"database": gin.H{
 					"status": hs.Status,
 					"stats": gin.H{
-						"total_conns":        hs.Stats.TotalConns,
-						"acquired_conns":     hs.Stats.AcquiredConns,
-						"idle_conns":         hs.Stats.IdleConns,
-						"constructing_conns": hs.Stats.ConstructingConns,
-						"max_conns":          hs.Stats.MaxConns,
-						"acquire_count":      hs.Stats.AcquireCount,
+						"total_conns":         hs.Stats.TotalConns,
+						"acquired_conns":      hs.Stats.AcquiredConns,
+						"idle_conns":          hs.Stats.IdleConns,
+						"constructing_conns":  hs.Stats.ConstructingConns,
+						"max_conns":           hs.Stats.MaxConns,
+						"acquire_count":       hs.Stats.AcquireCount,
 						"empty_acquire_count": hs.Stats.EmptyAcquireCount,
 					},
 				},
@@ -96,4 +96,3 @@ func writeError(c *gin.Context, status int, code, message string) {
 		"request_id": RequestID(c.Request.Context()),
 	})
 }
-

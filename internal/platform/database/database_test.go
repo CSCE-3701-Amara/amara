@@ -207,4 +207,3 @@ func TestNewPoolAppliesMaxConns(t *testing.T) {
 		t.Fatalf("MaxConns = %d, want 3", pool.Stat().MaxConns())
 	}
 }
-

@@ -105,8 +105,8 @@ type stubDBService struct {
 }
 
 func (s *stubDBService) Health(_ context.Context) database.HealthStatus { return s.status }
-func (s *stubDBService) Pool() *pgxpool.Pool                             { return nil }
-func (s *stubDBService) Close()                                          {}
+func (s *stubDBService) Pool() *pgxpool.Pool                            { return nil }
+func (s *stubDBService) Close()                                         {}
 
 // stubDB returns a database.Service fake with the given pre-canned status.
 func stubDB(status string, errMsg string) database.Service {
@@ -443,4 +443,3 @@ func TestRunReportsListenErrors(t *testing.T) {
 		t.Fatal("an occupied port must return a startup error")
 	}
 }
-
