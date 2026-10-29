@@ -10,6 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	candhttp "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http"
+	candapplication "github.com/CSCE-3701-Amara/amara/internal/cand/application"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/config"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/database"
 	httpserver "github.com/CSCE-3701-Amara/amara/internal/platform/http"
@@ -53,7 +55,8 @@ func run() error {
 	defer pool.Close()
 	logger.Info("database connection ready")
 
-	server, err := httpserver.New(cfg.HTTP, logger)
+	feedHandler := candhttp.NewJobFeedHandler(candapplication.NewJobFeed(pool), nil)
+	server, err := httpserver.New(cfg.HTTP, logger, feedHandler.RegisterRoutes)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
 	}
