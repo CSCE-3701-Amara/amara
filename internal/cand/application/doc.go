@@ -42,8 +42,8 @@ type FeedJob struct {
 	SalaryMax           pgtype.Int4      `json:"salary_max"`
 	SalaryVisible       pgtype.Bool      `json:"salary_visible"`
 	OpenPositions       pgtype.Int4      `json:"open_positions"`
-	ApplicationOpening  *time.Time      `json:"application_opening"`
-	ApplicationDeadline *time.Time      `json:"application_deadline"`
+	ApplicationOpening  *time.Time       `json:"application_opening"`
+	ApplicationDeadline *time.Time       `json:"application_deadline"`
 	MaxApplications     pgtype.Int4      `json:"max_applications"`
 	Status              pgtype.Text      `json:"status"`
 	LastAutosavedAt     pgtype.Timestamp `json:"last_autosaved_at"`
@@ -73,8 +73,12 @@ func (s *JobFeed) List(ctx context.Context, filter FeedFilter) (FeedPage, error)
 		return FeedPage{}, fmt.Errorf("job feed database is not configured")
 	}
 	limit := filter.Limit
-	if limit == 0 { limit = 20 }
-	if limit < 1 || limit > 100 { return FeedPage{}, fmt.Errorf("limit must be between 1 and 100") }
+	if limit == 0 {
+		limit = 20
+	}
+	if limit < 1 || limit > 100 {
+		return FeedPage{}, fmt.Errorf("limit must be between 1 and 100")
+	}
 	// Expired postings transition to archived as part of feed reads, so status
 	// and archived_at remain consistent even before a scheduled worker exists.
 	if _, err := s.pool.Exec(ctx, `UPDATE job_postings SET status = 'archived', archived_at = COALESCE(archived_at, now()), updated_at = now() WHERE status = 'published' AND deleted_at IS NULL AND application_deadline IS NOT NULL AND application_deadline <= now()`); err != nil {
@@ -83,37 +87,69 @@ func (s *JobFeed) List(ctx context.Context, filter FeedFilter) (FeedPage, error)
 
 	args := []any{}
 	where := []string{"status = 'published'", "deleted_at IS NULL", "published_at IS NOT NULL", "(application_opening IS NULL OR application_opening <= now())", "(application_deadline IS NULL OR application_deadline > now())"}
-	add := func(expr string, value any) { args = append(args, value); where = append(where, fmt.Sprintf(expr, len(args))) }
-	if v := strings.TrimSpace(filter.Title); v != "" { add("title ILIKE $%d", "%"+v+"%") }
-	if v := strings.TrimSpace(filter.Language); v != "" { add("language = $%d", v) }
-	if v := strings.TrimSpace(filter.Currency); v != "" { add("currency = $%d", v) }
-	if v := strings.TrimSpace(filter.SeniorityLevel); v != "" { add("seniority_level = $%d", v) }
-	if v := strings.TrimSpace(filter.EmploymentType); v != "" { add("employment_type = $%d", v) }
-	if v := strings.TrimSpace(filter.Location); v != "" { add("location ILIKE $%d", "%"+v+"%") }
-	if filter.SalaryMin != nil { add("(salary_max IS NULL OR salary_max >= $%d)", *filter.SalaryMin) }
-	if filter.SalaryMax != nil { add("(salary_min IS NULL OR salary_min <= $%d)", *filter.SalaryMax) }
+	add := func(expr string, value any) {
+		args = append(args, value)
+		where = append(where, fmt.Sprintf(expr, len(args)))
+	}
+	if v := strings.TrimSpace(filter.Title); v != "" {
+		add("title ILIKE $%d", "%"+v+"%")
+	}
+	if v := strings.TrimSpace(filter.Language); v != "" {
+		add("language = $%d", v)
+	}
+	if v := strings.TrimSpace(filter.Currency); v != "" {
+		add("currency = $%d", v)
+	}
+	if v := strings.TrimSpace(filter.SeniorityLevel); v != "" {
+		add("seniority_level = $%d", v)
+	}
+	if v := strings.TrimSpace(filter.EmploymentType); v != "" {
+		add("employment_type = $%d", v)
+	}
+	if v := strings.TrimSpace(filter.Location); v != "" {
+		add("location ILIKE $%d", "%"+v+"%")
+	}
+	if filter.SalaryMin != nil {
+		add("(salary_max IS NULL OR salary_max >= $%d)", *filter.SalaryMin)
+	}
+	if filter.SalaryMax != nil {
+		add("(salary_min IS NULL OR salary_min <= $%d)", *filter.SalaryMax)
+	}
 	if filter.Cursor != "" {
 		parts := strings.SplitN(filter.Cursor, "|", 2)
-		if len(parts) != 2 { return FeedPage{}, fmt.Errorf("invalid cursor") }
-		timestamp, err := time.Parse(time.RFC3339Nano, parts[0]); if err != nil { return FeedPage{}, fmt.Errorf("invalid cursor timestamp: %w", err) }
+		if len(parts) != 2 {
+			return FeedPage{}, fmt.Errorf("invalid cursor")
+		}
+		timestamp, err := time.Parse(time.RFC3339Nano, parts[0])
+		if err != nil {
+			return FeedPage{}, fmt.Errorf("invalid cursor timestamp: %w", err)
+		}
 		var id pgtype.UUID
-		if err := id.Scan(parts[1]); err != nil { return FeedPage{}, fmt.Errorf("invalid cursor UUID: %w", err) }
+		if err := id.Scan(parts[1]); err != nil {
+			return FeedPage{}, fmt.Errorf("invalid cursor UUID: %w", err)
+		}
 		args = append(args, timestamp, id)
 		where = append(where, fmt.Sprintf("(published_at, id) < ($%d, $%d)", len(args)-1, len(args)))
 	}
 	args = append(args, limit+1)
 	query := `SELECT id, company_id, title, description, language, currency, seniority_level, employment_type, location, salary_min, salary_max, salary_visible, open_positions, application_opening, application_deadline, max_applications, status, last_autosaved_at, published_at, archived_at, created_at, updated_at, deleted_at FROM job_postings WHERE ` + strings.Join(where, " AND ") + fmt.Sprintf(" ORDER BY published_at DESC, id DESC LIMIT $%d", len(args))
 	rows, err := s.pool.Query(ctx, query, args...)
-	if err != nil { return FeedPage{}, fmt.Errorf("query job feed: %w", err) }
+	if err != nil {
+		return FeedPage{}, fmt.Errorf("query job feed: %w", err)
+	}
 	defer rows.Close()
 	items := make([]FeedJob, 0, limit)
 	for rows.Next() {
 		var item FeedJob
-		if err := rows.Scan(&item.ID, &item.CompanyID, &item.Title, &item.Description, &item.Language, &item.Currency, &item.SeniorityLevel, &item.EmploymentType, &item.Location, &item.SalaryMin, &item.SalaryMax, &item.SalaryVisible, &item.OpenPositions, &item.ApplicationOpening, &item.ApplicationDeadline, &item.MaxApplications, &item.Status, &item.LastAutosavedAt, &item.PublishedAt, &item.ArchivedAt, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err != nil { return FeedPage{}, fmt.Errorf("scan job feed row: %w", err) }
+		if err := rows.Scan(&item.ID, &item.CompanyID, &item.Title, &item.Description, &item.Language, &item.Currency, &item.SeniorityLevel, &item.EmploymentType, &item.Location, &item.SalaryMin, &item.SalaryMax, &item.SalaryVisible, &item.OpenPositions, &item.ApplicationOpening, &item.ApplicationDeadline, &item.MaxApplications, &item.Status, &item.LastAutosavedAt, &item.PublishedAt, &item.ArchivedAt, &item.CreatedAt, &item.UpdatedAt, &item.DeletedAt); err != nil {
+			return FeedPage{}, fmt.Errorf("scan job feed row: %w", err)
+		}
 		item.ApplicationURL = "/v1/jobs/" + item.ID.String() + "/apply"
 		items = append(items, item)
 	}
-	if err := rows.Err(); err != nil { return FeedPage{}, fmt.Errorf("read job feed rows: %w", err) }
+	if err := rows.Err(); err != nil {
+		return FeedPage{}, fmt.Errorf("read job feed rows: %w", err)
+	}
 	page := FeedPage{Items: items}
 	if len(items) > limit {
 		last := items[limit-1]

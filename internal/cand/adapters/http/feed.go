@@ -40,18 +40,29 @@ func (h *JobFeedHandler) getFeed(c *gin.Context) {
 	}
 	if raw := c.Query("limit"); raw != "" {
 		limit, err := strconv.Atoi(raw)
-		if err != nil { c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"code": "invalid_limit", "message": "limit must be an integer."}}); return }
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"code": "invalid_limit", "message": "limit must be an integer."}})
+			return
+		}
 		filter.Limit = limit
 	}
 	if raw := c.Query("salary_min"); raw != "" {
 		value, err := strconv.ParseInt(raw, 10, 32)
-		if err != nil { c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"code": "invalid_salary_min", "message": "salary_min must be a 32-bit integer."}}); return }
-		n := int32(value); filter.SalaryMin = &n
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"code": "invalid_salary_min", "message": "salary_min must be a 32-bit integer."}})
+			return
+		}
+		n := int32(value)
+		filter.SalaryMin = &n
 	}
 	if raw := c.Query("salary_max"); raw != "" {
 		value, err := strconv.ParseInt(raw, 10, 32)
-		if err != nil { c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"code": "invalid_salary_max", "message": "salary_max must be a 32-bit integer."}}); return }
-		n := int32(value); filter.SalaryMax = &n
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"code": "invalid_salary_max", "message": "salary_max must be a 32-bit integer."}})
+			return
+		}
+		n := int32(value)
+		filter.SalaryMax = &n
 	}
 	page, err := h.feed.List(c.Request.Context(), filter)
 	if err != nil {
