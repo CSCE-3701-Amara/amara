@@ -71,14 +71,14 @@ func TestRoutesAndRequestIDs(t *testing.T) {
 				t.Fatalf("unexpected health response: %s", response.Body)
 			}
 			if tc.code != "" {
-				var body struct {
-					Error     struct{ Code string } `json:"error"`
-					RequestID string                `json:"request_id"`
+				if ct := response.Header().Get("Content-Type"); ct != ProblemContentType {
+					t.Fatalf("Content-Type = %q, want %q", ct, ProblemContentType)
 				}
+				var body ProblemDetails
 				if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil {
 					t.Fatal(err)
 				}
-				if body.Error.Code != tc.code || body.RequestID != id {
+				if body.Code != tc.code || body.Status != tc.status || body.Type != "about:blank" || body.Instance != tc.path {
 					t.Fatalf("unexpected error response: %+v", body)
 				}
 			}
