@@ -5,6 +5,7 @@ CREATE TABLE companies (
     password_hash       BYTEA   NOT NULL,
     salt                BYTEA   NOT NULL,
     legal_name          TEXT    NOT NULL,
+    tax_number          TEXT    NOT NULL,
     display_name        TEXT,
     description         TEXT,
     website_link        TEXT,

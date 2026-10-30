@@ -68,7 +68,7 @@ func isValidPassword(password string) bool {
 	return length >= 8 && length <= 128 && !isCompromised(password)
 }
 
-func CreateCandidateAccount(name, email, password) (db.Candidate, error) {
+func CreateCandidateAccount(name, email, password string) (db.Candidate | db.Interviewer | db.Company, error) {
 	if !isValidEmail(name) {
 		return nil, fmt.Error("Invalid email format")
 	}
@@ -88,24 +88,29 @@ func CreateCandidateAccount(name, email, password) (db.Candidate, error) {
 
 	password_hash := hashPassword(password, salt)
 
-	return db.CreateCandidate(name, email, password_hash, salt)
+	return db.CreateCandidate(name, email, password_hash, salt)	
 }
 
-func CreateInterviewerAccount(user InterviewerInfo) (Interviewer, error) {
-	if !isValidEmail(user.Email) {
+func CreateInterviewer(name, email, password, company_tax_number string) {
+	if !isValidEmail(name) {
 		return nil, fmt.Error("Invalid email format")
 	}
 
-	if !isUniqueEmail(user.Email) {
+	if !isUniqueEmail(email) {
 		return nil, fmt.Error("Email already exists")
 	}
 
-	if !isValidPassword(user.Password) {
+	if !isValidPassword(password) {
 		return nil, fmt.Error("Invalid password")
 	}
 
-	// TODO:
-	interviewer, err := db.CreateInterviewer()
+	salt := make([]byte, 16)
+	if _, err := rand.Read(salt); err != nil {
+		return nil, err
+	}
 
-	return interviewer, err
+	password_hash := hashPassword(password, salt)
+
+	// TODO: 
+	return db.CreateInterviewer(name, email, password_hash, salt, company_tax_number)
 }
