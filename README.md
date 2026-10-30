@@ -39,7 +39,7 @@ Host ports default to `API_PORT=8080` and `WEB_PORT=3000`; set them in the
 shell environment when the defaults collide.
 
 - API: `http://localhost:8080/health`
-- Web: `http://localhost:3000` (nginx serves the SPA and proxies `/v1` to the
+- Web: `http://localhost:3000` (Next.js server with standalone runtime, proxying `/v1` to the
   API, so browser traffic is same-origin)
 - Worker: same image as the API
 

@@ -57,7 +57,7 @@ services:
     image: amara-web:dev
     restart: unless-stopped
     ports:
-      - "${WEB_PORT:-3000}:80"
+      - "${WEB_PORT:-3000}:3000"
     depends_on:
       - api
 
