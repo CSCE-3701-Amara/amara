@@ -1,4 +1,3 @@
--- +goose Up
 CREATE TABLE applications (
     id                  UUID    PRIMARY KEY,
     reference_number    INTEGER NOT NULL    UNIQUE,
@@ -14,6 +13,3 @@ CREATE TABLE applications (
     screened_out        BOOLEAN,
     screening_completed_at  TIMESTAMP
 );
-
--- +goose Down
-DROP TABLE applications;
