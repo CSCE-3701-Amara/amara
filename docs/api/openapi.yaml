@@ -28,8 +28,444 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/auth/registrations:
+    post:
+      summary: Register a candidate or interviewer
+      operationId: registerCandidateOrInterviewer
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+      responses:
+        '201':
+          description: Account registration accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/auth/company-registrations:
+    post:
+      summary: Submit a company registration request
+      operationId: registerCompany
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyRegistrationRequest'
+      responses:
+        '201':
+          description: Company registration request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/auth/sessions:
+    post:
+      summary: Create an authenticated session
+      operationId: createSession
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated session created
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SessionCookie'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/candidates/me:
+    patch:
+      summary: Modify the authenticated candidate profile
+      operationId: updateCandidateProfile
+      tags:
+        - Auth
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CandidateProfileUpdateRequest'
+      responses:
+        '200':
+          description: Candidate profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidateProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/auth/account-actions:
+    post:
+      summary: Deactivate or delete the authenticated candidate profile
+      operationId: performAccountAction
+      tags:
+        - Auth
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountActionRequest'
+      responses:
+        '204':
+          description: Account action completed and the session was terminated
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/ClearedSessionCookie'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/auth/sessions/current:
+    delete:
+      summary: Terminate the current authenticated session
+      operationId: deleteCurrentSession
+      tags:
+        - Auth
+      security:
+        - SessionCookie: []
+      responses:
+        '204':
+          description: Session terminated
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/ClearedSessionCookie'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   schemas:
+    UserRegistrationRequest:
+      oneOf:
+        - $ref: '#/components/schemas/CandidateRegistrationRequest'
+        - $ref: '#/components/schemas/InterviewerRegistrationRequest'
+      discriminator:
+        propertyName: accountType
+
+    CandidateRegistrationRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - accountType
+        - email
+        - password
+        - firstName
+        - lastName
+      properties:
+        accountType:
+          const: candidate
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 100
+
+    InterviewerRegistrationRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - accountType
+        - email
+        - password
+        - firstName
+        - lastName
+        - companySecret
+      properties:
+        accountType:
+          const: interviewer
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        companySecret:
+          type: string
+
+    CompanyRegistrationRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - companyName
+        - registrationNumber
+        - email
+        - password
+      properties:
+        companyName:
+          type: string
+          minLength: 1
+          maxLength: 200
+        registrationNumber:
+          type: string
+          minLength: 1
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+
+    RegistrationResponse:
+      type: object
+      required:
+        - id
+        - accountType
+        - email
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+        accountType:
+          type: string
+          enum:
+            - candidate
+            - interviewer
+            - company
+        email:
+          type: string
+          format: email
+        status:
+          type: string
+          enum:
+            - pending_verification
+            - pending_review
+            - active
+        createdAt:
+          type: string
+          format: date-time
+
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        mfaCode:
+          type: string
+          minLength: 1
+          maxLength: 10
+
+    LoginResponse:
+      type: object
+      required:
+        - user
+        - session
+      properties:
+        user:
+          $ref: '#/components/schemas/AuthenticatedUser'
+        session:
+          $ref: '#/components/schemas/Session'
+
+    AuthenticatedUser:
+      type: object
+      required:
+        - id
+        - email
+        - role
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum:
+            - candidate
+            - interviewer
+            - company_representative
+
+    Session:
+      type: object
+      required:
+        - expiresAt
+      properties:
+        expiresAt:
+          type: string
+          format: date-time
+
+    CandidateProfileFields:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        phoneNumber:
+          type: string
+          maxLength: 50
+        githubProfile:
+          type: string
+          format: uri
+        linkedinProfile:
+          type: string
+          format: uri
+        portfolioLink:
+          type: string
+          format: uri
+        gender:
+          type: string
+          maxLength: 50
+        birthDate:
+          type: string
+          format: date
+        nationality:
+          type: string
+          maxLength: 100
+        address:
+          type: string
+          maxLength: 500
+        biography:
+          type: string
+          maxLength: 5000
+        yearsOfExperience:
+          type: integer
+          minimum: 0
+        available:
+          type: boolean
+
+    CandidateProfileUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/CandidateProfileFields'
+      unevaluatedProperties: false
+
+    CandidateProfile:
+      allOf:
+        - $ref: '#/components/schemas/CandidateProfileFields'
+        - type: object
+          required:
+            - id
+            - name
+            - email
+            - createdAt
+          properties:
+            id:
+              type: string
+              format: uuid
+            email:
+              type: string
+              format: email
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+      unevaluatedProperties: false
+
+    AccountActionRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum:
+            - deactivate
+            - delete
+
     FieldError:
       type: object
       required:
@@ -83,6 +519,22 @@ components:
           description: List of field-level validation errors, present when status is 422.
           items:
             $ref: '#/components/schemas/FieldError'
+
+  headers:
+    SessionCookie:
+      description: HttpOnly session cookie established by the server.
+      schema:
+        type: string
+    ClearedSessionCookie:
+      description: Expired session cookie clearing the authenticated session.
+      schema:
+        type: string
+
+  securitySchemes:
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: amara_session
 
   responses:
     BadRequest:
