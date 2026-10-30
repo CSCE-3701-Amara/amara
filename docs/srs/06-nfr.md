@@ -6,13 +6,13 @@ Each NFR *SHALL* be measurable (a number, a condition, or a standard) and is ide
 
 Planning horizons used below. Numbers are targets to validate with real usage, not a claim about the Egyptian market size.
 
-| Horizon | When | What it means |
-|---|---|---|
-| T1 | 6 months | Launch in Egypt. Must run on a student budget and student operations. |
-| T2 | Year 1 | Paying small companies and startups. Still one team, still cost-conscious. |
-| T3 | Year 2+ | Large Egyptian employers as well as small ones. National footprint. |
-| T4 | After T3 | Expansion to the MENA region. |
-| T5 | After T4 | International expansion beyond MENA. |
+| Horizon | When     | What it means                                                              |
+| ------- | -------- | -------------------------------------------------------------------------- |
+| T1      | 6 months | Launch in Egypt. Must run on a student budget and student operations.      |
+| T2      | Year 1   | Paying small companies and startups. Still one team, still cost-conscious. |
+| T3      | Year 2+  | Large Egyptian employers as well as small ones. National footprint.        |
+| T4      | After T3 | Expansion to the MENA region.                                              |
+| T5      | After T4 | International expansion beyond MENA.                                       |
 
 A *Shall* is required for T1. A *Should* is the T2 bar. A *Could* is the T3 bar. T4 and T5 are expansion horizons only. They are not yet written into the requirements below. The architecture *SHALL* not make a later horizon impossible (see `NFR-SCAL-001`).
 

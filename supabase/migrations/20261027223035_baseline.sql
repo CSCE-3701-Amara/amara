@@ -1,5 +1,2 @@
 -- Amara baseline migration.
 --
--- No schema objects yet: the five epic schemas (accounts, cand, job, invw,
--- ana) arrive with their owning modules. Note that the AUTH epic must not use
--- a schema named `auth`, which Supabase reserves for its own services.

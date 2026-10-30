@@ -1,0 +1,53 @@
+
+erDiagram
+    USER ||--o{ MEMBERSHIP : has
+    COMPANY ||--o{ MEMBERSHIP : has
+    USER ||--o{ INVITATION : sends
+    COMPANY ||--o{ INVITATION : issues
+    USER ||--o{ USER_ROLE : assigned
+    ROLE ||--o{ USER_ROLE : contains
+    USER ||--o{ SESSION : has
+
+    COMPANY ||--o{ JOB_POSTING : publishes
+    JOB_POSTING ||--o{ JOB_REQUIREMENT : defines
+    JOB_POSTING ||--o{ APPLICATION : receives
+    CANDIDATE ||--o{ APPLICATION : submits
+    APPLICATION ||--o{ APPLICATION_SNAPSHOT : preserves
+    APPLICATION ||--o{ SCREENING_DECISION : has
+
+    CANDIDATE ||--o{ RESUME : owns
+    RESUME ||--o{ RESUME_VERSION : has
+    CANDIDATE ||--o{ DOCUMENT : owns
+    CANDIDATE ||--o{ CANDIDATE_SKILL : has
+    SKILL ||--o{ CANDIDATE_SKILL : describes
+    CANDIDATE ||--o{ CANDIDATE_HISTORY : has
+    CANDIDATE ||--o{ IDENTITY_REVEAL_RECORD : has
+
+    JOB_POSTING ||--o{ PIPELINE : uses
+    PIPELINE ||--o{ PIPELINE_VERSION : has
+    PIPELINE_VERSION ||--o{ PIPELINE_STAGE : contains
+    PIPELINE_STAGE ||--o{ STAGE_TRANSITION : outgoing
+    PIPELINE_STAGE ||--o{ STAGE_TRANSITION : incoming
+
+    PIPELINE_STAGE o|--o{ TEST_MODULE : configures
+    TEST_MODULE ||--o{ ASSESSMENT_QUESTION : contains
+
+    APPLICATION ||--o{ PIPELINE_EXECUTION : enters
+    PIPELINE_VERSION ||--o{ PIPELINE_EXECUTION : runs
+    PIPELINE_EXECUTION ||--o{ STAGE_EXECUTION : contains
+    PIPELINE_STAGE ||--o{ STAGE_EXECUTION : executes
+
+    STAGE_EXECUTION ||--o{ ASSESSMENT_ATTEMPT : has
+    ASSESSMENT_ATTEMPT ||--o{ ASSESSMENT_SUBMISSION : contains
+    ASSESSMENT_ATTEMPT ||--o| ASSESSMENT_RESULT : produces
+
+    STAGE_EXECUTION ||--o{ INTERVIEW : schedules
+    INTERVIEW ||--o{ INTERVIEWER_ASSIGNMENT : assigns
+    USER ||--o{ INTERVIEWER_ASSIGNMENT : participates
+    INTERVIEW ||--o{ INTERVIEW_FEEDBACK : receives
+    USER ||--o{ INTERVIEW_FEEDBACK : writes
+
+    APPLICATION ||--o{ OFFER : receives
+
+    USER ||--o{ IDENTITY_REVEAL_RECORD : reveals
+    PIPELINE_STAGE o|--o{ IDENTITY_REVEAL_RECORD : triggers
