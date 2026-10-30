@@ -1,10 +1,16 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "db/queries/"
-    schema: "supabase/migrations/"
+    queries: "internal/auth/adapters/database/queries/"
+    schema:
+      - "supabase/migrations/00001_create_candidates_table.sql"
+      - "supabase/migrations/00004_create_companies_table.sql"
+      - "supabase/migrations/00005_create_interviewers_table.sql"
+      - "supabase/migrations/00015_auth_registration.sql"
+      - "supabase/migrations/00016_company_registration_requests.sql"
+      - "supabase/migrations/00017_auth_mfa.sql"
     gen:
       go:
-        package: "db"
-        out: "db"
+        package: "sqlc"
+        out: "internal/auth/adapters/database/sqlc"
         sql_package: "pgx/v5"
