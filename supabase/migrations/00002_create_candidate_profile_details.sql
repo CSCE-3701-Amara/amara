@@ -1,3 +1,5 @@
+-- +goose Up
+-- +goose StatementBegin
 CREATE TABLE candidate_education (
     cand_id     UUID    REFERENCES candidates(id),
     degree_type TEXT,
@@ -21,3 +23,7 @@ CREATE TABLE candidate_languages (
     language    TEXT    NOT NULL,
     level       TEXT
 );
+-- +goose StatementEnd
+
+-- +goose Down
+DROP TABLE candidate_education, candidate_work_experience, candidate_languages;

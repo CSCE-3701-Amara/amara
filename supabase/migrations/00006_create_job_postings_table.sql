@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE job_postings (
     id                      UUID    PRIMARY KEY,
     company_id              UUID    NOT NULL    REFERENCES companies(id),
@@ -23,3 +24,6 @@ CREATE TABLE job_postings (
     updated_at              TIMESTAMP,
     deleted_at              TIMESTAMP
 );
+
+-- +goose Down
+DROP TABLE job_postings;

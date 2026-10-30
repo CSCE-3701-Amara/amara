@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE companies (
     id                  UUID    PRIMARY KEY,
     email               TEXT    NOT NULL,
@@ -19,3 +20,6 @@ CREATE TABLE companies (
     banned              BOOLEAN,
     ban_reason          TEXT
 );
+
+-- +goose Down
+DROP TABLE companies;

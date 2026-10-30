@@ -6,7 +6,6 @@ CREATE TABLE modules (
     description         TEXT,
     company_id          UUID    REFERENCES companies(id),
     active_time_limit   INTERVAL,
-    deadline            TIMESTAMP,
     published           BOOLEAN
 );
 

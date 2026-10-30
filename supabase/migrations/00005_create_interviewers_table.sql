@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE interviewers (
     id              UUID        PRIMARY KEY,
     company_id      UUID        REFERENCES companies(id),
@@ -11,3 +12,6 @@ CREATE TABLE interviewers (
     deactivated_at  TIMESTAMP,
     last_login_at   TIMESTAMP
 );
+
+-- +goose Down
+DROP TABLE interviewersl;
