@@ -16,11 +16,9 @@ type DatabaseConfig struct {
 	// MinConns is the minimum number of connections kept alive in the pool.
 	// Zero lets pgxpool manage the idle floor automatically.
 	MinConns int32
-	// MaxConnLifetime is the maximum age of a pooled connection before it is
-	// replaced. Zero means no limit.
+	// MaxConnLifetime overrides pgxpool's default connection lifetime when positive.
 	MaxConnLifetime time.Duration
-	// MaxConnIdleTime is how long an idle connection may remain open before the
-	// pool closes it. Zero means no limit.
+	// MaxConnIdleTime overrides pgxpool's default idle time when positive.
 	MaxConnIdleTime time.Duration
 	// HealthTimeout bounds the ping issued by the database health check.
 	HealthTimeout time.Duration
@@ -66,7 +64,6 @@ func newDatabaseConfig(lookup func(string) (string, bool)) (DatabaseConfig, erro
 			cfg.MaxConns = int32(conns)
 		}
 	}
-
 	if v, ok := lookup("DB_POOL_MIN_CONNS"); ok {
 		v = strings.TrimSpace(v)
 		if v != "" {
@@ -77,7 +74,6 @@ func newDatabaseConfig(lookup func(string) (string, bool)) (DatabaseConfig, erro
 			cfg.MinConns = int32(conns)
 		}
 	}
-
 	if cfg.MinConns > cfg.MaxConns {
 		return DatabaseConfig{}, fmt.Errorf("DB_POOL_MIN_CONNS must not exceed DB_POOL_MAX_CONNS")
 	}
@@ -93,14 +89,13 @@ func newDatabaseConfig(lookup func(string) (string, bool)) (DatabaseConfig, erro
 		if v, ok := lookup(setting.name); ok {
 			v = strings.TrimSpace(v)
 			if v != "" {
-				d, err := time.ParseDuration(v)
-				if err != nil || d <= 0 {
+				duration, err := time.ParseDuration(v)
+				if err != nil || duration <= 0 {
 					return DatabaseConfig{}, fmt.Errorf("%s must be a positive duration, such as 30m", setting.name)
 				}
-				*setting.target = d
+				*setting.target = duration
 			}
 		}
 	}
-
 	return cfg, nil
 }

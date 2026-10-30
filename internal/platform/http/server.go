@@ -27,10 +27,8 @@ type Server struct {
 // endpoint will respond as healthy in that case.
 func New(cfg config.HTTPConfig, logger *slog.Logger, dbSvc database.Service, registrars ...RouteRegistrar) (*Server, error) {
 	if logger == nil {
-
 		logger = slog.Default()
 	}
-
 	router, err := newRouter(cfg, logger, dbSvc, registrars...)
 	if err != nil {
 		return nil, err
