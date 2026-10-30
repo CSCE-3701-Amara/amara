@@ -16,7 +16,7 @@ func TestNewRouterRegistersHealthAndRegistrationRoutes(t *testing.T) {
 	handler := http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
 		writer.WriteHeader(http.StatusCreated)
 	})
-	router, err := NewRouter(handler)
+	router, err := NewRouter(handler, handler)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,6 +27,7 @@ func TestNewRouterRegistersHealthAndRegistrationRoutes(t *testing.T) {
 	}{
 		{path: "/health", want: http.StatusOK},
 		{path: RegistrationPath, want: http.StatusCreated},
+		{path: CompanyRegistrationPath, want: http.StatusCreated},
 	} {
 		request := httptest.NewRequest(http.MethodPost, test.path, nil)
 		if test.path == "/health" {

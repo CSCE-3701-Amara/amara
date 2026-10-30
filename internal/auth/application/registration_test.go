@@ -11,16 +11,19 @@ import (
 )
 
 type fakeRepository struct {
-	emailExists        bool
-	emailErr           error
-	companyID          string
-	companyErr         error
-	account            domain.Account
-	createErr          error
-	createdCandidate   bool
-	createdInterviewer bool
-	challenge          ports.VerificationChallenge
-	challengeErr       error
+	emailExists              bool
+	emailErr                 error
+	companyID                string
+	companyErr               error
+	account                  domain.Account
+	createErr                error
+	createdCandidate         bool
+	createdInterviewer       bool
+	challenge                ports.VerificationChallenge
+	challengeErr             error
+	registrationNumberExists bool
+	registrationNumberErr    error
+	companyRegistrationErr   error
 }
 
 func (f *fakeRepository) EmailExists(context.Context, string) (bool, error) {
@@ -40,6 +43,12 @@ func (f *fakeRepository) CreateInterviewer(context.Context, string, string, []by
 func (f *fakeRepository) SaveVerificationChallenge(_ context.Context, challenge ports.VerificationChallenge) error {
 	f.challenge = challenge
 	return f.challengeErr
+}
+func (f *fakeRepository) RegistrationNumberExists(context.Context, string) (bool, error) {
+	return f.registrationNumberExists, f.registrationNumberErr
+}
+func (f *fakeRepository) CreateCompanyRegistration(context.Context, ports.CompanyRegistrationRecord) (domain.Account, error) {
+	return f.account, f.companyRegistrationErr
 }
 
 type fakeChecker struct {
