@@ -16,8 +16,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/CSCE-3701-Amara/amara/internal/platform/config"
+	"github.com/CSCE-3701-Amara/amara/internal/platform/database"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/logging"
 )
 
@@ -32,8 +34,13 @@ func testConfig() config.HTTPConfig {
 
 func testServer(t *testing.T, cfg config.HTTPConfig, output io.Writer, registrars ...RouteRegistrar) *Server {
 	t.Helper()
+	return testServerWithDB(t, cfg, output, nil, registrars...)
+}
+
+func testServerWithDB(t *testing.T, cfg config.HTTPConfig, output io.Writer, dbSvc database.Service, registrars ...RouteRegistrar) *Server {
+	t.Helper()
 	gin.SetMode(gin.TestMode)
-	server, err := New(cfg, logging.New(output, slog.LevelInfo, "json"), nil, registrars...)
+	server, err := New(cfg, logging.New(output, slog.LevelInfo, "json"), dbSvc, registrars...)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,6 +57,8 @@ func TestRoutesAndRequestIDs(t *testing.T) {
 		status             int
 	}{
 		{http.MethodGet, "/health", "", http.StatusOK},
+		{http.MethodGet, "/health/live", "", http.StatusOK},
+		{http.MethodGet, "/health/ready", "", http.StatusOK},
 		{http.MethodGet, "/v1/example", "", http.StatusNoContent},
 		{http.MethodGet, "/missing", "not_found", http.StatusNotFound},
 		{http.MethodPost, "/health", "method_not_allowed", http.StatusMethodNotAllowed},
@@ -67,8 +76,8 @@ func TestRoutesAndRequestIDs(t *testing.T) {
 				t.Fatalf("request must have a unique server-generated ID, got %q", id)
 			}
 			seenIDs[id] = true
-			if tc.path == "/health" && tc.method == http.MethodGet && response.Body.String() != `{"status":"ok"}` {
-				t.Fatalf("unexpected health response: %s", response.Body)
+			if (tc.path == "/health" || tc.path == "/health/live") && tc.method == http.MethodGet && response.Body.String() != `{"status":"ok"}` {
+				t.Fatalf("unexpected liveness response: %s", response.Body)
 			}
 			if tc.code != "" {
 				var body struct {
@@ -85,6 +94,117 @@ func TestRoutesAndRequestIDs(t *testing.T) {
 		})
 	}
 }
+
+// ---------------------------------------------------------------------------
+// Health endpoint behaviour
+// ---------------------------------------------------------------------------
+
+// stubDBService is an in-process test double for database.Service.
+type stubDBService struct {
+	status database.HealthStatus
+}
+
+func (s *stubDBService) Health(_ context.Context) database.HealthStatus { return s.status }
+func (s *stubDBService) Pool() *pgxpool.Pool                            { return nil }
+func (s *stubDBService) Close()                                         {}
+
+// stubDB returns a database.Service fake with the given pre-canned status.
+func stubDB(status string, errMsg string) database.Service {
+	return &stubDBService{status: database.HealthStatus{
+		Status: status,
+		Error:  errMsg,
+		Stats:  database.PoolStats{MaxConns: 4},
+	}}
+}
+
+func TestLivenessIsIndependentOfDatabase(t *testing.T) {
+	// Even with an "unhealthy" database stub the liveness endpoint must return 200.
+	server := testServerWithDB(t, testConfig(), io.Discard, stubDB("down", "ping failed"))
+	for _, path := range []string{"/health", "/health/live"} {
+		request := httptest.NewRequest(http.MethodGet, path, nil)
+		response := httptest.NewRecorder()
+		server.server.Handler.ServeHTTP(response, request)
+		if response.Code != http.StatusOK {
+			t.Fatalf("%s: status = %d, want 200 (liveness must never depend on DB)", path, response.Code)
+		}
+		if response.Body.String() != `{"status":"ok"}` {
+			t.Fatalf("%s: unexpected body: %s", path, response.Body)
+		}
+	}
+}
+
+func TestReadinessReturns200WhenDatabaseIsUp(t *testing.T) {
+	server := testServerWithDB(t, testConfig(), io.Discard, stubDB("up", ""))
+	request := httptest.NewRequest(http.MethodGet, "/health/ready", nil)
+	response := httptest.NewRecorder()
+	server.server.Handler.ServeHTTP(response, request)
+	if response.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200: %s", response.Code, response.Body)
+	}
+	var body struct {
+		Status   string `json:"status"`
+		Database struct {
+			Status string `json:"status"`
+		} `json:"database"`
+	}
+	if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil {
+		t.Fatalf("unmarshal response: %v", err)
+	}
+	if body.Status != "up" || body.Database.Status != "up" {
+		t.Fatalf("unexpected body: %+v", body)
+	}
+}
+
+func TestReadinessReturns503WhenDatabaseIsDown(t *testing.T) {
+	server := testServerWithDB(t, testConfig(), io.Discard, stubDB("down", "database ping timed out"))
+	request := httptest.NewRequest(http.MethodGet, "/health/ready", nil)
+	response := httptest.NewRecorder()
+	server.server.Handler.ServeHTTP(response, request)
+	if response.Code != http.StatusServiceUnavailable {
+		t.Fatalf("status = %d, want 503: %s", response.Code, response.Body)
+	}
+	var body struct {
+		Status string `json:"status"`
+		Error  string `json:"error"`
+	}
+	if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil {
+		t.Fatalf("unmarshal response: %v", err)
+	}
+	if body.Status != "down" {
+		t.Fatalf("body status = %q, want %q", body.Status, "down")
+	}
+	if body.Error == "" {
+		t.Fatal("error field must be present when database is down")
+	}
+}
+
+func TestReadinessWithNoDBServiceReturnsOK(t *testing.T) {
+	// nil dbSvc — no database wired. Should be treated as live-only.
+	server := testServerWithDB(t, testConfig(), io.Discard, nil)
+	request := httptest.NewRequest(http.MethodGet, "/health/ready", nil)
+	response := httptest.NewRecorder()
+	server.server.Handler.ServeHTTP(response, request)
+	if response.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200 when no DB service configured", response.Code)
+	}
+}
+
+func TestReadinessDoesNotExposeInternalDetails(t *testing.T) {
+	server := testServerWithDB(t, testConfig(), io.Discard, stubDB("down", "database ping timed out"))
+	request := httptest.NewRequest(http.MethodGet, "/health/ready", nil)
+	response := httptest.NewRecorder()
+	server.server.Handler.ServeHTTP(response, request)
+	body := response.Body.String()
+	for _, sensitive := range []string{"127.0.0.1", "password", "secret", "postgres://"} {
+		if strings.Contains(body, sensitive) {
+			t.Fatalf("response exposed sensitive string %q: %s", sensitive, body)
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// CORS
+// ---------------------------------------------------------------------------
 
 func TestCORS(t *testing.T) {
 	server := testServer(t, testConfig(), io.Discard)
@@ -130,6 +250,10 @@ func TestCORS(t *testing.T) {
 		t.Fatal("empty origin list must deny cross-origin requests")
 	}
 }
+
+// ---------------------------------------------------------------------------
+// Recovery and logging
+// ---------------------------------------------------------------------------
 
 func TestRecoveryAndLogsDoNotExposeRequestData(t *testing.T) {
 	var output bytes.Buffer
@@ -179,6 +303,10 @@ func TestRecoveryAndLogsDoNotExposeRequestData(t *testing.T) {
 	}
 }
 
+// ---------------------------------------------------------------------------
+// Trusted proxies
+// ---------------------------------------------------------------------------
+
 func TestTrustedProxies(t *testing.T) {
 	for _, trusted := range []bool{false, true} {
 		cfg := testConfig()
@@ -200,6 +328,10 @@ func TestTrustedProxies(t *testing.T) {
 		}
 	}
 }
+
+// ---------------------------------------------------------------------------
+// Shutdown
+// ---------------------------------------------------------------------------
 
 func TestServerShutdown(t *testing.T) {
 	for _, force := range []bool{false, true} {

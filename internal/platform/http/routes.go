@@ -29,14 +29,19 @@ func newRouter(cfg config.HTTPConfig, logger *slog.Logger, dbSvc database.Servic
 }
 
 func registerRoutes(router *gin.Engine, dbSvc database.Service, registrars ...RouteRegistrar) {
+	// /health/live reports process liveness without depending on the database.
+	// /health/ready checks database connectivity when the service is wired.
+	// Keep /health as a liveness alias for existing infrastructure probes.
 	liveHandler := func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	}
-	router.GET("/health", liveHandler)
-	router.GET("/health/live", liveHandler)
-	router.GET("/health/ready", func(c *gin.Context) {
+	health := router.Group("/health")
+	health.GET("", liveHandler)
+	health.GET("/live", liveHandler)
+	health.GET("/ready", func(c *gin.Context) {
 		if dbSvc == nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "down", "error": "database service is not configured"})
+			// The server can also run in configurations that do not use a database.
+			c.JSON(http.StatusOK, gin.H{"status": "ok"})
 			return
 		}
 		health := dbSvc.Health(c.Request.Context())
