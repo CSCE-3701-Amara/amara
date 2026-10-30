@@ -14,6 +14,7 @@ import (
 	candhttp "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http"
 	candapplication "github.com/CSCE-3701-Amara/amara/internal/cand/application"
 	jobdatabase "github.com/CSCE-3701-Amara/amara/internal/job/adapters/database"
+	jobhttp "github.com/CSCE-3701-Amara/amara/internal/job/adapters/http"
 	jobapplication "github.com/CSCE-3701-Amara/amara/internal/job/application"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/config"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/database"
@@ -62,7 +63,9 @@ func run() error {
 	jobLifecycle := jobapplication.NewPostingLifecycle(jobLifecycleRepo)
 	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
 	feedHandler := candhttp.NewJobFeedHandler(candapplication.NewJobFeed(feedRepo, jobLifecycle), nil)
-	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, feedHandler.RegisterRoutes)
+	postingListRepo := jobdatabase.NewCompanyPostingListRepository(dbSvc.Pool())
+	postingListHandler := jobhttp.NewPostingListHandler(jobapplication.NewCompanyPostingList(postingListRepo, jobLifecycle), nil)
+	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, feedHandler.RegisterRoutes, postingListHandler.RegisterRoutes)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
 	}
