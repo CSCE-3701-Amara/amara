@@ -550,7 +550,7 @@ Go and Node.js release lines current as of this draft. Container platform on AWS
 | NFR-ENV-004 | The repository *SHALL* define local, CI, staging, and production environments that use the same container image. | TBD |
 | NFR-ENV-005 | The client *SHALL* preserve module answers through a dropped connection using the autosave rule in `NFR-REL-008`. | TBD |
 | NFR-ENV-006 | T1 production *SHALL* be sized to the spend cap in `NFR-SCAL-005`. | TBD |
-| NFR-ENV-008 | CI *SHALL* build the frontend with a pinned Node.js 22 LTS release. | TBD |
+| NFR-ENV-008 | CI *SHALL* build the frontend with a pinned Node.js 24 LTS release. | TBD |
 | NFR-ENV-009 | A runtime version bump *SHALL* update the Dockerfiles and CI image in the same pull request. | TBD |
 | NFR-ENV-010 | Local development *SHALL* use the same major Go and Node.js versions as CI. | TBD |
 | NFR-ENV-011 | A pre-deployment measurement *SHALL* confirm the selected production region has a median HTTPS round trip from Cairo of at most 100 ms. | TBD |
