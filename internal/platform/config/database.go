@@ -78,6 +78,10 @@ func newDatabaseConfig(lookup func(string) (string, bool)) (DatabaseConfig, erro
 		}
 	}
 
+	if cfg.MinConns > cfg.MaxConns {
+		return DatabaseConfig{}, fmt.Errorf("DB_POOL_MIN_CONNS must not exceed DB_POOL_MAX_CONNS")
+	}
+
 	for _, setting := range []struct {
 		name   string
 		target *time.Duration
