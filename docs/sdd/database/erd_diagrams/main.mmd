@@ -1,0 +1,322 @@
+erDiagram
+    %% 1. USERS, COMPANIES AND AUTHORIZATION
+
+    USERS {
+        uuid id PK
+        uuid tenant_id FK "Nullable for candidates and platform admins"
+        uuid role_id FK "Nullable for candidates and platform admins"
+        string email UK
+    }
+
+    AUTH_SESSIONS {
+        uuid id PK
+        uuid user_id FK
+    }
+
+    COMPANIES {
+        uuid id PK
+        string name
+        uuid hiring_manager_user_id FK, UK
+    }
+
+    COMPANY_SETTINGS {
+        uuid id PK
+        uuid tenant_id FK, UK
+    }
+
+    COMPANY_VERIFICATIONS {
+        uuid id PK
+        uuid tenant_id FK
+        uuid reviewed_by FK
+        string status
+    }
+
+    SYSTEM_ADMINISTRATORS {
+        uuid id PK
+        uuid user_id FK, UK
+    }
+
+    INVITATIONS {
+        uuid id PK
+        uuid tenant_id FK
+        uuid invited_by FK
+        string email
+        string status
+    }
+
+    ROLES {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+    }
+
+    PERMISSIONS {
+        uuid id PK
+        string name UK
+    }
+
+    ROLE_PERMISSIONS {
+        uuid role_id PK, FK
+        uuid permission_id PK, FK
+    }
+
+    %% 2. CANDIDATE PROFILES
+
+    CANDIDATES {
+        uuid id PK
+        uuid user_id FK, UK
+    }
+
+    RESUMES {
+        uuid id PK
+        uuid candidate_id FK
+    }
+
+    RESUME_VERSIONS {
+        uuid id PK
+        uuid resume_id FK
+    }
+
+    DOCUMENTS {
+        uuid id PK
+        uuid candidate_id FK
+    }
+
+    SKILLS {
+        uuid id PK
+        string name UK
+    }
+
+    CANDIDATE_SKILLS {
+        uuid candidate_id PK, FK
+        uuid skill_id PK, FK
+    }
+
+    AMARAT {
+        uuid id PK
+        uuid candidate_id FK
+    }
+
+    CANDIDATE_HISTORY {
+        uuid id PK
+        uuid candidate_id FK
+    }
+
+    IDENTITY_REVEAL_RECORDS {
+        uuid id PK
+        uuid candidate_id FK
+        uuid revealed_by FK
+        uuid application_id FK
+    }
+
+    %% 3. JOB POSTINGS AND APPLICATIONS
+
+    JOB_POSTINGS {
+        uuid id PK
+        uuid tenant_id FK
+        uuid created_by FK
+    }
+
+    JOB_REQUIREMENTS {
+        uuid id PK
+        uuid job_id FK
+    }
+
+    JOB_SKILLS {
+        uuid job_id PK, FK
+        uuid skill_id PK, FK
+    }
+
+    APPLICATIONS {
+        uuid id PK
+        uuid job_id FK
+        uuid candidate_id FK
+    }
+
+    APPLICATION_SNAPSHOTS {
+        uuid id PK
+        uuid application_id FK
+    }
+
+    SCREENING_DECISIONS {
+        uuid id PK
+        uuid application_id FK
+        uuid decided_by FK
+    }
+
+    %% 4. RECRUITMENT PIPELINES
+
+    PIPELINES {
+        uuid id PK
+        uuid tenant_id FK
+        uuid job_id FK
+    }
+
+    PIPELINE_VERSIONS {
+        uuid id PK
+        uuid pipeline_id FK
+    }
+
+    PIPELINE_STAGES {
+        uuid id PK
+        uuid pipeline_version_id FK
+        string stage_type
+    }
+
+    STAGE_TRANSITIONS {
+        uuid id PK
+        uuid pipeline_version_id FK
+        uuid from_stage_id FK
+        uuid to_stage_id FK
+    }
+
+    TEST_MODULES {
+        uuid id PK
+        uuid tenant_id FK "Nullable for platform tests"
+        uuid created_by FK
+        string source
+    }
+
+    ASSESSMENT_QUESTIONS {
+        uuid id PK
+        uuid test_module_id FK
+    }
+
+    TEST_CONFIGURATIONS {
+        uuid id PK
+        uuid stage_id FK
+        uuid test_module_id FK
+    }
+
+    PIPELINE_EXECUTIONS {
+        uuid id PK
+        uuid application_id FK
+        uuid pipeline_version_id FK
+    }
+
+    STAGE_EXECUTIONS {
+        uuid id PK
+        uuid pipeline_execution_id FK
+        uuid stage_id FK
+    }
+
+    %% 5. ASSESSMENTS AND INTERVIEWS
+
+    ASSESSMENT_ATTEMPTS {
+        uuid id PK
+        uuid stage_execution_id FK
+        uuid candidate_id FK
+    }
+
+    ASSESSMENT_SUBMISSIONS {
+        uuid id PK
+        uuid attempt_id FK
+        uuid question_id FK
+    }
+
+    ASSESSMENT_RESULTS {
+        uuid id PK
+        uuid attempt_id FK
+    }
+
+    INTERVIEWS {
+        uuid id PK
+        uuid stage_execution_id FK
+    }
+
+    INTERVIEWER_ASSIGNMENTS {
+        uuid interview_id PK, FK
+        uuid interviewer_id PK, FK
+    }
+
+    INTERVIEW_FEEDBACK {
+        uuid id PK
+        uuid interview_id FK
+        uuid interviewer_id FK
+    }
+
+    OFFERS {
+        uuid id PK
+        uuid application_id FK
+    }
+
+    %% 6. ACCOUNT AND COMPANY RELATIONSHIPS
+
+    COMPANIES ||--o{ USERS : employs
+    COMPANIES o|--o{ ROLES : defines
+    ROLES o|--o{ USERS : assigns
+    USERS ||--o{ AUTH_SESSIONS : has
+    USERS ||--o| SYSTEM_ADMINISTRATORS : may_be_platform_admin
+    USERS ||--o| CANDIDATES : may_have_candidate_profile
+    USERS ||--o{ INVITATIONS : sends
+    COMPANIES ||--o{ INVITATIONS : issues
+    COMPANIES ||--o| COMPANY_SETTINGS : has
+    COMPANIES ||--o{ COMPANY_VERIFICATIONS : undergoes
+    USERS o|--o{ COMPANY_VERIFICATIONS : reviews
+
+    ROLES ||--o{ ROLE_PERMISSIONS : grants
+    PERMISSIONS ||--o{ ROLE_PERMISSIONS : included_in
+
+    %% 7. CANDIDATE DATA
+
+    CANDIDATES ||--o{ RESUMES : owns
+    RESUMES ||--o{ RESUME_VERSIONS : has
+    CANDIDATES ||--o{ DOCUMENTS : owns
+    CANDIDATES ||--o{ CANDIDATE_SKILLS : has
+    SKILLS ||--o{ CANDIDATE_SKILLS : describes
+    CANDIDATES ||--o{ AMARAT : earns
+    CANDIDATES ||--o{ CANDIDATE_HISTORY : has
+    CANDIDATES ||--o{ IDENTITY_REVEAL_RECORDS : subject_of
+    USERS ||--o{ IDENTITY_REVEAL_RECORDS : reveals
+
+    %% 8. JOBS AND APPLICATIONS
+
+    COMPANIES ||--o{ JOB_POSTINGS : owns
+    USERS ||--o{ JOB_POSTINGS : creates
+    JOB_POSTINGS ||--o{ JOB_REQUIREMENTS : defines
+    JOB_POSTINGS ||--o{ JOB_SKILLS : targets
+    SKILLS ||--o{ JOB_SKILLS : required_for
+    JOB_POSTINGS ||--o{ APPLICATIONS : receives
+    CANDIDATES ||--o{ APPLICATIONS : submits
+    APPLICATIONS ||--o{ APPLICATION_SNAPSHOTS : records
+    APPLICATIONS ||--o{ SCREENING_DECISIONS : receives
+    USERS ||--o{ SCREENING_DECISIONS : makes
+
+    %% 9. PIPELINE DESIGN AND EXECUTION
+
+    COMPANIES ||--o{ PIPELINES : owns
+    JOB_POSTINGS ||--o{ PIPELINES : uses
+    PIPELINES ||--o{ PIPELINE_VERSIONS : has
+    PIPELINE_VERSIONS ||--o{ PIPELINE_STAGES : contains
+    PIPELINE_VERSIONS ||--o{ STAGE_TRANSITIONS : connects
+    PIPELINE_STAGES ||--o{ STAGE_TRANSITIONS : source
+    PIPELINE_STAGES ||--o{ STAGE_TRANSITIONS : destination
+
+    COMPANIES o|--o{ TEST_MODULES : owns
+    USERS ||--o{ TEST_MODULES : creates
+    TEST_MODULES ||--o{ ASSESSMENT_QUESTIONS : contains
+    PIPELINE_STAGES ||--o{ TEST_CONFIGURATIONS : configures
+    TEST_MODULES ||--o{ TEST_CONFIGURATIONS : used_by
+
+    APPLICATIONS ||--o{ PIPELINE_EXECUTIONS : starts
+    PIPELINE_VERSIONS ||--o{ PIPELINE_EXECUTIONS : runs
+    PIPELINE_EXECUTIONS ||--o{ STAGE_EXECUTIONS : contains
+    PIPELINE_STAGES ||--o{ STAGE_EXECUTIONS : executes
+
+    %% 10. ASSESSMENTS AND INTERVIEWS
+
+    STAGE_EXECUTIONS ||--o{ ASSESSMENT_ATTEMPTS : starts
+    CANDIDATES ||--o{ ASSESSMENT_ATTEMPTS : takes
+    ASSESSMENT_ATTEMPTS ||--o{ ASSESSMENT_SUBMISSIONS : contains
+    ASSESSMENT_QUESTIONS ||--o{ ASSESSMENT_SUBMISSIONS : answered_by
+    ASSESSMENT_ATTEMPTS ||--o| ASSESSMENT_RESULTS : produces
+
+    STAGE_EXECUTIONS ||--o{ INTERVIEWS : schedules
+    INTERVIEWS ||--o{ INTERVIEWER_ASSIGNMENTS : assigns
+    USERS ||--o{ INTERVIEWER_ASSIGNMENTS : participates
+    INTERVIEWS ||--o{ INTERVIEW_FEEDBACK : receives
+    USERS ||--o{ INTERVIEW_FEEDBACK : submits
+
+    %% 11. OFFERS
+
+    APPLICATIONS ||--o{ OFFERS : receives
