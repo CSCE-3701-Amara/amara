@@ -5,7 +5,7 @@ CREATE TABLE assessment_instances (
     stage_id        UUID        NOT NULL    REFERENCES pipeline_stages(id),
     status          TEXT        NOT NULL,
     started_at      TIMESTAMP,
-    deadline        TIMESTAMP,
+    deadline        TIMESTAMP
 );
 
 -- +goose Down
