@@ -101,6 +101,29 @@ func (r *RegistrationRepository) SaveVerificationChallenge(ctx context.Context, 
 	return nil
 }
 
+func (r *RegistrationRepository) RegistrationNumberExists(ctx context.Context, number string) (bool, error) {
+	exists, err := r.queries.CompanyRegistrationNumberExists(ctx, number)
+	if err != nil {
+		return false, fmt.Errorf("query registration number: %w", err)
+	}
+	return exists, nil
+}
+
+func (r *RegistrationRepository) CreateCompanyRegistration(ctx context.Context, record ports.CompanyRegistrationRecord) (domain.Account, error) {
+	row, err := r.queries.CreateCompanyRegistration(ctx, sqlc.CreateCompanyRegistrationParams{
+		CompanyName: record.CompanyName, RegistrationNumber: record.RegistrationNumber,
+		Email: record.Email, PasswordHash: record.PasswordHash, Salt: record.Salt,
+		CreatedAt: pgtype.Timestamp{Time: record.CreatedAt, Valid: true},
+	})
+	if err != nil {
+		return domain.Account{}, mapCreateError(err)
+	}
+	return domain.Account{
+		ID: row.ID, Type: "company", Email: row.Email, Status: row.Status,
+		CreatedAt: row.CreatedAt.Time.UTC().Format(time.RFC3339),
+	}, nil
+}
+
 func parseUUID(value string) (pgtype.UUID, error) {
 	compact := strings.ReplaceAll(value, "-", "")
 	if len(compact) != 32 {

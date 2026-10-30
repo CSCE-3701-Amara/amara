@@ -5,6 +5,10 @@ SELECT EXISTS (
     SELECT 1 FROM interviewers WHERE lower(email) = lower($1)
     UNION ALL
     SELECT 1 FROM companies WHERE lower(email) = lower($1)
+    UNION ALL
+    SELECT 1 FROM auth_company_registration_requests
+    WHERE lower(email) = lower($1)
+      AND status IN ('pending_review', 'approved')
 );
 
 -- name: FindApprovedCompanyBySecret :one

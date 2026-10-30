@@ -13,14 +13,16 @@ type AccountType string
 const (
 	AccountTypeCandidate   AccountType = "candidate"
 	AccountTypeInterviewer AccountType = "interviewer"
+	AccountTypeCompany     AccountType = "company"
 )
 
 const PendingVerification = "pending_verification"
 
 var (
-	ErrInvalidRegistration = errors.New("invalid registration")
-	ErrEmailAlreadyExists  = errors.New("email already registered")
-	ErrCompanyNotFound     = errors.New("approved company association not found")
+	ErrInvalidRegistration       = errors.New("invalid registration")
+	ErrEmailAlreadyExists        = errors.New("email already registered")
+	ErrCompanyNotFound           = errors.New("approved company association not found")
+	ErrCompanyRegistrationExists = errors.New("company registration already exists")
 )
 
 type Registration struct {

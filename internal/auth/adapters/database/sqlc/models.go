@@ -8,6 +8,19 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type AuthCompanyRegistrationRequest struct {
+	ID                 pgtype.UUID
+	CompanyName        string
+	RegistrationNumber string
+	Email              string
+	PasswordHash       []byte
+	Salt               []byte
+	Status             string
+	CreatedAt          pgtype.Timestamp
+	ReviewedAt         pgtype.Timestamp
+	ReviewReason       pgtype.Text
+}
+
 type AuthEmailVerificationChallenge struct {
 	ID          pgtype.UUID
 	AccountID   pgtype.UUID

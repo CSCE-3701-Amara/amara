@@ -15,6 +15,21 @@ type AccountRepository interface {
 	SaveVerificationChallenge(context.Context, VerificationChallenge) error
 }
 
+type CompanyRegistrationRepository interface {
+	EmailExists(context.Context, string) (bool, error)
+	RegistrationNumberExists(context.Context, string) (bool, error)
+	CreateCompanyRegistration(context.Context, CompanyRegistrationRecord) (domain.Account, error)
+}
+
+type CompanyRegistrationRecord struct {
+	CompanyName        string
+	RegistrationNumber string
+	Email              string
+	PasswordHash       []byte
+	Salt               []byte
+	CreatedAt          time.Time
+}
+
 type PasswordCompromiseChecker interface {
 	IsCompromised(context.Context, string) (bool, error)
 }
