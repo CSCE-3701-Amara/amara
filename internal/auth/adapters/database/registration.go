@@ -124,6 +124,48 @@ func (r *RegistrationRepository) CreateCompanyRegistration(ctx context.Context, 
 	}, nil
 }
 
+func (r *RegistrationRepository) GetMFASecret(ctx context.Context, accountID string, accountType domain.AccountType) (ports.MFARecord, error) {
+	accountUUID, err := parseUUID(accountID)
+	if err != nil {
+		return ports.MFARecord{}, err
+	}
+	row, err := r.queries.GetMFASecret(ctx, sqlc.GetMFASecretParams{
+		Column1: accountUUID, AccountType: string(accountType),
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ports.MFARecord{}, ports.ErrMFANotConfigured
+		}
+		return ports.MFARecord{}, fmt.Errorf("query MFA credentials: %w", err)
+	}
+	return ports.MFARecord{
+		AccountID: row.AccountID, AccountType: domain.AccountType(row.AccountType),
+		Secret: row.Secret, Enabled: row.Enabled, CreatedAt: row.CreatedAt.Time,
+	}, nil
+}
+
+func (r *RegistrationRepository) SaveMFASecret(ctx context.Context, record ports.MFARecord) error {
+	accountUUID, err := parseUUID(record.AccountID)
+	if err != nil {
+		return err
+	}
+	return r.queries.SaveMFASecret(ctx, sqlc.SaveMFASecretParams{
+		Column1: accountUUID, AccountType: string(record.AccountType), Secret: record.Secret,
+		CreatedAt: pgtype.Timestamp{Time: record.CreatedAt, Valid: true},
+	})
+}
+
+func (r *RegistrationRepository) EnableMFA(ctx context.Context, accountID string, accountType domain.AccountType) error {
+	accountUUID, err := parseUUID(accountID)
+	if err != nil {
+		return err
+	}
+	return r.queries.EnableMFA(ctx, sqlc.EnableMFAParams{
+		Column1: accountUUID, AccountType: string(accountType),
+		EnabledAt: pgtype.Timestamp{Time: time.Now().UTC(), Valid: true},
+	})
+}
+
 func parseUUID(value string) (pgtype.UUID, error) {
 	compact := strings.ReplaceAll(value, "-", "")
 	if len(compact) != 32 {

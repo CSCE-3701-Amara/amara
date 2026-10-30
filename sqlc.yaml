@@ -8,6 +8,7 @@ sql:
       - "supabase/migrations/00005_create_interviewers_table.sql"
       - "supabase/migrations/00015_auth_registration.sql"
       - "supabase/migrations/00016_company_registration_requests.sql"
+      - "supabase/migrations/00017_auth_mfa.sql"
     gen:
       go:
         package: "sqlc"

@@ -31,6 +31,15 @@ type AuthEmailVerificationChallenge struct {
 	CreatedAt   pgtype.Timestamp
 }
 
+type AuthMfaCredential struct {
+	AccountID   pgtype.UUID
+	AccountType string
+	Secret      []byte
+	Enabled     bool
+	CreatedAt   pgtype.Timestamp
+	EnabledAt   pgtype.Timestamp
+}
+
 type Candidate struct {
 	ID                pgtype.UUID
 	Name              string
