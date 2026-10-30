@@ -14,4 +14,4 @@ CREATE TABLE interviewers (
 );
 
 -- +goose Down
-DROP TABLE interviewersl;
+DROP TABLE interviewers;
