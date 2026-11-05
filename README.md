@@ -130,6 +130,7 @@ An explicitly empty origin or proxy list disables that feature.
 | `CORS_ALLOWED_ORIGINS` | Local Vite origins in development | Comma-separated exact HTTP(S) origins; empty by default in other environments |
 | `HTTP_TRUSTED_PROXIES` | Empty | Comma-separated trusted proxy IP addresses or CIDR ranges |
 | `DATABASE_URL` | Required | PostgreSQL connection string; secrets arrive through Infisical. Use the Supavisor session pooler URL for local runs |
+| `AUTH_MFA_ENCRYPTION_KEY` | Required | Exactly 32-byte secret used to encrypt MFA secrets at rest |
 | `DB_POOL_MAX_CONNS` | `4` | Connection pool ceiling per process; shared Supabase plans are small |
 
 Development allows `http://localhost:5173` and `http://127.0.0.1:5173`.
