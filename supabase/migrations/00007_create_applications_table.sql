@@ -2,8 +2,8 @@
 CREATE TABLE applications (
     id                  UUID    PRIMARY KEY,
     reference_number    INTEGER NOT NULL    UNIQUE,
-    posting_id          UUID    NOT NULL    UNIQUE  REFERENCES job_postings(id),
-    cand_id             UUID    NOT NULL    UNIQUE  REFERENCES candidates(id),
+    posting_id          UUID    NOT NULL    REFERENCES job_postings(id),
+    cand_id             UUID    NOT NULL    REFERENCES candidates(id),
     status              TEXT,
     created_at          TIMESTAMP,
     updated_at          TIMESTAMP,
