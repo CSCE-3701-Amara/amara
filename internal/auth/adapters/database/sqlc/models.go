@@ -40,6 +40,14 @@ type AuthMfaCredential struct {
 	EnabledAt   pgtype.Timestamp
 }
 
+type AuthSession struct {
+	Token       string
+	AccountID   pgtype.UUID
+	AccountType string
+	ExpiresAt   pgtype.Timestamp
+	CreatedAt   pgtype.Timestamp
+}
+
 type Candidate struct {
 	ID                pgtype.UUID
 	Name              string

@@ -93,6 +93,9 @@ func (s *MFAService) VerifyLoginCode(ctx context.Context, accountID string, acco
 		if errors.Is(err, ports.ErrMFANotConfigured) && domain.MFARequired(accountType) {
 			return domain.ErrMFARequired
 		}
+		if errors.Is(err, ports.ErrMFANotConfigured) {
+			return nil
+		}
 		return fmt.Errorf("load MFA credentials: %w", err)
 	}
 	if !record.Enabled {

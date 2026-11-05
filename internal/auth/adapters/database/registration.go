@@ -23,6 +23,41 @@ type RegistrationRepository struct {
 	queries *sqlc.Queries
 }
 
+func (r *RegistrationRepository) FindCredentials(ctx context.Context, email string) (ports.Credentials, error) {
+	row, err := r.queries.FindCredentials(ctx, strings.ToLower(strings.TrimSpace(email)))
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ports.Credentials{}, domain.ErrInvalidCredentials
+		}
+		return ports.Credentials{}, fmt.Errorf("query login credentials: %w", err)
+	}
+	deactivated, ok := row.Deactivated.(bool)
+	if !ok {
+		return ports.Credentials{}, fmt.Errorf("query login credentials: invalid deactivated value")
+	}
+	companyID, ok := row.CompanyID.(string)
+	if !ok {
+		return ports.Credentials{}, fmt.Errorf("query login credentials: invalid company id")
+	}
+	return ports.Credentials{
+		ID: row.ID, Email: row.Email, AccountType: domain.AccountType(row.AccountType),
+		PasswordHash: row.PasswordHash, Salt: row.Salt, Status: row.AccountStatus,
+		Deactivated: deactivated, Banned: row.Banned, CompanyID: companyID,
+		CompanyApproved: row.CompanyApproved,
+	}, nil
+}
+
+func (r *RegistrationRepository) CreateSession(ctx context.Context, session ports.Session) error {
+	accountID, err := parseUUID(session.AccountID)
+	if err != nil {
+		return fmt.Errorf("parse session account id: %w", err)
+	}
+	return r.queries.CreateSession(ctx, sqlc.CreateSessionParams{
+		Token: session.Token, Column2: accountID, AccountType: string(session.AccountType),
+		ExpiresAt: pgtype.Timestamp{Time: session.ExpiresAt, Valid: true},
+	})
+}
+
 func NewRegistrationRepository(pool *pgxpool.Pool) (*RegistrationRepository, error) {
 	if pool == nil {
 		return nil, errors.New("database pool must not be nil")

@@ -66,6 +66,13 @@ func registerRoutes(router *gin.Engine, dbSvc database.Service, registrars ...Ro
 	for _, register := range registrars {
 		register(v1)
 	}
+	// AUTH is documented under /api/v1 while existing module routes use /v1.
+	// Mounting the same registrars at both prefixes preserves the existing API
+	// while exposing the contract path.
+	apiV1 := router.Group("/api/v1")
+	for _, register := range registrars {
+		register(apiV1)
+	}
 	router.NoRoute(func(c *gin.Context) {
 		writeError(c, http.StatusNotFound, "not_found", "The requested resource was not found.")
 	})
