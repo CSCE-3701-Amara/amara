@@ -144,7 +144,7 @@ func (r *PostingManagementRepository) Update(ctx context.Context, companyID, id 
 		return domain.Posting{}, fmt.Errorf("begin posting update: %w", err)
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
-	row, err := scanPosting(tx.QueryRow(ctx, `UPDATE job_postings SET title=$3, description=$4, language=$5,
+	_, err = scanPosting(tx.QueryRow(ctx, `UPDATE job_postings SET title=$3, description=$4, language=$5,
 		currency=$6, seniority_level=$7, employment_type=$8, location=$9, salary_min=$10,
 		salary_max=$11, salary_visible=$12, open_positions=$13, application_opening=$14,
 		application_deadline=$15, max_applications=$16, updated_at=now()
