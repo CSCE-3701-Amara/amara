@@ -28,6 +28,217 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /v1/jobs:
+    get:
+      summary: List postings owned by the authenticated company
+      operationId: listCompanyJobPostings
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Company postings, including drafts and archived postings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostingList'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
+    post:
+      summary: Create a job posting as a draft
+      operationId: createJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPostingRequest'
+      responses:
+        '201':
+          description: Draft posting created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+        '400':
+          $ref: '#/components/responses/PostingError'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
+
+  /v1/jobs/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: UUID of the job posting
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get a company-owned job posting
+      operationId: getCompanyJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Job posting details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+        '400':
+          $ref: '#/components/responses/PostingError'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '404':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
+    put:
+      summary: Replace a job posting's details
+      description: Replaces all editable fields; omitted nullable fields are cleared.
+      operationId: updateCompanyJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPostingRequest'
+      responses:
+        '200':
+          description: Updated job posting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+        '400':
+          $ref: '#/components/responses/PostingError'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '404':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
+    delete:
+      summary: Soft-delete a company-owned posting; system admins may delete any posting
+      operationId: deleteCompanyJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      responses:
+        '204':
+          description: Posting marked as deleted; no response body
+        '400':
+          $ref: '#/components/responses/PostingError'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '404':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
+
+  /v1/jobs/{id}/publish:
+    parameters:
+      - $ref: '#/components/parameters/JobPostingId'
+    post:
+      summary: Publish a draft job posting
+      operationId: publishJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Published posting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '404':
+          $ref: '#/components/responses/PostingError'
+        '409':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
+
+  /v1/jobs/{id}/republish:
+    parameters:
+      - $ref: '#/components/parameters/JobPostingId'
+    post:
+      summary: Republish an archived job posting
+      operationId: republishJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Republished posting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '404':
+          $ref: '#/components/responses/PostingError'
+        '409':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
+
+  /v1/jobs/{id}/archive:
+    parameters:
+      - $ref: '#/components/parameters/JobPostingId'
+    post:
+      summary: Archive a published job posting
+      operationId: archiveJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Archived posting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPosting'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '404':
+          $ref: '#/components/responses/PostingError'
+        '409':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
+
   /api/v1/auth/registrations:
     post:
       summary: Register a candidate or interviewer
@@ -206,6 +417,15 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
 components:
+  parameters:
+    JobPostingId:
+      name: id
+      in: path
+      required: true
+      description: UUID of the job posting
+      schema:
+        type: string
+        format: uuid
   schemas:
     UserRegistrationRequest:
       oneOf:
@@ -327,6 +547,212 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    JobPostingRequest:
+      type: object
+      additionalProperties: false
+      required: [title, seniority_level, employment_type, amarat]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: [string, 'null']
+        language:
+          type: [string, 'null']
+        currency:
+          type: [string, 'null']
+        seniority_level:
+          type: string
+          minLength: 1
+        employment_type:
+          type: string
+          enum:
+            - "on-site full-time"
+            - "on-site part-time"
+            - "remote full-time"
+            - "remote part-time"
+        location:
+          type: [string, 'null']
+        salary_min:
+          type: [integer, 'null']
+          format: int32
+          minimum: 0
+        salary_max:
+          type: [integer, 'null']
+          format: int32
+          minimum: 0
+        salary_visible:
+          type: [boolean, 'null']
+        open_positions:
+          type: [integer, 'null']
+          format: int32
+          minimum: 1
+        application_opening:
+          type: [string, 'null']
+          format: date-time
+        application_deadline:
+          type: [string, 'null']
+          format: date-time
+        max_applications:
+          type: [integer, 'null']
+          format: int32
+          minimum: 1
+        requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobPostingRequirementInput'
+        amarat:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/JobPostingAmaraInput'
+
+    JobPostingRequirementInput:
+      type: object
+      additionalProperties: false
+      required: [text, requirement_type]
+      properties:
+        text:
+          type: string
+          minLength: 1
+        requirement_type:
+          type: string
+          enum: [must_have, nice_to_have]
+
+    JobPostingAmaraInput:
+      type: object
+      additionalProperties: false
+      required: [title]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: [string, 'null']
+
+    JobPosting:
+      type: object
+      required: [id, company_id, title, seniority_level, employment_type, status, created_at, updated_at, requirements, amarat]
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: [string, 'null']
+        language:
+          type: [string, 'null']
+        currency:
+          type: [string, 'null']
+        seniority_level:
+          type: string
+        employment_type:
+          type: string
+          enum:
+            - "on-site full-time"
+            - "on-site part-time"
+            - "remote full-time"
+            - "remote part-time"
+        location:
+          type: [string, 'null']
+        salary_min:
+          type: [integer, 'null']
+          format: int32
+        salary_max:
+          type: [integer, 'null']
+          format: int32
+        salary_visible:
+          type: [boolean, 'null']
+        open_positions:
+          type: [integer, 'null']
+          format: int32
+        application_opening:
+          type: [string, 'null']
+          format: date-time
+        application_deadline:
+          type: [string, 'null']
+          format: date-time
+        max_applications:
+          type: [integer, 'null']
+          format: int32
+        status:
+          type: string
+          enum: [draft, published, archived]
+        last_autosaved_at:
+          type: [string, 'null']
+          format: date-time
+        published_at:
+          type: [string, 'null']
+          format: date-time
+        archived_at:
+          type: [string, 'null']
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobPostingRequirement'
+        amarat:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobPostingAmara'
+
+    JobPostingRequirement:
+      type: object
+      required: [id, text, requirement_type]
+      properties:
+        id:
+          type: string
+          format: uuid
+        text:
+          type: string
+        requirement_type:
+          type: string
+          enum: [must_have, nice_to_have]
+
+    JobPostingAmara:
+      type: object
+      required: [id, title]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: [string, 'null']
+
+    JobPostingList:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobPosting'
+
+    PostingErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
 
     LoginRequest:
       type: object
@@ -537,6 +963,12 @@ components:
       name: amara_session
 
   responses:
+    PostingError:
+      description: Posting management error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostingErrorResponse'
     BadRequest:
       description: Bad Request (RFC 9457)
       content:
