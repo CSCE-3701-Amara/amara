@@ -3,22 +3,21 @@ set -euo pipefail
 
 URL="${PUBLIC_ORIGIN:?Set PUBLIC_ORIGIN to your public URL}"
 
-# Fetch final response headers after redirects.
-HEADERS=$(curl -fsSL --max-time 20 -D - -o /dev/null "$URL" \
-  | tr -d '\r' \
-  | tr '[:upper:]' '[:lower:]')
+# Fetch headers from the final response after redirects.
+HEADERS=$(curl -fsSL --max-time 20 -o /dev/null \
+  -w '%{header_json}' "$URL" | tr '[:upper:]' '[:lower:]')
 
 check_header() {
   local name="$1"
   local expected="${2:-}"
 
-  if ! grep -Eiq "^${name}:" <<< "$HEADERS"; then
+  if ! grep -Eq "\"${name}\":" <<< "$HEADERS"; then
     echo "FAIL: Missing header: $name"
     return 1
   fi
 
   if [[ -n "$expected" ]] &&
-     ! grep -Eiq "^${name}:.*${expected}" <<< "$HEADERS"; then
+     ! grep -Eq "\"${name}\":[[:space:]]*\"[^\"]*${expected}" <<< "$HEADERS"; then
     echo "FAIL: $name does not match expected value: $expected"
     return 1
   fi
