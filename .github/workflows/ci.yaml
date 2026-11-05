@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   tests:
     name: Tests
@@ -17,51 +20,76 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version: "1.26.0"
+          cache: true
 
-      - name: Type check and compile
+      - name: Build
         run: go build ./...
 
-      - name: Run unit tests
+      - name: Unit tests
         run: go test -cover ./...
-
-      - name: Static analysis with vet
-        run: go vet ./...
-
-      - name: Install staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@latest
-
-      - name: Static analysis with staticcheck
-        run: staticcheck ./...
-
-      - name: Install gosec
-        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
-
-      - name: Static security check with gosec      
-        run: gosec ./...
-
-      - name: Static security check with semgrep
-        uses: semgrep/semgrep-action@v1
-        with:
-          config: p/default
-  
-      - name: Install govulncheck
-        run: go install golang.org/x/vuln/cmd/govulncheck@latest
-
-      - name: Known vulnerability check with govulncheck
-        run: govulncheck ./...
 
   style:
     name: Style
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-      - name: Set up Go
-        uses: actions/setup-go@v6
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.26.0"
-      
-      - name: Check Formatting
-        run: test -z $(go fmt ./...)
+          cache: true
+
+      - name: Check formatting
+        run: |
+          test -z "$(gofmt -l .)"
+
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.26.0"
+          cache: true
+
+      - name: Go vet
+        run: go vet ./...
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Staticcheck
+        run: staticcheck ./...
+
+  security:
+    name: Security
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.26.0"
+          cache: true
+
+      - name: Install gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+      - name: Gosec
+        run: gosec ./...
+
+      - name: Semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: p/default
+
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: Govulncheck
+        run: govulncheck ./...
