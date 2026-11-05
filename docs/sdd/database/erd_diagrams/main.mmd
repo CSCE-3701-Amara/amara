@@ -1,166 +1,269 @@
 erDiagram
-    %% 1. USERS, COMPANIES AND AUTHORIZATION
-
-    USERS {
-        uuid id PK
-        uuid tenant_id FK "Nullable for candidates and platform admins"
-        uuid role_id FK "Nullable for candidates and platform admins"
-        string email UK
-    }
-
-    AUTH_SESSIONS {
-        uuid id PK
-        uuid user_id FK
-    }
-
-    COMPANIES {
-        uuid id PK
-        string name
-        uuid hiring_manager_user_id FK, UK
-    }
-
-    COMPANY_SETTINGS {
-        uuid id PK
-        uuid tenant_id FK, UK
-    }
-
-    COMPANY_VERIFICATIONS {
-        uuid id PK
-        uuid tenant_id FK
-        uuid reviewed_by FK
-        string status
-    }
-
-    SYSTEM_ADMINISTRATORS {
-        uuid id PK
-        uuid user_id FK, UK
-    }
-
-    INVITATIONS {
-        uuid id PK
-        uuid tenant_id FK
-        uuid invited_by FK
-        string email
-        string status
-    }
-
-    ROLES {
-        uuid id PK
-        uuid tenant_id FK
-        string name
-    }
-
-    PERMISSIONS {
-        uuid id PK
-        string name UK
-    }
-
-    ROLE_PERMISSIONS {
-        uuid role_id PK, FK
-        uuid permission_id PK, FK
-    }
-
-    %% 2. CANDIDATE PROFILES
+    %% Candidate accounts and profiles
 
     CANDIDATES {
         uuid id PK
-        uuid user_id FK, UK
+        text name "NOT NULL"
+        text email "NOT NULL"
+        bytea password_hash "NOT NULL"
+        bytea salt "NOT NULL"
+        timestamp created_at "NOT NULL"
+        timestamp updated_at
+        timestamp deleted_at
+        timestamp deactivated_at
+        timestamp last_login_at
+        text phone_number
+        text github_profile
+        text linkedin_profile
+        text portfolio_link
+        text profile_picture_url
+        text gender
+        date birth_date
+        text nationality
+        text address
+        text biography
+        integer years_of_experience
+        boolean available
+        boolean banned
+        text ban_reason
+        text account_status "NOT NULL"
     }
 
-    RESUMES {
+    AUTH_EMAIL_VERIFICATION_CHALLENGES {
         uuid id PK
-        uuid candidate_id FK
+        uuid account_id "Candidate or interviewer UUID"
+        text account_type "NOT NULL"
+        bytea code_hash "NOT NULL"
+        timestamp expires_at "NOT NULL"
+        timestamp consumed_at
+        timestamp created_at "NOT NULL"
     }
 
-    RESUME_VERSIONS {
+    CANDIDATE_EDUCATION {
+        uuid cand_id FK
+        text degree_type
+        text provider
+        date start_date
+        date end_date
+        text summary
+    }
+
+    CANDIDATE_WORK_EXPERIENCE {
+        uuid cand_id FK
+        text position
+        text company_name
+        date start_date
+        date end_date
+        text summary
+    }
+
+    CANDIDATE_LANGUAGES {
+        uuid cand_id FK
+        text language "NOT NULL"
+        text level
+    }
+
+    CANDIDATE_DOCUMENTS {
+        uuid cand_id FK
+        text docu_name
+        text doc_type
+        integer doc_size
+        text doc_url "NOT NULL"
+        timestamp uploaded_at
+    }
+
+    CANDIDATE_CERTIFICATIONS {
+        uuid cand_id FK
+        text certification_name "NOT NULL"
+        text certification_type
+        text verification_link
+    }
+
+    CANDIDATE_AMARAT {
         uuid id PK
-        uuid resume_id FK
-    }
-
-    DOCUMENTS {
-        uuid id PK
-        uuid candidate_id FK
-    }
-
-    SKILLS {
-        uuid id PK
-        string name UK
-    }
-
-    CANDIDATE_SKILLS {
-        uuid candidate_id PK, FK
-        uuid skill_id PK, FK
-    }
-
-    AMARAT {
-        uuid id PK
-        uuid candidate_id FK
-    }
-
-    CANDIDATE_HISTORY {
-        uuid id PK
-        uuid candidate_id FK
-    }
-
-    IDENTITY_REVEAL_RECORDS {
-        uuid id PK
-        uuid candidate_id FK
-        uuid revealed_by FK
+        uuid cand_id FK
+        text amara_title "NOT NULL"
+        text amara_description
+        uuid module_id FK
+        uuid company_id FK
         uuid application_id FK
+        uuid source_stage_execution_id FK
+        integer definition_version
+        jsonb definition_snapshot
+        integer score
+        text level
+        text strengths
+        text areas_for_development
+        jsonb pass_decision
+        timestamptz awarded_at "NOT NULL"
     }
 
-    %% 3. JOB POSTINGS AND APPLICATIONS
+    %% Companies, interviewers, jobs, and applications
+
+    COMPANIES {
+        uuid id PK
+        text email "NOT NULL"
+        bytea password_hash "NOT NULL"
+        bytea salt "NOT NULL"
+        text legal_name "NOT NULL"
+        text display_name
+        text description
+        text website_link
+        text logo_url
+        text contact_phone
+        text contact_email
+        text linkedin_profile
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
+        timestamp deactivated_at
+        timestamp last_login_at
+        boolean banned
+        text ban_reason
+        boolean approved "NOT NULL"
+        bytea registration_secret_hash
+    }
+
+    AUTH_COMPANY_REGISTRATION_REQUESTS {
+        uuid id PK
+        text company_name "NOT NULL"
+        text registration_number "NOT NULL"
+        text email "NOT NULL"
+        bytea password_hash "NOT NULL"
+        bytea salt "NOT NULL"
+        text status "NOT NULL"
+        timestamp created_at "NOT NULL"
+        timestamp reviewed_at
+        text review_reason
+    }
+
+    INTERVIEWERS {
+        uuid id PK
+        uuid company_id FK
+        text name "NOT NULL"
+        text email "NOT NULL"
+        bytea password_hash "NOT NULL"
+        bytea salt "NOT NULL"
+        timestamp created_at "NOT NULL"
+        timestamp updated_at
+        timestamp deleted_at
+        timestamp deactivated_at
+        timestamp last_login_at
+        text account_status "NOT NULL"
+    }
+
+    AUTH_MFA_CREDENTIALS {
+        uuid account_id PK
+        text account_type PK
+        bytea secret "NOT NULL"
+        boolean enabled "NOT NULL"
+        timestamp created_at "NOT NULL"
+        timestamp enabled_at
+    }
 
     JOB_POSTINGS {
         uuid id PK
-        uuid tenant_id FK
-        uuid created_by FK
-    }
-
-    JOB_REQUIREMENTS {
-        uuid id PK
-        uuid job_id FK
-    }
-
-    JOB_SKILLS {
-        uuid job_id PK, FK
-        uuid skill_id PK, FK
+        uuid company_id FK
+        text title "NOT NULL"
+        text description
+        text language
+        text currency
+        text seniority_level
+        text employment_type
+        text location
+        integer salary_min
+        integer salary_max
+        boolean salary_visible
+        integer open_positions
+        timestamp application_opening
+        timestamp application_deadline
+        integer max_applications
+        text status
+        timestamp last_autosaved_at
+        timestamp published_at
+        timestamp archived_at
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
+        uuid pipeline_id FK
     }
 
     APPLICATIONS {
         uuid id PK
-        uuid job_id FK
-        uuid candidate_id FK
+        integer reference_number UK "NOT NULL"
+        uuid posting_id FK, UK
+        uuid cand_id FK, UK
+        text status
+        timestamp created_at
+        timestamp updated_at
+        timestamp submitted_at
+        timestamp withdrawn_at
+        boolean final_decision
+        text final_feedback
+        boolean screened_out
+        timestamp screening_completed_at
     }
 
-    APPLICATION_SNAPSHOTS {
+    %% Assessment modules and pipeline definitions
+
+    MODULES {
         uuid id PK
-        uuid application_id FK
+        text name "NOT NULL"
+        text type "NOT NULL"
+        text description
+        uuid company_id FK
+        interval active_time_limit
+        boolean published
+        text source "NOT NULL"
+        interval completion_window
+        text selection_mode "NOT NULL"
+        integer question_count
+        jsonb difficulty_mix "NOT NULL"
+        jsonb amara_definitions "NOT NULL"
+        jsonb rubric "NOT NULL"
+        integer interview_duration_minutes
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at
     }
-
-    SCREENING_DECISIONS {
-        uuid id PK
-        uuid application_id FK
-        uuid decided_by FK
-    }
-
-    %% 4. RECRUITMENT PIPELINES
 
     PIPELINES {
         uuid id PK
-        uuid tenant_id FK
-        uuid job_id FK
+        uuid posting_id FK
+        uuid published_version_id FK
+        text status
+        boolean anonymity_enabled "NOT NULL"
+        text identity_reveal_point
+        uuid reveal_stage_id FK
+        text rejection_feedback_mode "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at
     }
 
     PIPELINE_VERSIONS {
         uuid id PK
+        integer version_number "NOT NULL"
+        boolean is_published
         uuid pipeline_id FK
+        uuid previous_version_id FK
+        uuid published_by FK
+        jsonb migration_plan "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz published_at
     }
 
     PIPELINE_STAGES {
         uuid id PK
-        uuid pipeline_version_id FK
-        string stage_type
+        uuid version_id FK
+        text name "NOT NULL"
+        text module_type "NOT NULL"
+        text advancement_rule "NOT NULL"
+        integer score_threshold
+        text below_threshold_action "NOT NULL"
+        text feedback_mode "NOT NULL"
+        timestamptz scheduled_start_at
+        timestamptz scheduled_end_at
+        numeric position_x "NOT NULL"
+        numeric position_y "NOT NULL"
     }
 
     STAGE_TRANSITIONS {
@@ -170,153 +273,297 @@ erDiagram
         uuid to_stage_id FK
     }
 
-    TEST_MODULES {
-        uuid id PK
-        uuid tenant_id FK "Nullable for platform tests"
-        uuid created_by FK
-        string source
-    }
-
     ASSESSMENT_QUESTIONS {
         uuid id PK
         uuid test_module_id FK
+        text prompt "NOT NULL"
+        text response_format "NOT NULL"
+        text scoring_method "NOT NULL"
+        numeric max_points "NOT NULL"
+        jsonb answer_key
+        jsonb options
+        jsonb test_cases
+        text difficulty
+        text amara_name "NOT NULL"
+        uuid grader_id FK
+        uuid grader_company_id FK
+        boolean ai_generated "NOT NULL"
+        uuid reviewed_by FK
+        timestamptz reviewed_at
+        integer position "NOT NULL"
+        jsonb configuration "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at
     }
 
     TEST_CONFIGURATIONS {
         uuid id PK
-        uuid stage_id FK
+        uuid stage_id FK, UK
         uuid test_module_id FK
+        interval active_time_limit
+        interval completion_window
+        jsonb configuration "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at
     }
+
+    %% Pipeline execution and assessments
 
     PIPELINE_EXECUTIONS {
         uuid id PK
-        uuid application_id FK
+        uuid application_id FK, UK
         uuid pipeline_version_id FK
+        text status "NOT NULL"
+        uuid anonymous_identifier UK "NOT NULL"
+        timestamptz started_at "NOT NULL"
+        timestamptz completed_at
+        jsonb rejection_feedback
+        boolean feedback_is_ai_generated "NOT NULL"
+        timestamptz feedback_approved_at
+        timestamptz feedback_released_at
+        timestamptz updated_at
     }
 
     STAGE_EXECUTIONS {
         uuid id PK
         uuid pipeline_execution_id FK
         uuid stage_id FK
+        text status "NOT NULL"
+        timestamptz available_at
+        timestamptz deadline
+        timestamptz started_at
+        timestamptz completed_at
+        integer score
+        text decision_type
+        uuid decided_by FK
+        timestamptz decided_at
+        text decision_reason
+        integer score_at_decision
+        jsonb decision_history "NOT NULL"
+        text feedback
+        boolean feedback_is_ai_generated "NOT NULL"
+        timestamptz feedback_approved_at
+        timestamptz feedback_released_at
     }
 
-    %% 5. ASSESSMENTS AND INTERVIEWS
+    CANDIDATE_STAGE_PROGRESS {
+        uuid id PK
+        uuid application_id FK
+        uuid stage_id FK
+        text status "NOT NULL"
+        text amara_awarded
+        uuid stage_execution_id FK, UK
+    }
+
+    ASSESSMENT_INSTANCES {
+        uuid id PK
+        uuid application_id FK
+        uuid stage_id FK
+        text status "NOT NULL"
+        timestamp started_at
+        timestamp deadline
+    }
 
     ASSESSMENT_ATTEMPTS {
         uuid id PK
-        uuid stage_execution_id FK
+        uuid stage_execution_id FK, UK
         uuid candidate_id FK
+        uuid instance_id FK, UK
+        text status "NOT NULL"
+        jsonb selected_content "NOT NULL"
+        jsonb configuration_snapshot "NOT NULL"
+        timestamptz started_at
+        timestamptz deadline "NOT NULL"
+        timestamptz submitted_at
+        boolean auto_submitted "NOT NULL"
+        jsonb extension_history "NOT NULL"
     }
 
     ASSESSMENT_SUBMISSIONS {
         uuid id PK
         uuid attempt_id FK
         uuid question_id FK
+        jsonb response
+        numeric max_points "NOT NULL"
+        numeric earned_points
+        text grading_status "NOT NULL"
+        uuid grader_id FK
+        uuid grader_company_id FK
+        timestamptz graded_at
+        jsonb evaluator_result
+        timestamptz saved_at "NOT NULL"
     }
 
     ASSESSMENT_RESULTS {
         uuid id PK
-        uuid attempt_id FK
+        uuid instance_id FK, UK
+        boolean passed "NOT NULL"
+        integer score
+        text feedback
+        boolean is_disclosed
+        uuid attempt_id FK, UK
+        numeric earned_points
+        numeric max_points
+        boolean feedback_is_ai_generated "NOT NULL"
+        timestamptz feedback_approved_at
+        timestamptz disclosed_at
+        timestamptz scored_at
     }
+
+    %% Interviews, identity reveal, and offers
 
     INTERVIEWS {
         uuid id PK
-        uuid stage_execution_id FK
+        uuid stage_execution_id FK, UK
+        timestamptz scheduled_start_at "NOT NULL"
+        timestamptz scheduled_end_at "NOT NULL"
+        text status "NOT NULL"
+        text outcome
+        text provider
+        text provider_meeting_id
+        text join_url
+        smallint reschedule_count "NOT NULL"
+        jsonb reschedule_history "NOT NULL"
+        jsonb rubric_snapshot "NOT NULL"
+        integer score
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at
     }
 
     INTERVIEWER_ASSIGNMENTS {
         uuid interview_id PK, FK
         uuid interviewer_id PK, FK
+        timestamptz assigned_at "NOT NULL"
+        jsonb available_slots "NOT NULL"
+        text scorecard_status "NOT NULL"
+        uuid waived_by FK
+        timestamptz waived_at
+        text waiver_reason
     }
 
     INTERVIEW_FEEDBACK {
         uuid id PK
         uuid interview_id FK
         uuid interviewer_id FK
+        text notes
+        timestamp notes_updated_at
+        jsonb ratings "NOT NULL"
+        text recommendation
+        timestamptz submitted_at
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at
+    }
+
+    IDENTITY_REVEAL_RECORDS {
+        uuid id PK
+        uuid candidate_id FK
+        uuid revealed_by FK
+        uuid application_id FK, UK
+        uuid stage_id FK
+        timestamptz revealed_at "NOT NULL"
     }
 
     OFFERS {
         uuid id PK
         uuid application_id FK
+        text job_title "NOT NULL"
+        text compensation_summary "NOT NULL"
+        date proposed_start_date "NOT NULL"
+        timestamptz response_deadline "NOT NULL"
+        text message
+        text status "NOT NULL"
+        text response
+        timestamptz responded_at
+        timestamptz withdrawn_at
+        jsonb deadline_history "NOT NULL"
+        timestamptz capacity_confirmed_at
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at
     }
 
-    %% 6. ACCOUNT AND COMPANY RELATIONSHIPS
+    %% Candidate profile
 
-    COMPANIES ||--o{ USERS : employs
-    COMPANIES o|--o{ ROLES : defines
-    ROLES o|--o{ USERS : assigns
-    USERS ||--o{ AUTH_SESSIONS : has
-    USERS ||--o| SYSTEM_ADMINISTRATORS : may_be_platform_admin
-    USERS ||--o| CANDIDATES : may_have_candidate_profile
-    USERS ||--o{ INVITATIONS : sends
-    COMPANIES ||--o{ INVITATIONS : issues
-    COMPANIES ||--o| COMPANY_SETTINGS : has
-    COMPANIES ||--o{ COMPANY_VERIFICATIONS : undergoes
-    USERS o|--o{ COMPANY_VERIFICATIONS : reviews
+    CANDIDATES ||--o{ CANDIDATE_EDUCATION : has
+    CANDIDATES ||--o{ CANDIDATE_WORK_EXPERIENCE : has
+    CANDIDATES ||--o{ CANDIDATE_LANGUAGES : speaks
+    CANDIDATES ||--o{ CANDIDATE_DOCUMENTS : owns
+    CANDIDATES ||--o{ CANDIDATE_CERTIFICATIONS : earns
+    CANDIDATES ||--o{ CANDIDATE_AMARAT : receives
+    CANDIDATES ||--o{ AUTH_EMAIL_VERIFICATION_CHALLENGES : verifies
+    CANDIDATES ||--o{ AUTH_MFA_CREDENTIALS : secures
 
-    ROLES ||--o{ ROLE_PERMISSIONS : grants
-    PERMISSIONS ||--o{ ROLE_PERMISSIONS : included_in
+    %% Accounts, jobs, and applications
 
-    %% 7. CANDIDATE DATA
+    %% Auth account_id/account_type references are polymorphic and have no SQL FK.
+    COMPANIES ||--o{ INTERVIEWERS : employs
+    COMPANIES ||--o{ JOB_POSTINGS : publishes
+    COMPANIES o|--o{ MODULES : owns
+    COMPANIES ||--o{ AUTH_MFA_CREDENTIALS : secures
+    JOB_POSTINGS ||--o| APPLICATIONS : receives
+    CANDIDATES ||--o| APPLICATIONS : submits
+    JOB_POSTINGS o|--o| PIPELINES : uses
+    APPLICATIONS ||--o{ OFFERS : receives
 
-    CANDIDATES ||--o{ RESUMES : owns
-    RESUMES ||--o{ RESUME_VERSIONS : has
-    CANDIDATES ||--o{ DOCUMENTS : owns
-    CANDIDATES ||--o{ CANDIDATE_SKILLS : has
-    SKILLS ||--o{ CANDIDATE_SKILLS : describes
-    CANDIDATES ||--o{ AMARAT : earns
-    CANDIDATES ||--o{ CANDIDATE_HISTORY : has
-    CANDIDATES ||--o{ IDENTITY_REVEAL_RECORDS : subject_of
-    USERS ||--o{ IDENTITY_REVEAL_RECORDS : reveals
+    %% Pipeline definitions
 
-    %% 8. JOBS AND APPLICATIONS
-
-    COMPANIES ||--o{ JOB_POSTINGS : owns
-    USERS ||--o{ JOB_POSTINGS : creates
-    JOB_POSTINGS ||--o{ JOB_REQUIREMENTS : defines
-    JOB_POSTINGS ||--o{ JOB_SKILLS : targets
-    SKILLS ||--o{ JOB_SKILLS : required_for
-    JOB_POSTINGS ||--o{ APPLICATIONS : receives
-    CANDIDATES ||--o{ APPLICATIONS : submits
-    APPLICATIONS ||--o{ APPLICATION_SNAPSHOTS : records
-    APPLICATIONS ||--o{ SCREENING_DECISIONS : receives
-    USERS ||--o{ SCREENING_DECISIONS : makes
-
-    %% 9. PIPELINE DESIGN AND EXECUTION
-
-    COMPANIES ||--o{ PIPELINES : owns
-    JOB_POSTINGS ||--o{ PIPELINES : uses
     PIPELINES ||--o{ PIPELINE_VERSIONS : has
     PIPELINE_VERSIONS ||--o{ PIPELINE_STAGES : contains
+    PIPELINE_VERSIONS o|--o{ PIPELINE_VERSIONS : supersedes
     PIPELINE_VERSIONS ||--o{ STAGE_TRANSITIONS : connects
     PIPELINE_STAGES ||--o{ STAGE_TRANSITIONS : source
     PIPELINE_STAGES ||--o{ STAGE_TRANSITIONS : destination
-
-    COMPANIES o|--o{ TEST_MODULES : owns
-    USERS ||--o{ TEST_MODULES : creates
-    TEST_MODULES ||--o{ ASSESSMENT_QUESTIONS : contains
     PIPELINE_STAGES ||--o{ TEST_CONFIGURATIONS : configures
-    TEST_MODULES ||--o{ TEST_CONFIGURATIONS : used_by
+    MODULES ||--o{ TEST_CONFIGURATIONS : used_by
+    MODULES ||--o{ ASSESSMENT_QUESTIONS : contains
 
-    APPLICATIONS ||--o{ PIPELINE_EXECUTIONS : starts
+    %% Pipeline execution
+
+    APPLICATIONS ||--o| PIPELINE_EXECUTIONS : starts
     PIPELINE_VERSIONS ||--o{ PIPELINE_EXECUTIONS : runs
     PIPELINE_EXECUTIONS ||--o{ STAGE_EXECUTIONS : contains
     PIPELINE_STAGES ||--o{ STAGE_EXECUTIONS : executes
+    APPLICATIONS ||--o{ CANDIDATE_STAGE_PROGRESS : tracks
+    PIPELINE_STAGES ||--o{ CANDIDATE_STAGE_PROGRESS : tracks
+    STAGE_EXECUTIONS o|--o| CANDIDATE_STAGE_PROGRESS : records
+    APPLICATIONS ||--o{ ASSESSMENT_INSTANCES : schedules
+    PIPELINE_STAGES ||--o{ ASSESSMENT_INSTANCES : configures
 
-    %% 10. ASSESSMENTS AND INTERVIEWS
+    %% Assessments
 
-    STAGE_EXECUTIONS ||--o{ ASSESSMENT_ATTEMPTS : starts
+    STAGE_EXECUTIONS ||--o| ASSESSMENT_ATTEMPTS : starts
     CANDIDATES ||--o{ ASSESSMENT_ATTEMPTS : takes
+    ASSESSMENT_INSTANCES ||--o| ASSESSMENT_ATTEMPTS : instantiates
     ASSESSMENT_ATTEMPTS ||--o{ ASSESSMENT_SUBMISSIONS : contains
-    ASSESSMENT_QUESTIONS ||--o{ ASSESSMENT_SUBMISSIONS : answered_by
-    ASSESSMENT_ATTEMPTS ||--o| ASSESSMENT_RESULTS : produces
+    ASSESSMENT_QUESTIONS ||--o{ ASSESSMENT_SUBMISSIONS : answers
+    ASSESSMENT_INSTANCES ||--o| ASSESSMENT_RESULTS : produces
+    ASSESSMENT_ATTEMPTS o|--o| ASSESSMENT_RESULTS : scores
+    INTERVIEWERS o|--o{ ASSESSMENT_QUESTIONS : grades
+    COMPANIES o|--o{ ASSESSMENT_QUESTIONS : grades
+    COMPANIES o|--o{ ASSESSMENT_QUESTIONS : reviews
+    INTERVIEWERS o|--o{ ASSESSMENT_SUBMISSIONS : grades
+    COMPANIES o|--o{ ASSESSMENT_SUBMISSIONS : grades
 
-    STAGE_EXECUTIONS ||--o{ INTERVIEWS : schedules
+    %% Interviews and identity reveal
+
+    STAGE_EXECUTIONS ||--o| INTERVIEWS : schedules
     INTERVIEWS ||--o{ INTERVIEWER_ASSIGNMENTS : assigns
-    USERS ||--o{ INTERVIEWER_ASSIGNMENTS : participates
+    INTERVIEWERS ||--o{ INTERVIEWER_ASSIGNMENTS : participates
+    INTERVIEWERS ||--o{ AUTH_EMAIL_VERIFICATION_CHALLENGES : verifies
+    INTERVIEWERS ||--o{ AUTH_MFA_CREDENTIALS : secures
+    INTERVIEWER_ASSIGNMENTS ||--o| INTERVIEW_FEEDBACK : provides
+    COMPANIES o|--o{ INTERVIEWER_ASSIGNMENTS : waives
+    CANDIDATES ||--o{ IDENTITY_REVEAL_RECORDS : revealed
+    COMPANIES o|--o{ IDENTITY_REVEAL_RECORDS : reveals
+    APPLICATIONS ||--o| IDENTITY_REVEAL_RECORDS : identifies
+    PIPELINE_STAGES o|--o{ IDENTITY_REVEAL_RECORDS : at
+
+    %% Cross-domain references
+
+    MODULES o|--o{ CANDIDATE_AMARAT : awards
+    COMPANIES o|--o{ CANDIDATE_AMARAT : awards
+    APPLICATIONS o|--o{ CANDIDATE_AMARAT : awards
+    STAGE_EXECUTIONS o|--o{ CANDIDATE_AMARAT : awards
+    COMPANIES o|--o{ PIPELINE_VERSIONS : publishes
+    COMPANIES o|--o{ STAGE_EXECUTIONS : decides
+    COMPANIES o|--o{ INTERVIEW_FEEDBACK : submits
     INTERVIEWS ||--o{ INTERVIEW_FEEDBACK : receives
-    USERS ||--o{ INTERVIEW_FEEDBACK : submits
-
-    %% 11. OFFERS
-
-    APPLICATIONS ||--o{ OFFERS : receives
