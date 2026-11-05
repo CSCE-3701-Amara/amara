@@ -168,6 +168,8 @@ paths:
       security:
         - SessionCookie: []
       responses:
+        '400':
+          $ref: '#/components/responses/PostingError'
         '200':
           description: Published posting
           content:
@@ -195,6 +197,8 @@ paths:
       security:
         - SessionCookie: []
       responses:
+        '400':
+          $ref: '#/components/responses/PostingError'
         '200':
           description: Republished posting
           content:
@@ -222,6 +226,8 @@ paths:
       security:
         - SessionCookie: []
       responses:
+        '400':
+          $ref: '#/components/responses/PostingError'
         '200':
           description: Archived posting
           content:
