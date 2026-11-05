@@ -49,47 +49,47 @@ OWASP Top 10:2021 (A01–A10). OWASP ASVS 4.0 Level 1 for the product, Level 2 f
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-SEC-001 | The system *SHALL* deny access by default. | TBD |
-| NFR-SEC-002 | The system *SHALL* serve all browser and API traffic over TLS 1.2 or later. | TBD |
-| NFR-SEC-003 | The system *SHALL* use parameterized queries for all database access. | TBD |
-| NFR-SEC-004 | Each epic *SHALL* have a written threat model covering its assets, actors, abuse cases, and the NFR that addresses each abuse case before its first production deployment. | TBD |
-| NFR-SEC-005 | Production containers *SHALL* run as non-root. | TBD |
-| NFR-SEC-006 | CI *SHALL* run `govulncheck` on the Go module. | TBD |
-| NFR-SEC-007 | The system *SHALL* lock an account for 15 minutes after 5 failed sign-in attempts from that account. | TBD |
-| NFR-SEC-008 | Container images *SHALL* be built only in CI from the Go and frontend lockfiles (`go.sum`, `package-lock.json`). | TBD |
-| NFR-SEC-013 | The system *SHALL* check every API caller's role against the AUTH permission matrix before returning protected data. | TBD |
-| NFR-SEC-014 | An automated test *SHALL* exercise every API route with an anonymous caller, a caller with the wrong role, and a caller with the correct role. | TBD |
-| NFR-SEC-015 | A release *SHALL* have zero confirmed OWASP A01 (Broken Access Control) findings. | TBD |
-| NFR-SEC-016 | The system *SHALL* reject plaintext HTTP requests, except to redirect them to HTTPS. | TBD |
-| NFR-SEC-017 | The system *SHALL* encrypt Candidate personal data and secrets at rest using AES-256 or the cloud provider's equivalent. | TBD |
-| NFR-SEC-018 | The system *SHALL* hash passwords with Argon2id using at least 64 MiB of memory, at least 3 iterations, and parallelism 1. | TBD |
-| NFR-SEC-019 | The system *SHALL* store passwords in a non-reversible form. | TBD |
-| NFR-SEC-020 | The system *SHALL NOT* interpolate untrusted input into a shell command string. | TBD |
-| NFR-SEC-021 | The system *SHALL* contextually encode untrusted input before rendering it as HTML. | TBD |
-| NFR-SEC-022 | A release *SHALL* have zero confirmed OWASP A03 (Injection) findings from SAST and DAST scans run in CI. | TBD |
-| NFR-SEC-023 | The sign-in flow *SHALL* be covered by at least one abuse-case test before the first production deployment. | TBD |
-| NFR-SEC-024 | Production containers *SHALL NOT* include default credentials. | TBD |
-| NFR-SEC-025 | The public origin *SHALL* send the `Strict-Transport-Security` response header. | TBD |
-| NFR-SEC-026 | The public origin *SHALL* send the `Content-Security-Policy` response header. | TBD |
-| NFR-SEC-027 | The public origin *SHALL* send the `X-Content-Type-Options: nosniff` response header. | TBD |
-| NFR-SEC-028 | The public origin *SHALL* send the `Referrer-Policy` response header. | TBD |
-| NFR-SEC-029 | A CI header check *SHALL* fail when any required security header is missing from the public origin. | TBD |
-| NFR-SEC-030 | CI *SHALL* run `npm audit` against the frontend dependencies and report high- and critical-severity findings. | TBD |
-| NFR-SEC-031 | A dependency with a known high- or critical-severity CVE *SHALL* be patched or explicitly waived within 14 days of the advisory. | TBD |
-| NFR-SEC-032 | A waiver for a high- or critical-severity dependency CVE *SHALL* name an owner and include a written reason. | TBD |
-| NFR-SEC-033 | The system *SHALL* rate-limit sign-in to 10 attempts per IP address per minute. | TBD |
-| NFR-SEC-034 | An authenticated Hiring Manager session *SHALL* end after 30 minutes of inactivity. | TBD |
-| NFR-SEC-035 | An authenticated Hiring Manager session *SHALL* end after 12 hours, regardless of activity. | TBD |
-| NFR-SEC-036 | The system *SHALL* regenerate session identifiers when a user signs in. | TBD |
-| NFR-SEC-037 | CI *SHALL* tag each container image with the Git commit that produced it. | TBD |
-| NFR-SEC-038 | The deployment process *SHALL NOT* deploy a container image built outside CI. | TBD |
-| NFR-SEC-039 | The system *SHALL NOT* deserialize untrusted data using a Go decoder that executes code. | TBD |
-| NFR-SEC-040 | CI *SHALL* run SAST and DAST scans. | TBD |
-| NFR-SEC-041 | The pipeline anonymity flow *SHALL* be covered by at least one abuse-case test before the first production deployment. | TBD |
-| NFR-SEC-042 | The offer flow *SHALL* be covered by at least one abuse-case test before the first production deployment. | TBD |
-| NFR-SEC-043 | Passwords *SHALL NOT* be written to logs. | TBD |
-| NFR-SEC-044 | Each API route that returns company-scoped data *SHALL* enforce the caller's company scope defined by AUTH. | TBD |
-| NFR-SEC-045 | An automated test *SHALL* verify that a user associated with one company cannot access company-scoped data belonging to another company. | TBD |
+| NFR-SEC-001 | The system *SHALL* deny access by default. | AMARA-705 |
+| NFR-SEC-002 | The system *SHALL* serve all browser and API traffic over TLS 1.2 or later. | AMARA-706 |
+| NFR-SEC-003 | The system *SHALL* use parameterized queries for all database access. | AMARA-707 |
+| NFR-SEC-004 | Each epic *SHALL* have a written threat model covering its assets, actors, abuse cases, and the NFR that addresses each abuse case before its first production deployment. | AMARA-708 |
+| NFR-SEC-005 | Production containers *SHALL* run as non-root. | AMARA-709 |
+| NFR-SEC-006 | CI *SHALL* run `govulncheck` on the Go module. | AMARA-710 |
+| NFR-SEC-007 | The system *SHALL* lock an account for 15 minutes after 5 failed sign-in attempts from that account. | AMARA-711 |
+| NFR-SEC-008 | Container images *SHALL* be built only in CI from the Go and frontend lockfiles (`go.sum`, `package-lock.json`). | AMARA-712 |
+| NFR-SEC-013 | The system *SHALL* check every API caller's role against the AUTH permission matrix before returning protected data. | AMARA-713 |
+| NFR-SEC-014 | An automated test *SHALL* exercise every API route with an anonymous caller, a caller with the wrong role, and a caller with the correct role. | AMARA-714 |
+| NFR-SEC-015 | A release *SHALL* have zero confirmed OWASP A01 (Broken Access Control) findings. | AMARA-715 |
+| NFR-SEC-016 | The system *SHALL* reject plaintext HTTP requests, except to redirect them to HTTPS. | AMARA-716 |
+| NFR-SEC-017 | The system *SHALL* encrypt Candidate personal data and secrets at rest using AES-256 or the cloud provider's equivalent. | AMARA-717 |
+| NFR-SEC-018 | The system *SHALL* hash passwords with Argon2id using at least 64 MiB of memory, at least 3 iterations, and parallelism 1. | AMARA-718 |
+| NFR-SEC-019 | The system *SHALL* store passwords in a non-reversible form. | AMARA-719 |
+| NFR-SEC-020 | The system *SHALL NOT* interpolate untrusted input into a shell command string. | AMARA-720 |
+| NFR-SEC-021 | The system *SHALL* contextually encode untrusted input before rendering it as HTML. | AMARA-721 |
+| NFR-SEC-022 | A release *SHALL* have zero confirmed OWASP A03 (Injection) findings from SAST and DAST scans run in CI. | AMARA-722 |
+| NFR-SEC-023 | The sign-in flow *SHALL* be covered by at least one abuse-case test before the first production deployment. | AMARA-723 |
+| NFR-SEC-024 | Production containers *SHALL NOT* include default credentials. | AMARA-724 |
+| NFR-SEC-025 | The public origin *SHALL* send the `Strict-Transport-Security` response header. | AMARA-725 |
+| NFR-SEC-026 | The public origin *SHALL* send the `Content-Security-Policy` response header. | AMARA-726 |
+| NFR-SEC-027 | The public origin *SHALL* send the `X-Content-Type-Options: nosniff` response header. | AMARA-727 |
+| NFR-SEC-028 | The public origin *SHALL* send the `Referrer-Policy` response header. | AMARA-728 |
+| NFR-SEC-029 | A CI header check *SHALL* fail when any required security header is missing from the public origin. | AMARA-729 |
+| NFR-SEC-030 | CI *SHALL* run `npm audit` against the frontend dependencies and report high- and critical-severity findings. | AMARA-730 |
+| NFR-SEC-031 | A dependency with a known high- or critical-severity CVE *SHALL* be patched or explicitly waived within 14 days of the advisory. | AMARA-731 |
+| NFR-SEC-032 | A waiver for a high- or critical-severity dependency CVE *SHALL* name an owner and include a written reason. | AMARA-732 |
+| NFR-SEC-033 | The system *SHALL* rate-limit sign-in to 10 attempts per IP address per minute. | AMARA-733 |
+| NFR-SEC-034 | An authenticated Hiring Manager session *SHALL* end after 30 minutes of inactivity. | AMARA-734 |
+| NFR-SEC-035 | An authenticated Hiring Manager session *SHALL* end after 12 hours, regardless of activity. | AMARA-735 |
+| NFR-SEC-036 | The system *SHALL* regenerate session identifiers when a user signs in. | AMARA-736 |
+| NFR-SEC-037 | CI *SHALL* tag each container image with the Git commit that produced it. | AMARA-737 |
+| NFR-SEC-038 | The deployment process *SHALL NOT* deploy a container image built outside CI. | AMARA-738 |
+| NFR-SEC-039 | The system *SHALL NOT* deserialize untrusted data using a Go decoder that executes code. | AMARA-739 |
+| NFR-SEC-040 | CI *SHALL* run SAST and DAST scans. | AMARA-740 |
+| NFR-SEC-041 | The pipeline anonymity flow *SHALL* be covered by at least one abuse-case test before the first production deployment. | AMARA-741 |
+| NFR-SEC-042 | The offer flow *SHALL* be covered by at least one abuse-case test before the first production deployment. | AMARA-742 |
+| NFR-SEC-043 | Passwords *SHALL NOT* be written to logs. | AMARA-743 |
+| NFR-SEC-044 | Each API route that returns company-scoped data *SHALL* enforce the caller's company scope defined by AUTH. | AMARA-744 |
+| NFR-SEC-045 | An automated test *SHALL* verify that a user associated with one company cannot access company-scoped data belonging to another company. | AMARA-745 |
 
 **Drives:** AUTH permission middleware, Argon2id hasher, sign-in rate limiter, CI security jobs, secure container configuration, and security-header checks.
 
@@ -113,33 +113,33 @@ Handle Candidate and Company personal data lawfully for an Egypt launch, and kee
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-PRIV-001 | The system *SHALL* store account identity fields, including name, photo, email, phone, date of birth, gender, nationality, and address, and *SHALL* keep them when pipeline anonymity is enabled. | TBD |
-| NFR-PRIV-002 | Before account creation, the system *SHALL* show a privacy notice in Arabic and English that states what personal data is collected, why it is collected, who receives it, and how long it is retained. | TBD |
-| NFR-PRIV-003 | The system *SHALL* let a Candidate download their profile, applications, and released feedback as JSON within 7 days of the request. | TBD |
-| NFR-PRIV-004 | The system *SHALL* delete a Candidate's personal data within 30 days of a verified erasure request, except records subject to a recorded legal hold or records the Company is required to retain to document a hiring decision. | TBD |
-| NFR-PRIV-005 | Records retained to document a hiring decision *SHALL* omit the Candidate's name, contact details, photo, and free-text answers, and *SHALL* retain only the decision, time, and decider role. | TBD |
-| NFR-PRIV-006 | Pipeline anonymity *SHALL NOT* be treated as deletion of the Candidate's stored account identity fields. | TBD |
-| NFR-PRIV-007 | When anonymity is enabled, hiring views, exports, resume copies, dashboards, scorecards, and notes *SHALL* show the anonymous identifier instead of the Candidate's identity fields before the reveal point (FR-INVW-071). | TBD |
-| NFR-PRIV-008 | The Candidate's own account view *SHALL* continue to show the Candidate's stored identity fields while pipeline anonymity is enabled. | TBD |
-| NFR-PRIV-009 | At the identity-reveal point, the same hiring views *SHALL* show the Candidate's identity fields and *SHALL NOT* hide them again (FR-INVW-073). | TBD |
-| NFR-PRIV-010 | An integration test *SHALL* fail if a pre-reveal hiring response contains a Candidate identity field. | TBD |
-| NFR-PRIV-011 | An integration test *SHALL* fail if pipeline anonymity removes a Candidate identity field from the stored account record. | TBD |
-| NFR-PRIV-012 | Within 72 hours of confirming a personal-data breach, the system *SHALL* produce a notice stating what happened, which data was affected, and how many people were affected. | TBD |
-| NFR-PRIV-013 | A personal-data breach notice *SHALL* be deliverable to the team lead and, where required by law, to affected people. | TBD |
-| NFR-PRIV-014 | Production personal data *SHALL* be stored in one selected region (see `NFR-ENV-002`). | TBD |
-| NFR-PRIV-015 | Before personal data is transferred outside the selected region, a written decision *SHALL* name the recipient, purpose, and safeguard. | TBD |
-| NFR-PRIV-016 | Before a third-party processor is enabled in production, a register *SHALL* identify the data that processor receives. | TBD |
-| NFR-PRIV-017 | AI prompts *SHALL NOT* include Candidate identity data, including name, photo, email, phone, personal links, date of birth, gender, nationality, address, or national ID. | TBD |
-| NFR-PRIV-018 | A vendor that will not agree to the personal-data training restriction in `NFR-PRIV-026` *SHALL NOT* receive Candidate or Company personal data. | TBD |
-| NFR-PRIV-019 | Logs and traces *SHALL NOT* contain session tokens, national IDs, or full resumes. | TBD |
-| NFR-PRIV-020 | A log scrubber *SHALL* redact email-address and phone-number patterns. | TBD |
-| NFR-PRIV-021 | A test *SHALL* fail if a fixture secret appears in a captured log line. | TBD |
-| NFR-PRIV-022 | The system *SHALL* delete personal data for an application with final status Rejected, Withdrawn, Screened Out, Offer Declined, or Offer Expired 24 months after the status was set, unless a legal hold is recorded. | TBD |
-| NFR-PRIV-023 | A scheduled job *SHALL* delete application personal data that has reached the retention period. | TBD |
-| NFR-PRIV-024 | A third-party processor that receives Candidate or Company personal data *SHALL* agree not to use it to train models. | TBD |
-| NFR-PRIV-025 | A field inventory *SHALL* list each personal-data field stored by the system, its purpose, and its retention period. | TBD |
-| NFR-PRIV-026 | Account creation *SHALL* require an explicit consent action, stored with a timestamp and the privacy-notice version. | TBD |
-| NFR-PRIV-027 | A Candidate data download *SHALL* be completed in the product and *SHALL NOT* be emailed in a file that contains another person's data. | TBD |
+| NFR-PRIV-001 | The system *SHALL* store account identity fields, including name, photo, email, phone, date of birth, gender, nationality, and address, and *SHALL* keep them when pipeline anonymity is enabled. | AMARA-746 |
+| NFR-PRIV-002 | Before account creation, the system *SHALL* show a privacy notice in Arabic and English that states what personal data is collected, why it is collected, who receives it, and how long it is retained. | AMARA-747 |
+| NFR-PRIV-003 | The system *SHALL* let a Candidate download their profile, applications, and released feedback as JSON within 7 days of the request. | AMARA-748 |
+| NFR-PRIV-004 | The system *SHALL* delete a Candidate's personal data within 30 days of a verified erasure request, except records subject to a recorded legal hold or records the Company is required to retain to document a hiring decision. | AMARA-749 |
+| NFR-PRIV-005 | Records retained to document a hiring decision *SHALL* omit the Candidate's name, contact details, photo, and free-text answers, and *SHALL* retain only the decision, time, and decider role. | AMARA-750 |
+| NFR-PRIV-006 | Pipeline anonymity *SHALL NOT* be treated as deletion of the Candidate's stored account identity fields. | AMARA-751 |
+| NFR-PRIV-007 | When anonymity is enabled, hiring views, exports, resume copies, dashboards, scorecards, and notes *SHALL* show the anonymous identifier instead of the Candidate's identity fields before the reveal point (FR-INVW-071). | AMARA-752 |
+| NFR-PRIV-008 | The Candidate's own account view *SHALL* continue to show the Candidate's stored identity fields while pipeline anonymity is enabled. | AMARA-753 |
+| NFR-PRIV-009 | At the identity-reveal point, the same hiring views *SHALL* show the Candidate's identity fields and *SHALL NOT* hide them again (FR-INVW-073). | AMARA-754 |
+| NFR-PRIV-010 | An integration test *SHALL* fail if a pre-reveal hiring response contains a Candidate identity field. | AMARA-755 |
+| NFR-PRIV-011 | An integration test *SHALL* fail if pipeline anonymity removes a Candidate identity field from the stored account record. | AMARA-756 |
+| NFR-PRIV-012 | Within 72 hours of confirming a personal-data breach, the system *SHALL* produce a notice stating what happened, which data was affected, and how many people were affected. | AMARA-757 |
+| NFR-PRIV-013 | A personal-data breach notice *SHALL* be deliverable to the team lead and, where required by law, to affected people. | AMARA-758 |
+| NFR-PRIV-014 | Production personal data *SHALL* be stored in one selected region (see `NFR-ENV-002`). | AMARA-759 |
+| NFR-PRIV-015 | Before personal data is transferred outside the selected region, a written decision *SHALL* name the recipient, purpose, and safeguard. | AMARA-760 |
+| NFR-PRIV-016 | Before a third-party processor is enabled in production, a register *SHALL* identify the data that processor receives. | AMARA-761 |
+| NFR-PRIV-017 | AI prompts *SHALL NOT* include Candidate identity data, including name, photo, email, phone, personal links, date of birth, gender, nationality, address, or national ID. | AMARA-762 |
+| NFR-PRIV-018 | A vendor that will not agree to the personal-data training restriction in `NFR-PRIV-026` *SHALL NOT* receive Candidate or Company personal data. | AMARA-763 |
+| NFR-PRIV-019 | Logs and traces *SHALL NOT* contain session tokens, national IDs, or full resumes. | AMARA-764 |
+| NFR-PRIV-020 | A log scrubber *SHALL* redact email-address and phone-number patterns. | AMARA-765 |
+| NFR-PRIV-021 | A test *SHALL* fail if a fixture secret appears in a captured log line. | AMARA-766 |
+| NFR-PRIV-022 | The system *SHALL* delete personal data for an application with final status Rejected, Withdrawn, Screened Out, Offer Declined, or Offer Expired 24 months after the status was set, unless a legal hold is recorded. | AMARA-767 |
+| NFR-PRIV-023 | A scheduled job *SHALL* delete application personal data that has reached the retention period. | AMARA-768 |
+| NFR-PRIV-024 | A third-party processor that receives Candidate or Company personal data *SHALL* agree not to use it to train models. | AMARA-769 |
+| NFR-PRIV-025 | A field inventory *SHALL* list each personal-data field stored by the system, its purpose, and its retention period. | AMARA-770 |
+| NFR-PRIV-026 | Account creation *SHALL* require an explicit consent action, stored with a timestamp and the privacy-notice version. | AMARA-771 |
+| NFR-PRIV-027 | A Candidate data download *SHALL* be completed in the product and *SHALL NOT* be emailed in a file that contains another person's data. | AMARA-772 |
 
 **Drives:** account identity fields, a hiring-view mapper that substitutes the anonymous identifier before the reveal point, erasure job, processor register, and log redaction.
 
@@ -163,26 +163,26 @@ Planning targets below. Egypt launch context: formal private-sector employers pl
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-CAP-001 | At T1, the system *SHALL* store data for at least 50 companies without manual sharding. | TBD |
-| NFR-CAP-002 | The data model and tenant key *SHALL* allow growth to T2 (1,000 companies, 500,000 Candidate accounts, 10,000,000 applications) and T3 (10,000 companies, 2,000,000 Candidate accounts, 100,000,000 applications) by adding capacity, without changing identifiers or dropping tenant isolation. | TBD |
-| NFR-CAP-003 | The system *SHALL* store at least 2,000 applications on one posting at T1, 10,000 at T2, and 25,000 at T3, including each retained resume copy. This is a storage ceiling, not the Hiring Manager's application cap configured by JOB. | TBD |
-| NFR-CAP-004 | The system *SHALL* support a pipeline of at least 50 stages and 100 links per posting at T1. | TBD |
-| NFR-CAP-005 | At T1, object storage *SHALL* hold retained resume copies and video responses for the retention window in `NFR-PRIV-024`; the planning size is 5 TB. | TBD |
-| NFR-CAP-006 | At T1, the system *SHALL* sustain 500 concurrent signed-in users. | TBD |
-| NFR-CAP-007 | The notification sender *SHALL* support a T1 volume of 100,000 emails per month. | TBD |
-| NFR-CAP-008 | At T1, hot logs and traces *SHALL* be retained for 14 days. | TBD |
-| NFR-CAP-009 | At T1, the system *SHALL* store at least 250 Hiring Manager and Interviewer accounts. | TBD |
-| NFR-CAP-010 | At T1, the system *SHALL* store at least 25,000 Candidate accounts. | TBD |
-| NFR-CAP-011 | At T1, the system *SHALL* store at least 500 active postings. | TBD |
-| NFR-CAP-012 | At T1, the system *SHALL* store at least 250,000 applications. | TBD |
-| NFR-CAP-013 | At T1, the relational database *SHALL* store the required data within 50 GB. | TBD |
-| NFR-CAP-014 | At T1, the system *SHALL* render and validate a pipeline at the capacity in `NFR-CAP-004` without timing out the request (FR-INVW-005, FR-INVW-006). | TBD |
-| NFR-CAP-015 | At T1, video objects older than 30 days *SHALL* move to a lower-cost storage tier. | TBD |
-| NFR-CAP-016 | Objects past the retention period in `NFR-PRIV-024` *SHALL* be deleted by a scheduled job. | TBD |
-| NFR-CAP-017 | At T1, the system *SHALL* sustain a burst of 10 application submissions per second for 15 minutes. | TBD |
-| NFR-CAP-018 | The system *SHALL NOT* lose an application submission during the T1 burst in `NFR-CAP-017`. | TBD |
-| NFR-CAP-019 | The notification sender *SHALL* queue messages rather than drop them when the provider is slow, so bounded INVW notifications still receive a recorded delivery attempt. | TBD |
-| NFR-CAP-020 | At T1, a log-ingest cost cap *SHALL* stop additional log ingestion, rather than stop the product, if a day's ingest exceeds 2 GB. | TBD |
+| NFR-CAP-001 | At T1, the system *SHALL* store data for at least 50 companies without manual sharding. | AMARA-773 |
+| NFR-CAP-002 | The data model and tenant key *SHALL* allow growth to T2 (1,000 companies, 500,000 Candidate accounts, 10,000,000 applications) and T3 (10,000 companies, 2,000,000 Candidate accounts, 100,000,000 applications) by adding capacity, without changing identifiers or dropping tenant isolation. | AMARA-774 |
+| NFR-CAP-003 | The system *SHALL* store at least 2,000 applications on one posting at T1, 10,000 at T2, and 25,000 at T3, including each retained resume copy. This is a storage ceiling, not the Hiring Manager's application cap configured by JOB. | AMARA-775 |
+| NFR-CAP-004 | The system *SHALL* support a pipeline of at least 50 stages and 100 links per posting at T1. | AMARA-776 |
+| NFR-CAP-005 | At T1, object storage *SHALL* hold retained resume copies and video responses for the retention window in `NFR-PRIV-024`; the planning size is 5 TB. | AMARA-777 |
+| NFR-CAP-006 | At T1, the system *SHALL* sustain 500 concurrent signed-in users. | AMARA-778 |
+| NFR-CAP-007 | The notification sender *SHALL* support a T1 volume of 100,000 emails per month. | AMARA-779 |
+| NFR-CAP-008 | At T1, hot logs and traces *SHALL* be retained for 14 days. | AMARA-780 |
+| NFR-CAP-009 | At T1, the system *SHALL* store at least 250 Hiring Manager and Interviewer accounts. | AMARA-781 |
+| NFR-CAP-010 | At T1, the system *SHALL* store at least 25,000 Candidate accounts. | AMARA-782 |
+| NFR-CAP-011 | At T1, the system *SHALL* store at least 500 active postings. | AMARA-783 |
+| NFR-CAP-012 | At T1, the system *SHALL* store at least 250,000 applications. | AMARA-784 |
+| NFR-CAP-013 | At T1, the relational database *SHALL* store the required data within 50 GB. | AMARA-785 |
+| NFR-CAP-014 | At T1, the system *SHALL* render and validate a pipeline at the capacity in `NFR-CAP-004` without timing out the request (FR-INVW-005, FR-INVW-006). | AMARA-786 |
+| NFR-CAP-015 | At T1, video objects older than 30 days *SHALL* move to a lower-cost storage tier. | AMARA-787 |
+| NFR-CAP-016 | Objects past the retention period in `NFR-PRIV-024` *SHALL* be deleted by a scheduled job. | AMARA-788 |
+| NFR-CAP-017 | At T1, the system *SHALL* sustain a burst of 10 application submissions per second for 15 minutes. | AMARA-789 |
+| NFR-CAP-018 | The system *SHALL NOT* lose an application submission during the T1 burst in `NFR-CAP-017`. | AMARA-790 |
+| NFR-CAP-019 | The notification sender *SHALL* queue messages rather than drop them when the provider is slow, so bounded INVW notifications still receive a recorded delivery attempt. | AMARA-791 |
+| NFR-CAP-020 | At T1, a log-ingest cost cap *SHALL* stop additional log ingestion, rather than stop the product, if a day's ingest exceeds 2 GB. | AMARA-792 |
 
 **Drives:** tenant-keyed tables, object-storage lifecycle rules, submission and email queues, and a log-ingest cap.
 
@@ -206,26 +206,26 @@ Browser support: current and previous major version, matching common SaaS practi
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-COMP-001 | The apply flow, sign-in, and Hiring Manager posting form *SHALL* work on the current and previous major versions of Chrome, Edge, Firefox, and Safari, plus Chrome for Android and Safari for iOS. | TBD |
-| NFR-COMP-002 | The apply flow, sign-in, and Hiring Manager posting form *SHALL* be usable at viewport widths from 360 px to 1920 px. | TBD |
-| NFR-COMP-003 | On a throttled profile of 1.5 Mbps down, 750 Kbps up, and 300 ms round-trip latency, the apply form *SHALL* be visible and submittable within 8 seconds. | TBD |
-| NFR-COMP-004 | The UI *SHALL* be available in Arabic (`ar-EG`, right to left) and English (`en`). | TBD |
-| NFR-COMP-005 | The HTTP API *SHALL* return JSON under a version prefix (`/v1`). | TBD |
-| NFR-COMP-006 | Failure of the meeting or email provider *SHALL NOT* block application submission, screening, or a Hiring Manager decision. | TBD |
-| NFR-COMP-007 | The system *SHOULD* accept resume uploads as PDF or DOCX files up to 10 MB. | TBD |
-| NFR-COMP-008 | Internet Explorer *SHALL NOT* be supported. | TBD |
-| NFR-COMP-009 | A browser compatibility matrix *SHALL* be rerun before each milestone. | TBD |
-| NFR-COMP-010 | The apply flow *SHALL NOT* require hover interactions at a viewport width of 360 px. | TBD |
-| NFR-COMP-011 | The apply flow *SHALL NOT* require horizontal scrolling at a viewport width of 360 px. | TBD |
-| NFR-COMP-012 | A feature that requires a faster network connection than the profile in `NFR-COMP-003` (such as live video or a large upload) *SHALL* show a named error instead of a blank page. | TBD |
-| NFR-COMP-013 | Dates, times, and numbers *SHALL* follow the viewer's locale. | TBD |
-| NFR-COMP-014 | The system *SHALL* store timestamps in UTC. | TBD |
-| NFR-COMP-015 | The UI *SHALL* display timestamps in the viewer's time zone, defaulting to `Africa/Cairo` (FR-INVW-029). | TBD |
-| NFR-COMP-016 | A breaking HTTP API change *SHALL* increment the API version. | TBD |
-| NFR-COMP-017 | The previous HTTP API version *SHALL* remain available for at least 6 months after a new version is announced. | TBD |
-| NFR-COMP-018 | The system *SHALL* retry meeting-provider and email-provider failures according to the INVW error-handling rules. | TBD |
-| NFR-COMP-019 | The system *SHALL* show in-product notifications even when email delivery fails. | TBD |
-| NFR-COMP-020 | The system *SHALL* reject resume uploads in unsupported formats and show a message naming the allowed formats. | TBD |
+| NFR-COMP-001 | The apply flow, sign-in, and Hiring Manager posting form *SHALL* work on the current and previous major versions of Chrome, Edge, Firefox, and Safari, plus Chrome for Android and Safari for iOS. | AMARA-793 |
+| NFR-COMP-002 | The apply flow, sign-in, and Hiring Manager posting form *SHALL* be usable at viewport widths from 360 px to 1920 px. | AMARA-794 |
+| NFR-COMP-003 | On a throttled profile of 1.5 Mbps down, 750 Kbps up, and 300 ms round-trip latency, the apply form *SHALL* be visible and submittable within 8 seconds. | AMARA-795 |
+| NFR-COMP-004 | The UI *SHALL* be available in Arabic (`ar-EG`, right to left) and English (`en`). | AMARA-796 |
+| NFR-COMP-005 | The HTTP API *SHALL* return JSON under a version prefix (`/v1`). | AMARA-797 |
+| NFR-COMP-006 | Failure of the meeting or email provider *SHALL NOT* block application submission, screening, or a Hiring Manager decision. | AMARA-798 |
+| NFR-COMP-007 | The system *SHOULD* accept resume uploads as PDF or DOCX files up to 10 MB. | AMARA-799 |
+| NFR-COMP-008 | Internet Explorer *SHALL NOT* be supported. | AMARA-800 |
+| NFR-COMP-009 | A browser compatibility matrix *SHALL* be rerun before each milestone. | AMARA-801 |
+| NFR-COMP-010 | The apply flow *SHALL NOT* require hover interactions at a viewport width of 360 px. | AMARA-802 |
+| NFR-COMP-011 | The apply flow *SHALL NOT* require horizontal scrolling at a viewport width of 360 px. | AMARA-803 |
+| NFR-COMP-012 | A feature that requires a faster network connection than the profile in `NFR-COMP-003` (such as live video or a large upload) *SHALL* show a named error instead of a blank page. | AMARA-804 |
+| NFR-COMP-013 | Dates, times, and numbers *SHALL* follow the viewer's locale. | AMARA-805 |
+| NFR-COMP-014 | The system *SHALL* store timestamps in UTC. | AMARA-806 |
+| NFR-COMP-015 | The UI *SHALL* display timestamps in the viewer's time zone, defaulting to `Africa/Cairo` (FR-INVW-029). | AMARA-807 |
+| NFR-COMP-016 | A breaking HTTP API change *SHALL* increment the API version. | AMARA-808 |
+| NFR-COMP-017 | The previous HTTP API version *SHALL* remain available for at least 6 months after a new version is announced. | AMARA-809 |
+| NFR-COMP-018 | The system *SHALL* retry meeting-provider and email-provider failures according to the INVW error-handling rules. | AMARA-810 |
+| NFR-COMP-019 | The system *SHALL* show in-product notifications even when email delivery fails. | AMARA-811 |
+| NFR-COMP-020 | The system *SHALL* reject resume uploads in unsupported formats and show a message naming the allowed formats. | AMARA-812 |
 
 **Drives:** browser test matrix in CI, locale middleware, `/v1` router, provider interfaces with a timeout and a fallback.
 
@@ -249,35 +249,35 @@ Availability is monthly, measured by an external check, excluding a maintenance 
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-REL-001 | At T1, the apply and sign-in paths *SHALL* be available 99.0% of each calendar month, measured by an external HTTPS check every 60 seconds from outside the hosting account. Three consecutive failed checks count as an outage. | TBD |
-| NFR-REL-002 | At T2, the apply and sign-in paths *SHOULD* be available 99.5% of each calendar month; at T3 they *SHOULD* be available 99.9%, measured as in `NFR-REL-001`. | TBD |
-| NFR-REL-003 | At T1, the system *SHALL* recover the apply and sign-in paths within 24 hours of a confirmed outage (RTO 24 h). | TBD |
-| NFR-REL-004 | At T2, the system *SHOULD* meet an RPO of 1 hour. | TBD |
-| NFR-REL-005 | A restore from backup *SHALL* be executed and timed at least once per academic term at T1, once every 6 months at T2, and once per quarter at T3. The run *SHALL* record the time to a working sign-in and one readable application. | TBD |
-| NFR-REL-006 | Every production container *SHALL* expose a health check. | TBD |
-| NFR-REL-007 | The system *SHALL* acknowledge an application submission only after the application row and retained resume copy are committed. | TBD |
-| NFR-REL-008 | Module answers *SHALL* be saved at least every 30 seconds and when connectivity drops. | TBD |
-| NFR-REL-009 | If the screening queue is older than 60 seconds, the system *SHALL* continue accepting submissions and *SHALL NOT* drop queued work. | TBD |
-| NFR-REL-010 | Planned maintenance *SHALL* occur Friday 22:00–Saturday 06:00 `Africa/Cairo`. | TBD |
-| NFR-REL-011 | At T1, a Sev-1 incident that takes down the apply or sign-in path *SHALL* be acknowledged within 4 business hours. | TBD |
-| NFR-REL-012 | At T1, the system *SHALL* have an RPO of no more than 24 hours. | TBD |
-| NFR-REL-013 | At T1, the system *SHALL* make automated daily backups of the database and object storage. | TBD |
-| NFR-REL-014 | At T2, the system *SHOULD* recover the apply and sign-in paths within 4 hours (RTO 4 h). | TBD |
-| NFR-REL-015 | At T2, the system *SHOULD* use a standby database in a second availability zone and continuous backup. | TBD |
-| NFR-REL-016 | At T3, the system *SHOULD* have an RPO of no more than 5 minutes. | TBD |
-| NFR-REL-017 | At T3, the system *SHOULD* recover the apply and sign-in paths within 1 hour (RTO 1 h). | TBD |
-| NFR-REL-018 | The platform *SHALL* restart a production container after it fails 3 consecutive health checks. | TBD |
-| NFR-REL-019 | A deployment *SHALL NOT* send traffic to a container that has not passed its health check. | TBD |
-| NFR-REL-020 | A retry of the same application submission *SHALL NOT* create a second application. | TBD |
-| NFR-REL-021 | A client retry after an application-submission timeout *SHALL* be safe. | TBD |
-| NFR-REL-022 | After reconnecting, a Candidate *SHALL* be able to resume an assessment with the last saved answers. | TBD |
-| NFR-REL-023 | When an assessment time limit expires, the system *SHALL* submit saved answers even if the browser has closed (FR-INVW-012). | TBD |
-| NFR-REL-024 | If the screening queue is older than 60 seconds, the system *SHALL* show the Hiring Manager a delayed-screening state. | TBD |
-| NFR-REL-025 | The system *SHALL* record the completion time for every screening job, including jobs completed after the target in `NFR-PERF-005` or `NFR-PERF-011`. | TBD |
-| NFR-REL-026 | Planned maintenance *SHALL* be announced in the product at least 72 hours in advance. | TBD |
-| NFR-REL-027 | Planned maintenance *SHALL NOT* overlap a stored posting deadline. | TBD |
-| NFR-REL-028 | At T2, a Sev-1 incident that takes down the apply or sign-in path *SHALL* be acknowledged within 30 minutes during Sunday–Thursday, 09:00–18:00 `Africa/Cairo`. | TBD |
-| NFR-REL-029 | An incident note *SHALL* record the incident start, detection time, mitigation, and any data loss. | TBD |
+| NFR-REL-001 | At T1, the apply and sign-in paths *SHALL* be available 99.0% of each calendar month, measured by an external HTTPS check every 60 seconds from outside the hosting account. Three consecutive failed checks count as an outage. | AMARA-813 |
+| NFR-REL-002 | At T2, the apply and sign-in paths *SHOULD* be available 99.5% of each calendar month; at T3 they *SHOULD* be available 99.9%, measured as in `NFR-REL-001`. | AMARA-814 |
+| NFR-REL-003 | At T1, the system *SHALL* recover the apply and sign-in paths within 24 hours of a confirmed outage (RTO 24 h). | AMARA-815 |
+| NFR-REL-004 | At T2, the system *SHOULD* meet an RPO of 1 hour. | AMARA-816 |
+| NFR-REL-005 | A restore from backup *SHALL* be executed and timed at least once per academic term at T1, once every 6 months at T2, and once per quarter at T3. The run *SHALL* record the time to a working sign-in and one readable application. | AMARA-817 |
+| NFR-REL-006 | Every production container *SHALL* expose a health check. | AMARA-818 |
+| NFR-REL-007 | The system *SHALL* acknowledge an application submission only after the application row and retained resume copy are committed. | AMARA-819 |
+| NFR-REL-008 | Module answers *SHALL* be saved at least every 30 seconds and when connectivity drops. | AMARA-820 |
+| NFR-REL-009 | If the screening queue is older than 60 seconds, the system *SHALL* continue accepting submissions and *SHALL NOT* drop queued work. | AMARA-821 |
+| NFR-REL-010 | Planned maintenance *SHALL* occur Friday 22:00–Saturday 06:00 `Africa/Cairo`. | AMARA-822 |
+| NFR-REL-011 | At T1, a Sev-1 incident that takes down the apply or sign-in path *SHALL* be acknowledged within 4 business hours. | AMARA-823 |
+| NFR-REL-012 | At T1, the system *SHALL* have an RPO of no more than 24 hours. | AMARA-824 |
+| NFR-REL-013 | At T1, the system *SHALL* make automated daily backups of the database and object storage. | AMARA-825 |
+| NFR-REL-014 | At T2, the system *SHOULD* recover the apply and sign-in paths within 4 hours (RTO 4 h). | AMARA-826 |
+| NFR-REL-015 | At T2, the system *SHOULD* use a standby database in a second availability zone and continuous backup. | AMARA-827 |
+| NFR-REL-016 | At T3, the system *SHOULD* have an RPO of no more than 5 minutes. | AMARA-828 |
+| NFR-REL-017 | At T3, the system *SHOULD* recover the apply and sign-in paths within 1 hour (RTO 1 h). | AMARA-829 |
+| NFR-REL-018 | The platform *SHALL* restart a production container after it fails 3 consecutive health checks. | AMARA-830 |
+| NFR-REL-019 | A deployment *SHALL NOT* send traffic to a container that has not passed its health check. | AMARA-831 |
+| NFR-REL-020 | A retry of the same application submission *SHALL NOT* create a second application. | AMARA-832 |
+| NFR-REL-021 | A client retry after an application-submission timeout *SHALL* be safe. | AMARA-833 |
+| NFR-REL-022 | After reconnecting, a Candidate *SHALL* be able to resume an assessment with the last saved answers. | AMARA-834 |
+| NFR-REL-023 | When an assessment time limit expires, the system *SHALL* submit saved answers even if the browser has closed (FR-INVW-012). | AMARA-835 |
+| NFR-REL-024 | If the screening queue is older than 60 seconds, the system *SHALL* show the Hiring Manager a delayed-screening state. | AMARA-836 |
+| NFR-REL-025 | The system *SHALL* record the completion time for every screening job, including jobs completed after the target in `NFR-PERF-005` or `NFR-PERF-011`. | AMARA-837 |
+| NFR-REL-026 | Planned maintenance *SHALL* be announced in the product at least 72 hours in advance. | AMARA-838 |
+| NFR-REL-027 | Planned maintenance *SHALL NOT* overlap a stored posting deadline. | AMARA-839 |
+| NFR-REL-028 | At T2, a Sev-1 incident that takes down the apply or sign-in path *SHALL* be acknowledged within 30 minutes during Sunday–Thursday, 09:00–18:00 `Africa/Cairo`. | AMARA-840 |
+| NFR-REL-029 | An incident note *SHALL* record the incident start, detection time, mitigation, and any data loss. | AMARA-841 |
 
 **Drives:** external uptime check, daily backup job, health checks on the container platform, idempotency key on submit, answer autosave, screening queue.
 
@@ -301,28 +301,28 @@ Go and TypeScript community defaults (`gofmt`, `golangci-lint`, ESLint, Prettier
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-MAINT-001 | A new developer *SHALL* be able to run the backend, frontend, and database with one documented command (`docker compose`) and sign in to a seeded local account within 30 minutes of a clean clone, on an 8 GB RAM laptop without a cloud account. | TBD |
-| NFR-MAINT-002 | CI *SHALL* run formatting, lint, type checks, and tests on every pull request. | TBD |
-| NFR-MAINT-003 | Automated tests *SHALL* cover at least 70% of statements in backend packages overall. | TBD |
-| NFR-MAINT-004 | Schema changes *SHALL* be stored as versioned migration files. | TBD |
-| NFR-MAINT-005 | Every HTTP request *SHALL* carry a trace identifier that is returned in the response header and written on every log line for that request. | TBD |
-| NFR-MAINT-006 | The HTTP API *SHALL* have an OpenAPI description checked into the repository. | TBD |
-| NFR-MAINT-007 | A significant design choice (datastore, queue, authentication mechanism, or hosting) *SHALL* have an architecture decision record in the repository before dependent code is merged. | TBD |
-| NFR-MAINT-008 | Production configuration *SHALL* come from environment variables rather than values compiled into a container image. | TBD |
-| NFR-MAINT-009 | ANA code *SHALL NOT* write AUTH, CAND, JOB, or INVW tables. | TBD |
+| NFR-MAINT-001 | A new developer *SHALL* be able to run the backend, frontend, and database with one documented command (`docker compose`) and sign in to a seeded local account within 30 minutes of a clean clone, on an 8 GB RAM laptop without a cloud account. | AMARA-842 |
+| NFR-MAINT-002 | CI *SHALL* run formatting, lint, type checks, and tests on every pull request. | AMARA-843 |
+| NFR-MAINT-003 | Automated tests *SHALL* cover at least 70% of statements in backend packages overall. | AMARA-844 |
+| NFR-MAINT-004 | Schema changes *SHALL* be stored as versioned migration files. | AMARA-845 |
+| NFR-MAINT-005 | Every HTTP request *SHALL* carry a trace identifier that is returned in the response header and written on every log line for that request. | AMARA-846 |
+| NFR-MAINT-006 | The HTTP API *SHALL* have an OpenAPI description checked into the repository. | AMARA-847 |
+| NFR-MAINT-007 | A significant design choice (datastore, queue, authentication mechanism, or hosting) *SHALL* have an architecture decision record in the repository before dependent code is merged. | AMARA-848 |
+| NFR-MAINT-008 | Production configuration *SHALL* come from environment variables rather than values compiled into a container image. | AMARA-849 |
+| NFR-MAINT-009 | ANA code *SHALL NOT* write AUTH, CAND, JOB, or INVW tables. | AMARA-850 |
 | NFR-MAINT-010 | A pull request with a failing CI check *SHALL NOT* be merged. | TBD |
-| NFR-MAINT-011 | A CI run *SHALL* finish within 15 minutes on the student runner quota. | TBD |
-| NFR-MAINT-012 | Automated tests *SHALL* cover at least 85% of statements in backend packages that implement scoring, anonymity, and offer state. | TBD |
-| NFR-MAINT-013 | CI *SHALL* report backend test coverage and fail a pull request if either coverage threshold in `NFR-MAINT-003` or `NFR-MAINT-012` is missed. | TBD |
-| NFR-MAINT-014 | The deployment process *SHALL* apply versioned schema migrations. | TBD |
-| NFR-MAINT-015 | Each schema migration *SHALL* be reversible by one down migration for one release. | TBD |
-| NFR-MAINT-016 | A production schema change *SHALL NOT* depend on a person running SQL by hand. | TBD |
-| NFR-MAINT-017 | Logs *SHALL* be structured JSON. | TBD |
-| NFR-MAINT-018 | Given a submission ID, an operator *SHALL* be able to find its request, decision, and provider errors without reading source code. | TBD |
-| NFR-MAINT-019 | A pull request that changes an HTTP request or response shape *SHALL* update the OpenAPI description in the same pull request. | TBD |
-| NFR-MAINT-020 | An architecture decision record *SHALL* name the options considered and explain why the selected choice fits the student budget. | TBD |
-| NFR-MAINT-021 | The same container image *SHALL* run in local, CI, staging, and production environments. | TBD |
-| NFR-MAINT-022 | A review check or import rule *SHALL* fail if an analytics package imports another epic's write repository. | TBD |
+| NFR-MAINT-011 | A CI run *SHALL* finish within 15 minutes on the student runner quota. | AMARA-852 |
+| NFR-MAINT-012 | Automated tests *SHALL* cover at least 85% of statements in backend packages that implement scoring, anonymity, and offer state. | AMARA-853 |
+| NFR-MAINT-013 | CI *SHALL* report backend test coverage and fail a pull request if either coverage threshold in `NFR-MAINT-003` or `NFR-MAINT-012` is missed. | AMARA-854 |
+| NFR-MAINT-014 | The deployment process *SHALL* apply versioned schema migrations. | AMARA-855 |
+| NFR-MAINT-015 | Each schema migration *SHALL* be reversible by one down migration for one release. | AMARA-856 |
+| NFR-MAINT-016 | A production schema change *SHALL NOT* depend on a person running SQL by hand. | AMARA-857 |
+| NFR-MAINT-017 | Logs *SHALL* be structured JSON. | AMARA-858 |
+| NFR-MAINT-018 | Given a submission ID, an operator *SHALL* be able to find its request, decision, and provider errors without reading source code. | AMARA-859 |
+| NFR-MAINT-019 | A pull request that changes an HTTP request or response shape *SHALL* update the OpenAPI description in the same pull request. | AMARA-860 |
+| NFR-MAINT-020 | An architecture decision record *SHALL* name the options considered and explain why the selected choice fits the student budget. | AMARA-861 |
+| NFR-MAINT-021 | The same container image *SHALL* run in local, CI, staging, and production environments. (Withdrawn; redundant with NFR-ENV-004) | AMARA-862 |
+| NFR-MAINT-022 | A review check or import rule *SHALL* fail if an analytics package imports another epic's write repository. | AMARA-863 |
 
 **Drives:** `docker-compose` dev stack, CI workflow, coverage gate, migration tool, OpenTelemetry middleware, OpenAPI file, and ADR folder.
 
@@ -345,22 +345,22 @@ OCI container images. Twelve-factor app. Terraform (or an equivalent that target
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-PORT-001 | The backend and frontend *SHALL* ship as OCI container images. | TBD |
-| NFR-PORT-002 | Cloud resources *SHALL* be described as code that can target AWS or Azure. | TBD |
-| NFR-PORT-003 | Object storage *SHALL* be accessed through an interface in the Go module. | TBD |
-| NFR-PORT-004 | A full logical export of one tenant (company, postings, applications, decisions, and files) *SHALL* be producible as SQL or JSON plus object files within 7 days of a request. | TBD |
-| NFR-PORT-005 | Container images *SHOULD* be built for `linux/amd64` and `linux/arm64`. | TBD |
-| NFR-PORT-006 | Replacing the LLM vendor *SHOULD NOT* require a schema change. | TBD |
-| NFR-PORT-007 | OCI images *SHALL* run unmodified on the local Docker engine, in CI, and on the chosen cloud container service. | TBD |
-| NFR-PORT-008 | OCI images *SHALL NOT* depend on a host path or a host-installed toolchain. | TBD |
-| NFR-PORT-009 | A production cloud resource *SHALL NOT* require manual creation in a cloud console without an equivalent infrastructure-as-code definition. | TBD |
-| NFR-PORT-010 | Email delivery *SHALL* be accessed through an interface in the Go module. | TBD |
-| NFR-PORT-011 | The meeting provider *SHALL* be accessed through an interface in the Go module. | TBD |
-| NFR-PORT-012 | The LLM provider *SHALL* be accessed through an interface in the Go module. | TBD |
-| NFR-PORT-013 | Replacing an external provider *SHALL* require only a configuration change and an adapter, without changes to application, pipeline, or offer logic. | TBD |
-| NFR-PORT-014 | A tenant export *SHALL NOT* contain rows or files belonging to another tenant. | TBD |
-| NFR-PORT-015 | LLM prompts and model names *SHALL* be stored in configuration. | TBD |
-| NFR-PORT-016 | A second LLM adapter *SHOULD* be demonstrable in one sprint if a vendor fails the privacy requirement in `NFR-PRIV-026`. | TBD |
+| NFR-PORT-001 | The backend and frontend *SHALL* ship as OCI container images. | AMARA-864 |
+| NFR-PORT-002 | Cloud resources *SHALL* be described as code that can target AWS or Azure. | AMARA-865 |
+| NFR-PORT-003 | Object storage *SHALL* be accessed through an interface in the Go module. | AMARA-866 |
+| NFR-PORT-004 | A full logical export of one tenant (company, postings, applications, decisions, and files) *SHALL* be producible as SQL or JSON plus object files within 7 days of a request. | AMARA-867 |
+| NFR-PORT-005 | Container images *SHOULD* be built for `linux/amd64` and `linux/arm64`. | AMARA-868 |
+| NFR-PORT-006 | Replacing the LLM vendor *SHOULD NOT* require a schema change. | AMARA-869 |
+| NFR-PORT-007 | OCI images *SHALL* run unmodified on the local Docker engine, in CI, and on the chosen cloud container service. | AMARA-870 |
+| NFR-PORT-008 | OCI images *SHALL NOT* depend on a host path or a host-installed toolchain. | AMARA-871 |
+| NFR-PORT-009 | A production cloud resource *SHALL NOT* require manual creation in a cloud console without an equivalent infrastructure-as-code definition. | AMARA-872 |
+| NFR-PORT-010 | Email delivery *SHALL* be accessed through an interface in the Go module. | AMARA-873 |
+| NFR-PORT-011 | The meeting provider *SHALL* be accessed through an interface in the Go module. | AMARA-874 |
+| NFR-PORT-012 | The LLM provider *SHALL* be accessed through an interface in the Go module. | AMARA-875 |
+| NFR-PORT-013 | Replacing an external provider *SHALL* require only a configuration change and an adapter, without changes to application, pipeline, or offer logic. | AMARA-876 |
+| NFR-PORT-014 | A tenant export *SHALL NOT* contain rows or files belonging to another tenant. | AMARA-877 |
+| NFR-PORT-015 | LLM prompts and model names *SHALL* be stored in configuration. | AMARA-878 |
+| NFR-PORT-016 | A second LLM adapter *SHOULD* be demonstrable in one sprint if a vendor fails the privacy requirement in `NFR-PRIV-026`. | AMARA-879 |
 
 **Drives:** Dockerfiles, Terraform modules with AWS and Azure targets, provider interfaces, tenant export job, and multi-architecture CI build.
 
@@ -383,28 +383,28 @@ Stateless app tier. Horizontal scaling. Queue for work that has a deadline measu
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-SCAL-001 | The application tier *SHALL* be stateless. | TBD |
-| NFR-SCAL-002 | Screening work *SHALL* run on workers fed by a queue. | TBD |
-| NFR-SCAL-003 | The system *SHALL* absorb 10 times the trailing-hour submission rate for 60 minutes. | TBD |
-| NFR-SCAL-004 | Analytics and dashboard reads *SHOULD* be able to use a read replica or a read model. | TBD |
-| NFR-SCAL-005 | At T1, monthly cloud spend for production *SHALL* stay within US$150 or within the student-credit balance if that is lower. | TBD |
-| NFR-SCAL-006 | Before each milestone that claims a capacity target, a load test at that target's concurrency *SHALL* be run and its result stored in the repository. | TBD |
-| NFR-SCAL-007 | At T2, the web tier *SHOULD* add an instance within 3 minutes after CPU usage exceeds 70% for 5 minutes. | TBD |
-| NFR-SCAL-008 | Session state *SHALL NOT* live in application-process memory. | TBD |
-| NFR-SCAL-009 | Adding a second application instance *SHALL NOT* require a code change or break sign-in or submission. | TBD |
-| NFR-SCAL-010 | Email delivery *SHALL* run on workers fed by a queue. | TBD |
-| NFR-SCAL-011 | AI feedback generation *SHALL* run on workers fed by a queue. | TBD |
-| NFR-SCAL-012 | The web process *SHALL NOT* perform screening, email delivery, or AI feedback generation inline. | TBD |
-| NFR-SCAL-013 | Worker count *SHALL* be raisable without redeploying the web process. | TBD |
-| NFR-SCAL-014 | The system *SHALL NOT* drop a committed application submission during the load in `NFR-SCAL-003`. | TBD |
-| NFR-SCAL-015 | Sign-in *SHALL* remain available during the load in `NFR-SCAL-003`. | TBD |
-| NFR-SCAL-016 | Excess application submissions *SHALL* wait in a queue rather than fail an HTTP request that has already committed the submission. | TBD |
-| NFR-SCAL-017 | An analytics query *SHALL NOT* take a write lock on the application-submission path. | TBD |
-| NFR-SCAL-018 | If the T1 production cloud-spend limit in `NFR-SCAL-005` is exceeded, an ADR *SHALL* record the overrun and the resources turned off or resized. | TBD |
-| NFR-SCAL-019 | Video lifecycle management (`NFR-CAP-015`) and log-ingest limits (`NFR-CAP-020`) *SHALL* be the first cost-reduction levers. | TBD |
-| NFR-SCAL-020 | A missed latency target *SHALL* be fixed or documented as a known gap with an owner. | TBD |
-| NFR-SCAL-021 | At T2, the web tier *SHOULD* scale in when CPU usage stays below 30% for 15 minutes. | TBD |
-| NFR-SCAL-022 | Scale-in *SHALL NOT* drop an in-flight request. | TBD |
+| NFR-SCAL-001 | The application tier *SHALL* be stateless. | AMARA-880 |
+| NFR-SCAL-002 | Screening work *SHALL* run on workers fed by a queue. | AMARA-881 |
+| NFR-SCAL-003 | The system *SHALL* absorb 10 times the trailing-hour submission rate for 60 minutes. | AMARA-882 |
+| NFR-SCAL-004 | Analytics and dashboard reads *SHOULD* be able to use a read replica or a read model. | AMARA-883 |
+| NFR-SCAL-005 | At T1, monthly cloud spend for production *SHALL* stay within US$150 or within the student-credit balance if that is lower. | AMARA-884 |
+| NFR-SCAL-006 | Before each milestone that claims a capacity target, a load test at that target's concurrency *SHALL* be run and its result stored in the repository. | AMARA-885 |
+| NFR-SCAL-007 | At T2, the web tier *SHOULD* add an instance within 3 minutes after CPU usage exceeds 70% for 5 minutes. | AMARA-886 |
+| NFR-SCAL-008 | Session state *SHALL NOT* live in application-process memory. | AMARA-887 |
+| NFR-SCAL-009 | Adding a second application instance *SHALL NOT* require a code change or break sign-in or submission. | AMARA-888 |
+| NFR-SCAL-010 | Email delivery *SHALL* run on workers fed by a queue. | AMARA-889 |
+| NFR-SCAL-011 | AI feedback generation *SHALL* run on workers fed by a queue. | AMARA-890 |
+| NFR-SCAL-012 | The web process *SHALL NOT* perform screening, email delivery, or AI feedback generation inline. | AMARA-891 |
+| NFR-SCAL-013 | Worker count *SHALL* be raisable without redeploying the web process. | AMARA-892 |
+| NFR-SCAL-014 | The system *SHALL NOT* drop a committed application submission during the load in `NFR-SCAL-003`. | AMARA-893 |
+| NFR-SCAL-015 | Sign-in *SHALL* remain available during the load in `NFR-SCAL-003`. | AMARA-894 |
+| NFR-SCAL-016 | Excess application submissions *SHALL* wait in a queue rather than fail an HTTP request that has already committed the submission. | AMARA-895 |
+| NFR-SCAL-017 | An analytics query *SHALL NOT* take a write lock on the application-submission path. | AMARA-896 |
+| NFR-SCAL-018 | If the T1 production cloud-spend limit in `NFR-SCAL-005` is exceeded, an ADR *SHALL* record the overrun and the resources turned off or resized. | AMARA-897 |
+| NFR-SCAL-019 | Video lifecycle management (`NFR-CAP-015`) and log-ingest limits (`NFR-CAP-020`) *SHALL* be the first cost-reduction levers. | AMARA-898 |
+| NFR-SCAL-020 | A missed latency target *SHALL* be fixed or documented as a known gap with an owner. | AMARA-899 |
+| NFR-SCAL-021 | At T2, the web tier *SHOULD* scale in when CPU usage stays below 30% for 15 minutes. | AMARA-900 |
+| NFR-SCAL-022 | Scale-in *SHALL NOT* drop an in-flight request. | AMARA-901 |
 
 **Drives:** JWT or shared session store, queue and worker process, read replica for ANA, budget alarm, load-test script in CI or a documented manual run.
 
@@ -428,21 +428,21 @@ ISO 9241-11 (effectiveness, efficiency, satisfaction). System Usability Scale (S
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-USAB-001 | A first-time Candidate with a complete profile *SHALL* be able to submit an application in 5 minutes or less in a moderated usability test. | TBD |
-| NFR-USAB-002 | A first-time Hiring Manager *SHALL* be able to create a posting with a title, description, deadline, and one Must-have criterion in 10 minutes or less. | TBD |
-| NFR-USAB-003 | A Hiring Manager *SHALL* be able to build a 5-stage pipeline, connect it, and reach a publishable state in 10 minutes or less. | TBD |
-| NFR-USAB-004 | Each destructive action (reject, withdraw, override, or publish a migration) *SHALL* ask for confirmation and name its consequence. | TBD |
-| NFR-USAB-005 | Status labels shown to a Candidate, a Hiring Manager, and in email *SHALL* match the status values defined by INVW. | TBD |
-| NFR-USAB-006 | A user action *SHALL* show a visible acknowledgement within 100 ms. | TBD |
-| NFR-USAB-007 | A System Usability Scale (SUS) test with at least 5 Candidates and 5 Hiring Managers *SHOULD* score at least 68 for each role before the milestone that declares the apply and posting flows complete. | TBD |
-| NFR-USAB-008 | An empty Company account *SHOULD* show the next required action (verify Company, create a posting, or publish a pipeline) instead of only an empty chart. | TBD |
-| NFR-USAB-009 | Each error *SHALL* state what failed and the next action, using terminology consistent with the INVW error-handling rules. | TBD |
-| NFR-USAB-010 | A pull request that introduces an application status *SHALL* update the status definitions in INVW and the glossary in the same pull request. | TBD |
-| NFR-USAB-011 | An operation that takes more than 1 second *SHALL* show progress or a busy state. | TBD |
-| NFR-USAB-012 | An operation that takes more than 1 second *SHALL NOT* appear frozen. | TBD |
-| NFR-USAB-013 | At least 4 of 5 first-time Candidates in a moderated application test *SHALL* complete the test without facilitator assistance. | TBD |
-| NFR-USAB-014 | The pipeline canvas *SHALL* support undo for at least 10 editing actions. | TBD |
-| NFR-USAB-015 | The pipeline canvas *SHALL* provide a non-drag method to add and connect a stage. | TBD |
+| NFR-USAB-001 | A first-time Candidate with a complete profile *SHALL* be able to submit an application in 5 minutes or less in a moderated usability test. | AMARA-902 |
+| NFR-USAB-002 | A first-time Hiring Manager *SHALL* be able to create a posting with a title, description, deadline, and one Must-have criterion in 10 minutes or less. | AMARA-903 |
+| NFR-USAB-003 | A Hiring Manager *SHALL* be able to build a 5-stage pipeline, connect it, and reach a publishable state in 10 minutes or less. | AMARA-904 |
+| NFR-USAB-004 | Each destructive action (reject, withdraw, override, or publish a migration) *SHALL* ask for confirmation and name its consequence. | AMARA-905 |
+| NFR-USAB-005 | Status labels shown to a Candidate, a Hiring Manager, and in email *SHALL* match the status values defined by INVW. | AMARA-906 |
+| NFR-USAB-006 | A user action *SHALL* show a visible acknowledgement within 100 ms. | AMARA-907 |
+| NFR-USAB-007 | A System Usability Scale (SUS) test with at least 5 Candidates and 5 Hiring Managers *SHOULD* score at least 68 for each role before the milestone that declares the apply and posting flows complete. | AMARA-908 |
+| NFR-USAB-008 | An empty Company account *SHOULD* show the next required action (verify Company, create a posting, or publish a pipeline) instead of only an empty chart. | AMARA-909 |
+| NFR-USAB-009 | Each error *SHALL* state what failed and the next action, using terminology consistent with the INVW error-handling rules. | AMARA-910 |
+| NFR-USAB-010 | A pull request that introduces an application status *SHALL* update the status definitions in INVW and the glossary in the same pull request. | AMARA-911 |
+| NFR-USAB-011 | An operation that takes more than 1 second *SHALL* show progress or a busy state. | AMARA-912 |
+| NFR-USAB-012 | An operation that takes more than 1 second *SHALL NOT* appear frozen. | AMARA-913 |
+| NFR-USAB-013 | At least 4 of 5 first-time Candidates in a moderated application test *SHALL* complete the test without facilitator assistance. | AMARA-914 |
+| NFR-USAB-014 | The pipeline canvas *SHALL* support undo for at least 10 editing actions. | AMARA-915 |
+| NFR-USAB-015 | The pipeline canvas *SHALL* provide a non-drag method to add and connect a stage. | AMARA-916 |
 
 **Drives:** usability test script before the milestone, canvas undo stack, shared status enum with the glossary, and empty-state components.
 
@@ -466,23 +466,23 @@ WCAG 2.2 Level AA. axe-core for the automated slice. Egypt Law No. 10 of 2018 on
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-ACC-001 | The apply flow, sign-in, posting form, dashboard, and Candidate application view *SHOULD* conform to WCAG 2.2 Level AA. | TBD |
-| NFR-ACC-002 | Every action, including adding, connecting, and deleting a pipeline stage, *SHOULD* be operable by keyboard alone. | TBD |
-| NFR-ACC-003 | Text *SHOULD* have a contrast ratio of at least 4.5:1; large text and UI components *SHOULD* have a contrast ratio of at least 3:1. | TBD |
-| NFR-ACC-004 | Pages *COULD* remain usable at 200% text zoom. | TBD |
-| NFR-ACC-006 | The UI *COULD* honor `prefers-reduced-motion`. | TBD |
-| NFR-ACC-007 | Interactive controls *SHOULD* have an accessible name. | TBD |
-| NFR-ACC-008 | Touch and click targets on the apply flow *COULD* be at least 24 by 24 CSS pixels. | TBD |
-| NFR-ACC-009 | An axe-core (or equivalent) scan in CI *SHOULD* report zero critical or serious accessibility violations on the routes in `NFR-ACC-001`. | TBD |
-| NFR-ACC-010 | A manual accessibility test using a keyboard and one screen reader (NVDA or VoiceOver) *SHOULD* be recorded before each milestone. | TBD |
-| NFR-ACC-011 | Focus *SHOULD* be visible for all keyboard-operable controls. | TBD |
-| NFR-ACC-012 | The user interface *SHOULD NOT* contain a keyboard trap. | TBD |
-| NFR-ACC-013 | The pipeline canvas *SHOULD* provide the non-drag alternative in `NFR-USAB-015`. | TBD |
-| NFR-ACC-014 | The apply flow *COULD* reflow at a 320 px width without requiring two-dimensional scrolling. | TBD |
-| NFR-ACC-015 | Motion that plays longer than 5 seconds *COULD* include a pause control. | TBD |
-| NFR-ACC-016 | Status changes that occur without a page load, including stage advances, offer responses, and notification arrivals, *SHOULD* be announced to assistive technology. | TBD |
-| NFR-ACC-017 | The page language *SHOULD* match the selected locale and include `dir="rtl"` for Arabic. | TBD |
-| NFR-ACC-018 | Pipeline state (passed, rejected, current, and held) *SHOULD* use an icon or text as well as color. | TBD |
+| NFR-ACC-001 | The apply flow, sign-in, posting form, dashboard, and Candidate application view *SHOULD* conform to WCAG 2.2 Level AA. | AMARA-917 |
+| NFR-ACC-002 | Every action, including adding, connecting, and deleting a pipeline stage, *SHOULD* be operable by keyboard alone. | AMARA-918 |
+| NFR-ACC-003 | Text *SHOULD* have a contrast ratio of at least 4.5:1; large text and UI components *SHOULD* have a contrast ratio of at least 3:1. | AMARA-919 |
+| NFR-ACC-004 | Pages *COULD* remain usable at 200% text zoom. | AMARA-920 |
+| NFR-ACC-006 | The UI *COULD* honor `prefers-reduced-motion`. | AMARA-921 |
+| NFR-ACC-007 | Interactive controls *SHOULD* have an accessible name. | AMARA-922 |
+| NFR-ACC-008 | Touch and click targets on the apply flow *COULD* be at least 24 by 24 CSS pixels. | AMARA-923 |
+| NFR-ACC-009 | An axe-core (or equivalent) scan in CI *SHOULD* report zero critical or serious accessibility violations on the routes in `NFR-ACC-001`. | AMARA-924 |
+| NFR-ACC-010 | A manual accessibility test using a keyboard and one screen reader (NVDA or VoiceOver) *SHOULD* be recorded before each milestone. | AMARA-925 |
+| NFR-ACC-011 | Focus *SHOULD* be visible for all keyboard-operable controls. | AMARA-926 |
+| NFR-ACC-012 | The user interface *SHOULD NOT* contain a keyboard trap. | AMARA-927 |
+| NFR-ACC-013 | The pipeline canvas *SHOULD* provide the non-drag alternative in `NFR-USAB-015`. | AMARA-928 |
+| NFR-ACC-014 | The apply flow *COULD* reflow at a 320 px width without requiring two-dimensional scrolling. | AMARA-929 |
+| NFR-ACC-015 | Motion that plays longer than 5 seconds *COULD* include a pause control. | AMARA-930 |
+| NFR-ACC-016 | Status changes that occur without a page load, including stage advances, offer responses, and notification arrivals, *SHOULD* be announced to assistive technology. | AMARA-931 |
+| NFR-ACC-017 | The page language *SHOULD* match the selected locale and include `dir="rtl"` for Arabic. | AMARA-932 |
+| NFR-ACC-018 | Pipeline state (passed, rejected, current, and held) *SHOULD* use an icon or text as well as color. | AMARA-933 |
 
 **Drives:** axe-core CI job, keyboard stage editor, status icon set, locale `lang` and `dir` on the document.
 
@@ -506,19 +506,19 @@ Core Web Vitals (LCP, INP, CLS). Latency is server time plus network, at the per
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-PERF-001 | On the apply page and sign-in page, the 75th percentile of field loads *SHALL* meet LCP of at most 2.5 s, INP of at most 200 ms, and CLS of at most 0.1 on desktop broadband. | TBD |
-| NFR-PERF-002 | Read APIs used by the posting form and Candidate application view *SHALL* respond within 300 ms for 95% of requests and within 800 ms for 99% of requests at T1 concurrency, excluding the client's network. | TBD |
-| NFR-PERF-003 | Job search *SHALL* return the first page of results within 2 seconds for 95% of requests at 500 concurrent users. | TBD |
-| NFR-PERF-004 | Application submission *SHALL* return an acknowledgement within 1 second for 95% of requests at the burst in `NFR-CAP-017`, after the durable write in `NFR-REL-007`. | TBD |
-| NFR-PERF-005 | Must-have screening *SHALL* finish within 30 seconds for 95% of submissions at T1 load. | TBD |
-| NFR-PERF-006 | Email and in-product notifications with a 10-minute functional deadline *SHALL* be attempted within 2 minutes for 95% of events at T1 volume. | TBD |
-| NFR-PERF-007 | The Hiring Manager dashboard *SHALL* show stage counts for a posting of 1,000 applications within 3 seconds for 95% of loads. | TBD |
-| NFR-PERF-008 | The gzipped JavaScript for the apply route *SHALL* be at most 200 KB. | TBD |
-| NFR-PERF-009 | A Lighthouse performance run on the apply route *SHOULD* be stored each milestone. A drop of more than 5 points from the previous milestone *SHOULD* be fixed or accepted in writing by the epic owner before release. | TBD |
-| NFR-PERF-011 | Must-have screening *SHALL* finish within 60 seconds for 100% of submissions when its queue is not delayed (NFR-REL-009). | TBD |
-| NFR-PERF-012 | Email and in-product notifications with a 10-minute functional deadline *SHALL* be attempted within 10 minutes for 100% of events, except during a provider outage; failed attempts *SHALL* be retried per the INVW error-handling rules. | TBD |
-| NFR-PERF-013 | The pipeline canvas *SHALL* render 50 stages within 2 seconds. | TBD |
-| NFR-PERF-014 | List endpoints *SHALL* be paginated with a default page size of at most 50 and *SHALL NOT* return an unbounded collection. | TBD |
+| NFR-PERF-001 | On the apply page and sign-in page, the 75th percentile of field loads *SHALL* meet LCP of at most 2.5 s, INP of at most 200 ms, and CLS of at most 0.1 on desktop broadband. | AMARA-934 |
+| NFR-PERF-002 | Read APIs used by the posting form and Candidate application view *SHALL* respond within 300 ms for 95% of requests and within 800 ms for 99% of requests at T1 concurrency, excluding the client's network. | AMARA-935 |
+| NFR-PERF-003 | Job search *SHALL* return the first page of results within 2 seconds for 95% of requests at 500 concurrent users. | AMARA-936 |
+| NFR-PERF-004 | Application submission *SHALL* return an acknowledgement within 1 second for 95% of requests at the burst in `NFR-CAP-017`, after the durable write in `NFR-REL-007`. | AMARA-937 |
+| NFR-PERF-005 | Must-have screening *SHALL* finish within 30 seconds for 95% of submissions at T1 load. | AMARA-938 |
+| NFR-PERF-006 | Email and in-product notifications with a 10-minute functional deadline *SHALL* be attempted within 2 minutes for 95% of events at T1 volume. | AMARA-939 |
+| NFR-PERF-007 | The Hiring Manager dashboard *SHALL* show stage counts for a posting of 1,000 applications within 3 seconds for 95% of loads. | AMARA-940 |
+| NFR-PERF-008 | The gzipped JavaScript for the apply route *SHALL* be at most 200 KB. | AMARA-941 |
+| NFR-PERF-009 | A Lighthouse performance run on the apply route *SHOULD* be stored each milestone. A drop of more than 5 points from the previous milestone *SHOULD* be fixed or accepted in writing by the epic owner before release. | AMARA-942 |
+| NFR-PERF-011 | Must-have screening *SHALL* finish within 60 seconds for 100% of submissions when its queue is not delayed (NFR-REL-009). | AMARA-943 |
+| NFR-PERF-012 | Email and in-product notifications with a 10-minute functional deadline *SHALL* be attempted within 10 minutes for 100% of events, except during a provider outage; failed attempts *SHALL* be retried per the INVW error-handling rules. | AMARA-944 |
+| NFR-PERF-013 | The pipeline canvas *SHALL* render 50 stages within 2 seconds. | AMARA-945 |
+| NFR-PERF-014 | List endpoints *SHALL* be paginated with a default page size of at most 50 and *SHALL NOT* return an unbounded collection. | AMARA-946 |
 
 **Drives:** CDN or static hosting for Next.js assets, pagination on list queries, screening worker pool sized for T1, bundle-size check.
 
@@ -544,24 +544,24 @@ Go and Node.js release lines current as of this draft. Container platform on AWS
 #### Requirements
 | ID | Requirement | Jira |
 |----|-------------|------|
-| NFR-ENV-001 | CI *SHALL* build the backend with a pinned Go 1.23 or later patch release. | TBD |
-| NFR-ENV-002 | Production *SHALL* run in one region selected for Cairo users, on AWS or Azure container hosting. | TBD |
-| NFR-ENV-003 | Production *SHALL* run only as containers. | TBD |
-| NFR-ENV-004 | The repository *SHALL* define local, CI, staging, and production environments that use the same container image. | TBD |
-| NFR-ENV-005 | The client *SHALL* preserve module answers through a dropped connection using the autosave rule in `NFR-REL-008`. | TBD |
-| NFR-ENV-006 | T1 production *SHALL* be sized to the spend cap in `NFR-SCAL-005`. | TBD |
-| NFR-ENV-008 | CI *SHALL* build the frontend with a pinned Node.js 22 LTS release. | TBD |
-| NFR-ENV-009 | A runtime version bump *SHALL* update the Dockerfiles and CI image in the same pull request. | TBD |
-| NFR-ENV-010 | Local development *SHALL* use the same major Go and Node.js versions as CI. | TBD |
-| NFR-ENV-011 | A pre-deployment measurement *SHALL* confirm the selected production region has a median HTTPS round trip from Cairo of at most 100 ms. | TBD |
-| NFR-ENV-012 | At T1, production personal data *SHALL NOT* be replicated to a second region. | TBD |
-| NFR-ENV-013 | Production *SHALL NOT* depend on a manually configured virtual machine that deployment does not recreate from code. | TBD |
-| NFR-ENV-014 | Base container images *SHALL* be pinned by digest in the Dockerfile. | TBD |
-| NFR-ENV-015 | Staging *SHALL* use synthetic data only. | TBD |
-| NFR-ENV-016 | Production personal data *SHALL NOT* be copied to local or CI environments. | TBD |
-| NFR-ENV-017 | The client *SHALL* show an offline state within 5 seconds of a failed request. | TBD |
-| NFR-ENV-018 | AI inference *SHALL* use an external API. | TBD |
-| NFR-ENV-019 | A developer machine or T1 server *SHALL NOT* be required to host a GPU. | TBD |
-| NFR-ENV-020 | A future change to Egypt's daylight-saving rule *SHALL* be picked up from the platform time-zone database rather than a hardcoded offset. | TBD |
+| NFR-ENV-001 | CI *SHALL* build the backend with a pinned Go 1.23 or later patch release. | AMARA-947 |
+| NFR-ENV-002 | Production *SHALL* run in one region selected for Cairo users, on AWS or Azure container hosting. | AMARA-948 |
+| NFR-ENV-003 | Production *SHALL* run only as containers. | AMARA-949 |
+| NFR-ENV-004 | The repository *SHALL* define local, CI, staging, and production environments that use the same container image. | AMARA-950 |
+| NFR-ENV-005 | The client *SHALL* preserve module answers through a dropped connection using the autosave rule in `NFR-REL-008`. | AMARA-951 |
+| NFR-ENV-006 | T1 production *SHALL* be sized to the spend cap in `NFR-SCAL-005`. | AMARA-952 |
+| NFR-ENV-008 | CI *SHALL* build the frontend with a pinned Node.js 22 LTS release. | AMARA-953 |
+| NFR-ENV-009 | A runtime version bump *SHALL* update the Dockerfiles and CI image in the same pull request. | AMARA-954 |
+| NFR-ENV-010 | Local development *SHALL* use the same major Go and Node.js versions as CI. | AMARA-955 |
+| NFR-ENV-011 | A pre-deployment measurement *SHALL* confirm the selected production region has a median HTTPS round trip from Cairo of at most 100 ms. | AMARA-956 |
+| NFR-ENV-012 | At T1, production personal data *SHALL NOT* be replicated to a second region. | AMARA-957 |
+| NFR-ENV-013 | Production *SHALL NOT* depend on a manually configured virtual machine that deployment does not recreate from code. | AMARA-958 |
+| NFR-ENV-014 | Base container images *SHALL* be pinned by digest in the Dockerfile. | AMARA-959 |
+| NFR-ENV-015 | Staging *SHALL* use synthetic data only. | AMARA-960 |
+| NFR-ENV-016 | Production personal data *SHALL NOT* be copied to local or CI environments. | AMARA-961 |
+| NFR-ENV-017 | The client *SHALL* show an offline state within 5 seconds of a failed request. | AMARA-962 |
+| NFR-ENV-018 | AI inference *SHALL* use an external API. | AMARA-963 |
+| NFR-ENV-019 | A developer machine or T1 server *SHALL NOT* be required to host a GPU. | AMARA-964 |
+| NFR-ENV-020 | A future change to Egypt's daylight-saving rule *SHALL* be picked up from the platform time-zone database rather than a hardcoded offset. | AMARA-965 |
 
 **Drives:** pinned Dockerfiles, a one-region Terraform stack, a staging project with synthetic data, an offline banner, and zone-database time formatting.
