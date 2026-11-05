@@ -245,6 +245,36 @@ paths:
         '500':
           $ref: '#/components/responses/PostingError'
 
+  /v1/jobs/{id}/apply:
+    parameters:
+      - $ref: '#/components/parameters/JobPostingId'
+    post:
+      summary: Apply to a published job posting
+      description: Submits the authenticated candidate and screens them against every Amara configured on the posting. Passing candidates are admitted; candidates missing any required Amara are screened out, with missing Amarat recorded.
+      operationId: applyToJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      responses:
+        '201':
+          description: Application submitted and screened
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobApplication'
+        '400':
+          $ref: '#/components/responses/PostingError'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '404':
+          $ref: '#/components/responses/PostingError'
+        '409':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
+
   /api/v1/auth/registrations:
     post:
       summary: Register a candidate or interviewer
@@ -737,6 +767,35 @@ components:
           type: string
         description:
           type: [string, 'null']
+
+    JobApplication:
+      type: object
+      required: [id, reference_number, posting_id, status, submitted_at, screened_out, screening_completed_at, failed_amarat]
+      properties:
+        id:
+          type: string
+          format: uuid
+        reference_number:
+          type: integer
+          format: int32
+        posting_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [admitted, screened_out]
+        submitted_at:
+          type: string
+          format: date-time
+        screened_out:
+          type: boolean
+        screening_completed_at:
+          type: string
+          format: date-time
+        failed_amarat:
+          type: array
+          items:
+            type: string
 
     JobPostingList:
       type: object
