@@ -1,0 +1,12 @@
+# Never send secrets or artifacts to the daemon build context.
+.git
+.github
+bin/
+docs/
+local-plans/
+web/
+.env
+.env.*
+!*.example
+*.log
+coverage.*
