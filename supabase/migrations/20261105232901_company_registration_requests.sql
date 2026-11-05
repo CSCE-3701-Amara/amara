@@ -1,4 +1,3 @@
--- +goose Up
 CREATE TABLE auth_company_registration_requests (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     company_name        TEXT NOT NULL,
@@ -18,8 +17,3 @@ CREATE UNIQUE INDEX auth_company_registration_email_idx
 CREATE UNIQUE INDEX auth_company_registration_number_idx
     ON auth_company_registration_requests (lower(registration_number))
     WHERE status IN ('pending_review', 'approved');
-
--- +goose Down
-DROP INDEX auth_company_registration_number_idx;
-DROP INDEX auth_company_registration_email_idx;
-DROP TABLE auth_company_registration_requests;
