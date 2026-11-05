@@ -70,7 +70,7 @@ type FindCredentialsRow struct {
 	PasswordHash    []byte
 	Salt            []byte
 	AccountStatus   string
-	Deactivated     interface{}
+	Deactivated     pgtype.Bool
 	Banned          bool
 	CompanyID       interface{}
 	CompanyApproved bool

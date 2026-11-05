@@ -31,10 +31,10 @@ func (r *RegistrationRepository) FindCredentials(ctx context.Context, email stri
 		}
 		return ports.Credentials{}, fmt.Errorf("query login credentials: %w", err)
 	}
-	deactivated, ok := row.Deactivated.(bool)
-	if !ok {
+	if !row.Deactivated.Valid {
 		return ports.Credentials{}, fmt.Errorf("query login credentials: invalid deactivated value")
 	}
+	deactivated := row.Deactivated.Bool
 	companyID, ok := row.CompanyID.(string)
 	if !ok {
 		return ports.Credentials{}, fmt.Errorf("query login credentials: invalid company id")
