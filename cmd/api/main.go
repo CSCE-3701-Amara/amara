@@ -66,10 +66,13 @@ func run() error {
 	// AUTH integration placeholder: the current checkout has no session middleware.
 	// The handler fails closed until AUTH supplies a middleware that sets its principal.
 	postingHandler := jobhttp.NewPostingHandler(postingService, nil)
+	applicationRepo := jobdatabase.NewApplicationRepository(dbSvc.Pool())
+	applicationService := jobapplication.NewApplicationAdmission(applicationRepo)
+	applicationHandler := jobhttp.NewApplicationHandler(applicationService, nil)
 	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
 	feedHandler := candhttp.NewJobFeedHandler(candapplication.NewJobFeed(feedRepo, jobLifecycle), nil)
 	// Frontend integration placeholder: this REST API is the contract for the future posting editor.
-	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, feedHandler.RegisterRoutes, postingHandler.RegisterRoutes)
+	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, feedHandler.RegisterRoutes, postingHandler.RegisterRoutes, applicationHandler.RegisterRoutes)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
 	}
