@@ -14,6 +14,7 @@ import (
 	candhttp "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http"
 	candapplication "github.com/CSCE-3701-Amara/amara/internal/cand/application"
 	jobdatabase "github.com/CSCE-3701-Amara/amara/internal/job/adapters/database"
+	jobhttp "github.com/CSCE-3701-Amara/amara/internal/job/adapters/http"
 	jobapplication "github.com/CSCE-3701-Amara/amara/internal/job/application"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/config"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/database"
@@ -60,9 +61,15 @@ func run() error {
 
 	jobLifecycleRepo := jobdatabase.NewPostingLifecycleRepository(dbSvc.Pool())
 	jobLifecycle := jobapplication.NewPostingLifecycle(jobLifecycleRepo)
+	postingRepo := jobdatabase.NewPostingManagementRepository(dbSvc.Pool())
+	postingService := jobapplication.NewPostingManagement(postingRepo)
+	// AUTH integration placeholder: the current checkout has no session middleware.
+	// The handler fails closed until AUTH supplies a middleware that sets its principal.
+	postingHandler := jobhttp.NewPostingHandler(postingService, nil)
 	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
 	feedHandler := candhttp.NewJobFeedHandler(candapplication.NewJobFeed(feedRepo, jobLifecycle), nil)
-	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, feedHandler.RegisterRoutes)
+	// Frontend integration placeholder: this REST API is the contract for the future posting editor.
+	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, feedHandler.RegisterRoutes, postingHandler.RegisterRoutes)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
 	}
