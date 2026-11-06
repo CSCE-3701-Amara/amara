@@ -6,7 +6,7 @@ import (
 	"crypto/cipher"
 	"crypto/hmac"
 	"crypto/rand"
-	"crypto/sha1" // #nosec G505 -- TOTP per RFC 6238 must support SHA-1 for authenticator compatibility.
+	"crypto/sha1" // #nosec G505 -- RFC 6238 HMAC-SHA-1 is used for compatibility with existing authenticator enrollments.
 	"encoding/base32"
 	"encoding/binary"
 	"errors"
@@ -164,7 +164,11 @@ func verifyTOTP(secret []byte, code string, now time.Time) bool {
 	if _, err := strconv.Atoi(code); err != nil {
 		return false
 	}
-	current := now.Unix() / int64(totpPeriod/time.Second)
+	seconds := now.Unix()
+	if seconds < 0 {
+		return false
+	}
+	current := seconds / int64(totpPeriod/time.Second)
 	for offset := int64(-1); offset <= 1; offset++ {
 		if hmac.Equal([]byte(generateTOTP(secret, current+offset)), []byte(code)) {
 			return true

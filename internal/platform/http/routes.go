@@ -11,8 +11,9 @@ import (
 	"github.com/CSCE-3701-Amara/amara/internal/platform/database"
 )
 
-// RouteRegistrar mounts a module's HTTP handlers under /v1. Each module applies
-// its own authentication and authorization middleware to protected routes.
+// RouteRegistrar mounts a module's HTTP handlers under /v1. Each
+// module applies its own authentication and authorization to protected routes;
+// the platform middleware wraps every route.
 type RouteRegistrar func(*gin.RouterGroup)
 
 func newRouter(cfg config.HTTPConfig, logger *slog.Logger, dbSvc database.Service, registrars ...RouteRegistrar) (*gin.Engine, error) {
@@ -65,13 +66,6 @@ func registerRoutes(router *gin.Engine, dbSvc database.Service, registrars ...Ro
 	v1 := router.Group("/v1")
 	for _, register := range registrars {
 		register(v1)
-	}
-	// AUTH is documented under /api/v1 while existing module routes use /v1.
-	// Mounting the same registrars at both prefixes preserves the existing API
-	// while exposing the contract path.
-	apiV1 := router.Group("/api/v1")
-	for _, register := range registrars {
-		register(apiV1)
 	}
 	router.NoRoute(func(c *gin.Context) {
 		writeError(c, http.StatusNotFound, "not_found", "The requested resource was not found.")
