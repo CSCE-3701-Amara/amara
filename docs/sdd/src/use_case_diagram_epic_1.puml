@@ -22,7 +22,7 @@ rectangle "AUTH" {
     
     package "Profiles and Documents" {
         usecase "Modify Profile" as UC_AUTH_005
-        usecase "Deactivate/Delete Profile" as UC_AUTH_006
+        usecase "Deactivate/Delete Account" as UC_AUTH_006
         usecase "Share Profile" as UC_AUTH_007
         usecase "Upload Supporting Documents" as UC_AUTH_008
         usecase "View Public Company Profile" as UC_AUTH_012
@@ -57,6 +57,8 @@ UC_AUTH_003 -- Candidate
 UC_AUTH_004 -- Candidate
 UC_AUTH_005 -- Candidate
 UC_AUTH_006 -- Candidate
+UC_AUTH_006 -- Interviewer
+UC_AUTH_006 -- HM
 UC_AUTH_007 -- Candidate
 UC_AUTH_008 -- Candidate
 UC_AUTH_009 -- Candidate

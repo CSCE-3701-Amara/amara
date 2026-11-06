@@ -16,11 +16,11 @@ Owner: All | Status: Draft | Last updated: 2026-10-18 | Jira: AMARA-32
 #### UC-AUTH-001: Candidate or Interviewer Registration
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Guest, System, Company Representative (optional) |
+|**Actor(s)**| Guest, System, Hiring Manager (optional) |
 |**Preconditions**| The user does not have an account of the selected type. For interviewer registration, the user has a claimed association with a company that may be verified during registration. |
 |**Trigger**| A user opens the candidate or interviewer registration page. |
 | **Main Flow** | 1. The user selects the account type and enters their personal information, email address, and password.<br>2. For interviewer registration, the user enters company association information.<br>3. The user clicks **Register**.<br>4. The system validates the password, registration information, and email format.<br>5. The system verifies that the email address is not already registered.<br>6. For interviewer registration, the system validates the user's association with an approved company.<br>7. The system creates the account with the collected data and, for interviewers, associates it with the company.<br>8. The system sends a verification code to the user's email and redirects the user to the verification page.<br>9. The user enters the verification code.<br>10. The system checks the code and activates the account.|
-|**Alternative Flows**|**Candidate MFA setup**: After activation, the candidate may choose to set up MFA, and the system associates the MFA method with the account.<br>**Interviewer MFA setup**: After email activation, the interviewer must set up MFA before the account can be used to log in.<br>**Interviewer company confirmation**: The system asks a company representative to confirm the interviewer's claimed association before activating the account.|
+|**Alternative Flows**|**Candidate MFA setup**: After activation, the candidate may choose to set up MFA, and the system associates the MFA method with the account.<br>**Interviewer MFA setup**: After email activation, the interviewer must set up MFA before the account can be used to log in.<br>**Interviewer company confirmation**: The system asks a hiring manager to confirm the interviewer's claimed association before activating the account.|
 |**Exception Flows**|**Invalid registration information**: The system displays an error message.<br>**Company association cannot be verified**: The system does not activate the interviewer account and informs the user of the required next step.<br>**The user does not receive the code**: The user requests a new verification code, and the system sends it to the registered email address.<br>**Invalid verification code**: The system displays an error message and allows the user to re-enter the code or request a new verification code.|
 |**Postconditions**|The user has an active candidate or interviewer account and can login.|
 
@@ -37,22 +37,22 @@ Owner: All | Status: Draft | Last updated: 2026-10-18 | Jira: AMARA-32
 #### UC-AUTH-003: User Login
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Candidate, Company Representative, Interviewer, System |
+|**Actor(s)**| Candidate, Hiring Manager, Interviewer, System |
 |**Preconditions**| The user has a registered and activated account. Company representatives must have an approved company account with MFA configured. Interviewers must have an active association with an approved company and MFA configured. |
 |**Trigger**| The user opens the login page. |
 | **Main Flow** | 1. The user enters their email address and password.<br>2. The user clicks **Login**.<br>3. The system validates the credentials.<br>4. The system checks that the account is activated and not deactivated or banned.<br>5. The system applies the authentication requirements for the user's account type.<br>6. The system creates an authenticated session with permissions scoped to the user's role and, where applicable, associated company.<br>7. The system redirects the user to the appropriate page or company workspace.|
-|**Alternative Flows**|**MFA verification**: If MFA is configured, the system requests and validates the user's MFA code.<br>**Candidate social login**: The candidate chooses Google, GitHub, or LinkedIn, authenticates with the selected provider, and the system creates an authenticated session.<br>**Company MFA**: The system requires and validates the company representative's MFA code. Login is prevented if MFA is not configured.<br>**Interviewer MFA**: The system requires and validates the interviewer's MFA code. Login is prevented if MFA is not configured.<br>**Interviewer company access**: The system verifies the interviewer's company association before creating the session.|
+|**Alternative Flows**|**MFA verification**: If MFA is configured, the system requests and validates the user's MFA code.<br>**Candidate social login**: The candidate chooses Google, GitHub, or LinkedIn, authenticates with the selected provider, and the system creates an authenticated session.<br>**Company MFA**: The system requires and validates the hiring manager's MFA code. Login is prevented if MFA is not configured.<br>**Interviewer MFA**: The system requires and validates the interviewer's MFA code. Login is prevented if MFA is not configured.<br>**Interviewer company access**: The system verifies the interviewer's company association before creating the session.|
 |**Exception Flows**|**Invalid credentials**: The system displays an error message and does not create a session.<br>**Account is not activated**: The system informs the user that activation is required and offers to resend the activation code.<br>**Invalid MFA code**: The system displays an error message and allows the user to try again.<br>**Company association is no longer valid**: The system prevents interviewer login and informs the interviewer that access must be reviewed.<br>**Forgotten password**: The user requests a password reset, verifies their identity through email, and sets a new password before trying again.|
 |**Postconditions**|The user has an authenticated session and can access resources permitted by their role and associated company.|
 
 #### UC-AUTH-004: Submit Report
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Candidate, Company Representative, System Admin, System |
+|**Actor(s)**| Candidate, Hiring Manager, System Admin, System |
 |**Preconditions**| The reporting user is authenticated and can view the target information permitted by their role. |
 |**Trigger**| The user selects the option to report a company or candidate. |
 | **Main Flow** | 1. The user opens the target's available profile or record.<br>2. The user selects **Report Company** or **Report Candidate**.<br>3. The user enters the reason and supporting details.<br>4. The user submits the report.<br>5. The system validates and records the report.<br>6. The system notifies system admins that a report has been submitted.<br>7. A system admin reviews the report and takes the appropriate action.|
-|**Alternative Flows**|**Report a company**: A candidate reports a company profile.<br>**Report a candidate**: A company representative reports a candidate profile or test record.|
+|**Alternative Flows**|**Report a company**: A candidate reports a company profile.<br>**Report a candidate**: A hiring manager reports a candidate profile or test record.|
 |**Exception Flows**|**Missing report details**: The system displays an error message and asks the user to complete the report.<br>**Report cannot be submitted**: The system displays an error message and allows the user to retry.|
 |**Postconditions**|The report is stored for system-admin review, or the user is informed that the report was not submitted.|
 
@@ -66,15 +66,16 @@ Owner: All | Status: Draft | Last updated: 2026-10-18 | Jira: AMARA-32
 |**Exception Flows**|**Invalid profile information**: The system displays an error message and identifies the fields that need correction.<br>**Unauthorized access**: The system denies the action and does not change the profile.<br>**The changes cannot be saved**: The system displays an error message and preserves the current profile information.|
 |**Postconditions**|The candidate's profile contains the validated changes, or remains unchanged if validation or saving fails.|
 
-#### UC-AUTH-006: Deactivate/Delete Profile
+#### UC-AUTH-006: Deactivate/Delete Account
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Candidate, System |
-|**Preconditions**| The candidate is authenticated. |
-|**Trigger**| The candidate opens the account settings page and chooses to deactivate or delete the profile. |
-| **Main Flow** | 1. The candidate chooses **Deactivate** or **Delete**.<br>2. The system explains the result of the selected action and requests confirmation.<br>3. The candidate confirms the action.<br>4. The system validates the candidate's authenticated session.<br>5. The system deactivates or deletes the profile according to the selected action.<br>6. The system terminates the candidate's authenticated session.<br>7. The system displays a confirmation.|
-|**Exception Flows**|**The candidate cancels**: The system keeps the profile active and returns to account settings.<br>**Unauthorized or expired session**: The system denies the action and requests authentication.<br>**The action cannot be completed**: The system displays an error message and leaves the profile unchanged.|
-|**Postconditions**|The profile is deactivated or deleted, and the candidate no longer has an active authenticated session.|
+|**Actor(s)**| Candidate, Interviewer, Hiring Manager, System |
+|**Preconditions**| The user is authenticated and is acting on their own account. |
+|**Trigger**| The user opens account settings and chooses to deactivate or delete their account. |
+| **Main Flow** | 1. The user chooses **Deactivate** or **Delete**.<br>2. The system explains the result of the selected action, including any account-type-specific effects, and requests confirmation.<br>3. The user confirms the action.<br>4. The system validates the user's authenticated session and account ownership.<br>5. The system deactivates or deletes the account according to the selected action and applicable retention and lifecycle rules.<br>6. The system terminates the user's authenticated sessions.<br>7. The system displays a confirmation.|
+|**Alternative Flows**|**Hiring Manager account**: The system applies the action to the associated company account and its permitted company-scoped access according to company lifecycle rules.<br>**Interviewer account**: The system removes the interviewer's active access to the associated company while applying the selected account action.|
+|**Exception Flows**|**The user cancels**: The system keeps the account active and returns to account settings.<br>**Unauthorized or expired session**: The system denies the action and requests authentication.<br>**The action cannot be completed**: The system displays an error message and leaves the account unchanged.|
+|**Postconditions**|The user's account is deactivated or deleted according to the selected action, applicable retention rules, and account type, and the user no longer has an active authenticated session.|
 
 #### UC-AUTH-007: Share Profile
 |Field|Description|
@@ -89,7 +90,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-18 | Jira: AMARA-32
 #### UC-AUTH-008: Upload Supporting Documents
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Candidate, Company Representative, Interviewer, System |
+|**Actor(s)**| Candidate, Hiring Manager, Interviewer, System |
 |**Preconditions**| The user is authenticated |
 |**Trigger**| The user opens the document upload controls. |
 | **Main Flow** | 1. The user chooses a supporting document.<br>2. The user uploads the document.<br>3. The system validates that the document is in PDF or DOCX format and does not exceed 10 MB.<br>4. The system stores the document and associates it with the user's account.<br>5. If supported, the system extracts profile information from the document.<br>6. The system displays the extracted information for the user to review.<br>7. The user confirms the information to fill the related profile fields.<br>8. The system saves the confirmed profile information and displays a confirmation.|
@@ -100,18 +101,18 @@ Owner: All | Status: Draft | Last updated: 2026-10-18 | Jira: AMARA-32
 #### UC-AUTH-009: Submit Rating
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Candidate, Company Representative, System |
+|**Actor(s)**| Candidate, Hiring Manager, System |
 |**Preconditions**| The user is authenticated and has completed the testing interaction required to rate the target. |
 |**Trigger**| The user chooses to rate a company or candidate. |
 | **Main Flow** | 1. The user opens the target's rating form.<br>2. The user selects a rating value and enters optional supporting comments.<br>3. The user submits the rating.<br>4. The system validates that the user is eligible to rate the target.<br>5. The system records the rating and associates it with the target and the relevant testing interaction.<br>6. The system displays a confirmation.|
-|**Alternative Flows**|**Rate a company**: A candidate rates a company after completing a test or testing interaction.<br>**Rate a candidate**: A company representative rates a candidate after testing the candidate.|
+|**Alternative Flows**|**Rate a company**: A candidate rates a company after completing a test or testing interaction.<br>**Rate a candidate**: A hiring manager rates a candidate after testing the candidate.|
 |**Exception Flows**|**User is not eligible**: The system prevents the rating and displays an error message.<br>**Invalid rating**: The system displays an error message and asks the user to provide a valid rating.<br>**Rating cannot be submitted**: The system displays an error message and allows the user to retry.|
 |**Postconditions**|The eligible user's rating is recorded for the target, or no rating is recorded if validation or submission fails.|
 
 #### UC-AUTH-010: Reset Password
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Candidate, Company Representative, Interviewer, System |
+|**Actor(s)**| Candidate, Hiring Manager, Interviewer, System |
 |**Preconditions**| The user has a registered account and access to its registered email address. |
 |**Trigger**| The user selects **Forgot Password** or **Reset Password** on the login page. |
 | **Main Flow** | 1. The user enters the email address associated with their account.<br>2. The user submits the password-reset request.<br>3. The system sends a verification code to the registered email address.<br>4. The user enters the verification code.<br>5. The system verifies the user's identity.<br>6. The user enters and confirms a new password.<br>7. The system validates the new password against the password policy.<br>8. The system updates the password, invalidates existing authenticated sessions, and displays a confirmation.|
@@ -122,7 +123,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-18 | Jira: AMARA-32
 #### UC-AUTH-011: Logout
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Candidate, Company Representative, Interviewer, System |
+|**Actor(s)**| Candidate, Hiring Manager, Interviewer, System |
 |**Preconditions**| The user has an authenticated session. |
 |**Trigger**| The user selects **Logout**. |
 | **Main Flow** | 1. The user selects **Logout**.<br>2. The system terminates the user's authenticated session.<br>3. The system redirects the user to the login page.|
@@ -132,7 +133,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-18 | Jira: AMARA-32
 #### UC-AUTH-012: View Public Company Profile
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Guest, Candidate, Company Representative, System |
+|**Actor(s)**| Guest, Candidate, Hiring Manager, System |
 |**Preconditions**| The company has a public profile. |
 |**Trigger**| A visitor opens a company's public profile page. |
 |**Main Flow**| 1. The visitor opens the company profile link.<br>2. The system retrieves the company's public information.<br>3. The system displays the company information and its job postings.<br>4. The visitor selects a job posting to view its details.|
@@ -164,7 +165,7 @@ Owner: All | Status: Draft | Last updated: 2026-10-18 | Jira: AMARA-32
 #### UC-AUTH-015: Review Company Registration Requests
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| System Admin, System, Company Representative (optional)|
+|**Actor(s)**| System Admin, System, Hiring Manager (optional)|
 |**Preconditions**| The system admin is authenticated and authorized to review company registration requests. |
 |**Trigger**| The system admin opens the company registration request queue. |
 | **Main Flow** | 1. The system displays pending company registration requests.<br>2. The system admin selects a request.<br>3. The system displays the submitted company and requester information, including verification results.<br>4. The system admin reviews the request.<br>5. The system admin accepts or rejects the request.<br>6. The system records the decision and notifies the requester.|
