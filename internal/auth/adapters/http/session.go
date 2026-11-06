@@ -16,6 +16,10 @@ func CandidateAuth(validator ports.SessionValidator) gin.HandlerFunc {
 	return sessionAuth(validator, domain.AccountTypeCandidate)
 }
 
+func AuthenticatedAuth(validator ports.SessionValidator) gin.HandlerFunc {
+	return sessionAuth(validator, "")
+}
+
 func sessionAuth(validator ports.SessionValidator, requiredType domain.AccountType) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if validator == nil {
@@ -38,7 +42,7 @@ func sessionAuth(validator ports.SessionValidator, requiredType domain.AccountTy
 			})
 			return
 		}
-		if identity.AccountType != requiredType {
+		if requiredType != "" && identity.AccountType != requiredType {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"error": gin.H{"code": "forbidden", "message": "This account cannot access the requested resource."},
 			})

@@ -28,6 +28,10 @@ type SessionRepository interface {
 	CreateSession(context.Context, Session) error
 }
 
+type SessionTerminator interface {
+	TerminateSession(context.Context, string) error
+}
+
 type SessionValidator interface {
 	ValidateSession(context.Context, string) (Identity, error)
 }
