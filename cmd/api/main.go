@@ -98,7 +98,10 @@ func run() error {
 		candapplication.NewJobFeed(feedRepo, jobLifecycle),
 		authhttp.CandidateAuth(authRepo),
 	)
-	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, loginHandler.RegisterRoutes, feedHandler.RegisterRoutes, postingHandler.RegisterRoutes, applicationHandler.RegisterRoutes)
+	trackingRepo := canddatabase.NewApplicationTrackingRepository(dbSvc.Pool())
+	trackingHandler := candhttp.NewApplicationTrackingHandler(trackingRepo, authRepo)
+	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, loginHandler.RegisterRoutes,
+		feedHandler.RegisterRoutes, postingHandler.RegisterRoutes, applicationHandler.RegisterRoutes, trackingHandler.RegisterRoutes)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
 	}
