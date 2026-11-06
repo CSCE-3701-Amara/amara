@@ -101,6 +101,14 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("create logout handler: %w", err)
 	}
+	accountActionService, err := authapplication.NewAccountActionService(authRepo)
+	if err != nil {
+		return fmt.Errorf("create account action service: %w", err)
+	}
+	accountActionHandler, err := authhttp.NewAccountActionHandler(accountActionService, authRepo, logger)
+	if err != nil {
+		return fmt.Errorf("create account action handler: %w", err)
+	}
 
 	jobLifecycleRepo := jobdatabase.NewPostingLifecycleRepository(dbSvc.Pool())
 	jobLifecycle := jobapplication.NewPostingLifecycle(jobLifecycleRepo)
@@ -124,6 +132,7 @@ func run() error {
 		companyRegistrationHandler.RegisterRoutes,
 		loginHandler.RegisterRoutes,
 		logoutHandler.RegisterRoutes,
+		accountActionHandler.RegisterRoutes,
 		feedHandler.RegisterRoutes,
 		postingHandler.RegisterRoutes,
 		applicationHandler.RegisterRoutes,

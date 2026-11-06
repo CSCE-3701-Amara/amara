@@ -69,6 +69,45 @@ func (r *RegistrationRepository) TerminateSession(ctx context.Context, token str
 	return r.queries.TerminateSession(ctx, token)
 }
 
+func (r *RegistrationRepository) PerformAccountAction(ctx context.Context, accountID, sessionToken string, action domain.AccountAction) error {
+	if r == nil || r.pool == nil {
+		return errors.New("account action database is not configured")
+	}
+	accountID = strings.TrimSpace(accountID)
+	sessionToken = strings.TrimSpace(sessionToken)
+	if accountID == "" || sessionToken == "" {
+		return domain.ErrInvalidSession
+	}
+	if err := action.Validate(); err != nil {
+		return err
+	}
+
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("begin account action: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	column := "deactivated_at"
+	if action == domain.AccountActionDelete {
+		column = "deleted_at"
+	}
+	result, err := tx.Exec(ctx, "UPDATE candidates SET "+column+" = now(), updated_at = now() WHERE id = $1::uuid AND deleted_at IS NULL AND deactivated_at IS NULL", accountID)
+	if err != nil {
+		return fmt.Errorf("update candidate account: %w", err)
+	}
+	if result.RowsAffected() == 0 {
+		return domain.ErrInvalidSession
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM auth_sessions WHERE account_id = $1::uuid AND account_type = 'candidate'`, accountID); err != nil {
+		return fmt.Errorf("terminate account session: %w", err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit account action: %w", err)
+	}
+	return nil
+}
+
 func NewRegistrationRepository(pool *pgxpool.Pool) (*RegistrationRepository, error) {
 	if pool == nil {
 		return nil, errors.New("database pool must not be nil")
