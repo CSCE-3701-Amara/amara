@@ -33,7 +33,7 @@ type SessionTerminator interface {
 }
 
 type AccountActionRepository interface {
-	PerformAccountAction(context.Context, string, string, domain.AccountAction) error
+	PerformAccountAction(context.Context, string, string, domain.AccountType, domain.AccountAction) error
 }
 
 type SessionValidator interface {

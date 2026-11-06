@@ -69,7 +69,7 @@ func (r *RegistrationRepository) TerminateSession(ctx context.Context, token str
 	return r.queries.TerminateSession(ctx, token)
 }
 
-func (r *RegistrationRepository) PerformAccountAction(ctx context.Context, accountID, sessionToken string, action domain.AccountAction) error {
+func (r *RegistrationRepository) PerformAccountAction(ctx context.Context, accountID, sessionToken string, accountType domain.AccountType, action domain.AccountAction) error {
 	if r == nil || r.pool == nil {
 		return errors.New("account action database is not configured")
 	}
@@ -80,6 +80,10 @@ func (r *RegistrationRepository) PerformAccountAction(ctx context.Context, accou
 	}
 	if err := action.Validate(); err != nil {
 		return err
+	}
+	table, sessionType := accountActionTable(accountType)
+	if table == "" {
+		return domain.ErrInvalidSession
 	}
 
 	tx, err := r.pool.Begin(ctx)
@@ -92,20 +96,33 @@ func (r *RegistrationRepository) PerformAccountAction(ctx context.Context, accou
 	if action == domain.AccountActionDelete {
 		column = "deleted_at"
 	}
-	result, err := tx.Exec(ctx, "UPDATE candidates SET "+column+" = now(), updated_at = now() WHERE id = $1::uuid AND deleted_at IS NULL AND deactivated_at IS NULL", accountID)
+	result, err := tx.Exec(ctx, "UPDATE "+table+" SET "+column+" = now(), updated_at = now() WHERE id = $1::uuid AND deleted_at IS NULL AND deactivated_at IS NULL", accountID)
 	if err != nil {
-		return fmt.Errorf("update candidate account: %w", err)
+		return fmt.Errorf("update %s account: %w", string(accountType), err)
 	}
 	if result.RowsAffected() == 0 {
 		return domain.ErrInvalidSession
 	}
-	if _, err := tx.Exec(ctx, `DELETE FROM auth_sessions WHERE account_id = $1::uuid AND account_type = 'candidate'`, accountID); err != nil {
+	if _, err := tx.Exec(ctx, `DELETE FROM auth_sessions WHERE account_id = $1::uuid AND account_type = $2`, accountID, sessionType); err != nil {
 		return fmt.Errorf("terminate account session: %w", err)
 	}
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("commit account action: %w", err)
 	}
 	return nil
+}
+
+func accountActionTable(accountType domain.AccountType) (string, string) {
+	switch accountType {
+	case domain.AccountTypeCandidate:
+		return "candidates", string(domain.AccountTypeCandidate)
+	case domain.AccountTypeInterviewer:
+		return "interviewers", string(domain.AccountTypeInterviewer)
+	case domain.AccountTypeCompany:
+		return "companies", string(domain.AccountTypeCompany)
+	default:
+		return "", ""
+	}
 }
 
 func NewRegistrationRepository(pool *pgxpool.Pool) (*RegistrationRepository, error) {

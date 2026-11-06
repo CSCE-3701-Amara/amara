@@ -35,7 +35,7 @@ func NewAccountActionHandler(service *application.AccountActionService, validato
 }
 
 func (h *AccountActionHandler) RegisterRoutes(group *gin.RouterGroup) {
-	group.POST("/auth/account-actions", CandidateAuth(h.validator), func(c *gin.Context) {
+	group.POST("/auth/account-actions", AuthenticatedAuth(h.validator), func(c *gin.Context) {
 		identity, ok := Identity(c)
 		if !ok {
 			writeProblem(c.Writer, http.StatusInternalServerError, "internal_error", "An internal server error occurred.")
@@ -79,7 +79,7 @@ func (h *AccountActionHandler) serveHTTP(writer http.ResponseWriter, request *ht
 		writeProblem(writer, http.StatusUnauthorized, "authentication_required", "Authentication is required.")
 		return
 	}
-	if err := h.service.Perform(request.Context(), identity.AccountID, cookie.Value, action); err != nil {
+	if err := h.service.Perform(request.Context(), identity.AccountID, cookie.Value, identity.AccountType, action); err != nil {
 		if errors.Is(err, domain.ErrInvalidSession) {
 			writeProblem(writer, http.StatusUnauthorized, "authentication_required", "Authentication is required.")
 			return
