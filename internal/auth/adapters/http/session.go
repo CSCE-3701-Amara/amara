@@ -16,6 +16,10 @@ func CandidateAuth(validator ports.SessionValidator) gin.HandlerFunc {
 	return sessionAuth(validator, domain.AccountTypeCandidate)
 }
 
+func CompanyAuth(validator ports.SessionValidator) gin.HandlerFunc {
+	return sessionAuth(validator, domain.AccountTypeCompany)
+}
+
 func sessionAuth(validator ports.SessionValidator, requiredType domain.AccountType) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if validator == nil {
