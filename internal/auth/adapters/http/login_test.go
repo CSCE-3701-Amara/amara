@@ -61,7 +61,11 @@ func newTestLoginHandler(t *testing.T, credentials ports.Credentials, mfaErr, se
 	if err != nil {
 		t.Fatal(err)
 	}
-	return &LoginHandler{service: service}
+	handler, err := NewLoginHandler(service)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return handler
 }
 
 func testCredentials(accountType domain.AccountType) ports.Credentials {
@@ -180,6 +184,9 @@ func TestLoginHandlerMapsServiceErrors(t *testing.T) {
 			if body.Code != test.code {
 				t.Fatalf("code = %q, want %q", body.Code, test.code)
 			}
+			if test.code == "internal_error" && body.Detail != "An internal server error occurred." {
+				t.Errorf("detail = %q, want fixed internal error message", body.Detail)
+			}
 		})
 	}
 }
@@ -192,6 +199,13 @@ func TestLoginHandlerMapsSessionPersistenceError(t *testing.T) {
 	handler.ServeHTTP(recorder, request)
 	if recorder.Code != http.StatusInternalServerError {
 		t.Fatalf("status = %d, want %d", recorder.Code, http.StatusInternalServerError)
+	}
+	var body problemDetails
+	if err := json.Unmarshal(recorder.Body.Bytes(), &body); err != nil {
+		t.Fatal(err)
+	}
+	if body.Detail != "An internal server error occurred." {
+		t.Fatalf("detail = %q, want fixed internal error message", body.Detail)
 	}
 }
 

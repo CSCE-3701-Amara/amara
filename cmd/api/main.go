@@ -77,7 +77,7 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("create login service: %w", err)
 	}
-	loginHandler, err := authhttp.NewLoginHandler(loginService)
+	loginHandler, err := authhttp.NewLoginHandlerWithLogger(loginService, logger)
 	if err != nil {
 		return fmt.Errorf("create login handler: %w", err)
 	}

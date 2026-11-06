@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"net/mail"
 	"strings"
@@ -18,13 +19,21 @@ const sessionCookieName = "amara_session"
 
 type LoginHandler struct {
 	service *application.LoginService
+	logger  *slog.Logger
 }
 
 func NewLoginHandler(service *application.LoginService) (*LoginHandler, error) {
+	return NewLoginHandlerWithLogger(service, slog.Default())
+}
+
+func NewLoginHandlerWithLogger(service *application.LoginService, logger *slog.Logger) (*LoginHandler, error) {
 	if service == nil {
 		return nil, errors.New("login service must not be nil")
 	}
-	return &LoginHandler{service: service}, nil
+	if logger == nil {
+		logger = slog.Default()
+	}
+	return &LoginHandler{service: service, logger: logger}, nil
 }
 
 // RegisterRoutes mounts the session endpoint under the API version group.
@@ -75,7 +84,12 @@ func (h *LoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		case errors.Is(err, domain.ErrInvalidMFACode):
 			status, code = http.StatusUnauthorized, "invalid_mfa_code"
 		}
-		writeProblem(writer, status, code, strings.TrimPrefix(err.Error(), "invalid credentials: "))
+		detail := strings.TrimPrefix(err.Error(), "invalid credentials: ")
+		if status >= http.StatusInternalServerError {
+			h.logger.ErrorContext(request.Context(), "login failed", "error", err)
+			detail = "An internal server error occurred."
+		}
+		writeProblem(writer, status, code, detail)
 		return
 	}
 	http.SetCookie(writer, &http.Cookie{
