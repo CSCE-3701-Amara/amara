@@ -121,12 +121,26 @@ func (r *RegistrationRepository) PerformAccountAction(ctx context.Context, accou
 	if table == "" {
 		return domain.ErrInvalidSession
 	}
+	accountUUID, err := parseUUID(accountID)
+	if err != nil {
+		return domain.ErrInvalidSession
+	}
 
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("begin account action: %w", err)
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
+
+	queries := r.queries.WithTx(tx)
+	if _, err := queries.LockActiveSessionForAccount(ctx, sqlc.LockActiveSessionForAccountParams{
+		Token: sessionToken, Column2: accountUUID, AccountType: sessionType,
+	}); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.ErrInvalidSession
+		}
+		return fmt.Errorf("lock account session: %w", err)
+	}
 
 	column := "deactivated_at"
 	if action == domain.AccountActionDelete {

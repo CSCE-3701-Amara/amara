@@ -104,6 +104,15 @@ WHERE s.token = $1
      AND COALESCE(co.banned, FALSE) = FALSE)
   );
 
+-- name: LockActiveSessionForAccount :one
+SELECT token
+FROM auth_sessions
+WHERE token = $1
+  AND account_id = $2::uuid
+  AND account_type = $3
+  AND expires_at > now()
+FOR UPDATE;
+
 -- name: TerminateSession :exec
 DELETE FROM auth_sessions
 WHERE token = $1;

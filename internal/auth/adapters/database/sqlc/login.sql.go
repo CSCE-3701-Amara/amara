@@ -94,6 +94,29 @@ func (q *Queries) FindCredentials(ctx context.Context, lower string) (FindCreden
 	return i, err
 }
 
+const lockActiveSessionForAccount = `-- name: LockActiveSessionForAccount :one
+SELECT token
+FROM auth_sessions
+WHERE token = $1
+  AND account_id = $2::uuid
+  AND account_type = $3
+  AND expires_at > now()
+FOR UPDATE
+`
+
+type LockActiveSessionForAccountParams struct {
+	Token       string
+	Column2     pgtype.UUID
+	AccountType string
+}
+
+func (q *Queries) LockActiveSessionForAccount(ctx context.Context, arg LockActiveSessionForAccountParams) (string, error) {
+	row := q.db.QueryRow(ctx, lockActiveSessionForAccount, arg.Token, arg.Column2, arg.AccountType)
+	var token string
+	err := row.Scan(&token)
+	return token, err
+}
+
 const lockCandidateForSession = `-- name: LockCandidateForSession :one
 SELECT id::text
 FROM candidates
