@@ -97,19 +97,6 @@ func TestNewServiceConnectsToLiveDatabase(t *testing.T) {
 
 // closedService builds a service whose pool is already closed so that every
 // Ping() call fails, letting us exercise the unhealthy path without a live DB.
-func closedService(t *testing.T) Service {
-	t.Helper()
-	// Use an unreachable address so NewService fails; then construct the
-	// internal type directly to test the health logic in isolation.
-	cfg := config.DatabaseConfig{
-		URL:      "postgres://user:pass@127.0.0.1:1/db",
-		MaxConns: 1,
-	}
-	// We can't reach NewService here because the pool won't open. Use the
-	// exported interface only – test via a live DB if needed.
-	_ = cfg
-	return nil
-}
 
 // TestHealthStatusFields verifies the typed fields on HealthStatus without a
 // database: construct the struct directly and check zero values are safe.
