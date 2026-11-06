@@ -16,14 +16,15 @@ import (
 )
 
 type accountActionTerminator struct {
-	accountID string
-	token     string
-	action    domain.AccountAction
-	err       error
+	accountID   string
+	token       string
+	accountType domain.AccountType
+	action      domain.AccountAction
+	err         error
 }
 
-func (r *accountActionTerminator) PerformAccountAction(_ context.Context, accountID, token string, action domain.AccountAction) error {
-	r.accountID, r.token, r.action = accountID, token, action
+func (r *accountActionTerminator) PerformAccountAction(_ context.Context, accountID, token string, accountType domain.AccountType, action domain.AccountAction) error {
+	r.accountID, r.token, r.accountType, r.action = accountID, token, accountType, action
 	return r.err
 }
 
@@ -64,6 +65,38 @@ func TestAccountActionHandlerCompletesAndClearsSession(t *testing.T) {
 	cookies := recorder.Result().Cookies()
 	if len(cookies) != 1 || cookies[0].Name != sessionCookieName || cookies[0].MaxAge >= 0 {
 		t.Fatalf("unexpected cleared cookie: %+v", cookies)
+	}
+}
+
+func TestAccountActionHandlerAcceptsAllSelfServiceAccountTypes(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	tests := []struct {
+		name        string
+		accountType domain.AccountType
+	}{
+		{"candidate", domain.AccountTypeCandidate},
+		{"interviewer", domain.AccountTypeInterviewer},
+		{"hiring manager", domain.AccountTypeCompany},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			repository := &accountActionTerminator{}
+			handler := newTestAccountActionHandler(t, repository, sessionValidatorFunc(func(context.Context, string) (ports.Identity, error) {
+				return ports.Identity{AccountID: "account-id", AccountType: test.accountType}, nil
+			}))
+			router := gin.New()
+			handler.RegisterRoutes(router.Group("/v1"))
+
+			request := httptest.NewRequest(http.MethodPost, "/v1/auth/account-actions", strings.NewReader(`{"action":"deactivate"}`))
+			request.AddCookie(&http.Cookie{Name: sessionCookieName, Value: "session-token"})
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, request)
+
+			if recorder.Code != http.StatusNoContent || repository.accountID != "account-id" ||
+				repository.accountType != test.accountType || repository.action != domain.AccountActionDeactivate {
+				t.Fatalf("status = %d, repository = %+v", recorder.Code, repository)
+			}
+		})
 	}
 }
 
