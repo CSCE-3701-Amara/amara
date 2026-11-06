@@ -93,3 +93,13 @@ func (q *Queries) FindCredentials(ctx context.Context, lower string) (FindCreden
 	)
 	return i, err
 }
+
+const terminateSession = `-- name: TerminateSession :exec
+DELETE FROM auth_sessions
+WHERE token = $1
+`
+
+func (q *Queries) TerminateSession(ctx context.Context, token string) error {
+	_, err := q.db.Exec(ctx, terminateSession, token)
+	return err
+}

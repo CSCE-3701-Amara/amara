@@ -59,6 +59,16 @@ func (r *RegistrationRepository) CreateSession(ctx context.Context, session port
 	})
 }
 
+func (r *RegistrationRepository) TerminateSession(ctx context.Context, token string) error {
+	if strings.TrimSpace(token) == "" {
+		return domain.ErrInvalidSession
+	}
+	if r.queries == nil {
+		return errors.New("session termination database is not configured")
+	}
+	return r.queries.TerminateSession(ctx, token)
+}
+
 func NewRegistrationRepository(pool *pgxpool.Pool) (*RegistrationRepository, error) {
 	if pool == nil {
 		return nil, errors.New("database pool must not be nil")
