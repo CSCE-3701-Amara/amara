@@ -6,7 +6,7 @@ Amara's backend is a Go modular monolith using Gin. Business modules live under
 
 ## Run the API
 
-Install Go 1.26.9 or newer, then run from the repository root:
+Install Go 1.26.10 or newer, then run from the repository root:
 
 ```sh
 go mod download
@@ -181,7 +181,7 @@ authenticator enrollments. Password storage continues to use Argon2id.
 Install `govulncheck` before running `make govulncheck`. It scans all Go packages,
 then checks the API and worker dependency modules, rejecting advisories even
 when the executables do not call the affected functions. CI uses the Go version
-in `go.mod`, and Docker builds use Go 1.26.9.
+in `go.mod`, and Docker builds use Go 1.26.10.
 The pinned `golang.org/x/crypto` revision removes the unmaintained OpenPGP
 package, addressing [GO-2026-5932](https://pkg.go.dev/vuln/GO-2026-5932) in
 addition to the security fixes included in its preceding release.

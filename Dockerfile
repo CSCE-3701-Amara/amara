@@ -1,6 +1,6 @@
 # Amara backend image: one codebase builds the API and worker binaries
 # (separate execution roles of the modular monolith, see docs/sdd/03).
-FROM golang:1.26.9-alpine AS build
+FROM golang:1.26.10-alpine AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
