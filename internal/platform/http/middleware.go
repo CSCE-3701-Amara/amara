@@ -54,7 +54,7 @@ func requestLogger(logger *slog.Logger) gin.HandlerFunc {
 	}
 }
 
-func recoverPanic(logger *slog.Logger) gin.HandlerFunc {
+func Recovery(logger *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if recovered := recover(); recovered != nil {

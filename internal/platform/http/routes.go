@@ -24,7 +24,7 @@ func newRouter(cfg config.HTTPConfig, logger *slog.Logger, dbSvc database.Servic
 		return nil, fmt.Errorf("configure trusted proxies: %w", err)
 	}
 
-	router.Use(requestID(), requestLogger(logger), recoverPanic(logger), corsMiddleware(cfg.AllowedOrigins))
+	router.Use(requestID(), requestLogger(logger), Recovery(logger), corsMiddleware(cfg.AllowedOrigins))
 	registerRoutes(router, dbSvc, registrars...)
 	return router, nil
 }
