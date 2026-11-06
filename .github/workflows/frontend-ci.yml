@@ -1,4 +1,4 @@
-name: web-ci
+name: frontend-ci
 
 permissions:
   contents: read
@@ -8,7 +8,7 @@ on:
     branches: [main]
     paths:
       - "web/**"
-      - ".github/workflows/web-ci.yaml"
+      - ".github/workflows/frontend-ci.yml"
 
 jobs:
   web:
