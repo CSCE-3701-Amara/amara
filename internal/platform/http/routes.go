@@ -68,16 +68,31 @@ func registerRoutes(router *gin.Engine, dbSvc database.Service, registrars ...Ro
 		register(v1)
 	}
 	router.NoRoute(func(c *gin.Context) {
-		writeError(c, http.StatusNotFound, "not_found", "The requested resource was not found.")
+		WriteProblem(c, ProblemDetails{
+			Type:   "about:blank",
+			Title:  "Not Found",
+			Status: http.StatusNotFound,
+			Detail: "The requested resource was not found.",
+			Code:   "not_found",
+		})
 	})
 	router.NoMethod(func(c *gin.Context) {
-		writeError(c, http.StatusMethodNotAllowed, "method_not_allowed", "The request method is not allowed.")
+		WriteProblem(c, ProblemDetails{
+			Type:   "about:blank",
+			Title:  "Method Not Allowed",
+			Status: http.StatusMethodNotAllowed,
+			Detail: "The request method is not allowed.",
+			Code:   "method_not_allowed",
+		})
 	})
 }
 
 func writeError(c *gin.Context, status int, code, message string) {
-	c.AbortWithStatusJSON(status, gin.H{
-		"error":      gin.H{"code": code, "message": message},
-		"request_id": RequestID(c.Request.Context()),
+	WriteProblem(c, ProblemDetails{
+		Type:   "about:blank",
+		Title:  defaultTitle(status),
+		Status: status,
+		Detail: message,
+		Code:   code,
 	})
 }
