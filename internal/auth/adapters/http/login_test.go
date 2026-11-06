@@ -85,7 +85,7 @@ func TestNewLoginHandlerRequiresService(t *testing.T) {
 
 func TestLoginHandlerSuccess(t *testing.T) {
 	handler := newTestLoginHandler(t, testCredentials(domain.AccountTypeCandidate), ports.ErrMFANotConfigured, nil)
-	request := httptest.NewRequest(http.MethodPost, "/api/v1/auth/sessions",
+	request := httptest.NewRequest(http.MethodPost, "/v1/auth/sessions",
 		strings.NewReader(`{"email":"user@example.com","password":"password123"}`))
 	recorder := httptest.NewRecorder()
 
@@ -134,7 +134,7 @@ func TestLoginHandlerRejectsRequests(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			request := httptest.NewRequest(test.method, "/api/v1/auth/sessions", strings.NewReader(test.body))
+			request := httptest.NewRequest(test.method, "/v1/auth/sessions", strings.NewReader(test.body))
 			recorder := httptest.NewRecorder()
 			handler.ServeHTTP(recorder, request)
 			if recorder.Code != test.want {
@@ -170,7 +170,7 @@ func TestLoginHandlerMapsServiceErrors(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			handler := newTestLoginHandler(t, test.record, test.mfaErr, nil)
-			request := httptest.NewRequest(http.MethodPost, "/api/v1/auth/sessions",
+			request := httptest.NewRequest(http.MethodPost, "/v1/auth/sessions",
 				strings.NewReader(`{"email":"user@example.com","password":"password123"}`))
 			recorder := httptest.NewRecorder()
 			handler.ServeHTTP(recorder, request)
@@ -193,7 +193,7 @@ func TestLoginHandlerMapsServiceErrors(t *testing.T) {
 
 func TestLoginHandlerMapsSessionPersistenceError(t *testing.T) {
 	handler := newTestLoginHandler(t, testCredentials(domain.AccountTypeCandidate), ports.ErrMFANotConfigured, errors.New("storage unavailable"))
-	request := httptest.NewRequest(http.MethodPost, "/api/v1/auth/sessions",
+	request := httptest.NewRequest(http.MethodPost, "/v1/auth/sessions",
 		strings.NewReader(`{"email":"user@example.com","password":"password123"}`))
 	recorder := httptest.NewRecorder()
 	handler.ServeHTTP(recorder, request)
@@ -213,9 +213,9 @@ func TestLoginHandlerRoutes(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 	handler := newTestLoginHandler(t, testCredentials(domain.AccountTypeCandidate), ports.ErrMFANotConfigured, nil)
-	handler.RegisterRoutes(router.Group("/api/v1"))
+	handler.RegisterRoutes(router.Group("/v1"))
 
-	for _, path := range []string{"/api/v1/auth/sessions", "/api/v1/auth/login"} {
+	for _, path := range []string{"/v1/auth/sessions", "/v1/auth/login"} {
 		request := httptest.NewRequest(http.MethodPost, path,
 			strings.NewReader(`{"email":"user@example.com","password":"password123"}`))
 		recorder := httptest.NewRecorder()

@@ -96,6 +96,13 @@ adapter with the signature `func(*gin.RouterGroup)`. Construct the adapter and
 its application dependencies in `cmd/api`, then pass the registration method
 to `httpserver.New(cfg.HTTP, logger, dbSvc, handler.RegisterRoutes)`. Registrars receive
 the `/v1` group, so registering `/jobs` exposes `/v1/jobs`.
+Registration, login, and company registration use these same registrars and
+receive the platform middleware. Company registration uses the shared database
+pool and the HIBP password checker. Candidate/interviewer registration returns
+`503 registration_unavailable` at startup until a verification sender is
+configured; no account is created in that case. With a sender available,
+construct `auth/application.RegistrationService` and its HTTP handler and pass
+`handler.RegisterRoutes` in place of `RegisterUnavailableRegistrationRoutes`.
 
 The adapter must apply AUTH's authentication and authorization middleware to
 protected routes. Schema migrations live in `supabase/migrations/` and are

@@ -156,3 +156,10 @@ go test -race ./... # Check for data races
 Business HTTP adapters register routes under `/v1` through the server's
 `RouteRegistrar` functions. Construct their dependencies in `cmd/api/main.go`;
 keep business logic and authentication policy in the owning module.
+
+`POST /v1/auth/company-registrations` uses the shared database service and
+the HIBP password compromise checker. Candidate/interviewer registration at
+`POST /v1/auth/registrations` returns `503 registration_unavailable` until
+verification email delivery is configured. Requests are rejected before any
+account or verification challenge is written. Both endpoints use the shared
+request ID, logging, recovery, and CORS middleware.

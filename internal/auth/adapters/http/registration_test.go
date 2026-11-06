@@ -45,7 +45,7 @@ type handlerSender struct{}
 
 func (handlerSender) SendVerificationCode(context.Context, string, string) error { return nil }
 
-const registrationPath = "/api/v1/auth/registrations"
+const registrationPath = "/v1/auth/registrations"
 
 func newTestHandler(t *testing.T) *RegistrationHandler {
 	t.Helper()

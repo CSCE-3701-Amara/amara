@@ -62,7 +62,7 @@ func TestCompanyRegistrationHandler(t *testing.T) {
 			ID: "request-id", Email: "owner@example.com", Status: domain.PendingReview, CreatedAt: "2026-10-30T20:00:00Z",
 		}})
 		recorder := httptest.NewRecorder()
-		handler.ServeHTTP(recorder, httptest.NewRequest(http.MethodPost, "/api/v1/auth/company-registrations", strings.NewReader(body)))
+		handler.ServeHTTP(recorder, httptest.NewRequest(http.MethodPost, "/v1/auth/company-registrations", strings.NewReader(body)))
 		if recorder.Code != http.StatusCreated || !strings.Contains(recorder.Body.String(), `"accountType":"company"`) {
 			t.Fatalf("unexpected response: %d %s", recorder.Code, recorder.Body.String())
 		}
@@ -85,7 +85,7 @@ func TestCompanyRegistrationHandler(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			handler := newCompanyHandler(t, test.repository)
 			recorder := httptest.NewRecorder()
-			handler.ServeHTTP(recorder, httptest.NewRequest(test.method, "/api/v1/auth/company-registrations", strings.NewReader(test.body)))
+			handler.ServeHTTP(recorder, httptest.NewRequest(test.method, "/v1/auth/company-registrations", strings.NewReader(test.body)))
 			assertProblem(t, recorder, test.status, test.code)
 		})
 	}

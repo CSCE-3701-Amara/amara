@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/CSCE-3701-Amara/amara/internal/auth/application"
 	"github.com/CSCE-3701-Amara/amara/internal/auth/domain"
 )
@@ -19,6 +21,11 @@ func NewCompanyRegistrationHandler(service *application.CompanyRegistrationServi
 		return nil, errors.New("company registration service must not be nil")
 	}
 	return &CompanyRegistrationHandler{service: service}, nil
+}
+
+// RegisterRoutes mounts company registration under the API version group.
+func (h *CompanyRegistrationHandler) RegisterRoutes(group *gin.RouterGroup) {
+	group.POST("/auth/company-registrations", gin.WrapH(h))
 }
 
 type companyRegistrationRequest struct {

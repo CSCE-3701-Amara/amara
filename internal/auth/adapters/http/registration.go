@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/CSCE-3701-Amara/amara/internal/auth/application"
 	"github.com/CSCE-3701-Amara/amara/internal/auth/domain"
 )
@@ -19,6 +21,21 @@ func NewRegistrationHandler(service *application.RegistrationService) (*Registra
 		return nil, errors.New("registration service must not be nil")
 	}
 	return &RegistrationHandler{service: service}, nil
+}
+
+// RegisterRoutes mounts account registration under the API version group.
+func (h *RegistrationHandler) RegisterRoutes(group *gin.RouterGroup) {
+	group.POST("/auth/registrations", gin.WrapH(h))
+}
+
+// RegisterUnavailableRegistrationRoutes keeps the endpoint discoverable until
+// verification delivery is configured. Reject before creating an account or
+// verification challenge that cannot be delivered.
+func RegisterUnavailableRegistrationRoutes(group *gin.RouterGroup) {
+	group.POST("/auth/registrations", func(c *gin.Context) {
+		writeProblem(c.Writer, http.StatusServiceUnavailable, "registration_unavailable", "Account registration is temporarily unavailable.")
+		c.Abort()
+	})
 }
 
 type registrationRequest struct {
