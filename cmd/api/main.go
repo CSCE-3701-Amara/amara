@@ -68,11 +68,13 @@ func run() error {
 	feedHandler := candhttp.NewJobFeedHandler(candapplication.NewJobFeed(feedRepo, jobLifecycle), nil)
 	assessmentProgressRepo := canddatabase.NewAssessmentProgressRepository(dbSvc.Pool())
 	assessmentProgressHandler := candhttp.NewAssessmentProgressHandler(candapplication.NewAssessmentProgress(assessmentProgressRepo), nil)
+	assessmentResultRepo := canddatabase.NewAssessmentResultRepository(dbSvc.Pool())
+	assessmentResultHandler := candhttp.NewAssessmentResultHandler(candapplication.NewAssessmentResults(assessmentResultRepo), nil)
 	pipelineProgressRepo := invwdatabase.NewCandidatePipelineProgressRepository(dbSvc.Pool())
 	pipelineProgressHandler := invwhttp.NewCandidatePipelineProgressHandler(invwapplication.NewCandidatePipelineProgress(pipelineProgressRepo), nil)
 	postingListRepo := jobdatabase.NewCompanyPostingListRepository(dbSvc.Pool())
 	postingListHandler := jobhttp.NewPostingListHandler(jobapplication.NewCompanyPostingList(postingListRepo, jobLifecycle), nil)
-	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, feedHandler.RegisterRoutes, assessmentProgressHandler.RegisterRoutes, pipelineProgressHandler.RegisterRoutes, postingListHandler.RegisterRoutes)
+	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, feedHandler.RegisterRoutes, assessmentProgressHandler.RegisterRoutes, assessmentResultHandler.RegisterRoutes, pipelineProgressHandler.RegisterRoutes, postingListHandler.RegisterRoutes)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
 	}
