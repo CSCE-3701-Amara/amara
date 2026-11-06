@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/CSCE-3701-Amara/amara/internal/auth/application"
+	"github.com/CSCE-3701-Amara/amara/internal/auth/domain"
 	"github.com/CSCE-3701-Amara/amara/internal/auth/ports"
 )
 
@@ -32,7 +33,34 @@ func NewLogoutHandler(service *application.LogoutService, validator ports.Sessio
 }
 
 func (h *LogoutHandler) RegisterRoutes(group *gin.RouterGroup) {
-	group.DELETE("/auth/sessions/current", AuthenticatedAuth(h.validator), gin.WrapH(h))
+	group.DELETE("/auth/sessions/current", logoutAuth(h.validator), gin.WrapH(h))
+}
+
+func logoutAuth(validator ports.SessionValidator) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if validator == nil {
+			authenticationRequired(c)
+			return
+		}
+		cookie, err := c.Request.Cookie(sessionCookieName)
+		if err != nil || cookie.Value == "" {
+			authenticationRequired(c)
+			return
+		}
+		identity, err := validator.ValidateSession(c.Request.Context(), cookie.Value)
+		if err != nil {
+			if errors.Is(err, domain.ErrInvalidSession) {
+				c.Next()
+				return
+			}
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": gin.H{"code": "authentication_unavailable", "message": "Authentication is temporarily unavailable."},
+			})
+			return
+		}
+		c.Set(identityContextKey, identity)
+		c.Next()
+	}
 }
 
 func (h *LogoutHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
