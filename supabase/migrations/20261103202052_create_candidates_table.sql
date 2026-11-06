@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE candidates (
     id                  UUID        PRIMARY KEY,
     name                TEXT        NOT NULL,
@@ -24,3 +25,6 @@ CREATE TABLE candidates (
     banned              BOOLEAN,
     ban_reason          TEXT
 );
+
+-- +goose Down
+DROP TABLE candidates;
