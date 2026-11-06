@@ -2,7 +2,16 @@ openapi: 3.1.0
 info:
   title: AMARA API
   version: 0.1.0
-  description: AMARA HTTP API specification following RFC 9457 Problem Details for HTTP errors.
+  description: |
+    AMARA HTTP API specification following RFC 9457 Problem Details for HTTP errors,
+    except where an implemented operation documents its existing JSON error shape.
+    New endpoints use the canonical /v1 prefix. Existing AUTH and candidate-profile
+    contract paths under /api/v1 are retained at their documented URLs.
+    On main, registered module routes also have /api/v1 compatibility aliases;
+    login additionally accepts /v1/auth/login and /api/v1/auth/login. Clients should
+    use the exact operation paths below rather than substituting prefixes.
+    Operations marked x-implementation-status: planned describe intended behavior;
+    their handlers are not registered and requests currently return router 404s.
 tags:
   - name: Health
     description: Service liveness.
@@ -36,7 +45,7 @@ tags:
     description: Company registration review and account administration.
 
 # Established paths and payloads take precedence over newer additions.
-# Preserve existing /api/v1 routes; planned additions use /v1.
+# New endpoints use /v1; retained /api/v1 paths and compatibility aliases are described above.
 paths:
 
   # Health
@@ -70,6 +79,8 @@ paths:
     post:
       summary: Register a candidate or interviewer
       operationId: registerCandidateOrInterviewer
+      description: Planned operation; no registration handler is currently registered.
+      x-implementation-status: planned
       tags:
         - Auth
       requestBody:
@@ -100,6 +111,8 @@ paths:
     post:
       summary: Submit a company registration request
       operationId: registerCompany
+      description: Planned operation; no company registration handler is currently registered.
+      x-implementation-status: planned
       tags:
         - Auth
       requestBody:
@@ -165,6 +178,8 @@ paths:
     delete:
       summary: Terminate the current authenticated session
       operationId: deleteCurrentSession
+      description: Planned operation; no logout handler is currently registered. The 204 response and clearing cookie describe intended behavior.
+      x-implementation-status: planned
       tags:
         - Auth
       security:
@@ -184,6 +199,8 @@ paths:
     post:
       summary: Deactivate or delete the authenticated candidate profile
       operationId: performAccountAction
+      description: Planned operation; no account-action handler is currently registered.
+      x-implementation-status: planned
       tags:
         - Auth
       security:
@@ -217,6 +234,8 @@ paths:
     patch:
       summary: Modify the authenticated candidate profile
       operationId: updateCandidateProfile
+      description: Planned operation; no candidate-profile update handler is currently registered.
+      x-implementation-status: planned
       tags:
         - Auth
       security:
@@ -534,6 +553,140 @@ paths:
           $ref: '#/components/responses/PostingError'
         '500':
           $ref: '#/components/responses/PostingError'
+
+  /v1/jobs/feed:
+    get:
+      summary: Browse published job postings as a candidate
+      operationId: getCandidateJobFeed
+      tags: [Jobs]
+      description: |
+        Requires a valid amara_session cookie for a candidate account. Returns
+        published, nondeleted postings whose application window is open, ordered
+        by published_at descending, then id descending. Expired postings are
+        archived before loading the feed. String filters are trimmed; blank
+        strings are ignored. This existing endpoint uses cursor pagination and
+        snake_case JSON fields. It returns neither a total nor an offset.
+      security:
+        - SessionCookie: []
+      parameters:
+        - name: title
+          in: query
+          description: Case-insensitive substring match on title (SQL ILIKE; percent and underscore retain wildcard semantics).
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Exact match on posting language.
+          schema:
+            type: string
+        - name: currency
+          in: query
+          description: Exact match on posting currency.
+          schema:
+            type: string
+        - name: seniority_level
+          in: query
+          description: Exact match on posting seniority level.
+          schema:
+            type: string
+        - name: employment_type
+          in: query
+          description: Exact match on posting employment type.
+          schema:
+            type: string
+        - name: location
+          in: query
+          description: Case-insensitive substring match on location (SQL ILIKE; percent and underscore retain wildcard semantics).
+          schema:
+            type: string
+        - name: salary_min
+          in: query
+          description: Keep postings whose salary_max is at least this value or is null. Negative values are accepted by the current handler.
+          schema:
+            type: integer
+            format: int32
+            minimum: -2147483648
+            maximum: 2147483647
+        - name: salary_max
+          in: query
+          description: Keep postings whose salary_min is at most this value or is null. Negative values are accepted by the current handler.
+          schema:
+            type: integer
+            format: int32
+            minimum: -2147483648
+            maximum: 2147483647
+        - name: limit
+          in: query
+          description: Page size from 1 to 100. Omitted, empty, or zero selects the default of 20; other out-of-range values return 400.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+            default: 20
+        - name: cursor
+          in: query
+          description: Pass the previous page's next_cursor unchanged and URL-encoded. Empty or omitted starts the feed; malformed timestamps or UUIDs return 400.
+          schema:
+            type: string
+          example: '2026-11-01T12:30:00.123456789Z|4ce85a22-78c1-48bb-bbf6-1b2e06f6ad17'
+      responses:
+        '200':
+          description: Candidate job feed; items is empty when no postings match. next_cursor is omitted when there is no further page.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobFeedPage'
+              example:
+                items:
+                  - id: 4ce85a22-78c1-48bb-bbf6-1b2e06f6ad17
+                    company_id: 1a1a77b2-32ed-45db-a437-7f66271e78af
+                    title: Backend Engineer
+                    description: Build reliable services.
+                    language: en
+                    currency: EGP
+                    seniority_level: senior
+                    employment_type: remote full-time
+                    location: Cairo
+                    salary_min: 40000
+                    salary_max: 70000
+                    salary_visible: true
+                    open_positions: 2
+                    application_opening: null
+                    application_deadline: '2026-12-01T12:30:00Z'
+                    max_applications: 50
+                    status: published
+                    last_autosaved_at: null
+                    published_at: '2026-11-01T12:30:00.123456789Z'
+                    archived_at: null
+                    created_at: '2026-10-31T12:30:00Z'
+                    updated_at: '2026-11-01T12:30:00Z'
+                    deleted_at: null
+                    application_url: /v1/jobs/4ce85a22-78c1-48bb-bbf6-1b2e06f6ad17/apply
+                next_cursor: '2026-11-01T12:30:00.123456789Z|4ce85a22-78c1-48bb-bbf6-1b2e06f6ad17'
+        '400':
+          description: Invalid query; codes are invalid_limit, invalid_salary_min, invalid_salary_max, or invalid_feed_query.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostingErrorResponse'
+        '401':
+          description: Missing, empty, expired, or invalid session; code is authentication_required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostingErrorResponse'
+        '403':
+          description: The authenticated account is not a candidate; code is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostingErrorResponse'
+        '500':
+          description: Authentication or feed dependency failure; code is authentication_unavailable or feed_unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostingErrorResponse'
 
   /v1/jobs/{id}:
     parameters:
@@ -5601,7 +5754,7 @@ components:
         instance:
           type: string
           description: Request path identifying the occurrence of the problem.
-          example: /api/v1/jobs/job_123
+          example: /v1/jobs/job_123
         code:
           type: string
           description: Stable machine-readable code for programmatic error handling.
@@ -6221,6 +6374,113 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JobPosting'
+
+    JobFeedPage:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobFeedItem'
+        next_cursor:
+          type: string
+          description: Present only when another page exists. Treat as opaque; currently RFC3339Nano published_at, a pipe, and posting UUID.
+
+    JobFeedItem:
+      type: object
+      description: Candidate feed projection. Nullable fields are emitted as null; requirements, amarat, and candidate application status are not included.
+      required:
+        - id
+        - company_id
+        - title
+        - description
+        - language
+        - currency
+        - seniority_level
+        - employment_type
+        - location
+        - salary_min
+        - salary_max
+        - salary_visible
+        - open_positions
+        - application_opening
+        - application_deadline
+        - max_applications
+        - status
+        - last_autosaved_at
+        - published_at
+        - archived_at
+        - created_at
+        - updated_at
+        - deleted_at
+        - application_url
+      properties:
+        id:
+          type: string
+          format: uuid
+        company_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: [string, 'null']
+        language:
+          type: [string, 'null']
+        currency:
+          type: [string, 'null']
+        seniority_level:
+          type: [string, 'null']
+        employment_type:
+          type: [string, 'null']
+        location:
+          type: [string, 'null']
+        salary_min:
+          type: [integer, 'null']
+          format: int32
+        salary_max:
+          type: [integer, 'null']
+          format: int32
+        salary_visible:
+          type: [boolean, 'null']
+        open_positions:
+          type: [integer, 'null']
+          format: int32
+        application_opening:
+          type: [string, 'null']
+          format: date-time
+        application_deadline:
+          type: [string, 'null']
+          format: date-time
+        max_applications:
+          type: [integer, 'null']
+          format: int32
+        status:
+          type: string
+          enum: [published]
+        last_autosaved_at:
+          type: [string, 'null']
+          format: date-time
+        published_at:
+          type: string
+          format: date-time
+        archived_at:
+          type: [string, 'null']
+          format: date-time
+        created_at:
+          type: [string, 'null']
+          format: date-time
+        updated_at:
+          type: [string, 'null']
+          format: date-time
+        deleted_at:
+          type: [string, 'null']
+          format: date-time
+        application_url:
+          type: string
+          format: uri-reference
+          description: Application submission path under /v1/jobs/{id}/apply.
 
     PostingErrorResponse:
       type: object

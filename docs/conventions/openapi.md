@@ -1,6 +1,6 @@
 # AMARA API Conventions
  
-Owner: Ziad Eliwa | Status: In Review | Last updated: 2026-10-29 | Jira: AMARA-1311
+Owner: Ziad Eliwa | Status: In Review | Last updated: 2026-11-07 | Jira: AMARA-1311
 
 **Status:** Draft — team review required  
 **Applies to:** All AMARA HTTP API modules  
@@ -25,7 +25,15 @@ Each API change MUST update its OpenAPI contract and relevant tests in the same 
 
 ## 3. URLs, resources, and versioning
 
-Base prefix: `/api/v1`. The version is part of the public API path. The `/v1` prefix is reserved for backward-incompatible changes; compatible additions do not require a new version.
+Canonical base prefix for new endpoints: `/v1`. The version is part of the public API path; compatible additions remain under `/v1`.
+
+### Compatibility paths
+
+Existing AUTH and candidate-profile contract paths under `/api/v1` are retained at their documented URLs. The server on `main` also mounts registered module routes under `/api/v1` as compatibility aliases of `/v1`; this does not make unregistered operations available. Do not use `/api/v1` for new contract paths or assume aliases exist for planned endpoints. Clients MUST use the exact path documented for each operation.
+
+Login also retains `/v1/auth/login` and `/api/v1/auth/login` as aliases of the session-creation operation documented at `POST /api/v1/auth/sessions`.
+
+### Resource naming
 
 Rules:
 
@@ -36,18 +44,18 @@ Rules:
 - Use shallow nesting where possible. Nest only when it clarifies ownership or context, e.g. `/jobs/{jobId}/applications`.
 - Use query parameters for filtering, sorting, and pagination, not path segments.
 - No trailing slash in canonical routes (except `/`).
-- A domain operation that is not CRUD MAY use an explicit action subresource, documented in OpenAPI, e.g. `POST /api/v1/jobs/{jobId}/publish`. Such operations MUST define authorization, validation, idempotency expectations, and possible errors.
+- A domain operation that is not CRUD MAY use an explicit action subresource, documented in OpenAPI, e.g. `POST /v1/jobs/{jobId}/publish`. Such operations MUST define authorization, validation, idempotency expectations, and possible errors.
 
 Examples:
 
 ```http
-GET    /api/v1/jobs
-POST   /api/v1/jobs
-GET    /api/v1/jobs/{jobId}
-PATCH  /api/v1/jobs/{jobId}
-DELETE /api/v1/jobs/{jobId}
-GET    /api/v1/jobs/{jobId}/applications
-POST   /api/v1/jobs/{jobId}/publish
+GET    /v1/jobs
+POST   /v1/jobs
+GET    /v1/jobs/{jobId}
+PATCH  /v1/jobs/{jobId}
+DELETE /v1/jobs/{jobId}
+GET    /v1/jobs/{jobId}/applications
+POST   /v1/jobs/{jobId}/publish
 ```
 
 Resource IDs MUST be treated as opaque strings by clients. Their actual format is defined by each resource schema; clients MUST NOT infer business meaning from an ID.
@@ -114,7 +122,7 @@ Initial strategy: offset pagination for list endpoints.
 - Offset pagination can show duplicates or skips when underlying data changes between requests. Use cursor pagination later if a particular endpoint requires stable traversal at scale.
 
 ```http
-GET /api/v1/jobs?limit=20&offset=0&sort=-createdAt&status=open
+GET /v1/jobs?limit=20&offset=0&sort=-createdAt&status=open
 ```
 
 ```json
@@ -148,7 +156,7 @@ Content-Type: application/problem+json
   "title": "Not Found",
   "status": 404,
   "detail": "The requested job does not exist.",
-  "instance": "/api/v1/jobs/job_123",
+  "instance": "/v1/jobs/job_123",
   "code": "job_not_found"
 }
 ```
@@ -257,13 +265,13 @@ Generated Go types or interfaces MAY be used, but generated code MUST remain sep
 
 ## 14. Backward compatibility
 
-Within `/api/v1`, changes SHOULD remain backward-compatible:
+Within `/v1` and retained `/api/v1` compatibility paths, changes SHOULD remain backward-compatible:
 
 **Usually compatible:** adding an optional response field, adding a new endpoint, adding an optional request parameter with safe defaults.
 
 **Potentially breaking:** removing/renaming a field, changing a field's type or meaning, making an optional request field required, changing authorization requirements, or changing response shapes/status semantics. Adding enum values can also break clients that exhaustively switch over known values; review such changes carefully.
 
-Breaking changes require explicit team review and a migration plan. Do not create `/api/v2` for every minor addition.
+Breaking changes require explicit team review and a migration plan. Do not create `/v2` for every minor addition.
 
 ## 15. Pull request checklist
 
@@ -281,7 +289,7 @@ Breaking changes require explicit team review and a migration plan. Do not creat
 
 These defaults are proposals, not claims about already implemented AMARA behavior:
 
-1. Confirm whether every module uses `/api/v1` and which endpoints are public.
+1. Confirm which endpoints are public; use `/v1` for new endpoints and document compatibility aliases separately.
 2. Confirm Supabase JWT issuer/audience configuration and role/tenant authorization model.
 3. Confirm whether PATCH's endpoint-specific JSON update schemas are sufficient, including explicit-null behavior.
 4. Confirm `limit`/`offset` defaults, max limit, and whether `total` is affordable for each collection.
