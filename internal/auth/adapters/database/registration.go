@@ -21,13 +21,49 @@ import (
 
 type RegistrationRepository struct {
 	queries *sqlc.Queries
+	pool    *pgxpool.Pool
+}
+
+func (r *RegistrationRepository) FindCredentials(ctx context.Context, email string) (ports.Credentials, error) {
+	row, err := r.queries.FindCredentials(ctx, strings.ToLower(strings.TrimSpace(email)))
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ports.Credentials{}, domain.ErrInvalidCredentials
+		}
+		return ports.Credentials{}, fmt.Errorf("query login credentials: %w", err)
+	}
+	if !row.Deactivated.Valid {
+		return ports.Credentials{}, fmt.Errorf("query login credentials: invalid deactivated value")
+	}
+	deactivated := row.Deactivated.Bool
+	companyID, ok := row.CompanyID.(string)
+	if !ok {
+		return ports.Credentials{}, fmt.Errorf("query login credentials: invalid company id")
+	}
+	return ports.Credentials{
+		ID: row.ID, Email: row.Email, AccountType: domain.AccountType(row.AccountType),
+		PasswordHash: row.PasswordHash, Salt: row.Salt, Status: row.AccountStatus,
+		Deactivated: deactivated, Banned: row.Banned, CompanyID: companyID,
+		CompanyApproved: row.CompanyApproved,
+	}, nil
+}
+
+func (r *RegistrationRepository) CreateSession(ctx context.Context, session ports.Session) error {
+	accountID, err := parseUUID(session.AccountID)
+	if err != nil {
+		return fmt.Errorf("parse session account id: %w", err)
+	}
+	return r.queries.CreateSession(ctx, sqlc.CreateSessionParams{
+		Token: session.Token, Column2: accountID, AccountType: string(session.AccountType),
+		ExpiresAt: pgtype.Timestamp{Time: session.ExpiresAt, Valid: true},
+	})
 }
 
 func NewRegistrationRepository(pool *pgxpool.Pool) (*RegistrationRepository, error) {
 	if pool == nil {
 		return nil, errors.New("database pool must not be nil")
 	}
-	return &RegistrationRepository{queries: sqlc.New(pool)}, nil
+	return &RegistrationRepository{queries: sqlc.New(pool), pool: pool}, nil
 }
 
 func NewRegistrationRepositoryWithQueries(queries *sqlc.Queries) (*RegistrationRepository, error) {
@@ -35,6 +71,35 @@ func NewRegistrationRepositoryWithQueries(queries *sqlc.Queries) (*RegistrationR
 		return nil, errors.New("database queries must not be nil")
 	}
 	return &RegistrationRepository{queries: queries}, nil
+}
+
+func (r *RegistrationRepository) ValidateSession(ctx context.Context, token string) (ports.Identity, error) {
+	if r.pool == nil {
+		return ports.Identity{}, errors.New("session validation database is not configured")
+	}
+	var identity ports.Identity
+	var accountType string
+	err := r.pool.QueryRow(ctx, `
+		SELECT s.account_id::text, s.account_type,
+		       CASE
+		           WHEN s.account_type = 'company' THEN s.account_id::text
+		           WHEN s.account_type = 'interviewer' THEN COALESCE(i.company_id::text, '')
+		           ELSE ''
+		       END AS company_id,
+		       s.expires_at
+		FROM auth_sessions s
+		LEFT JOIN interviewers i
+		  ON s.account_type = 'interviewer' AND i.id = s.account_id
+		WHERE s.token = $1 AND s.expires_at > now()
+	`, token).Scan(&identity.AccountID, &accountType, &identity.CompanyID, &identity.ExpiresAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ports.Identity{}, domain.ErrInvalidSession
+		}
+		return ports.Identity{}, fmt.Errorf("validate session: %w", err)
+	}
+	identity.AccountType = domain.AccountType(accountType)
+	return identity, nil
 }
 
 func (r *RegistrationRepository) EmailExists(ctx context.Context, email string) (bool, error) {

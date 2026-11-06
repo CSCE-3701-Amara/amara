@@ -95,9 +95,6 @@ func TestNewServiceConnectsToLiveDatabase(t *testing.T) {
 // Health – unit-level stubs
 // ---------------------------------------------------------------------------
 
-// closedService builds a service whose pool is already closed so that every
-// Ping() call fails, letting us exercise the unhealthy path without a live DB.
-
 // TestHealthStatusFields verifies the typed fields on HealthStatus without a
 // database: construct the struct directly and check zero values are safe.
 func TestHealthStatusFields(t *testing.T) {
