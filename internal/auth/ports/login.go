@@ -28,9 +28,20 @@ type SessionRepository interface {
 	CreateSession(context.Context, Session) error
 }
 
+type SessionValidator interface {
+	ValidateSession(context.Context, string) (Identity, error)
+}
+
 type Session struct {
 	Token       string
 	AccountID   string
 	AccountType domain.AccountType
+	ExpiresAt   time.Time
+}
+
+type Identity struct {
+	AccountID   string
+	AccountType domain.AccountType
+	CompanyID   string
 	ExpiresAt   time.Time
 }

@@ -85,7 +85,10 @@ func run() error {
 	jobLifecycleRepo := jobdatabase.NewPostingLifecycleRepository(dbSvc.Pool())
 	jobLifecycle := jobapplication.NewPostingLifecycle(jobLifecycleRepo)
 	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
-	feedHandler := candhttp.NewJobFeedHandler(candapplication.NewJobFeed(feedRepo, jobLifecycle), nil)
+	feedHandler := candhttp.NewJobFeedHandler(
+		candapplication.NewJobFeed(feedRepo, jobLifecycle),
+		authhttp.CandidateAuth(authRepo),
+	)
 	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, loginHandler.RegisterRoutes, feedHandler.RegisterRoutes)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)

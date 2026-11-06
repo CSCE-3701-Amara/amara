@@ -21,6 +21,7 @@ import (
 
 type RegistrationRepository struct {
 	queries *sqlc.Queries
+	pool    *pgxpool.Pool
 }
 
 func (r *RegistrationRepository) FindCredentials(ctx context.Context, email string) (ports.Credentials, error) {
@@ -62,7 +63,7 @@ func NewRegistrationRepository(pool *pgxpool.Pool) (*RegistrationRepository, err
 	if pool == nil {
 		return nil, errors.New("database pool must not be nil")
 	}
-	return &RegistrationRepository{queries: sqlc.New(pool)}, nil
+	return &RegistrationRepository{queries: sqlc.New(pool), pool: pool}, nil
 }
 
 func NewRegistrationRepositoryWithQueries(queries *sqlc.Queries) (*RegistrationRepository, error) {
@@ -70,6 +71,35 @@ func NewRegistrationRepositoryWithQueries(queries *sqlc.Queries) (*RegistrationR
 		return nil, errors.New("database queries must not be nil")
 	}
 	return &RegistrationRepository{queries: queries}, nil
+}
+
+func (r *RegistrationRepository) ValidateSession(ctx context.Context, token string) (ports.Identity, error) {
+	if r.pool == nil {
+		return ports.Identity{}, errors.New("session validation database is not configured")
+	}
+	var identity ports.Identity
+	var accountType string
+	err := r.pool.QueryRow(ctx, `
+		SELECT s.account_id::text, s.account_type,
+		       CASE
+		           WHEN s.account_type = 'company' THEN s.account_id::text
+		           WHEN s.account_type = 'interviewer' THEN COALESCE(i.company_id::text, '')
+		           ELSE ''
+		       END AS company_id,
+		       s.expires_at
+		FROM auth_sessions s
+		LEFT JOIN interviewers i
+		  ON s.account_type = 'interviewer' AND i.id = s.account_id
+		WHERE s.token = $1 AND s.expires_at > now()
+	`, token).Scan(&identity.AccountID, &accountType, &identity.CompanyID, &identity.ExpiresAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ports.Identity{}, domain.ErrInvalidSession
+		}
+		return ports.Identity{}, fmt.Errorf("validate session: %w", err)
+	}
+	identity.AccountType = domain.AccountType(accountType)
+	return identity, nil
 }
 
 func (r *RegistrationRepository) EmailExists(ctx context.Context, email string) (bool, error) {
