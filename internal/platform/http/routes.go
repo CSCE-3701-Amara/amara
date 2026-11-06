@@ -86,13 +86,3 @@ func registerRoutes(router *gin.Engine, dbSvc database.Service, registrars ...Ro
 		})
 	})
 }
-
-func writeError(c *gin.Context, status int, code, message string) {
-	WriteProblem(c, ProblemDetails{
-		Type:   "about:blank",
-		Title:  defaultTitle(status),
-		Status: status,
-		Detail: message,
-		Code:   code,
-	})
-}
