@@ -42,7 +42,7 @@ func (r *ApplicationRepository) Apply(ctx context.Context, postingID, candidateI
 	if err := tx.QueryRow(ctx, "SELECT clock_timestamp()").Scan(&now); err != nil {
 		return domain.Application{}, fmt.Errorf("read database time: %w", err)
 	}
-	if postingStatus != domain.PostingPublished || opening != nil && now.Before(*opening) || deadline != nil && !now.Before(*deadline) {
+	if !domain.ApplicationIsOpen(postingStatus, opening, deadline, now) {
 		return domain.Application{}, domain.ErrApplicationPostingUnavailable
 	}
 	var eligible bool
@@ -64,34 +64,23 @@ func (r *ApplicationRepository) Apply(ctx context.Context, postingID, candidateI
 		if err := tx.QueryRow(ctx, `SELECT count(*) FROM applications WHERE posting_id=$1::uuid`, postingID).Scan(&count); err != nil {
 			return domain.Application{}, fmt.Errorf("count applications: %w", err)
 		}
-		if count >= int64(*maxApplications) {
+		if domain.ApplicationCapReached(maxApplications, count) {
 			return domain.Application{}, domain.ErrApplicationLimitReached
 		}
 	}
 	// Exact case-insensitive matching uses current candidate_amarat. Free-text posting
 	// requirements are informational and are not evaluated. Immutable resume/profile
 	// snapshots are not implemented; failed criteria are retained.
-	failed := make([]string, 0)
-	rows, err := tx.Query(ctx, `SELECT pa.amara_title FROM job_posting_amarat pa
- WHERE pa.posting_id=$1::uuid AND NOT EXISTS(SELECT 1 FROM candidate_amarat ca
- WHERE ca.cand_id=$2::uuid AND lower(btrim(ca.amara_title))=lower(btrim(pa.amara_title)))
- ORDER BY lower(pa.amara_title),pa.amara_title`, postingID, candidateID)
+	requiredAmarat, err := applicationAmaraTitles(ctx, tx, `SELECT amara_title FROM job_posting_amarat WHERE posting_id=$1::uuid ORDER BY lower(amara_title),amara_title`, postingID)
 	if err != nil {
-		return domain.Application{}, fmt.Errorf("screen Amarat: %w", err)
+		return domain.Application{}, fmt.Errorf("load required Amarat: %w", err)
 	}
-	for rows.Next() {
-		var title string
-		if err := rows.Scan(&title); err != nil {
-			rows.Close()
-			return domain.Application{}, fmt.Errorf("scan failed Amara: %w", err)
-		}
-		failed = append(failed, title)
+	candidateAmarat, err := applicationAmaraTitles(ctx, tx, `SELECT amara_title FROM candidate_amarat WHERE cand_id=$1::uuid`, candidateID)
+	if err != nil {
+		return domain.Application{}, fmt.Errorf("load candidate Amarat: %w", err)
 	}
-	if err := rows.Err(); err != nil {
-		rows.Close()
-		return domain.Application{}, fmt.Errorf("read screening results: %w", err)
-	}
-	rows.Close()
+	failed := domain.MissingAmarat(requiredAmarat, candidateAmarat)
+
 	appStatus := domain.ApplicationAdmitted
 	screenedOut := len(failed) > 0
 	if screenedOut {
@@ -111,4 +100,24 @@ func (r *ApplicationRepository) Apply(ctx context.Context, postingID, candidateI
 	// TODO(INVW): send admitted applications into the published pipeline. This checkout
 	// has no JOB-to-INVW admission event/outbox consumer; JOB admission is recorded only.
 	return result, nil
+}
+
+func applicationAmaraTitles(ctx context.Context, tx pgx.Tx, query string, id string) ([]string, error) {
+	rows, err := tx.Query(ctx, query, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	titles := make([]string, 0)
+	for rows.Next() {
+		var title string
+		if err := rows.Scan(&title); err != nil {
+			return nil, err
+		}
+		titles = append(titles, title)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return titles, nil
 }
