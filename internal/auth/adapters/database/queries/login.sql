@@ -31,6 +31,79 @@ LIMIT 1;
 INSERT INTO auth_sessions (token, account_id, account_type, expires_at)
 VALUES ($1, $2::uuid, $3, $4);
 
+-- name: LockCandidateForSession :one
+SELECT id::text
+FROM candidates
+WHERE id = $1::uuid
+  AND account_status = 'active'
+  AND deleted_at IS NULL
+  AND deactivated_at IS NULL
+FOR UPDATE;
+
+-- name: LockInterviewerForSession :one
+SELECT i.id::text
+FROM interviewers i
+JOIN companies co ON co.id = i.company_id
+WHERE i.id = $1::uuid
+  AND i.account_status = 'active'
+  AND i.deleted_at IS NULL
+  AND i.deactivated_at IS NULL
+  AND co.approved = TRUE
+  AND co.deleted_at IS NULL
+  AND co.deactivated_at IS NULL
+  AND COALESCE(co.banned, FALSE) = FALSE
+FOR UPDATE OF i, co;
+
+-- name: LockCompanyForSession :one
+SELECT id::text
+FROM companies
+WHERE id = $1::uuid
+  AND approved = TRUE
+  AND deleted_at IS NULL
+  AND deactivated_at IS NULL
+  AND COALESCE(banned, FALSE) = FALSE
+FOR UPDATE;
+
+-- name: ValidateSession :one
+SELECT s.account_id::text, s.account_type,
+       CASE
+           WHEN s.account_type = 'company' THEN s.account_id::text
+           WHEN s.account_type = 'interviewer' THEN COALESCE(i.company_id::text, '')
+           ELSE ''
+       END AS company_id,
+       s.expires_at
+FROM auth_sessions s
+LEFT JOIN interviewers i
+  ON s.account_type = 'interviewer' AND i.id = s.account_id
+LEFT JOIN candidates c
+  ON s.account_type = 'candidate' AND c.id = s.account_id
+LEFT JOIN companies co
+  ON (s.account_type = 'company' AND co.id = s.account_id)
+  OR (s.account_type = 'interviewer' AND co.id = i.company_id)
+WHERE s.token = $1
+  AND s.expires_at > now()
+  AND (
+    (s.account_type = 'candidate'
+     AND c.account_status = 'active'
+     AND c.deleted_at IS NULL
+     AND c.deactivated_at IS NULL)
+    OR
+    (s.account_type = 'interviewer'
+     AND i.account_status = 'active'
+     AND i.deleted_at IS NULL
+     AND i.deactivated_at IS NULL
+     AND co.approved = TRUE
+     AND co.deleted_at IS NULL
+     AND co.deactivated_at IS NULL
+     AND COALESCE(co.banned, FALSE) = FALSE)
+    OR
+    (s.account_type = 'company'
+     AND co.approved = TRUE
+     AND co.deleted_at IS NULL
+     AND co.deactivated_at IS NULL
+     AND COALESCE(co.banned, FALSE) = FALSE)
+  );
+
 -- name: TerminateSession :exec
 DELETE FROM auth_sessions
 WHERE token = $1;

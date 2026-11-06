@@ -49,14 +49,50 @@ func (r *RegistrationRepository) FindCredentials(ctx context.Context, email stri
 }
 
 func (r *RegistrationRepository) CreateSession(ctx context.Context, session ports.Session) error {
+	if r == nil || r.pool == nil {
+		return errors.New("session creation database is not configured")
+	}
 	accountID, err := parseUUID(session.AccountID)
 	if err != nil {
 		return fmt.Errorf("parse session account id: %w", err)
 	}
-	return r.queries.CreateSession(ctx, sqlc.CreateSessionParams{
-		Token: session.Token, Column2: accountID, AccountType: string(session.AccountType),
+	_, sessionType := accountActionTable(session.AccountType)
+	if sessionType == "" {
+		return domain.ErrInvalidSession
+	}
+
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("begin session creation: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	queries := r.queries.WithTx(tx)
+	var lockErr error
+	switch session.AccountType {
+	case domain.AccountTypeCandidate:
+		_, lockErr = queries.LockCandidateForSession(ctx, accountID)
+	case domain.AccountTypeInterviewer:
+		_, lockErr = queries.LockInterviewerForSession(ctx, accountID)
+	case domain.AccountTypeCompany:
+		_, lockErr = queries.LockCompanyForSession(ctx, accountID)
+	}
+	if lockErr != nil {
+		if errors.Is(lockErr, pgx.ErrNoRows) {
+			return domain.ErrAccountInactive
+		}
+		return fmt.Errorf("lock session account: %w", lockErr)
+	}
+	if err := queries.CreateSession(ctx, sqlc.CreateSessionParams{
+		Token: session.Token, Column2: accountID, AccountType: sessionType,
 		ExpiresAt: pgtype.Timestamp{Time: session.ExpiresAt, Valid: true},
-	})
+	}); err != nil {
+		return fmt.Errorf("insert session: %w", err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit session creation: %w", err)
+	}
+	return nil
 }
 
 func (r *RegistrationRepository) TerminateSession(ctx context.Context, token string) error {
@@ -143,29 +179,17 @@ func (r *RegistrationRepository) ValidateSession(ctx context.Context, token stri
 	if r.pool == nil {
 		return ports.Identity{}, errors.New("session validation database is not configured")
 	}
-	var identity ports.Identity
-	var accountType string
-	err := r.pool.QueryRow(ctx, `
-		SELECT s.account_id::text, s.account_type,
-		       CASE
-		           WHEN s.account_type = 'company' THEN s.account_id::text
-		           WHEN s.account_type = 'interviewer' THEN COALESCE(i.company_id::text, '')
-		           ELSE ''
-		       END AS company_id,
-		       s.expires_at
-		FROM auth_sessions s
-		LEFT JOIN interviewers i
-		  ON s.account_type = 'interviewer' AND i.id = s.account_id
-		WHERE s.token = $1 AND s.expires_at > now()
-	`, token).Scan(&identity.AccountID, &accountType, &identity.CompanyID, &identity.ExpiresAt)
+	row, err := r.queries.ValidateSession(ctx, token)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return ports.Identity{}, domain.ErrInvalidSession
 		}
 		return ports.Identity{}, fmt.Errorf("validate session: %w", err)
 	}
-	identity.AccountType = domain.AccountType(accountType)
-	return identity, nil
+	return ports.Identity{
+		AccountID: row.SAccountID, AccountType: domain.AccountType(row.AccountType),
+		CompanyID: row.CompanyID, ExpiresAt: row.ExpiresAt.Time,
+	}, nil
 }
 
 func (r *RegistrationRepository) EmailExists(ctx context.Context, email string) (bool, error) {
