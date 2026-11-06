@@ -6,7 +6,7 @@ import (
 	"crypto/cipher"
 	"crypto/hmac"
 	"crypto/rand"
-	"crypto/sha1"
+	"crypto/sha1" // #nosec G505 -- TOTP per RFC 6238 must support SHA-1 for authenticator compatibility.
 	"encoding/base32"
 	"encoding/binary"
 	"errors"
@@ -174,8 +174,11 @@ func verifyTOTP(secret []byte, code string, now time.Time) bool {
 }
 
 func generateTOTP(secret []byte, counter int64) string {
+	if counter < 0 {
+		return ""
+	}
 	var input [8]byte
-	binary.BigEndian.PutUint64(input[:], uint64(counter))
+	binary.BigEndian.PutUint64(input[:], uint64(counter)) // #nosec G115 -- counter is checked as non-negative above.
 	mac := hmac.New(sha1.New, secret)
 	_, _ = mac.Write(input[:])
 	sum := mac.Sum(nil)

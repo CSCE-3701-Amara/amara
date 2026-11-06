@@ -2,7 +2,7 @@ package password
 
 import (
 	"context"
-	"crypto/sha1"
+	"crypto/sha1" // #nosec G505 -- HIBP k-anonymity API requires SHA-1 hash prefixes.
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -24,7 +24,7 @@ func NewHIBPChecker(client *http.Client) (*HIBPChecker, error) {
 }
 
 func (c *HIBPChecker) IsCompromised(ctx context.Context, password string) (bool, error) {
-	sum := sha1.Sum([]byte(password))
+	sum := sha1.Sum([]byte(password)) // #nosec G401 -- required by HIBP range API protocol.
 	hash := strings.ToUpper(hex.EncodeToString(sum[:]))
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+hash[:5], nil)
 	if err != nil {
