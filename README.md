@@ -74,6 +74,22 @@ supabase migration new <name>       # create the next migration file
 schema changes through the dashboard SQL editor; they must exist as migration
 files in this repository.
 
+Migration files contain forward SQL only. Supabase executes the whole file;
+Goose Up/Down comments do not separate forward and rollback statements. The
+duplicate November table-creation files have been removed because the October
+migrations already create those tables.
+
+With Python 3 and PostgreSQL's `initdb`, `pg_ctl`, and `psql` on `PATH`, verify
+the full migration sequence without connecting to Supabase:
+
+```sh
+make test-migrations
+```
+
+This creates a temporary local database, applies every migration in order,
+checks the resulting tables and columns against `main.mmd`, verifies that an
+existing candidate survives the sequence, and removes the temporary database.
+
 ## Infisical
 
 Infisical is the secrets manager. The CLI injects configuration and secrets as

@@ -1,5 +1,3 @@
--- +goose Up
--- +goose StatementBegin
 ALTER TABLE modules
     ADD COLUMN source TEXT NOT NULL DEFAULT 'company'
         CHECK (source IN ('platform', 'company')),
@@ -120,53 +118,3 @@ CREATE TABLE test_configurations (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ
 );
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-DROP TABLE test_configurations, assessment_questions, stage_transitions;
-
-ALTER TABLE pipeline_stages
-    DROP CONSTRAINT pipeline_stages_threshold_check,
-    DROP CONSTRAINT pipeline_stages_schedule_check,
-    DROP CONSTRAINT pipeline_stages_version_id_key,
-    DROP CONSTRAINT pipeline_stages_name_key,
-    DROP COLUMN position_y,
-    DROP COLUMN position_x,
-    DROP COLUMN scheduled_end_at,
-    DROP COLUMN scheduled_start_at,
-    DROP COLUMN feedback_mode,
-    DROP COLUMN below_threshold_action,
-    DROP COLUMN score_threshold,
-    DROP COLUMN advancement_rule;
-
-DROP INDEX pipeline_versions_one_published_idx;
-ALTER TABLE pipeline_versions
-    DROP CONSTRAINT pipeline_versions_number_key,
-    DROP COLUMN published_at,
-    DROP COLUMN created_at,
-    DROP COLUMN migration_plan,
-    DROP COLUMN published_by,
-    DROP COLUMN previous_version_id;
-
-ALTER TABLE pipelines
-    DROP CONSTRAINT pipelines_identity_reveal_check,
-    DROP COLUMN updated_at,
-    DROP COLUMN created_at,
-    DROP COLUMN rejection_feedback_mode,
-    DROP COLUMN reveal_stage_id,
-    DROP COLUMN identity_reveal_point,
-    DROP COLUMN anonymity_enabled;
-
-ALTER TABLE modules
-    DROP COLUMN updated_at,
-    DROP COLUMN created_at,
-    DROP COLUMN interview_duration_minutes,
-    DROP COLUMN rubric,
-    DROP COLUMN amara_definitions,
-    DROP COLUMN difficulty_mix,
-    DROP COLUMN question_count,
-    DROP COLUMN selection_mode,
-    DROP COLUMN completion_window,
-    DROP COLUMN source;
--- +goose StatementEnd

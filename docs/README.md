@@ -12,6 +12,7 @@ This directory contains the product requirements, software design, diagrams, and
 | Find quality targets such as security, privacy, capacity, reliability, or accessibility | [SRS non-functional requirements](srs/06-nfr.md) |
 | Understand how the system is intended to be structured | [SDD system architecture](sdd/03-system-architecture.md) |
 | Find a specific epic's components | The matching page in [`sdd/04-component-diagram/`](sdd/04-component-diagram/) |
+| Understand database tables, relationships, constraints, and migration limitations | [Database design](sdd/database/database_design.md) |
 | Find the design's editable diagrams or rendered figures | [`sdd/src/`](sdd/src/) and [`sdd/img/`](sdd/img/) |
 | Find items that are not specified or completed yet | [Milestone TBDs and open items](srs/TBD.md) |
 | Check writing, ID, or diagram conventions | [`conventions/`](conventions/) |
@@ -46,6 +47,7 @@ The Software Design Document describes the proposed architecture and design choi
 | [`sdd/03-system-architecture.md`](sdd/03-system-architecture.md) | Modular-monolith structure, workers, module contracts, data ownership, patterns, and tradeoffs. |
 | [`sdd/04-component-diagram/`](sdd/04-component-diagram/) | Component responsibilities, interactions, and design decisions for each epic. |
 | [`sdd/05-interfaces.md`](sdd/05-interfaces.md) | Human-facing interfaces and the related SRS use-case flows. |
+| [`sdd/database/database_design.md`](sdd/database/database_design.md) | Database dictionary, relationships, integrity rules, indexes, and migration limitations, based on the ER diagram and Supabase migrations. |
 | [`sdd/src/`](sdd/src/) | Editable PlantUML source diagrams. |
 | [`sdd/img/`](sdd/img/) | Rendered diagrams embedded in the SDD pages. |
 

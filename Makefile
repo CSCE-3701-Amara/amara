@@ -1,7 +1,7 @@
 INFISICAL_ENV ?= dev
 INFISICAL_PATH ?= /backend
 
-.PHONY: run run-secrets build test vet fmt db-push db-pull db-reset
+.PHONY: run run-secrets build test test-migrations vet fmt db-push db-pull db-reset
 
 run:
 	go run ./cmd/api
@@ -27,6 +27,9 @@ build:
 
 test:
 	go test ./...
+
+test-migrations:
+	python3 tests/migrations/test_migrations.py
 
 vet:
 	go vet ./...
