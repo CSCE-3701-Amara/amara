@@ -120,6 +120,7 @@ func TestLoginDependencyAndPersistenceErrors(t *testing.T) {
 	if _, err := NewLoginService(nil, &loginSessions{}, &MFAService{}); err == nil {
 		t.Fatal("expected dependency validation error")
 	}
+
 	hash, salt := hashedPassword("password123")
 	sessions := &loginSessions{err: errors.New("storage down")}
 	service := loginService(t, ports.Credentials{
@@ -132,5 +133,21 @@ func TestLoginDependencyAndPersistenceErrors(t *testing.T) {
 	service.credentials = loginCredentials{err: errors.New("database down")}
 	if _, err := service.Login(context.Background(), domain.Login{Email: "user@example.com", Password: "password123"}); err == nil {
 		t.Fatal("expected credential lookup error")
+	}
+}
+
+func TestLoginAttemptLimiter(t *testing.T) {
+	var limiter loginAttemptLimiter
+	now := time.Unix(1000, 0)
+	for i := 0; i < maxLoginAttempts; i++ {
+		if !limiter.allow("user@example.com", now) {
+			t.Fatalf("attempt %d was unexpectedly blocked", i+1)
+		}
+	}
+	if limiter.allow("user@example.com", now) {
+		t.Fatal("expected login attempts to be rate limited")
+	}
+	if !limiter.allow("user@example.com", now.Add(loginAttemptWindow)) {
+		t.Fatal("expected attempts to be allowed after the window")
 	}
 }

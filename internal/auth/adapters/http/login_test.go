@@ -201,12 +201,14 @@ func TestLoginHandlerRoutes(t *testing.T) {
 	handler := newTestLoginHandler(t, testCredentials(domain.AccountTypeCandidate), ports.ErrMFANotConfigured, nil)
 	handler.RegisterRoutes(router.Group("/api/v1"))
 
-	request := httptest.NewRequest(http.MethodPost, "/api/v1/auth/sessions",
-		strings.NewReader(`{"email":"user@example.com","password":"password123"}`))
-	recorder := httptest.NewRecorder()
-	router.ServeHTTP(recorder, request)
-	if recorder.Code != http.StatusOK {
-		t.Fatalf("status = %d, want %d", recorder.Code, http.StatusOK)
+	for _, path := range []string{"/api/v1/auth/sessions", "/api/v1/auth/login"} {
+		request := httptest.NewRequest(http.MethodPost, path,
+			strings.NewReader(`{"email":"user@example.com","password":"password123"}`))
+		recorder := httptest.NewRecorder()
+		router.ServeHTTP(recorder, request)
+		if recorder.Code != http.StatusOK {
+			t.Errorf("%s: status = %d, want %d", path, recorder.Code, http.StatusOK)
+		}
 	}
 }
 

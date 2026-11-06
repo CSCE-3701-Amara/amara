@@ -30,6 +30,7 @@ func NewLoginHandler(service *application.LoginService) (*LoginHandler, error) {
 // RegisterRoutes mounts the session endpoint under the API version group.
 func (h *LoginHandler) RegisterRoutes(group *gin.RouterGroup) {
 	group.POST("/auth/sessions", gin.WrapH(h))
+	group.POST("/auth/login", gin.WrapH(h))
 }
 
 type loginRequest struct {
@@ -62,6 +63,9 @@ func (h *LoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		switch {
 		case errors.Is(err, domain.ErrInvalidCredentials):
 			status, code = http.StatusUnauthorized, "invalid_credentials"
+		case errors.Is(err, domain.ErrLoginRateLimited):
+			writer.Header().Set("Retry-After", "60")
+			status, code = http.StatusTooManyRequests, "login_rate_limited"
 		case errors.Is(err, domain.ErrAccountInactive):
 			status, code = http.StatusForbidden, "account_not_active"
 		case errors.Is(err, domain.ErrAccountForbidden):

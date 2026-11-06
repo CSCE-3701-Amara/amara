@@ -4,6 +4,7 @@ import "errors"
 
 var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
+	ErrLoginRateLimited   = errors.New("login attempts rate limited")
 	ErrInvalidSession     = errors.New("invalid session")
 	ErrAccountInactive    = errors.New("account is not active")
 	ErrAccountForbidden   = errors.New("account is forbidden")
