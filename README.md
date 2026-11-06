@@ -149,6 +149,7 @@ and path parameter values. Gin prints its route diagnostics in development mode.
 make build          # Build bin/api
 make test           # Run Go tests
 make vet            # Run go vet
+make gosec          # Run gosec with the reviewed false-positive exceptions
 make fmt            # Format Go packages
 go test -race ./... # Check for data races
 ```
@@ -163,3 +164,14 @@ the HIBP password compromise checker. Candidate/interviewer registration at
 verification email delivery is configured. Requests are rejected before any
 account or verification challenge is written. Both endpoints use the shared
 request ID, logging, recovery, and CORS middleware.
+
+The `gosec` executable must be installed before running `make gosec`.
+[.gosec.json](.gosec.json) excludes only G101 (hardcoded credentials) in the
+generated `auth_registration.sql.go`, `login.sql.go`, and `mfa.sql.go` files:
+the four flagged constants are parameterized SQL statements containing column
+names such as `secret` and `password_hash`, with credential values supplied at
+runtime. Other rules still scan these files, and G101 remains enabled elsewhere.
+The configuration survives `sqlc generate` without editing generated code.
+The SHA-1 exceptions are annotated at their exact import/call sites: HIBP uses
+SHA-1 hash prefixes for breach lookups, and TOTP uses HMAC-SHA-1 for existing
+authenticator enrollments. Password storage continues to use Argon2id.

@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"errors"
+	"math"
 	"strings"
 	"testing"
 	"time"
@@ -122,5 +123,52 @@ func TestMFAEnrollmentErrors(t *testing.T) {
 	repository = &mfaRepository{saveErr: errors.New("db down")}
 	if _, err := newMFAService(t, repository).BeginEnrollment(context.Background(), "id", domain.AccountTypeCandidate, "user@example.com"); err == nil {
 		t.Fatal("expected save error")
+	}
+}
+
+func TestGenerateTOTPRFC4226Vectors(t *testing.T) {
+	// RFC 4226 Appendix D: independent reference values for the HOTP primitive
+	// used by TOTP. Keep the six-digit output and SHA-1 enrollment compatible.
+	secret := []byte("12345678901234567890")
+	for counter, want := range []string{
+		"755224", "287082", "359152", "969429", "338314",
+		"254676", "287922", "162583", "399871", "520489",
+	} {
+		if got := generateTOTP(secret, int64(counter)); got != want {
+			t.Fatalf("counter %d: code = %q, want %q", counter, got, want)
+		}
+	}
+}
+
+func TestGenerateTOTPRejectsNegativeCounters(t *testing.T) {
+	for _, counter := range []int64{math.MinInt64, -1} {
+		if got := generateTOTP([]byte("12345678901234567890"), counter); got != "" {
+			t.Fatalf("negative counter %d must not produce a code", counter)
+		}
+	}
+}
+
+func TestVerifyTOTPEpochAndWindowBoundaries(t *testing.T) {
+	secret := []byte("12345678901234567890")
+	for _, tc := range []struct {
+		name    string
+		seconds int64
+		code    string
+		want    bool
+	}{
+		{"before epoch", -1, "755224", false},
+		{"negative time step", -30, "755224", false},
+		{"epoch", 0, "755224", true},
+		{"next epoch step", 0, "287082", true},
+		{"previous step", 60, "287082", true},
+		{"current step", 60, "359152", true},
+		{"next step", 60, "969429", true},
+		{"expired step", 60, "755224", false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := verifyTOTP(secret, tc.code, time.Unix(tc.seconds, 0)); got != tc.want {
+				t.Fatalf("verification = %t, want %t", got, tc.want)
+			}
+		})
 	}
 }
