@@ -6,7 +6,7 @@ Amara's backend is a Go modular monolith using Gin. Business modules live under
 
 ## Run the API
 
-Install Go 1.26 or newer, then run from the repository root:
+Install Go 1.26.9 or newer, then run from the repository root:
 
 ```sh
 go mod download
@@ -149,7 +149,9 @@ and path parameter values. Gin prints its route diagnostics in development mode.
 make build          # Build bin/api
 make test           # Run Go tests
 make vet            # Run go vet
+make security       # Run all local security and static-analysis checks
 make gosec          # Run gosec with the reviewed false-positive exceptions
+make govulncheck    # Check Go code and both executables' dependency modules
 make fmt            # Format Go packages
 go test -race ./... # Check for data races
 ```
@@ -175,3 +177,38 @@ The configuration survives `sqlc generate` without editing generated code.
 The SHA-1 exceptions are annotated at their exact import/call sites: HIBP uses
 SHA-1 hash prefixes for breach lookups, and TOTP uses HMAC-SHA-1 for existing
 authenticator enrollments. Password storage continues to use Argon2id.
+
+Install `govulncheck` before running `make govulncheck`. It scans all Go packages,
+then checks the API and worker dependency modules, rejecting advisories even
+when the executables do not call the affected functions. CI uses the Go version
+in `go.mod`, and Docker builds use Go 1.26.9.
+The pinned `golang.org/x/crypto` revision removes the unmaintained OpenPGP
+package, addressing [GO-2026-5932](https://pkg.go.dev/vuln/GO-2026-5932) in
+addition to the security fixes included in its preceding release.
+
+Run [scripts/check-security.sh](scripts/check-security.sh), or `make security`,
+to run Go vet, Staticcheck, gosec, govulncheck, and Semgrep (`p/default`). The
+script works from any directory, continues after individual failures, and
+returns a nonzero status for findings, scanner errors, or missing tools. It
+prints the directory containing per-check logs and `summary.txt`; set
+`SECURITY_REPORT_DIR` to choose a persistent location. It finds installed Go
+tools through `PATH` and Go's configured `GOBIN`/`GOPATH`.
+
+Install the tools before running the script:
+
+```sh
+go install honnef.co/go/tools/cmd/staticcheck@latest
+go install github.com/securego/gosec/v2/cmd/gosec@latest
+go install golang.org/x/vuln/cmd/govulncheck@latest
+uv tool install semgrep
+./scripts/check-security.sh
+```
+
+Use `--release` to include the release workflow's ZAP active scan and public
+HTTP header check. This mode requires Docker and runs an active scan against
+the supplied staging environment; ZAP warnings also fail the check.
+
+```sh
+STAGING_URL=https://staging.example.com PUBLIC_ORIGIN=https://app.example.com \
+  ./scripts/check-security.sh --release
+```

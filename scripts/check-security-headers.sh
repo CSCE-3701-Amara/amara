@@ -17,7 +17,7 @@ check_header() {
   fi
 
   if [[ -n "$expected" ]] &&
-     ! grep -Eq "\"${name}\":[[:space:]]*\"[^\"]*${expected}" <<< "$HEADERS"; then
+     ! grep -Eq "\"${name}\":[[:space:]]*\[[[:space:]]*\"[^\"]*${expected}" <<< "$HEADERS"; then
     echo "FAIL: $name does not match expected value: $expected"
     return 1
   fi

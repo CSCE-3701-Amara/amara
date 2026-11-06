@@ -1,7 +1,7 @@
 INFISICAL_ENV ?= dev
 INFISICAL_PATH ?= /backend
 
-.PHONY: run run-secrets build test vet gosec fmt db-push db-pull db-reset
+.PHONY: run run-secrets build test vet security gosec govulncheck fmt db-push db-pull db-reset
 
 run:
 	go run ./cmd/api
@@ -31,8 +31,16 @@ test:
 vet:
 	go vet ./...
 
+security:
+	./scripts/check-security.sh
+
 gosec:
 	gosec -conf .gosec.json ./...
+
+govulncheck:
+	govulncheck ./...
+	govulncheck -C cmd/api -scan module
+	govulncheck -C cmd/worker -scan module
 
 fmt:
 	go fmt ./...
