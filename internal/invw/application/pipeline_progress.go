@@ -65,7 +65,7 @@ func (s *CandidatePipelineProgressService) Get(ctx context.Context, candidateID,
 	incoming := make(map[string]int, len(pipeline.Stages))
 	passed := make(map[string]bool, len(pipeline.Stages))
 	for _, stage := range pipeline.Stages {
-		if stage.Progress != nil && stage.Progress.CompletedAt != nil {
+		if stage.Progress != nil && stage.Progress.Completed {
 			passed[stage.ID] = stage.Progress.Passed
 		}
 	}
@@ -83,7 +83,7 @@ func (s *CandidatePipelineProgressService) Get(ctx context.Context, candidateID,
 		status := domain.PipelineStageLocked
 		var completedAt *time.Time
 		var stagePassed *bool
-		if stage.Progress != nil && stage.Progress.CompletedAt != nil {
+		if stage.Progress != nil && stage.Progress.Completed {
 			status = domain.PipelineStageCompleted
 			completedAt = stage.Progress.CompletedAt
 			value := stage.Progress.Passed

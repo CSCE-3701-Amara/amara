@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -32,14 +33,15 @@ func (r *CandidatePipelineProgressRepository) GetByCandidateApplication(ctx cont
 	defer func() { _ = tx.Rollback(ctx) }()
 
 	result := domain.CandidatePipelineProgress{ApplicationID: applicationID}
+	var pipelineExecutionID string
 	err = tx.QueryRow(ctx, `
-		SELECT pv.id::text, pv.version_number, pv.published_at
+		SELECT pv.id::text, pv.version_number, pv.published_at, execution.id::text
 		FROM applications a
-		JOIN application_pipeline_assignments assignment ON assignment.application_id = a.id
-		JOIN pipeline_versions pv ON pv.id = assignment.pipeline_version_id
-		WHERE a.id = $1 AND a.cand_id = $2 AND pv.status = 'published'`,
+		JOIN pipeline_executions execution ON execution.application_id = a.id
+		JOIN pipeline_versions pv ON pv.id = execution.pipeline_version_id
+		WHERE a.id = $1 AND a.cand_id = $2 AND pv.published_at IS NOT NULL`,
 		applicationID, candidateID,
-	).Scan(&result.Pipeline.ID, &result.Pipeline.Version, &result.Pipeline.PublishedAt)
+	).Scan(&result.Pipeline.ID, &result.Pipeline.Version, &result.Pipeline.PublishedAt, &pipelineExecutionID)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return domain.CandidatePipelineProgress{}, fmt.Errorf("%w: no published pipeline is assigned to this application", domain.ErrPipelineProgressNotFound)
 	}
@@ -48,29 +50,32 @@ func (r *CandidatePipelineProgressRepository) GetByCandidateApplication(ctx cont
 	}
 
 	rows, err := tx.Query(ctx, `
-		SELECT stage.id::text, stage.name, stage.stage_type,
-		       progress.state, progress.passed, progress.completed_at
+		SELECT stage.id::text, stage.name, stage.module_type,
+		       execution.status, execution.completed_at
 		FROM pipeline_stages stage
-		LEFT JOIN application_stage_progress progress
-		  ON progress.stage_id = stage.id AND progress.application_id = $2
-		WHERE stage.pipeline_version_id = $1
-	ORDER BY stage.position, stage.id`, result.Pipeline.ID, applicationID)
+		LEFT JOIN stage_executions execution
+		  ON execution.stage_id = stage.id AND execution.pipeline_execution_id = $2
+		WHERE stage.version_id = $1
+		ORDER BY stage.position, stage.id`, result.Pipeline.ID, pipelineExecutionID)
 	if err != nil {
 		return domain.CandidatePipelineProgress{}, fmt.Errorf("query published pipeline stages: %w", err)
 	}
 	for rows.Next() {
 		var stage domain.PipelineStage
-		var state *string
-		var passed *bool
+		var executionStatus *string
 		var completedAt *time.Time
-		if err := rows.Scan(&stage.ID, &stage.Name, &stage.Type, &state, &passed, &completedAt); err != nil {
+		if err := rows.Scan(&stage.ID, &stage.Name, &stage.Type, &executionStatus, &completedAt); err != nil {
 			rows.Close()
 			return domain.CandidatePipelineProgress{}, fmt.Errorf("scan published pipeline stage: %w", err)
 		}
-		if state != nil {
-			stage.Progress = &domain.StageProgress{Active: *state == "active"}
-			if *state == "completed" && passed != nil {
-				stage.Progress.Passed = *passed
+		if executionStatus != nil {
+			completed := *executionStatus == "passed" || *executionStatus == "rejected" ||
+				*executionStatus == "cancelled" || *executionStatus == "missed"
+			active := *executionStatus == "available" || *executionStatus == "in_progress" ||
+				*executionStatus == "pending_grading" || *executionStatus == "held"
+			stage.Progress = &domain.StageProgress{Completed: completed, Active: active}
+			if completed {
+				stage.Progress.Passed = *executionStatus == "passed"
 				stage.Progress.CompletedAt = completedAt
 			}
 		}
@@ -85,7 +90,7 @@ func (r *CandidatePipelineProgressRepository) GetByCandidateApplication(ctx cont
 
 	rows, err = tx.Query(ctx, `
 		SELECT link.from_stage_id::text, link.to_stage_id::text
-		FROM pipeline_links link
+		FROM stage_transitions link
 		WHERE link.pipeline_version_id = $1
 		ORDER BY link.from_stage_id, link.to_stage_id`, result.Pipeline.ID)
 	if err != nil {
@@ -107,20 +112,25 @@ func (r *CandidatePipelineProgressRepository) GetByCandidateApplication(ctx cont
 	rows.Close()
 
 	rows, err = tx.Query(ctx, `
-		SELECT award.id::text, award.stage_id::text, award.company_id::text,
-		       COALESCE(NULLIF(BTRIM(company.display_name), ''), company.legal_name), award.amara_name,
-		       award.crest, award.skill_domain, award.level, award.level_description,
-		       award.strengths, award.development_areas, award.evidence, award.awarded_at
-		FROM amara_awards award
-		JOIN application_stage_progress progress
-		  ON progress.application_id = award.application_id
-		 AND progress.stage_id = award.stage_id AND progress.state = 'completed' AND progress.passed
-		JOIN application_pipeline_assignments assignment
-		  ON assignment.application_id = award.application_id
-		JOIN applications app ON app.id = assignment.application_id
-		JOIN companies company ON company.id = award.company_id
-		WHERE assignment.pipeline_version_id = $1 AND app.id = $2 AND app.cand_id = $3
-		ORDER BY award.awarded_at, award.id`, result.Pipeline.ID, applicationID, candidateID)
+		SELECT award.id::text, execution.stage_id::text,
+		       COALESCE(award.company_id::text, ''),
+		       COALESCE(NULLIF(BTRIM(company.display_name), ''), company.legal_name, ''),
+		       award.amara_title,
+		       COALESCE(award.definition_snapshot->>'crest', ''),
+		       COALESCE(award.definition_snapshot->>'domain', ''),
+		       award.level, award.definition_snapshot->>'level_description',
+		       award.strengths, award.areas_for_development,
+		       CASE WHEN jsonb_typeof(award.pass_decision->'evidence') = 'array'
+		            THEN award.pass_decision->'evidence' ELSE '[]'::jsonb END,
+		       award.awarded_at
+		FROM candidate_amarat award
+		JOIN stage_executions execution
+		  ON execution.id = award.source_stage_execution_id
+		 AND execution.pipeline_execution_id = $3
+		 AND execution.status = 'passed'
+		LEFT JOIN companies company ON company.id = award.company_id
+		WHERE award.application_id = $1 AND award.cand_id = $2
+		ORDER BY award.awarded_at, award.id`, applicationID, candidateID, pipelineExecutionID)
 	if err != nil {
 		return domain.CandidatePipelineProgress{}, fmt.Errorf("query candidate Amara awards: %w", err)
 	}
@@ -132,7 +142,8 @@ func (r *CandidatePipelineProgressRepository) GetByCandidateApplication(ctx cont
 	for rows.Next() {
 		var award domain.AmaraAward
 		var stageID string
-		var strengths, developmentAreas, evidence []byte
+		var strengths, developmentAreas *string
+		var evidence []byte
 		if err := rows.Scan(
 			&award.ID, &stageID, &award.CompanyID, &award.CompanyName, &award.Name,
 			&award.Crest, &award.SkillDomain, &award.Level, &award.LevelDescription,
@@ -140,14 +151,13 @@ func (r *CandidatePipelineProgressRepository) GetByCandidateApplication(ctx cont
 		); err != nil {
 			return domain.CandidatePipelineProgress{}, fmt.Errorf("scan candidate Amara award: %w", err)
 		}
-		if err := json.Unmarshal(strengths, &award.Strengths); err != nil {
-			return domain.CandidatePipelineProgress{}, fmt.Errorf("decode Amara strengths: %w", err)
-		}
-		if err := json.Unmarshal(developmentAreas, &award.DevelopmentAreas); err != nil {
-			return domain.CandidatePipelineProgress{}, fmt.Errorf("decode Amara development areas: %w", err)
-		}
 		if err := json.Unmarshal(evidence, &award.Evidence); err != nil {
 			return domain.CandidatePipelineProgress{}, fmt.Errorf("decode Amara evidence: %w", err)
+		}
+		award.Strengths = awardTextList(strengths)
+		award.DevelopmentAreas = awardTextList(developmentAreas)
+		if award.Evidence == nil {
+			award.Evidence = []string{}
 		}
 		if stage := stages[stageID]; stage != nil {
 			stage.Awards = append(stage.Awards, award)
@@ -157,4 +167,11 @@ func (r *CandidatePipelineProgressRepository) GetByCandidateApplication(ctx cont
 		return domain.CandidatePipelineProgress{}, fmt.Errorf("read candidate Amara awards: %w", err)
 	}
 	return result, nil
+}
+
+func awardTextList(value *string) []string {
+	if value == nil || strings.TrimSpace(*value) == "" {
+		return []string{}
+	}
+	return []string{*value}
 }

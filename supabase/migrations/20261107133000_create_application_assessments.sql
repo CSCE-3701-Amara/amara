@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE application_assessments (
     id                      UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     application_id          UUID        NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
@@ -5,7 +6,7 @@ CREATE TABLE application_assessments (
     status                  TEXT        NOT NULL DEFAULT 'not_started'
                                         CHECK (status IN ('not_started', 'in_progress', 'submitted', 'completed')),
     supports_interruption   BOOLEAN     NOT NULL DEFAULT FALSE,
-    saved_progress          JSONB,
+    saved_progress          JSONB       CHECK (saved_progress IS NULL OR jsonb_typeof(saved_progress) = 'object'),
     created_at              TIMESTAMP   NOT NULL DEFAULT now(),
     updated_at              TIMESTAMP   NOT NULL DEFAULT now(),
     UNIQUE (application_id, assessment_id)
@@ -13,3 +14,7 @@ CREATE TABLE application_assessments (
 
 CREATE INDEX application_assessments_application_created_idx
     ON application_assessments (application_id, created_at, id);
+
+-- +goose Down
+DROP INDEX IF EXISTS application_assessments_application_created_idx;
+DROP TABLE IF EXISTS application_assessments;

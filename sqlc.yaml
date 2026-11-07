@@ -1,10 +1,13 @@
 version: "2"
+
 sql:
-  - engine: "postgresql"
-    queries: "db/queries/"
+  - name: auth
+    engine: "postgresql"
     schema: "supabase/migrations/"
+    queries: "internal/auth/adapters/database/queries/"
     gen:
       go:
-        package: "db"
-        out: "db"
+        package: "sqlc"
+        out: "internal/auth/adapters/database/sqlc"
         sql_package: "pgx/v5"
+        omit_unused_structs: true
