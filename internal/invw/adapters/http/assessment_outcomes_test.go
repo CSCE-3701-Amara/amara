@@ -161,6 +161,7 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	repo := database.NewAssessmentRepository(pool)
 	router := gin.New()
 	NewAssessmentHandler(repo, outcomeSessions{}).RegisterRoutes(router.Group("/v1"))
+	NewPipelineHandler(nil, outcomeSessions{}).RegisterRoutes(router.Group("/v1"))
 	request := func(method, path, token, body string, status int) []byte {
 		t.Helper()
 		req := httptest.NewRequest(method, "/v1"+path, strings.NewReader(body))
@@ -453,5 +454,43 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		JOIN stage_executions se ON se.pipeline_execution_id=pe.id WHERE se.id=$1::uuid`, interviewStage).
 		Scan(&finalist); err != nil || !finalist {
 		t.Fatalf("finalist after behavioral interview: finalist=%v: %v", finalist, err)
+	}
+	exec(`
+		UPDATE job_postings SET finalist_target=2;
+		UPDATE applications SET status='admitted', nice_to_have_score=75;
+		UPDATE pipeline_executions SET status='active';
+		UPDATE pipeline_stages SET advancement_rule='threshold', score_threshold=90 WHERE stage_order=7;
+		UPDATE stage_executions SET status='held' WHERE stage_id='00000000-0000-0000-0000-000000000017';
+		UPDATE interviews SET status='completed', outcome='held', score=80
+		WHERE id='00000000-0000-0000-0000-000000000031';
+	`)
+	dashboardPath := "/jobs/00000000-0000-0000-0000-000000000003/pipeline/dashboard"
+	request(http.MethodGet, dashboardPath, "candidate", "", http.StatusForbidden)
+	dashboard := string(request(http.MethodGet, dashboardPath, "company", "", http.StatusOK))
+	for _, want := range []string{`"finalistTarget":2`, `"niceToHaveScore":75`, `"percentile":100`} {
+		if !strings.Contains(dashboard, want) {
+			t.Fatalf("dashboard missing %s: %s", want, dashboard)
+		}
+	}
+	if strings.Contains(dashboard, "candidate@example.test") || strings.Contains(dashboard, "00000000-0000-0000-0000-000000000001") {
+		t.Fatalf("dashboard exposes candidate identity: %s", dashboard)
+	}
+	thresholdPath := "/pipeline-stages/00000000-0000-0000-0000-000000000017/threshold"
+	preview := request(http.MethodPost, thresholdPath+"/preview", "company",
+		`{"threshold":80,"expectedThreshold":90}`, http.StatusOK)
+	if !strings.Contains(string(preview), `"status":"passed"`) {
+		t.Fatalf("threshold preview did not project a pass: %s", preview)
+	}
+	stageState(7, "held")
+	request(http.MethodPut, thresholdPath, "company",
+		`{"threshold":80,"expectedThreshold":90,"preview":[]}`, http.StatusConflict)
+	apply := fmt.Sprintf(`{"threshold":80,"expectedThreshold":90,"preview":%s}`, preview)
+	request(http.MethodPut, thresholdPath, "company", apply, http.StatusOK)
+	stageState(7, "passed")
+	request(http.MethodPut, thresholdPath, "company", apply, http.StatusConflict)
+	var audited bool
+	if err := pool.QueryRow(ctx, `SELECT count(*)=1 FROM pipeline_threshold_changes
+		WHERE previous_threshold=90 AND new_threshold=80`).Scan(&audited); err != nil || !audited {
+		t.Fatalf("threshold audit recorded=%v: %v", audited, err)
 	}
 }

@@ -40,6 +40,7 @@ type Posting struct {
 	ApplicationOpening  *time.Time    `json:"application_opening"`
 	ApplicationDeadline *time.Time    `json:"application_deadline"`
 	MaxApplications     *int32        `json:"max_applications"`
+	FinalistTarget      *int32        `json:"finalist_target"`
 	Status              string        `json:"status"`
 	LastAutosavedAt     *time.Time    `json:"last_autosaved_at"`
 	PublishedAt         *time.Time    `json:"published_at"`
@@ -103,6 +104,9 @@ func (p Posting) ValidateForSave() error {
 	}
 	if p.OpenPositions != nil && *p.OpenPositions < 1 {
 		return fmt.Errorf("%w: open_positions must be positive", ErrInvalidPosting)
+	}
+	if p.FinalistTarget != nil && *p.FinalistTarget < 1 {
+		return fmt.Errorf("%w: finalist_target must be positive", ErrInvalidPosting)
 	}
 	if p.MaxApplications != nil && *p.MaxApplications < 1 {
 		return fmt.Errorf("%w: max_applications must be positive", ErrInvalidPosting)

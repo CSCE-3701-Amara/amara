@@ -29,6 +29,9 @@ func (h *AssessmentHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 	company := authhttp.CompanyAuth(h.sessions, writeError)
 	v1.POST("/stage-executions/:stageExecutionId/decisions", company, h.stageDecision(false))
 	v1.POST("/pipeline-stages/:stageId/decisions", company, h.stageDecision(true))
+	v1.GET("/jobs/:id/pipeline/dashboard", company, h.pipelineDashboard)
+	v1.POST("/pipeline-stages/:stageId/threshold/preview", company, h.stageThreshold(false))
+	v1.PUT("/pipeline-stages/:stageId/threshold", company, h.stageThreshold(true))
 	candidate := authhttp.CandidateAuthWithErrorWriter(h.sessions, writeError)
 	v1.GET("/applications/:applicationId/assessment-instances", candidate, h.listInstances)
 	v1.POST("/assessment-instances/:instanceId/start", candidate, h.attempt("instanceId", true, false))
@@ -165,6 +168,8 @@ func writeAssessment(c *gin.Context, result any, err error) {
 		writeError(c, http.StatusNotFound, "assessment_not_found", "The requested resource was not found.")
 	case errors.Is(err, database.ErrDecisionConflict):
 		writeError(c, http.StatusConflict, "stage_decision_conflict", err.Error())
+	case errors.Is(err, database.ErrThresholdConflict):
+		writeError(c, http.StatusConflict, "stage_threshold_conflict", err.Error())
 	case errors.Is(err, database.ErrAssessmentConflict):
 		writeError(c, http.StatusConflict, "assessment_conflict", err.Error())
 	default:
