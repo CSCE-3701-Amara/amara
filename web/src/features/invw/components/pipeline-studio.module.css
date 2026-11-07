@@ -1,0 +1,182 @@
+.editor {
+  display: grid;
+  grid-template-columns: 169px minmax(0, 1fr) minmax(280px, 33%);
+  gap: 15px;
+  align-items: start;
+  margin-top: 28px;
+}
+.palette {
+  background: #f5f1eb;
+  border: 1px solid #ded8cf;
+  border-radius: 12px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+.palette h2 {
+  font-size: 16px;
+  margin: 4px 0 8px;
+}
+.palette button {
+  padding: 14px 10px;
+  min-height: 48px;
+  border: 1px solid #ded8cf;
+  border-radius: 10px;
+  background: white;
+  text-align: left;
+  font-weight: 700;
+}
+.workspace {
+  border: 1px solid #ded8cf;
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 0;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border-bottom: 1px solid #ded8cf;
+  background: #fff;
+}
+.toolbar button {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid #ded8cf;
+  border-radius: 8px;
+  background: #f5f1eb;
+}
+.viewport {
+  height: 710px;
+  overflow: auto;
+  background-color: #faf8f3;
+  background-image: radial-gradient(#d9d0c3 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+.graph {
+  position: relative;
+  min-width: 700px;
+  min-height: 710px;
+  transform-origin: top left;
+}
+.edges {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.edge {
+  fill: none;
+  stroke: #918575;
+  stroke-width: 2;
+}
+.node {
+  position: absolute;
+  width: 210px;
+  min-height: 160px;
+  padding: 16px;
+  border: 1px solid #d4c8b9;
+  border-radius: 12px;
+  box-shadow: 0 3px 0 #e6dfd5;
+  background: #fffdf9;
+  text-align: left;
+  color: #211813;
+  touch-action: none;
+}
+.node[aria-pressed="true"] {
+  border: 2px solid #54a63e;
+  box-shadow: 0 0 0 3px #dcf2cb;
+}
+.node h3 {
+  font-size: 18px;
+  margin: 10px 0;
+}
+.node p {
+  font-size: 13px;
+  margin: 8px 0;
+}
+.node small {
+  font-size: 11px;
+  color: #655d55;
+}
+.terminal {
+  position: absolute;
+  border: 1px solid #c7d8b8;
+  background: #edf7e3;
+  border-radius: 14px;
+  padding: 16px;
+  min-width: 110px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+.inspector {
+  padding: 20px;
+  background: #fff9f0;
+  border: 1px solid #e3dbd1;
+  border-radius: 12px;
+  min-width: 0;
+}
+.inspector h2 {
+  font-size: 22px;
+  margin: 0 0 24px;
+}
+.inspector label {
+  font-size: 14px;
+}
+.inspector input,
+.inspector select {
+  min-height: 48px;
+  padding: 12px;
+  font-size: 15px;
+}
+.inspector fieldset {
+  border: 0;
+  border-top: 1px solid #e3dbd1;
+  margin: 24px 0 0;
+  padding: 24px 0 0;
+  min-width: 0;
+}
+.inspector legend {
+  font-weight: 700;
+  font-size: 16px;
+  padding-top: 24px;
+}
+.state {
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid #b26b45;
+  border-radius: 8px;
+  background: #fff0e8;
+}
+@media (max-width: 1250px) {
+  .editor {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+  .inspector {
+    grid-column: 1/-1;
+  }
+  .viewport {
+    height: 620px;
+  }
+}
+@media (max-width: 760px) {
+  .editor {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .palette {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .palette h2 {
+    flex-basis: 100%;
+  }
+  .viewport {
+    height: 540px;
+  }
+  .inspector {
+    grid-column: auto;
+  }
+}

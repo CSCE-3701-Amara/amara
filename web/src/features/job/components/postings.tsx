@@ -7,6 +7,13 @@ import {
   BusyState,
   workspaceStyles as s,
 } from "@/shared/ui/workspace";
+import {
+  ProductHeading,
+  Stats,
+  StatusBadge,
+  WorkspaceFooter,
+} from "@/shared/ui/product-ui";
+import e from "@/shared/ui/editor.module.css";
 import type { PostingList } from "../types/job.types";
 export function Postings() {
   const jobs = useApiResource<PostingList>("/v1/jobs");
@@ -19,12 +26,28 @@ export function Postings() {
   );
   return (
     <>
-      <h1>Your job postings</h1>
-      <p className={s.muted}>Manage the roles your team is hiring for.</p>
-      <Link href="/employer/jobs/new" className={`${s.button} ${s.primary}`}>
-        Create job posting
-      </Link>
-      <div className={s.filters}>
+      <ProductHeading
+        title="Job postings"
+        description="Manage the roles your team is hiring for."
+        artwork={{ src: "/figma/postings.svg", width: 345.6, height: 238.8 }}
+      />
+      <section className={e.list}>
+        <h2>Your job postings</h2>
+        <div className={e.actions}>
+          {["", "draft", "published", "archived"].map((value) => (
+            <button
+              type="button"
+              key={value}
+              aria-pressed={status === value}
+              onClick={() => setStatus(value)}
+            >
+              {value ? value[0].toUpperCase() + value.slice(1) : "All states"}
+            </button>
+          ))}
+          <Link href="/employer/jobs/new" className={e.primary}>
+            Create posting
+          </Link>
+        </div>
         <label className={s.field}>
           Search postings
           <input
@@ -33,43 +56,48 @@ export function Postings() {
             onChange={(event) => setTitle(event.target.value)}
           />
         </label>
-        <label className={s.field}>
-          Posting status
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value)}
-          >
-            <option value="">All statuses</option>
-            {["draft", "published", "archived"].map((value) => (
-              <option key={value}>{value}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <BusyState loading={jobs.loading} />
-      <ApiFeedback error={jobs.error} retry={jobs.reload} />
-      {jobs.data && (
-        <>
-          <div className={s.grid}>
-            {visible.map((job) => (
-              <article className={s.card} key={job.id}>
-                <h2>{job.title}</h2>
-                <span className={s.badge}>{job.status}</span>
-                <p>
-                  {job.location || "Location not set"} · {job.employment_type}
-                </p>
-                <Link
-                  href={`/employer/jobs/${encodeURIComponent(job.id)}`}
-                  className={s.button}
-                >
-                  Manage posting
-                </Link>
-              </article>
-            ))}
-          </div>
-          {!visible.length && <p>No postings match these filters.</p>}
-        </>
-      )}
+        <BusyState loading={jobs.loading} />
+        <ApiFeedback error={jobs.error} retry={jobs.reload} />
+        {jobs.data && (
+          <>
+            <div className={e.list}>
+              {visible.map((job) => (
+                <article className={e.row} key={job.id}>
+                  <div>
+                    <h3>{job.title}</h3>
+                    <p>
+                      {job.employment_type} · {job.seniority_level}
+                    </p>
+                  </div>
+                  <StatusBadge>{job.status}</StatusBadge>
+                  <Link
+                    href={`/employer/jobs/${encodeURIComponent(job.id)}`}
+                    className={s.button}
+                  >
+                    Edit
+                  </Link>
+                  <Link
+                    href={`/employer/jobs/${encodeURIComponent(job.id)}/preview`}
+                    className={s.button}
+                  >
+                    Preview
+                  </Link>
+                </article>
+              ))}
+            </div>
+            {!visible.length && <p>No postings match these filters.</p>}
+          </>
+        )}
+      </section>
+      <Stats
+        items={["draft", "published", "archived"].map((value) => ({
+          label: value[0].toUpperCase() + value.slice(1),
+          value:
+            jobs.data?.items?.filter((job) => job.status === value).length ??
+            "—",
+        }))}
+      />
+      <WorkspaceFooter />
     </>
   );
 }
