@@ -1,0 +1,230 @@
+.shell {
+  min-height: 100svh;
+  background: var(--background);
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  justify-content: space-between;
+  padding: 24px clamp(16px, 4vw, 72px);
+  border-bottom: 1px solid #ded7cd;
+  background: linear-gradient(115deg, #fff5df, #ffd3a1);
+  flex-wrap: wrap;
+}
+.header nav {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.header nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 18px;
+  border-radius: 28px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.header nav a[aria-current] {
+  background: #010101;
+  color: white;
+}
+.main {
+  max-width: 1250px;
+  margin: auto;
+  padding: 40px clamp(16px, 4vw, 64px) 80px;
+}
+.main h1 {
+  font-family: var(--font-funnel-display), sans-serif;
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.12;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+.main h2 {
+  font-size: 25px;
+  line-height: 1.25;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+.main h3 {
+  font-size: 21px;
+  font-weight: 700;
+  margin: 0;
+}
+.main p {
+  line-height: 1.55;
+  margin: 8px 0 16px;
+}
+.eyebrow {
+  color: #655346;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-block: 24px;
+}
+.card {
+  padding: clamp(20px, 3vw, 32px);
+  background: white;
+  border: 1px solid #ded7cd;
+  border-radius: 24px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  box-shadow: 0 8px 24px rgb(87 48 21 / 5%);
+  margin-block: 20px;
+}
+.grid .card {
+  margin-block: 0;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block: 16px;
+}
+.main button,
+.header button,
+.button {
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  background: var(--surface-secondary);
+  color: #111;
+  font-weight: 600;
+  border: 1px solid #b0a392;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.main .primary {
+  background: var(--accent);
+  border-color: #26781a;
+}
+.main .danger {
+  color: #93231d;
+  border-color: #93231d;
+}
+.form {
+  display: grid;
+  gap: 20px;
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 16px;
+  margin-block: 24px;
+}
+.filters label {
+  flex: 1 1 170px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  min-width: 0;
+}
+.field input:not([type="checkbox"]),
+.field select,
+.field textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--surface-muted);
+  font-weight: 400;
+}
+.field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+}
+.check input {
+  width: 22px;
+  height: 22px;
+  accent-color: #26781a;
+}
+.error {
+  background: #fff0eb;
+  color: #8b2617;
+  border: 1px solid #c58b7c;
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-block: 20px;
+}
+.error p {
+  margin-top: 0;
+}
+.success {
+  background: #ecffe4;
+  color: #22531b;
+  border: 1px solid #8db584;
+  padding: 16px;
+  border-radius: 16px;
+  margin-block: 16px;
+}
+.muted {
+  color: var(--text-muted);
+}
+.badge {
+  display: inline-block;
+  background: #f1eee8;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-block: 8px;
+}
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .header {
+    gap: 16px;
+  }
+  .header nav {
+    order: 3;
+    width: 100%;
+    gap: 6px;
+  }
+  .header nav a {
+    padding-inline: 12px;
+    font-size: 14px;
+  }
+  .main {
+    padding-top: 28px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card {
+    animation: enter 0.25s ease-out;
+  }
+  @keyframes enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

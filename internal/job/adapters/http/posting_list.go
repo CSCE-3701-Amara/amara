@@ -9,44 +9,58 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	authhttp "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/http"
+	authports "github.com/CSCE-3701-Amara/amara/internal/auth/ports"
 	"github.com/CSCE-3701-Amara/amara/internal/job/application"
 	httpserver "github.com/CSCE-3701-Amara/amara/internal/platform/http"
 )
 
-// companyIDParam names the company wildcard. Every /company/... route must
 const companyIDParam = "company_id"
 
 // PostingListHandler adapts the company posting list to HTTP.
 type PostingListHandler struct {
-	list              *application.CompanyPostingList
-	hiringManagerAuth gin.HandlerFunc
+	list     *application.CompanyPostingList
+	sessions authports.SessionValidator
 }
 
-// until AUTH is implemented.
-func NewPostingListHandler(list *application.CompanyPostingList, hiringManagerAuth gin.HandlerFunc) *PostingListHandler {
-	return &PostingListHandler{list: list, hiringManagerAuth: hiringManagerAuth}
+func NewPostingListHandler(list *application.CompanyPostingList, sessions authports.SessionValidator) *PostingListHandler {
+	return &PostingListHandler{list: list, sessions: sessions}
 }
 
-// TODO(AUTH): require hiringManagerAuth and check that :company_id matches the
-// session's company. Until then the path is trusted, and an unknown company
-// returns an empty list rather than an error.
 func (h *PostingListHandler) RegisterRoutes(group *gin.RouterGroup) {
 	route := group.Group("/company/:" + companyIDParam)
-	if h.hiringManagerAuth != nil {
-		route.Use(h.hiringManagerAuth)
-	}
+	route.Use(authhttp.CompanyAuth(h.sessions, writeError))
 	route.GET("/postings", h.listPostings)
 }
 
 func (h *PostingListHandler) listPostings(c *gin.Context) {
+	identity, ok := authhttp.Identity(c)
+	if !ok {
+		writeError(c, http.StatusUnauthorized, "authentication_required", "Authentication is required.")
+		return
+	}
+	companyID := c.Param(companyIDParam)
+	if !strings.EqualFold(identity.CompanyID, companyID) {
+		writeError(c, http.StatusForbidden, "forbidden", "You cannot access another company's postings.")
+		return
+	}
+
 	filter := application.PostingListFilter{
-		CompanyID: c.Param(companyIDParam), Title: c.Query("title"),
+		CompanyID: companyID, Title: c.Query("title"),
 		Status: c.Query("status"), Cursor: c.Query("cursor"),
 	}
-	if raw := c.Query("limit"); raw != "" {
-		limit, err := strconv.Atoi(raw)
+	if raw, supplied := c.Request.URL.Query()["limit"]; supplied {
+		if len(raw) != 1 {
+			writeError(c, http.StatusBadRequest, "invalid_limit", "limit must be supplied once as an integer between 1 and 100.")
+			return
+		}
+		limit, err := strconv.Atoi(raw[0])
 		if err != nil {
 			writeError(c, http.StatusBadRequest, "invalid_limit", "limit must be an integer.")
+			return
+		}
+		if limit < 1 || limit > 100 {
+			writeError(c, http.StatusBadRequest, "invalid_limit", "limit must be between 1 and 100.")
 			return
 		}
 		filter.Limit = limit

@@ -54,12 +54,18 @@ func requestLogger(logger *slog.Logger) gin.HandlerFunc {
 	}
 }
 
-func recoverPanic(logger *slog.Logger) gin.HandlerFunc {
+// Recovery recovers from unexpected panics during HTTP request execution, logs the panic
+// and diagnostic stack trace using the provided logger, and returns an RFC 9457 500 Problem Details response
+// if headers have not already been committed.
+func Recovery(logger *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if recovered := recover(); recovered != nil {
 				if recovered == http.ErrAbortHandler {
 					panic(recovered)
+				}
+				if logger == nil {
+					logger = slog.Default()
 				}
 				// Panic values may contain credentials or personal data.
 				logger.ErrorContext(c.Request.Context(), "HTTP handler panic recovered",
@@ -70,10 +76,27 @@ func recoverPanic(logger *slog.Logger) gin.HandlerFunc {
 					// A partial response cannot safely become a JSON error.
 					panic(http.ErrAbortHandler)
 				}
-				writeError(c, http.StatusInternalServerError, "internal_error", "An internal server error occurred.")
+				WriteProblem(c, ProblemDetails{
+					Type:   "about:blank",
+					Title:  "Internal Server Error",
+					Status: http.StatusInternalServerError,
+					Detail: "An internal server error occurred.",
+					Code:   "internal_error",
+				})
 			}
 		}()
 		c.Next()
+	}
+}
+
+// ErrorHandler returns a middleware that checks for gin.Context errors and writes
+// an RFC 9457 Problem Details response if no response has been written yet.
+func ErrorHandler(logger *slog.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
+		if len(c.Errors) > 0 && !c.Writer.Written() {
+			HandleError(c, logger, c.Errors.Last().Err)
+		}
 	}
 }
 

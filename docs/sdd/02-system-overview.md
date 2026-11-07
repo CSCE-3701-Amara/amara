@@ -30,7 +30,7 @@ Figure 1. The epic-level context and integration view. [PlantUML source](src/06-
 1. **Discover and apply:** The signed-in Candidate uses CAND views over Published JOB posting data and submits an application through JOB. JOB validates, stores an immutable submission snapshot, screens against Must-have criteria, and hands admitted applications to INVW.
 2. **Run the hiring workflow:** INVW places an admitted application into the published pipeline, schedules or presents assessments, records scores and decisions, manages feedback and anonymity, and moves the Candidate through stages. CAND displays permitted status and progress; ANA consumes approved source data for its analysis.
 3. **Reach a final outcome:** INVW identifies Finalists after completion, manages offers and final application states, and owns notifications. CAND presents the offer/decision to the Candidate and accepts the Candidate's offer response.
-4. **Manage a posting:** A Company Representative uses AUTH-controlled company access to create and publish a JOB posting; a Hiring Manager designs and operates its INVW pipeline. JOB posting capacity is read by INVW when evaluating finalist offers.
+4. **Manage a posting:** A Hiring Manager uses AUTH-controlled company access to create and publish a JOB posting and designs and operates its INVW pipeline. JOB posting capacity is read by INVW when evaluating finalist offers.
 
 ![Figure 2. Candidate journey across epic boundaries](img/07-view-candidate-journey.png)
 
@@ -58,7 +58,7 @@ Figure 4. External integrations. [PlantUML source](src/09-view-external-integrat
 
 ### 2.5 Users and access context
 
-The principal human actors are Candidate, Interviewer, Hiring Manager/Company Representative, Guest, and System Administrator. AUTH authenticates users and applies role and company scope. A person may hold a company role, but posting/pipeline operations remain tied to the authorized company and posting. Guests can enter registration and public-information flows; JOB's protected discovery/application routes can return users to the requested route after sign-in. ANA is a system module whose outputs are consumed only by authorized views.
+The principal human actors are Candidate, Interviewer, Hiring Manager, Guest, and System Administrator. AUTH authenticates users and applies role and company scope. A person may hold a company role, but posting/pipeline operations remain tied to the authorized company and posting. Guests can enter registration and public-information flows; JOB's protected discovery/application routes can return users to the requested route after sign-in. ANA is a system module whose outputs are consumed only by authorized views.
 
 Security enforcement and identity disclosure are separate concerns: AUTH decides whether the caller may access a resource; INVW masks Candidate identity until the pipeline's reveal point. See `05-functional/auth.md`, `05-functional/invw.md`, and the security view.
 

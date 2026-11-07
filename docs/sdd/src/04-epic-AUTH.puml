@@ -71,7 +71,7 @@ LGN ..> ACT : checks account activated
 LGN ..> MFA : verifies MFA code
 LGN ..> RBAC : role & company scoped session
 PWD ..> LGN : terminates old sessions
-PRF ..> LGN : ends session on deactivate/delete
+PRF ..> LGN : ends sessions on account deactivate/delete
 DOC ..> PRF : fills confirmed fields
 RPT ..> UMG : reports reviewed by admins
 UMG ..> ACT : activation rules for new accounts
