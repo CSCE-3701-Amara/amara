@@ -11,6 +11,206 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countCompanyInterviewers = `-- name: CountCompanyInterviewers :one
+SELECT COUNT(*)
+FROM interviewers i
+JOIN companies c ON c.id = i.company_id
+WHERE i.company_id = $1::uuid
+  AND i.deleted_at IS NULL
+  AND c.deleted_at IS NULL
+  AND c.deactivated_at IS NULL
+  AND c.approved = TRUE
+`
+
+func (q *Queries) CountCompanyInterviewers(ctx context.Context, companyID pgtype.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, countCompanyInterviewers, companyID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const getCompanyProfile = `-- name: GetCompanyProfile :one
+SELECT id::text, legal_name, display_name, description, website_link, logo_url,
+       contact_phone, contact_email, linkedin_profile, approved
+FROM companies
+WHERE id = $1::uuid
+  AND deleted_at IS NULL
+  AND ($2::bool OR (approved = TRUE AND deactivated_at IS NULL AND COALESCE(banned, FALSE) = FALSE))
+`
+
+type GetCompanyProfileParams struct {
+	ID             pgtype.UUID
+	IncludePrivate bool
+}
+
+type GetCompanyProfileRow struct {
+	ID              string
+	LegalName       string
+	DisplayName     pgtype.Text
+	Description     pgtype.Text
+	WebsiteLink     pgtype.Text
+	LogoUrl         pgtype.Text
+	ContactPhone    pgtype.Text
+	ContactEmail    pgtype.Text
+	LinkedinProfile pgtype.Text
+	Approved        bool
+}
+
+func (q *Queries) GetCompanyProfile(ctx context.Context, arg GetCompanyProfileParams) (GetCompanyProfileRow, error) {
+	row := q.db.QueryRow(ctx, getCompanyProfile, arg.ID, arg.IncludePrivate)
+	var i GetCompanyProfileRow
+	err := row.Scan(
+		&i.ID,
+		&i.LegalName,
+		&i.DisplayName,
+		&i.Description,
+		&i.WebsiteLink,
+		&i.LogoUrl,
+		&i.ContactPhone,
+		&i.ContactEmail,
+		&i.LinkedinProfile,
+		&i.Approved,
+	)
+	return i, err
+}
+
+const getInterviewerProfile = `-- name: GetInterviewerProfile :one
+SELECT i.id::text, i.company_id::text, i.name, i.email, i.account_status,
+       i.created_at, i.updated_at
+FROM interviewers i
+JOIN companies c ON c.id = i.company_id
+WHERE i.id = $1::uuid
+  AND i.deleted_at IS NULL
+  AND c.deleted_at IS NULL
+  AND c.deactivated_at IS NULL
+  AND c.approved = TRUE
+`
+
+type GetInterviewerProfileRow struct {
+	IID           string
+	ICompanyID    string
+	Name          string
+	Email         string
+	AccountStatus string
+	CreatedAt     pgtype.Timestamp
+	UpdatedAt     pgtype.Timestamp
+}
+
+func (q *Queries) GetInterviewerProfile(ctx context.Context, id pgtype.UUID) (GetInterviewerProfileRow, error) {
+	row := q.db.QueryRow(ctx, getInterviewerProfile, id)
+	var i GetInterviewerProfileRow
+	err := row.Scan(
+		&i.IID,
+		&i.ICompanyID,
+		&i.Name,
+		&i.Email,
+		&i.AccountStatus,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getPublicCompanyProfile = `-- name: GetPublicCompanyProfile :one
+SELECT id::text, legal_name, display_name, description, website_link, logo_url,
+       contact_phone, contact_email, linkedin_profile, approved
+FROM companies
+WHERE id = $1::uuid
+  AND approved = TRUE
+  AND deleted_at IS NULL
+  AND deactivated_at IS NULL
+  AND COALESCE(banned, FALSE) = FALSE
+`
+
+type GetPublicCompanyProfileRow struct {
+	ID              string
+	LegalName       string
+	DisplayName     pgtype.Text
+	Description     pgtype.Text
+	WebsiteLink     pgtype.Text
+	LogoUrl         pgtype.Text
+	ContactPhone    pgtype.Text
+	ContactEmail    pgtype.Text
+	LinkedinProfile pgtype.Text
+	Approved        bool
+}
+
+func (q *Queries) GetPublicCompanyProfile(ctx context.Context, id pgtype.UUID) (GetPublicCompanyProfileRow, error) {
+	row := q.db.QueryRow(ctx, getPublicCompanyProfile, id)
+	var i GetPublicCompanyProfileRow
+	err := row.Scan(
+		&i.ID,
+		&i.LegalName,
+		&i.DisplayName,
+		&i.Description,
+		&i.WebsiteLink,
+		&i.LogoUrl,
+		&i.ContactPhone,
+		&i.ContactEmail,
+		&i.LinkedinProfile,
+		&i.Approved,
+	)
+	return i, err
+}
+
+const listCompanyInterviewers = `-- name: ListCompanyInterviewers :many
+SELECT i.id::text, i.company_id::text, i.name, i.email, i.account_status,
+       i.created_at, i.updated_at
+FROM interviewers i
+JOIN companies c ON c.id = i.company_id
+WHERE i.company_id = $1::uuid
+  AND i.deleted_at IS NULL
+  AND c.deleted_at IS NULL
+  AND c.deactivated_at IS NULL
+  AND c.approved = TRUE
+ORDER BY i.created_at DESC, i.id
+LIMIT $3 OFFSET $2
+`
+
+type ListCompanyInterviewersParams struct {
+	CompanyID  pgtype.UUID
+	PageOffset int32
+	PageLimit  int32
+}
+
+type ListCompanyInterviewersRow struct {
+	IID           string
+	ICompanyID    string
+	Name          string
+	Email         string
+	AccountStatus string
+	CreatedAt     pgtype.Timestamp
+	UpdatedAt     pgtype.Timestamp
+}
+
+func (q *Queries) ListCompanyInterviewers(ctx context.Context, arg ListCompanyInterviewersParams) ([]ListCompanyInterviewersRow, error) {
+	rows, err := q.db.Query(ctx, listCompanyInterviewers, arg.CompanyID, arg.PageOffset, arg.PageLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListCompanyInterviewersRow
+	for rows.Next() {
+		var i ListCompanyInterviewersRow
+		if err := rows.Scan(
+			&i.IID,
+			&i.ICompanyID,
+			&i.Name,
+			&i.Email,
+			&i.AccountStatus,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateCandidateProfile = `-- name: UpdateCandidateProfile :one
 UPDATE candidates
 SET name = CASE WHEN $1::bool THEN $2::text ELSE name END,

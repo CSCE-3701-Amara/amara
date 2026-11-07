@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -31,8 +32,12 @@ func NewProfileHandler(service *application.ProfileService, validator ports.Sess
 }
 
 func (h *ProfileHandler) RegisterRoutes(group *gin.RouterGroup) {
+	group.GET("/companies/me", CompanyAuth(h.validator, writeSessionError), h.getOwnCompany)
 	group.PATCH("/candidates/me", CandidateAuth(h.validator), h.updateCandidate)
 	group.PATCH("/companies/me", CompanyAuth(h.validator, writeSessionError), h.updateCompany)
+	group.GET("/companies/me/interviewers", CompanyAuth(h.validator, writeSessionError), h.listCompanyInterviewers)
+	group.GET("/companies/:companyId", h.getPublicCompany)
+	group.GET("/interviewers/me", AuthenticatedAuth(h.validator), h.getOwnInterviewer)
 	group.PATCH("/interviewers/me", AuthenticatedAuth(h.validator), h.updateInterviewer)
 }
 
@@ -131,6 +136,94 @@ func (h *ProfileHandler) updateCandidate(c *gin.Context) {
 		return
 	}
 	writeJSON(c.Writer, http.StatusOK, makeCandidateProfileResponse(profile))
+}
+
+func (h *ProfileHandler) getOwnCompany(c *gin.Context) {
+	identity, ok := Identity(c)
+	if !ok {
+		writeProblem(c.Writer, http.StatusInternalServerError, "internal_error", "An internal server error occurred.")
+		return
+	}
+	profile, err := h.service.GetCompany(c.Request.Context(), identity.AccountID, true)
+	if err != nil {
+		writeProfileError(c.Writer, err)
+		return
+	}
+	writeJSON(c.Writer, http.StatusOK, makeCompanyProfileResponse(profile))
+}
+
+func (h *ProfileHandler) getPublicCompany(c *gin.Context) {
+	profile, err := h.service.GetPublicCompany(c.Request.Context(), c.Param("companyId"))
+	if err != nil {
+		writeProfileError(c.Writer, err)
+		return
+	}
+	writeJSON(c.Writer, http.StatusOK, makeCompanyProfileResponse(profile))
+}
+
+func (h *ProfileHandler) getOwnInterviewer(c *gin.Context) {
+	identity, ok := Identity(c)
+	if !ok {
+		writeProblem(c.Writer, http.StatusInternalServerError, "internal_error", "An internal server error occurred.")
+		return
+	}
+	if identity.AccountType != domain.AccountTypeInterviewer {
+		writeProblem(c.Writer, http.StatusForbidden, "forbidden", "This account cannot access the requested resource.")
+		return
+	}
+	profile, err := h.service.GetInterviewer(c.Request.Context(), identity.AccountID)
+	if err != nil {
+		writeProfileError(c.Writer, err)
+		return
+	}
+	writeJSON(c.Writer, http.StatusOK, makeInterviewerProfileResponse(profile))
+}
+
+func (h *ProfileHandler) listCompanyInterviewers(c *gin.Context) {
+	identity, ok := Identity(c)
+	if !ok {
+		writeProblem(c.Writer, http.StatusInternalServerError, "internal_error", "An internal server error occurred.")
+		return
+	}
+	limit, offset, err := profilePagination(c)
+	if err != nil {
+		writeProblem(c.Writer, http.StatusBadRequest, "invalid_pagination", "limit must be between 1 and 100 and offset must be non-negative")
+		return
+	}
+	profiles, total, err := h.service.ListCompanyInterviewers(c.Request.Context(), identity.AccountID, limit, offset)
+	if err != nil {
+		writeProfileError(c.Writer, err)
+		return
+	}
+	data := make([]interviewerProfileResponse, 0, len(profiles))
+	for _, profile := range profiles {
+		data = append(data, makeInterviewerProfileResponse(profile))
+	}
+	writeJSON(c.Writer, http.StatusOK, gin.H{
+		"data":       data,
+		"pagination": gin.H{"limit": limit, "offset": offset, "total": total},
+	})
+}
+
+func profilePagination(c *gin.Context) (int32, int32, error) {
+	limit, offset := int64(20), int64(0)
+	var err error
+	if value := c.Query("limit"); value != "" {
+		limit, err = strconv.ParseInt(value, 10, 32)
+		if err != nil {
+			return 0, 0, err
+		}
+	}
+	if value := c.Query("offset"); value != "" {
+		offset, err = strconv.ParseInt(value, 10, 32)
+		if err != nil {
+			return 0, 0, err
+		}
+	}
+	if limit < 1 || limit > 100 || offset < 0 {
+		return 0, 0, errors.New("invalid pagination")
+	}
+	return int32(limit), int32(offset), nil
 }
 
 func (h *ProfileHandler) updateCompany(c *gin.Context) {
@@ -274,4 +367,20 @@ func writeJSON(w http.ResponseWriter, status int, value any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(value)
+}
+
+func makeCompanyProfileResponse(profile domain.CompanyProfile) companyProfileResponse {
+	return companyProfileResponse{
+		ID: profile.ID, LegalName: profile.LegalName, DisplayName: profile.DisplayName,
+		Description: profile.Description, WebsiteLink: profile.WebsiteLink, LogoURL: profile.LogoURL,
+		ContactPhone: profile.ContactPhone, ContactEmail: profile.ContactEmail,
+		LinkedinProfile: profile.LinkedinProfile, Approved: profile.Approved,
+	}
+}
+
+func makeInterviewerProfileResponse(profile domain.InterviewerProfile) interviewerProfileResponse {
+	return interviewerProfileResponse{
+		ID: profile.ID, CompanyID: profile.CompanyID, Name: profile.Name, Email: profile.Email,
+		AccountStatus: profile.AccountStatus, CreatedAt: profile.CreatedAt, UpdatedAt: profile.UpdatedAt,
+	}
 }
