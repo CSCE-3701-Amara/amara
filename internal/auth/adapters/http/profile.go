@@ -1,8 +1,10 @@
 package http
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"time"
 
@@ -81,8 +83,18 @@ type interviewerProfileRequest struct {
 
 func decodeProfileRequest(w http.ResponseWriter, r *http.Request, input any) bool {
 	decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20))
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(input); err != nil {
+	var raw json.RawMessage
+	if err := decoder.Decode(&raw); err != nil || bytes.Equal(raw, []byte("null")) {
+		writeProblem(w, http.StatusBadRequest, "invalid_json", "request body must be valid JSON")
+		return false
+	}
+	if err := decoder.Decode(&struct{}{}); err != io.EOF {
+		writeProblem(w, http.StatusBadRequest, "invalid_json", "request body must contain exactly one JSON object")
+		return false
+	}
+	payloadDecoder := json.NewDecoder(bytes.NewReader(raw))
+	payloadDecoder.DisallowUnknownFields()
+	if err := payloadDecoder.Decode(input); err != nil {
 		writeProblem(w, http.StatusBadRequest, "invalid_json", "request body must be valid JSON")
 		return false
 	}

@@ -230,12 +230,18 @@ paths:
 
 
   # Candidate profile and application history
-  /api/v1/candidates/me:
+  /v1/candidates/me:
     patch:
       summary: Modify the authenticated candidate profile
       operationId: updateCandidateProfile
-      description: Planned operation; no candidate-profile update handler is currently registered.
-      x-implementation-status: planned
+      description: |
+        Updates any of the candidate's editable fields: name, phoneNumber, githubProfile, linkedinProfile,
+        portfolioLink, gender, birthDate, nationality, address, biography, yearsOfExperience, and available.
+        Omitted fields and explicit null values are unchanged. Unknown fields are rejected. The request must
+        contain exactly one JSON object. Authentication failures from middleware use
+        application/json with {"error":{"code":"...","message":"..."}}; request and handler failures use
+        application/problem+json ProblemDetails.
+      x-implementation-status: implemented
       tags:
         - Auth
       security:
@@ -337,11 +343,15 @@ paths:
       operationId: updateOwnCompanyProfile
       tags:
         - Companies
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain. Omitted properties are unchanged; explicit null clears only
-        nullable properties. Unknown and read-only fields are rejected. Approval and credentials are not editable
-        here.
-      x-implementation-status: planned
+      description: |
+        Updates the editable company fields legalName, displayName, description, websiteLink, logoUrl,
+        contactPhone, contactEmail, and linkedinProfile. Omitted properties are unchanged; explicit null
+        clears nullable company fields (all listed fields except legalName). legalName cannot be null.
+        Unknown and read-only fields are rejected. Approval and credentials are not editable here. The request
+        must contain exactly one JSON object. Authentication failures from middleware use
+        application/json with {"error":{"code":"...","message":"..."}}; request and handler failures use
+        application/problem+json ProblemDetails.
+      x-implementation-status: implemented
       x-erd-entities:
         - COMPANIES
       security:
@@ -368,8 +378,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '409':
-          $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/UnprocessableContent'
         '500':
@@ -468,10 +476,14 @@ paths:
       operationId: updateOwnInterviewerProfile
       tags:
         - Interviewers
-      description: Only the authenticated interviewer may update their profile. Company association, email verification,
-        and account status cannot be changed through this request. Omitted properties are unchanged; explicit
-        null clears only nullable properties. Unknown and read-only fields are rejected.
-      x-implementation-status: planned
+      description: |
+        Updates the authenticated interviewer's name. Company association, email, email verification, and
+        account status cannot be changed through this request. name is required and must be non-blank;
+        omitted or explicit null name values are invalid. Unknown and read-only fields are rejected. The
+        request must contain exactly one JSON object. Authentication failures use application/json with
+        {"error":{"code":"...","message":"..."}}; request and handler failures use
+        application/problem+json ProblemDetails.
+      x-implementation-status: implemented
       x-erd-entities:
         - INTERVIEWERS
       security:
@@ -497,8 +509,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '409':
-          $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/UnprocessableContent'
         '500':
