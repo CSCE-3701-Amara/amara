@@ -55,7 +55,7 @@ func (h *PostingListHandler) listPostings(c *gin.Context) {
 			writeError(c, http.StatusBadRequest, "invalid_limit", "limit must be supplied once as an integer between 1 and 100.")
 			return
 		}
-		limit, err := strconv.Atoi(raw)
+		limit, err := strconv.Atoi(raw[0])
 		if err != nil {
 			writeError(c, http.StatusBadRequest, "invalid_limit", "limit must be an integer.")
 			return
