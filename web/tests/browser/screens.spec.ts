@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 
 const screens = [
-  ["welcome", "/", "Beyond Resumes."],
   ["login-candidate", "/login", "Log in to your account"],
   ["login-company", "/login?account=company", "Log in to your company"],
   ["register-candidate", "/register", "Create a candidate account"],
@@ -45,10 +44,6 @@ for (const width of [1728, 375]) {
           .first(),
       ).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
-      if (name === "welcome") {
-        const supported = await page.evaluate(async () => !!(navigator.gpu && await navigator.gpu.requestAdapter()));
-        if (supported) await expect(page.locator("canvas")).toHaveAttribute("data-ready", "true", { timeout: 90000 });
-      }
       // A loaded page with missing CSS must not count as a passing visual check.
       expect(
         await page

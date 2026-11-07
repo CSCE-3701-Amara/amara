@@ -6,7 +6,7 @@ const baseURL = `http://127.0.0.1:${port}`;
 export default defineConfig({
   testDir: "./tests/browser",
   fullyParallel: true,
-  workers: process.env.CI ? 1 : 2,
+  workers: 2,
   use: {
     baseURL,
     viewport: { width: 1728, height: 1117 },
@@ -14,7 +14,11 @@ export default defineConfig({
     launchOptions: {
       args: [
         "--enable-unsafe-webgpu",
-        "--use-angle=swiftshader",
+        "--enable-features=Vulkan",
+        "--use-angle=vulkan",
+        "--use-vulkan=swiftshader",
+        "--use-webgpu-adapter=swiftshader",
+        "--disable-vulkan-surface",
       ],
     },
     trace: "retain-on-failure",
