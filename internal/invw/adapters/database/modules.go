@@ -148,22 +148,8 @@ func (r *ModuleRepository) Publish(ctx context.Context, company, id string) (dom
 		return module, nil
 	}
 
-	var problems []domain.LibraryProblem
-	if module.Library != nil {
-		problems, err = listProblems(ctx, tx)
-		if err != nil {
-			return domain.Module{}, err
-		}
-	}
-	if err := module.ValidatePublication(problems); err != nil {
-		return domain.Module{}, &domain.InvalidModuleError{Reason: err.Error()}
-	}
-	if module.Library != nil && len(module.Library.DifficultyMix) > 0 {
-		for _, problem := range problems {
-			if module.Library.DifficultyMix[problem.Difficulty] > 0 {
-				module.Library.Pool = append(module.Library.Pool, problem.ProblemRef)
-			}
-		}
+	if err := prepareModuleDefinition(ctx, tx, &module.Definition); err != nil {
+		return domain.Module{}, err
 	}
 
 	_, err = tx.Exec(ctx, `UPDATE modules SET published = true, updated_at = now(),
@@ -176,4 +162,27 @@ func (r *ModuleRepository) Publish(ctx context.Context, company, id string) (dom
 	}
 	module.Published = true
 	return module, nil
+}
+
+func prepareModuleDefinition(ctx context.Context, tx pgx.Tx, definition *domain.Definition) error {
+	var err error
+	var problems []domain.LibraryProblem
+	if definition.Library != nil {
+		problems, err = listProblems(ctx, tx)
+		if err != nil {
+			return err
+		}
+	}
+	if err := definition.ValidatePublication(problems); err != nil {
+		return &domain.InvalidModuleError{Reason: err.Error()}
+	}
+	if definition.Library != nil && len(definition.Library.DifficultyMix) > 0 {
+		for _, problem := range problems {
+			if definition.Library.DifficultyMix[problem.Difficulty] > 0 {
+				definition.Library.Pool = append(definition.Library.Pool, problem.ProblemRef)
+			}
+		}
+	}
+
+	return nil
 }

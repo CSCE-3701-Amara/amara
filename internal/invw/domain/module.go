@@ -121,23 +121,9 @@ func (d Definition) ValidatePublication(problems []LibraryProblem) error {
 	if d.Type != RecordedVideo && len(d.Rubric) != 0 {
 		return errors.New("only recorded video supports a rubric")
 	}
-	mapped := make(map[string]bool, len(d.Amarat))
-	for _, a := range d.Amarat {
-		if strings.TrimSpace(a.Name) == "" || strings.TrimSpace(a.Crest) == "" ||
-			strings.TrimSpace(a.Domain) == "" || strings.TrimSpace(a.Description) == "" {
-			return errors.New("each Amara requires a name, crest, domain, and description")
-		}
-		if _, exists := mapped[a.Name]; exists {
-			return errors.New("Amara names must be unique")
-		}
-		mapped[a.Name] = false
-	}
-	mark := func(name string) error {
-		if _, exists := mapped[name]; !exists {
-			return fmt.Errorf("unknown Amara %q", name)
-		}
-		mapped[name] = true
-		return nil
+	mappings, err := newAmaraMappings(d.Amarat)
+	if err != nil {
+		return err
 	}
 	code := d.Type == Coding || d.Type == ProgrammingLanguage
 	for i, question := range d.Questions {
@@ -145,18 +131,13 @@ func (d Definition) ValidatePublication(problems []LibraryProblem) error {
 			return fmt.Errorf("question %d: %w", i+1, err)
 		}
 		if code {
-			if err := mark(question.Amara); err != nil {
+			if err := mappings.mark(question.Amara); err != nil {
 				return fmt.Errorf("question %d: %w", i+1, err)
 			}
 		}
 	}
-	for i, criterion := range d.Rubric {
-		if strings.TrimSpace(criterion.Description) == "" {
-			return fmt.Errorf("rubric criterion %d requires a description", i+1)
-		}
-		if err := mark(criterion.Amara); err != nil {
-			return fmt.Errorf("rubric criterion %d: %w", i+1, err)
-		}
+	if err := mappings.markRubric(d.Rubric); err != nil {
+		return err
 	}
 	if d.Library != nil {
 		if !code {
@@ -165,12 +146,53 @@ func (d Definition) ValidatePublication(problems []LibraryProblem) error {
 		if err := d.Library.validate(problems); err != nil {
 			return err
 		}
-		if err := mark(d.Library.Amara); err != nil {
+		if err := mappings.mark(d.Library.Amara); err != nil {
 			return err
 		}
 	}
-	for _, a := range d.Amarat {
-		if !mapped[a.Name] {
+	return mappings.validateUsed(d.Amarat)
+}
+
+type amaraMappings map[string]bool
+
+func newAmaraMappings(amarat []Amara) (amaraMappings, error) {
+	mapped := make(amaraMappings, len(amarat))
+	for _, a := range amarat {
+		if strings.TrimSpace(a.Name) == "" || strings.TrimSpace(a.Crest) == "" ||
+			strings.TrimSpace(a.Domain) == "" || strings.TrimSpace(a.Description) == "" {
+			return nil, errors.New("each Amara requires a name, crest, domain, and description")
+		}
+		if _, exists := mapped[a.Name]; exists {
+			return nil, errors.New("Amara names must be unique")
+		}
+		mapped[a.Name] = false
+	}
+	return mapped, nil
+}
+
+func (m amaraMappings) mark(name string) error {
+	if _, exists := m[name]; !exists {
+		return fmt.Errorf("unknown Amara %q", name)
+	}
+	m[name] = true
+	return nil
+}
+
+func (m amaraMappings) markRubric(rubric []Criterion) error {
+	for i, criterion := range rubric {
+		if strings.TrimSpace(criterion.Description) == "" {
+			return fmt.Errorf("rubric criterion %d requires a description", i+1)
+		}
+		if err := m.mark(criterion.Amara); err != nil {
+			return fmt.Errorf("rubric criterion %d: %w", i+1, err)
+		}
+	}
+	return nil
+}
+
+func (m amaraMappings) validateUsed(amarat []Amara) error {
+	for _, a := range amarat {
+		if !m[a.Name] {
 			return fmt.Errorf("Amara %q requires a scored item", a.Name)
 		}
 	}

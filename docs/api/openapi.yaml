@@ -1500,25 +1500,18 @@ paths:
     parameters:
       - $ref: '#/components/parameters/JobPostingId'
     get:
-      summary: Get the pipeline attached to a posting
+      summary: Get the posting pipeline and its latest version
       operationId: getJobPipeline
-      tags:
-        - Pipelines
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain.
-      x-implementation-status: planned
-      x-erd-entities:
-        - JOB_POSTINGS
-        - PIPELINES
+      tags: [Pipelines]
       security:
         - SessionCookie: []
       responses:
         '200':
-          description: Get the pipeline attached to a posting.
+          description: Get the posting pipeline and its latest version.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pipeline'
+                $ref: '#/components/schemas/LinearPipelineDraft'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1530,41 +1523,21 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
-      summary: Create and attach a pipeline to a posting
+      summary: Create a pipeline with an empty initial draft
       operationId: createJobPipeline
-      tags:
-        - Pipelines
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain. Atomically set both posting/pipeline references. Enforce one
-        attached pipeline per posting at the service boundary; return 409 if already attached.
-      x-implementation-status: planned
-      x-erd-entities:
-        - JOB_POSTINGS
-        - PIPELINES
+      tags: [Pipelines]
       security:
         - SessionCookie: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PipelineCreate'
-            example:
-              anonymityEnabled: false
-              rejectionFeedbackMode: ai_with_approval
       responses:
         '201':
-          description: Create and attach a pipeline to a posting.
+          description: Create a pipeline with an empty initial draft.
+          headers:
+            Location:
+              schema: {type: string, format: uri-reference}
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Pipeline'
-          headers:
-            Location:
-              description: URI under /v1/pipelines/{pipelineId}.
-              schema:
-                type: string
-                format: uri-reference
+                $ref: '#/components/schemas/LinearPipelineDraft'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1575,8 +1548,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
-        '422':
-          $ref: '#/components/responses/UnprocessableContent'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -1815,26 +1786,20 @@ paths:
     parameters:
       - $ref: '#/components/parameters/VersionId'
     get:
-      summary: Get all stages for a pipeline version
+      summary: List stages in progression order
       operationId: listPipelineStages
-      tags:
-        - Pipelines
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain. Return the complete graph vertex set ordered by ID.
-      x-implementation-status: planned
-      x-erd-entities:
-        - PIPELINE_STAGES
+      tags: [Pipelines]
       security:
         - SessionCookie: []
       responses:
         '200':
-          description: Get all stages for a pipeline version.
+          description: List stages in progression order.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/PipelineStage'
+                  $ref: '#/components/schemas/LinearDraftStage'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1843,6 +1808,46 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Replace the ordered stages of an unpublished draft
+      operationId: replaceLinearPipelineStages
+      tags: [Pipelines]
+      security:
+        - SessionCookie: []
+      description: The array order defines progression. Replaces the complete draft and generates new stage IDs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/LinearDraftStage'
+      responses:
+        '200':
+          description: Replace the ordered stages of an unpublished draft.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LinearDraftStage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
@@ -5717,6 +5722,66 @@ components:
             $ref: '#/components/schemas/PostingErrorResponse'
 
   schemas:
+    LinearPipelineDraft:
+      type: object
+      required: [id, postingId, versionId, versionNumber]
+      properties:
+        id: {type: string, format: uuid}
+        postingId: {type: string, format: uuid}
+        versionId: {type: string, format: uuid}
+        versionNumber: {type: integer, minimum: 1}
+    LinearDraftStage:
+      type: object
+      required: [name, type, scheduledStartAt, scheduledEndAt]
+      properties:
+        id: {type: string, format: uuid, readOnly: true}
+        name: {type: string}
+        type:
+          type: string
+          enum: [assessment, live_interview]
+        scheduledStartAt: {type: string, format: date-time}
+        scheduledEndAt:
+          type: string
+          format: date-time
+          description: Must be later than the opening time.
+        moduleIds:
+          description: Required for an assessment stage. Each module must belong to the company.
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: {type: string, format: uuid}
+        interview:
+          description: Required for a live interview stage, which has no test modules.
+          type: object
+          required: [durationMinutes, interviewerIds, threshold, rubric, amarat]
+          properties:
+            durationMinutes: {type: integer, minimum: 1}
+            interviewerIds:
+              type: array
+              minItems: 1
+              uniqueItems: true
+              items: {type: string, format: uuid}
+            threshold: {type: integer, minimum: 0, maximum: 100}
+            rubric:
+              type: array
+              minItems: 1
+              items:
+                type: object
+                required: [description, amara]
+                properties:
+                  description: {type: string}
+                  amara: {type: string}
+            amarat:
+              type: array
+              minItems: 1
+              items:
+                type: object
+                required: [name, crest, domain, description]
+                properties:
+                  name: {type: string}
+                  crest: {type: string}
+                  domain: {type: string}
+                  description: {type: string}
     ModuleAuthoringSummary:
       type: object
       required: [id, name, description, type, published]
