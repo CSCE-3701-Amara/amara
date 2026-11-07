@@ -201,6 +201,19 @@ func (r *AssessmentRepository) FinalizeEvidence(ctx context.Context, attemptID, 
 		return err
 	}
 	defer tx.Rollback(ctx)
+	// Serialize with advancement before locking the attempt so the next
+	// statement sees any stage decision committed while this lock was pending.
+	if _, err := tx.Exec(ctx, `
+		SELECT app.id FROM applications app
+		JOIN pipeline_executions pe ON pe.application_id = app.id
+		JOIN stage_executions se ON se.pipeline_execution_id = pe.id
+		JOIN assessment_attempts a ON a.stage_execution_id = se.id
+		JOIN job_postings j ON j.id = app.posting_id
+		WHERE a.id = $1::uuid AND ($2 = '' OR j.company_id::text = $2)
+		FOR NO KEY UPDATE OF app
+	`, attemptID, company); err != nil {
+		return err
+	}
 	var lockedID string
 	if err := tx.QueryRow(ctx, `SELECT id::text FROM assessment_attempts WHERE id = $1::uuid FOR UPDATE`,
 		attemptID).Scan(&lockedID); err != nil {
@@ -223,7 +236,8 @@ func (r *AssessmentRepository) FinalizeEvidence(ctx context.Context, attemptID, 
 					JOIN pipeline_executions pe ON pe.id = se.pipeline_execution_id
 					JOIN applications app ON app.id = pe.application_id
 					JOIN job_postings j ON j.id = app.posting_id
-					WHERE se.id = a.stage_execution_id AND pe.status = 'active'
+					WHERE se.id = a.stage_execution_id
+						AND (pe.status = 'active' OR se.status IN ('passed', 'rejected'))
 						AND ($3 = '' OR j.company_id::text = $3)
 				)
 				AND jsonb_array_length($2::jsonb) = (SELECT count(*) FROM (`+snapshotQuestions+`) q)
