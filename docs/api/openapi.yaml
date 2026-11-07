@@ -99,6 +99,8 @@ paths:
           $ref: '#/components/responses/UnprocessableContent'
         '429':
           $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/RegistrationUnavailable'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -209,7 +211,7 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/AuthenticatedUnauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '422':
@@ -5676,6 +5678,17 @@ components:
           schema:
             $ref: '#/components/schemas/ProblemDetails'
 
+    AuthenticatedUnauthorized:
+      description: Unauthorized session (legacy authentication error envelope)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticationErrorResponse'
+          example:
+            error:
+              code: authentication_required
+              message: Authentication is required.
+
     Forbidden:
       description: Forbidden (RFC 9457)
       content:
@@ -5758,6 +5771,19 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetails'
+
+    RegistrationUnavailable:
+      description: Account registration is temporarily unavailable (RFC 9457)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: about:blank
+            title: Service Unavailable
+            status: 503
+            detail: Account registration is temporarily unavailable.
+            code: registration_unavailable
 
     PostingError:
       description: Posting management error
@@ -6029,6 +6055,26 @@ components:
           description: List of field-level validation errors, present when status is 422.
           items:
             $ref: '#/components/schemas/FieldError'
+
+    AuthenticationErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              example: authentication_required
+            message:
+              type: string
+              example: Authentication is required.
 
 
     # Authentication and account lifecycle
