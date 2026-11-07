@@ -105,14 +105,18 @@ test("feed filters use handler query names and cursor pagination preserves filte
   await expect(
     page.getByRole("heading", { name: "Frontend Engineer" }),
   ).toBeVisible();
-  await page.getByLabel("Job title", { exact: true }).fill("C++ & React");
+  await page
+    .getByRole("searchbox", { name: "Search job titles" })
+    .fill("C++ & React");
   await page.getByLabel("Employment type").selectOption("remote full-time");
-  await page.getByRole("button", { name: "Search roles", exact: true }).click();
+  await page.getByRole("button", { name: "Search jobs", exact: true }).click();
   await expect.poll(() => queries.at(-1)?.get("title")).toBe("C++ & React");
   await expect(
     page.getByRole("heading", { name: "Frontend Engineer" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Next page", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Load more opportunities", exact: true })
+    .click();
   await expect.poll(() => queries.at(-1)?.get("cursor")).toBe(cursor);
   expect(queries.at(-1)?.get("employment_type")).toBe("remote full-time");
 });
@@ -150,14 +154,15 @@ test("apply displays backend rejection and only reports submission after success
         });
   });
   await page.goto("/candidate/dashboard");
-  await page.getByRole("button", { name: "Apply for this role" }).click();
+  await page.getByRole("link", { name: "View opportunity" }).click();
+  await page.getByRole("button", { name: "Apply now" }).click();
   await expect(page.locator("main").getByRole("alert")).toContainText(
     "Candidate authentication is required.",
   );
   await expect(page.getByText("Reference: 41.", { exact: false })).toHaveCount(
     0,
   );
-  await page.getByRole("button", { name: "Apply for this role" }).click();
+  await page.getByRole("button", { name: "Apply now" }).click();
   await expect(page.getByRole("status")).toContainText(
     "did not pass initial screening",
   );
@@ -196,11 +201,11 @@ test("application history reads the camelCase data envelope and private details"
   await expect(
     page.getByRole("heading", { name: "Frontend Engineer" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "View details" }).click();
-  await expect(page.getByText("Thank you for applying.")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Next page", exact: true }),
-  ).toBeDisabled();
+  ).toHaveCount(0);
+  await page.getByRole("link", { name: "Continue", exact: true }).click();
+  await expect(page.getByText("Thank you for applying.")).toBeVisible();
 });
 
 test("posting writes use backend field names and lifecycle deletion accepts 204", async ({
@@ -229,7 +234,7 @@ test("posting writes use backend field names and lifecycle deletion accepts 204"
   await page.getByLabel("Seniority level").fill("junior");
   await page.getByLabel("Employment type").selectOption("remote full-time");
   await page
-    .getByLabel("Required skills (Amarat), one per line")
+    .getByLabel("Required skills (amarat), one per line")
     .fill("React\nTypeScript");
   await page.getByRole("button", { name: "Create draft", exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/employer/jobs/${jobId}$`));
@@ -242,6 +247,10 @@ test("posting writes use backend field names and lifecycle deletion accepts 204"
   expect(saved).not.toHaveProperty("seniorityLevel");
   page.on("dialog", (dialog) => dialog.accept());
   await page
+    .getByRole("button", { name: "Delete posting", exact: true })
+    .click();
+  await page
+    .getByRole("dialog")
     .getByRole("button", { name: "Delete posting", exact: true })
     .click();
   await expect(page).toHaveURL(/\/employer\/jobs$/);
@@ -309,19 +318,31 @@ test("assessment forms use bare array responses and publish/copy existing module
     copied = true;
     return route.fulfill({ status: 201, json: assessment });
   });
-  await page.goto("/employer/pipelines");
-  await page.getByLabel("Assessment name", { exact: true }).fill("Teamwork");
+  await page.route(`**/v1/modules/${moduleId}`, (route) =>
+    route.fulfill({ json: { ...assessment, published } }),
+  );
+  await page.goto("/employer/modules/new");
+  await page.getByLabel("Module name (required)").fill("Teamwork");
+  await page.getByLabel("Prompt (required)").fill("How do you collaborate?");
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
+  await expect(page).toHaveURL(
+    new RegExp(`/employer/modules/${moduleId}/questions$`),
+  );
   await page
-    .getByLabel("Question", { exact: true })
-    .fill("How do you collaborate?");
-  await page.getByRole("button", { name: "Create assessment draft" }).click();
-  await page
-    .getByRole("button", { name: "Publish assessment", exact: true })
+    .getByRole("button", { name: "Publish module", exact: true })
     .click();
-  await expect(
-    page.getByRole("status").filter({ hasText: "Assessment published." }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Copy to workspace" }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Publish module", exact: true })
+    .click();
+  await expect.poll(() => published).toBe(true);
+  await page.goto("/employer/modules/library");
+  await page.getByRole("button", { name: "Teamwork", exact: true }).click();
+  await page.getByRole("button", { name: "Copy module", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Copy module", exact: true })
+    .click();
   await expect.poll(() => copied).toBe(true);
 });
 
@@ -354,7 +375,10 @@ test("pipeline saves an ordered stage array with version id and RFC3339 times", 
   await page.route("**/v1/modules", (route) =>
     route.fulfill({ json: [assessment] }),
   );
-  await page.goto(`/employer/jobs/${jobId}`);
+  await page.goto(`/employer/pipelines/${jobId}`);
+  await page
+    .getByText("Server-supported stage configuration", { exact: true })
+    .click();
   await page.getByRole("button", { name: "Create pipeline draft" }).click();
   await page.getByRole("button", { name: "Add assessment stage" }).click();
   await page.getByLabel("Stage name").fill("Skills assessment");
@@ -362,9 +386,9 @@ test("pipeline saves an ordered stage array with version id and RFC3339 times", 
   await page.getByLabel("Stage deadline").fill("2027-01-02T09:00");
   await page.getByRole("checkbox", { name: "Teamwork" }).check();
   await page.getByRole("button", { name: "Save pipeline stages" }).click();
-  await expect(page.getByRole("status")).toContainText(
-    "Pipeline stages saved.",
-  );
+  await expect(
+    page.getByRole("form", { name: "Pipeline stages" }).getByRole("status"),
+  ).toContainText("Pipeline stages saved.");
   expect(saved).toEqual([
     expect.objectContaining({
       name: "Skills assessment",

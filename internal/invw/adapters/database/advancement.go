@@ -170,6 +170,11 @@ func applyAdvancement(ctx context.Context, tx pgx.Tx, id, actor string, s advanc
 	if err != nil {
 		return err
 	}
+	if d.status == "passed" || d.status == "rejected" {
+		if err := persistAssessmentResult(ctx, tx, s.attempt); err != nil {
+			return err
+		}
+	}
 	if d.status == "rejected" {
 		// Persist the feedback work item on the existing pipeline record. Feedback
 		// generation, approval and delivery are pending UC-INVW-009 integration.

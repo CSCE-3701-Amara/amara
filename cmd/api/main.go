@@ -20,6 +20,7 @@ import (
 	candhttp "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http"
 	candapplication "github.com/CSCE-3701-Amara/amara/internal/cand/application"
 	authemail "github.com/CSCE-3701-Amara/amara/internal/integration/email"
+
 	invwdatabase "github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
 	invwhttp "github.com/CSCE-3701-Amara/amara/internal/invw/adapters/http"
 	invwapplication "github.com/CSCE-3701-Amara/amara/internal/invw/application"
@@ -93,6 +94,14 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("create registration handler: %w", err)
 	}
+	verification, err := authapplication.NewVerificationService(authRepo)
+	if err != nil {
+		return fmt.Errorf("create verification service: %w", err)
+	}
+	verificationHandler, err := authhttp.NewVerificationHandler(verification)
+	if err != nil {
+		return fmt.Errorf("create verification handler: %w", err)
+	}
 	companyRegistration, err := authapplication.NewCompanyRegistrationService(authRepo, passwordChecker)
 	if err != nil {
 		return fmt.Errorf("create company registration service: %w", err)
@@ -156,10 +165,21 @@ func run() error {
 	applicationService := jobapplication.NewApplicationAdmission(applicationRepo)
 	applicationHandler := jobhttp.NewApplicationHandler(applicationService, nil)
 
+	candidateAuth := authhttp.CandidateAuth(authRepo)
 	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
 	feedHandler := candhttp.NewJobFeedHandler(
 		candapplication.NewJobFeed(feedRepo, jobLifecycle),
-		authhttp.CandidateAuth(authRepo),
+		candidateAuth,
+	)
+	assessmentProgressRepo := canddatabase.NewAssessmentProgressRepository(dbSvc.Pool())
+	assessmentProgressHandler := candhttp.NewAssessmentProgressHandler(
+		candapplication.NewAssessmentProgress(assessmentProgressRepo),
+		candidateAuth,
+	)
+	assessmentResultRepo := canddatabase.NewAssessmentResultRepository(dbSvc.Pool())
+	assessmentResultHandler := candhttp.NewAssessmentResultHandler(
+		candapplication.NewAssessmentResults(assessmentResultRepo),
+		candidateAuth,
 	)
 	pipelineHandler := invwhttp.NewPipelineHandler(invwdatabase.NewPipelineRepository(dbSvc.Pool()), authRepo)
 	moduleHandler := invwhttp.NewModuleHandler(invwdatabase.NewModuleRepository(dbSvc.Pool()), authRepo)
@@ -170,19 +190,22 @@ func run() error {
 	pipelineProgressRepo := invwdatabase.NewCandidatePipelineProgressRepository(dbSvc.Pool())
 	pipelineProgressHandler := invwhttp.NewCandidatePipelineProgressHandler(
 		invwapplication.NewCandidatePipelineProgress(pipelineProgressRepo),
-		nil,
+		candidateAuth,
 	)
 
 	// Candidate/interviewer registration needs a verification sender. Until that
 	// provider is configured, reject requests before creating unusable accounts.
 	server, err := httpserver.New(cfg.HTTP, logger, dbSvc,
 		registrationHandler.RegisterRoutes,
+		verificationHandler.RegisterRoutes,
 		companyRegistrationHandler.RegisterRoutes,
 		loginHandler.RegisterRoutes,
 		logoutHandler.RegisterRoutes,
 		accountActionHandler.RegisterRoutes,
 		profileHandler.RegisterRoutes,
 		feedHandler.RegisterRoutes,
+		assessmentProgressHandler.RegisterRoutes,
+		assessmentResultHandler.RegisterRoutes,
 		postingHandler.RegisterRoutes,
 		func(group *gin.RouterGroup) { jobhttp.RegisterPostingPreviewRoutes(group, postingService, authRepo) },
 		postingListHandler.RegisterRoutes,

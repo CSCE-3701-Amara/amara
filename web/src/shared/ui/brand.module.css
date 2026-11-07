@@ -36,3 +36,21 @@
     height: 60px;
   }
 }
+
+/* Figma's compact workspace lockup; auth and welcome retain their own variants. */
+.workspace {
+  height: 48.36px;
+  width: 162.2px;
+  gap: 6.9px;
+  padding: 10.92px 13.26px;
+  border-radius: 24.18px;
+  font-size: 30.256px;
+  line-height: 21.746px;
+  background: var(--background);
+}
+@media (max-width: 700px) {
+  .workspace {
+    font-size: 30.256px;
+    gap: 6.9px;
+  }
+}

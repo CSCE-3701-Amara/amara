@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"slices"
 	"strings"
 	"time"
@@ -200,6 +201,19 @@ func (r *AssessmentRepository) FinalizeEvidence(ctx context.Context, attemptID, 
 		return err
 	}
 	defer tx.Rollback(ctx)
+	// Serialize with advancement before locking the attempt so the next
+	// statement sees any stage decision committed while this lock was pending.
+	if _, err := tx.Exec(ctx, `
+		SELECT app.id FROM applications app
+		JOIN pipeline_executions pe ON pe.application_id = app.id
+		JOIN stage_executions se ON se.pipeline_execution_id = pe.id
+		JOIN assessment_attempts a ON a.stage_execution_id = se.id
+		JOIN job_postings j ON j.id = app.posting_id
+		WHERE a.id = $1::uuid AND ($2 = '' OR j.company_id::text = $2)
+		FOR NO KEY UPDATE OF app
+	`, attemptID, company); err != nil {
+		return err
+	}
 	var lockedID string
 	if err := tx.QueryRow(ctx, `SELECT id::text FROM assessment_attempts WHERE id = $1::uuid FOR UPDATE`,
 		attemptID).Scan(&lockedID); err != nil {
@@ -222,7 +236,8 @@ func (r *AssessmentRepository) FinalizeEvidence(ctx context.Context, attemptID, 
 					JOIN pipeline_executions pe ON pe.id = se.pipeline_execution_id
 					JOIN applications app ON app.id = pe.application_id
 					JOIN job_postings j ON j.id = app.posting_id
-					WHERE se.id = a.stage_execution_id AND pe.status = 'active'
+					WHERE se.id = a.stage_execution_id
+						AND (pe.status = 'active' OR se.status IN ('passed', 'rejected'))
 						AND ($3 = '' OR j.company_id::text = $3)
 				)
 				AND jsonb_array_length($2::jsonb) = (SELECT count(*) FROM (`+snapshotQuestions+`) q)
@@ -264,7 +279,67 @@ func (r *AssessmentRepository) FinalizeEvidence(ctx context.Context, attemptID, 
 	if !finalized {
 		return ErrAssessmentConflict
 	}
+	if err := persistAssessmentResult(ctx, tx, attemptID); err != nil {
+		return fmt.Errorf("persist finalized assessment result: %w", err)
+	}
 	return tx.Commit(ctx)
+}
+
+func persistAssessmentResult(ctx context.Context, tx pgx.Tx, attemptID string) error {
+	if attemptID == "" {
+		return nil
+	}
+	_, err := tx.Exec(ctx, `
+		INSERT INTO assessment_results (
+			id, instance_id, passed, score, is_disclosed, attempt_id, scored_at
+		)
+		SELECT gen_random_uuid(), i.id, se.status = 'passed', t.final_score, false, t.id, t.evaluated_at
+		FROM assessment_attempts t
+		JOIN assessment_instances i ON i.id = t.instance_id
+		JOIN stage_executions se ON se.id = t.stage_execution_id
+		WHERE t.id = $1::uuid
+			AND t.status = 'scored' AND t.evaluated_at IS NOT NULL
+			AND se.status IN ('passed', 'rejected')
+		ON CONFLICT (instance_id) DO UPDATE SET
+			passed = EXCLUDED.passed,
+			score = EXCLUDED.score,
+			attempt_id = EXCLUDED.attempt_id,
+			scored_at = EXCLUDED.scored_at
+	`, attemptID)
+	return err
+}
+
+func (r *AssessmentRepository) ReleaseAssessmentResult(ctx context.Context, attemptID, company, feedback string, aiGenerated bool) error {
+	tag, err := r.pool.Exec(ctx, `
+		UPDATE assessment_results ar
+		SET feedback = $3,
+			feedback_is_ai_generated = $4,
+			feedback_approved_at = coalesce(ar.feedback_approved_at, statement_timestamp()),
+			disclosed_at = coalesce(ar.disclosed_at, statement_timestamp()),
+			is_disclosed = true
+		FROM assessment_attempts t
+		JOIN assessment_instances i ON i.id = t.instance_id
+		JOIN stage_executions se ON se.id = t.stage_execution_id
+		JOIN pipeline_executions pe ON pe.id = se.pipeline_execution_id
+		JOIN applications app ON app.id = pe.application_id
+		JOIN job_postings j ON j.id = app.posting_id
+		WHERE t.id = $1::uuid AND j.company_id::text = $2
+			AND ar.instance_id = i.id
+			AND t.status = 'scored' AND t.evaluated_at IS NOT NULL
+			AND se.status IN ('passed', 'rejected')
+			AND ar.passed = (se.status = 'passed')
+			AND (
+				(ar.disclosed_at IS NULL AND ar.is_disclosed IS NOT TRUE)
+				OR (ar.feedback IS NOT DISTINCT FROM $3 AND ar.feedback_is_ai_generated = $4)
+			)
+	`, attemptID, company, feedback, aiGenerated)
+	if err != nil {
+		return fmt.Errorf("release candidate assessment result: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return ErrAssessmentConflict
+	}
+	return nil
 }
 
 func (r *AssessmentRepository) RecordInterviewOutcome(ctx context.Context, interview, company, interviewer, outcome string) (json.RawMessage, error) {

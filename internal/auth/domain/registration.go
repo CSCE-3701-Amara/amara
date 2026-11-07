@@ -24,6 +24,7 @@ var (
 	ErrCompanyNotFound             = errors.New("approved company association not found")
 	ErrCompanyRegistrationExists   = errors.New("company registration already exists")
 	ErrPendingVerificationNotFound = errors.New("pending verification not found")
+	ErrInvalidVerificationCode     = errors.New("invalid verification code")
 )
 
 type Registration struct {

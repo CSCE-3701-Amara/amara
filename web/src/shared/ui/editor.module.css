@@ -1,0 +1,219 @@
+.section {
+  padding: 32px 24px;
+  border-bottom: 1px solid var(--workspace-border);
+}
+.section h2 {
+  margin: 0 0 28px;
+  font-size: 28px;
+}
+.section p {
+  color: var(--workspace-muted);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.field {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  min-width: 0;
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 60px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: var(--workspace-field);
+  padding: 18px;
+  color: var(--workspace-ink);
+  font:
+    400 18px/1.4 var(--font-funnel-sans),
+    sans-serif;
+}
+.field textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+.full {
+  grid-column: 1/-1;
+}
+.actions {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+.actions button,
+.actions a,
+.pill {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: var(--workspace-sidebar);
+  border: 1px solid transparent;
+  font:
+    700 16px/1.4 var(--font-funnel-sans),
+    sans-serif;
+  color: var(--workspace-ink);
+  text-decoration: none;
+}
+.actions .primary,
+.primary {
+  background: #7c3f1e;
+  color: white;
+}
+.actions [aria-pressed="true"] {
+  background: #211813;
+  color: white;
+}
+.tableWrap {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 18px;
+  text-align: left;
+}
+.table th {
+  color: #665145;
+  font-size: 16px;
+}
+.table td,
+.table th {
+  padding: 20px 18px;
+  border-bottom: 1px solid var(--workspace-border);
+  vertical-align: top;
+}
+.table td:first-child {
+  font-weight: 700;
+}
+.table a {
+  text-underline-offset: 4px;
+}
+.table caption {
+  text-align: left;
+  padding: 20px 0;
+  font-weight: 700;
+  font-size: 25px;
+}
+.list {
+  display: grid;
+  gap: 0;
+  margin: 24px 28px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 18px 0;
+  flex-wrap: wrap;
+}
+.row > :first-child {
+  margin-right: auto;
+  flex: 1;
+  min-width: 180px;
+}
+.row h2,
+.row h3 {
+  margin: 0 0 8px;
+  font-size: 25px;
+}
+.row p {
+  margin: 0;
+  color: var(--workspace-muted);
+  font-size: 18px;
+}
+.panel {
+  padding: 28px;
+  border: 1px solid var(--workspace-border);
+  border-radius: 12px;
+  background: white;
+  margin: 20px 0;
+}
+.panel h2 {
+  font-size: 28px;
+  margin-top: 0;
+}
+.note {
+  font-size: 15px;
+  color: var(--workspace-muted);
+  line-height: 1.5;
+}
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.55fr);
+  gap: 24px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+}
+.check input {
+  width: 22px;
+  height: 22px;
+}
+.error {
+  border-left: 4px solid #a12b24;
+  padding: 16px 20px;
+  background: #fff0eb;
+  color: #882c24;
+}
+@media (max-width: 760px) {
+  .grid,
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .section {
+    padding: 24px 0;
+  }
+  .list {
+    margin: 16px 0;
+  }
+  .row {
+    gap: 12px;
+  }
+  .panel {
+    padding: 20px;
+  }
+  .table th,
+  .table td {
+    padding: 14px 10px;
+  }
+  .actions {
+    gap: 10px;
+  }
+}
+
+.field input,
+.field select,
+.field textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+.table {
+  font-variant-numeric: tabular-nums;
+}
+.panel pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.panel,
+.row,
+.table td,
+.table th {
+  overflow-wrap: anywhere;
+}

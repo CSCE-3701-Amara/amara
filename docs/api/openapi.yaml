@@ -134,6 +134,32 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /v1/auth/verifications:
+    post:
+      summary: Activate a candidate or interviewer account by email code
+      operationId: verifyAccount
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountVerificationRequest'
+      responses:
+        '200':
+          description: Account activated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /v1/auth/sessions:
     post:
       summary: Create an authenticated session
@@ -6496,6 +6522,21 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    AccountVerificationRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - code
+      properties:
+        email:
+          type: string
+          format: email
+        code:
+          type: string
+          minLength: 64
+          maxLength: 64
 
     LoginRequest:
       type: object
