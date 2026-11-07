@@ -24,6 +24,10 @@ type profileHandlerRepository struct {
 	err             error
 }
 
+func (r *profileHandlerRepository) GetCandidateProfile(_ context.Context, _ string) (domain.CandidateProfile, error) {
+	return domain.CandidateProfile{ID: "candidate-id", Name: "Mona", Email: "mona@example.com", CreatedAt: time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)}, r.err
+}
+
 func (r *profileHandlerRepository) GetCompanyProfile(_ context.Context, _ string, _ bool) (domain.CompanyProfile, error) {
 	return domain.CompanyProfile{ID: "company-id", LegalName: "Example", Approved: true}, r.err
 }
@@ -90,8 +94,14 @@ func TestProfileHandlerUpdatesCandidate(t *testing.T) {
 }
 
 func TestProfileHandlerGetsProfiles(t *testing.T) {
+	_, router := newProfileTestHandler(t, &profileHandlerRepository{}, ports.Identity{AccountID: "candidate-id", AccountType: domain.AccountTypeCandidate})
+	if recorder := requestProfile(t, router, http.MethodGet, "/v1/candidates/me", ""); recorder.Code != http.StatusOK ||
+		!strings.Contains(recorder.Body.String(), `"name":"Mona"`) {
+		t.Fatalf("candidate profile status = %d, body = %s", recorder.Code, recorder.Body.String())
+	}
+
 	repository := &profileHandlerRepository{}
-	_, router := newProfileTestHandler(t, repository, ports.Identity{AccountID: "company-id", AccountType: domain.AccountTypeCompany})
+	_, router = newProfileTestHandler(t, repository, ports.Identity{AccountID: "company-id", AccountType: domain.AccountTypeCompany})
 	if recorder := requestProfile(t, router, http.MethodGet, "/v1/companies/me", ""); recorder.Code != http.StatusOK ||
 		!strings.Contains(recorder.Body.String(), `"legalName":"Example"`) {
 		t.Fatalf("company profile status = %d, body = %s", recorder.Code, recorder.Body.String())

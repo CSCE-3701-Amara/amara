@@ -15,6 +15,10 @@ type profileRepository struct {
 	err             error
 }
 
+func (r *profileRepository) GetCandidateProfile(context.Context, string) (domain.CandidateProfile, error) {
+	return domain.CandidateProfile{Name: "Mona"}, r.err
+}
+
 func (r *profileRepository) GetCompanyProfile(context.Context, string, bool) (domain.CompanyProfile, error) {
 	return domain.CompanyProfile{LegalName: "Example"}, r.err
 }
