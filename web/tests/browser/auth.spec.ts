@@ -184,6 +184,88 @@ for (const company of [false, true]) {
   });
 }
 
+test("candidate registration verifies by emailed code, preserves input on failure, and opens sign-in", async ({
+  page,
+}) => {
+  const code = "a".repeat(64);
+  await page.route("**/v1/auth/registrations", (route) =>
+    route.fulfill({
+      status: 201,
+      json: {
+        id: "candidate-1",
+        accountType: "candidate",
+        email: "candidate@example.com",
+        status: "pending_verification",
+        createdAt: "2026-11-07T00:00:00Z",
+      },
+    }),
+  );
+  let requests = 0;
+  await page.route("**/v1/auth/verifications", (route) => {
+    requests++;
+    expect(route.request().postDataJSON()).toEqual({
+      email: "candidate@example.com",
+      code,
+    });
+    return requests === 1
+      ? route.fulfill({
+          status: 422,
+          json: {
+            code: "invalid_verification_code",
+            detail: "Invalid or expired code.",
+          },
+        })
+      : route.fulfill({
+          json: {
+            id: "candidate-1",
+            accountType: "candidate",
+            email: "candidate@example.com",
+            status: "active",
+            createdAt: "2026-11-07T00:00:00Z",
+          },
+        });
+  });
+  await page.goto("/register");
+  await credentials(page);
+  await page.getByLabel("First name").fill("Aya");
+  await page.getByLabel("Last name").fill("Ali");
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Verification pending" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Email", { exact: true })).toHaveValue(
+    "candidate@example.com",
+  );
+  await page.getByLabel("Verification code").fill(code);
+  await page.getByRole("button", { name: "Verify account" }).click();
+  await expect(page.locator("main").getByRole("alert")).toHaveText(
+    "Invalid or expired code.",
+  );
+  await expect(page.getByLabel("Verification code")).toHaveValue(code);
+  await page.getByRole("button", { name: "Verify account" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Account verified" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Continue to sign-in" }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  expect(requests).toBe(2);
+});
+
+test("direct verification state accepts a candidate email and rejects malformed codes locally", async ({
+  page,
+}) => {
+  let requests = 0;
+  await page.route("**/v1/auth/verifications", (route) => {
+    requests++;
+    return route.fulfill({ status: 500, json: {} });
+  });
+  await page.goto("/register?state=verification-pending");
+  await page.getByLabel("Email", { exact: true }).fill("candidate@example.com");
+  await page.getByLabel("Verification code").fill("short");
+  await page.getByRole("button", { name: "Verify account" }).click();
+  expect(requests).toBe(0);
+});
+
 test("account selector and registration navigation preserve the workspace", async ({
   page,
 }) => {

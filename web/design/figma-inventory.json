@@ -1,6 +1,6 @@
 {
   "fileKey": "5alyud0Z3bCoU3yaV0q5BV",
-  "sessionId": "91292d60-0cab-46f2-afc9-106da2d45007",
+  "sessionId": "cbca484b-6350-4fbd-b8ad-e94da3e13f19",
   "inventoryVerified": true,
   "pages": [
     {
@@ -16,17 +16,17 @@
     {
       "id": "34:6",
       "name": "Hiring workspace",
-      "nodeCount": 1240
+      "nodeCount": 1533
     },
     {
       "id": "110:63",
       "name": "Pipeline studio",
-      "nodeCount": 2773
+      "nodeCount": 3001
     },
     {
       "id": "264:635",
       "name": "Administration",
-      "nodeCount": 152
+      "nodeCount": 170
     }
   ],
   "screens": [
@@ -40,8 +40,11 @@
       "route": "/register?account=company",
       "operations": "POST /v1/auth/company-registrations",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "motionStatus": "Unverified: frame flags animation; motion context retrieval unavailable after MCP quota exhaustion",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "11:51",
@@ -53,8 +56,11 @@
       "route": "/register",
       "operations": "POST /v1/auth/registrations",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "motionStatus": "Unverified: frame flags animation; motion context retrieval unavailable after MCP quota exhaustion",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "4:6",
@@ -66,8 +72,11 @@
       "route": "/login?account=company",
       "operations": "POST /v1/auth/sessions",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "motionStatus": "Unverified: frame flags animation; motion context retrieval unavailable after MCP quota exhaustion",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "10:5",
@@ -79,8 +88,11 @@
       "route": "/login",
       "operations": "POST /v1/auth/sessions",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "motionStatus": "Unverified: frame flags animation; motion context retrieval unavailable after MCP quota exhaustion",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "149:119",
@@ -92,8 +104,10 @@
       "route": "/",
       "operations": "—",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Not applicable",
+      "evidence": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks. Static entry screen; no data operation. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "268:14",
@@ -105,8 +119,11 @@
       "route": "/login?state=mfa",
       "operations": "POST /v1/auth/sessions",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "motionStatus": "Unverified: frame flags animation; motion context retrieval unavailable after MCP quota exhaustion",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "268:143",
@@ -118,8 +135,11 @@
       "route": "/login?state=code-rejected",
       "operations": "POST /v1/auth/sessions",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "motionStatus": "Unverified: frame flags animation; motion context retrieval unavailable after MCP quota exhaustion",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "268:272",
@@ -131,8 +151,11 @@
       "route": "/login?state=credentials-rejected",
       "operations": "POST /v1/auth/sessions",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "motionStatus": "Unverified: frame flags animation; motion context retrieval unavailable after MCP quota exhaustion",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "268:397",
@@ -144,8 +167,11 @@
       "route": "/login?state=rate-limited",
       "operations": "POST /v1/auth/sessions",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "motionStatus": "Unverified: frame flags animation; motion context retrieval unavailable after MCP quota exhaustion",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "268:522",
@@ -157,8 +183,11 @@
       "route": "/login?state=expired",
       "operations": "POST /v1/auth/sessions",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "motionStatus": "Unverified: frame flags animation; motion context retrieval unavailable after MCP quota exhaustion",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "268:647",
@@ -168,10 +197,13 @@
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=268-647",
       "route": "/register?state=verification-pending",
-      "operations": "POST /v1/auth/registrations",
+      "operations": "POST /v1/auth/registrations; POST /v1/auth/verifications",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Candidate email verification form sends the 64-character code to the registered handler, retains values after 422 errors, and offers sign-in only after an active response. Browser requests use mocks; authenticated activation remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "motionStatus": "Unverified: frame flags animation; motion context retrieval unavailable after MCP quota exhaustion",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "268:772",
@@ -183,8 +215,11 @@
       "route": "/register?account=company&state=review-pending",
       "operations": "POST /v1/auth/company-registrations",
       "designStatus": "Implemented but unverified",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "motionStatus": "Unverified: frame flags animation; motion context retrieval unavailable after MCP quota exhaustion",
+      "browserVerification": "Passed existing authentication/entry checks; primary auth states at 1728px and 375px, with additional responsive interaction checks."
     },
     {
       "id": "212:329",
@@ -195,9 +230,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=212-329",
       "route": "/candidate/applications/[id]?dialog=withdraw-review",
       "operations": "POST /v1/applications/{applicationId}/withdrawal",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "99:513",
@@ -208,9 +245,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=99-513",
       "route": "/candidate/profile",
       "operations": "GET /v1/candidates/me (missing)",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Profile GET missing; saves patch edited fields only. Reload persistence unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "89:298",
@@ -221,9 +260,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=89-298",
       "route": "/candidate/applications?state=empty",
       "operations": "GET /v1/candidates/me/applications",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "89:371",
@@ -234,9 +275,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=89-371",
       "route": "/candidate/applications?state=error",
       "operations": "GET /v1/candidates/me/applications",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "34:7",
@@ -247,9 +290,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=34-7",
       "route": "/candidate/applications",
       "operations": "GET /v1/candidates/me/applications",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "38:22",
@@ -259,10 +304,12 @@
       "height": 1831.800048828125,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=38-22",
       "route": "/candidate/profile/edit",
-      "operations": "PATCH /api/v1/candidates/me",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "PATCH /v1/candidates/me; GET profile missing",
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Profile GET missing; saves patch edited fields only. Reload persistence unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "212:71",
@@ -273,9 +320,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=212-71",
       "route": "/candidate/offers",
       "operations": "GET /v1/offers",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:52481",
@@ -285,10 +334,12 @@
       "height": 1420,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-52481",
       "route": "/candidate/assessments/[id]?state=submitted",
-      "operations": "POST /v1/assessment-attempts/{attemptId}/submission",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "GET /v1/assessment-attempts/{attemptId}",
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Start/save/submit wired; answer restoration GET missing. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:52370",
@@ -298,10 +349,12 @@
       "height": 1349,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-52370",
       "route": "/candidate/assessments/[id]/video",
-      "operations": "POST /v1/assessment-attempts/{attemptId}/video-uploads",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "GET /v1/assessment-attempts/{attemptId}; video upload missing",
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:52134",
@@ -311,10 +364,12 @@
       "height": 1484,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-52134",
       "route": "/candidate/assessments/[id]/coding",
-      "operations": "GET /v1/assessment-attempts/{attemptId}; PUT /v1/assessment-attempts/{attemptId}/submissions/{questionId}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "GET /v1/assessment-attempts/{attemptId}; PUT /v1/assessment-attempts/{attemptId}/submissions/{questionId}; POST /v1/assessment-attempts/{attemptId}/submission",
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Start/save/submit wired; answer restoration GET missing. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:51985",
@@ -324,10 +379,12 @@
       "height": 1143,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-51985",
       "route": "/candidate/applications/[id]/progress",
-      "operations": "GET /v1/applications/{applicationId}/stage-progress",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "GET /v1/applications/{application_id}/pipeline-progress; GET /v1/applications/{applicationId}/assessment-instances",
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "224:137",
@@ -338,9 +395,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=224-137",
       "route": "/candidate/applications/[id]?state=withdrawn",
       "operations": "GET /v1/applications/{applicationId}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "363:495",
@@ -351,9 +410,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=363-495",
       "route": "/candidate/dashboard",
       "operations": "GET /v1/jobs/feed",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "375:958",
@@ -364,9 +425,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=375-958",
       "route": "/candidate/applications/[id]",
       "operations": "GET /v1/applications/{applicationId}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "375:1077",
@@ -377,9 +440,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=375-1077",
       "route": "/candidate/interviews/[id]",
       "operations": "GET /v1/interviews/{interviewId}; GET /v1/interviews/{interviewId}/availability",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "375:1232",
@@ -390,9 +455,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=375-1232",
       "route": "/candidate/offers/[id]",
       "operations": "GET /v1/offers/{offerId}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "376:555",
@@ -403,9 +470,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-555",
       "route": "/candidate/interviews/[id]?dialog=confirm",
       "operations": "POST /v1/interviews/{interviewId}/confirmation",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:564",
@@ -416,9 +485,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-564",
       "route": "/candidate/interviews/[id]?dialog=reschedule",
       "operations": "POST /v1/interviews/{interviewId}/reschedules",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:573",
@@ -429,9 +500,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-573",
       "route": "/candidate/offers/[id]?dialog=accept",
       "operations": "POST /v1/offers/{offerId}/response",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:582",
@@ -442,9 +515,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-582",
       "route": "/candidate/offers/[id]?dialog=decline",
       "operations": "POST /v1/offers/{offerId}/response",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:591",
@@ -455,9 +530,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-591",
       "route": "/candidate/profile/edit?dialog=deactivate",
       "operations": "POST /v1/auth/account-actions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:600",
@@ -468,9 +545,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-600",
       "route": "/candidate/profile/edit?dialog=delete",
       "operations": "POST /v1/auth/account-actions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "377:553",
@@ -481,9 +560,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=377-553",
       "route": "/candidate/assessments/[id]?dialog=submit",
       "operations": "POST /v1/assessment-attempts/{attemptId}/submission",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Start/save/submit wired; answer restoration GET missing. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "378:571",
@@ -494,9 +575,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=378-571",
       "route": "/candidate/applications/[id]?dialog=withdraw",
       "operations": "POST /v1/applications/{applicationId}/withdrawal",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "383:553",
@@ -506,10 +589,12 @@
       "height": 1180,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=383-553",
       "route": "/candidate/assessments/[id]",
-      "operations": "GET /v1/assessment-attempts/{attemptId}; PUT /v1/assessment-attempts/{attemptId}/submissions/{questionId}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "GET /v1/assessment-attempts/{attemptId}; PUT /v1/assessment-attempts/{attemptId}/submissions/{questionId}; POST /v1/assessment-attempts/{attemptId}/submission",
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Start/save/submit wired; answer restoration GET missing. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "383:675",
@@ -520,9 +605,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=383-675",
       "route": "/candidate/assessments/[id]?state=result",
       "operations": "GET /v1/assessment-instances/{instanceId}/result",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "383:1196",
@@ -532,10 +619,12 @@
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=383-1196",
       "route": "/candidate/assessments/[id]?state=availability",
-      "operations": "GET /v1/assessment-instances/{instanceId}; POST /v1/assessment-instances/{instanceId}/start",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "GET /v1/applications/{applicationId}/assessment-instances; POST /v1/assessment-instances/{instanceId}/start",
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Start/save/submit wired; answer restoration GET missing. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "384:641",
@@ -546,204 +635,236 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=384-641",
       "route": "/candidate/jobs/[id]",
       "operations": "GET /v1/jobs/feed (no registered candidate posting-detail operation); POST /v1/jobs/{id}/apply",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "109:14385",
-      "name": "Job postings · Error",
+      "name": "22 · Postings feed unavailable",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=109-14385",
       "route": "/employer/jobs?state=error",
       "operations": "GET /v1/jobs",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "109:14301",
-      "name": "Job posting · Publication blocked",
+      "name": "21 · Publication blocked",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=109-14301",
       "route": "/employer/jobs/[id]?state=publication-blocked",
       "operations": "POST /v1/jobs/{id}/publish",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "109:14178",
-      "name": "Job posting · Save conflict",
+      "name": "23 · Job posting save conflict",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 2984.400146484375,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=109-14178",
       "route": "/employer/jobs/[id]?state=conflict",
       "operations": "PUT /v1/jobs/{id}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "109:14106",
-      "name": "Job posting · Published",
+      "name": "09 · Publication success",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=109-14106",
       "route": "/employer/jobs/[id]?state=published",
       "operations": "GET /v1/jobs/{id}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "109:13810",
-      "name": "Job posting · Validation",
+      "name": "03 · Posting validation",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 3062.60009765625,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=109-13810",
       "route": "/employer/jobs/new?state=validation",
       "operations": "POST /v1/jobs",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "109:13624",
-      "name": "Job posting · Preview",
+      "name": "04 · Posting details",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=109-13624",
       "route": "/employer/jobs/[id]/preview",
-      "operations": "GET /v1/jobs/{id}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "GET /v1/jobs/{id}/preview",
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "109:13334",
-      "name": "Job posting · Editor",
+      "name": "02 · Create and edit posting",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 2917.800048828125,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=109-13334",
       "route": "/employer/jobs/new",
       "operations": "POST /v1/jobs; PUT /v1/jobs/{id}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "109:13232",
-      "name": "Job postings · Overview",
+      "name": "01 · Unified job postings feed",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1229.4000244140625,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=109-13232",
       "route": "/employer/jobs",
       "operations": "GET /v1/jobs; GET /v1/company/{company_id}/postings",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "220:14",
-      "name": "Company profile · Edit",
+      "name": "20 · Edit company profile",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1539,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=220-14",
-      "route": "/employer/profile",
-      "operations": "GET /v1/companies/me; PATCH /v1/companies/me",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "route": "/employer/profile?edit=true",
+      "operations": "PATCH /v1/companies/me; GET profile missing",
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Profile GET missing; saves patch edited fields only. Reload persistence unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "225:87",
-      "name": "Job posting · Publication review",
+      "name": "08 · Review publication",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=225-87",
       "route": "/employer/jobs/[id]?state=publication-review",
       "operations": "POST /v1/jobs/{id}/publish",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:393",
-      "name": "Applications for Frontend Engineer",
+      "name": "10 · Applications for a job",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-393",
       "route": "/employer/jobs/[id]/applications",
       "operations": "GET /v1/jobs/{id}/applications",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:449",
-      "name": "Finalists",
+      "name": "11 · Finalists",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-449",
       "route": "/employer/jobs/[id]/finalists",
       "operations": "GET /v1/jobs/{id}/finalists",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:500",
-      "name": "Create finalist offer",
+      "name": "17 · Create finalist offer",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-500",
       "route": "/employer/offers/new",
       "operations": "POST /v1/applications/{applicationId}/offers",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:550",
-      "name": "Manage offer",
+      "name": "19 · Manage offer",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-550",
       "route": "/employer/offers/[id]",
       "operations": "GET /v1/offers/{offerId}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:593",
-      "name": "Edit interviewer profile",
+      "name": "15 · Edit interviewer profile",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-593",
       "route": "/interviewer/profile",
-      "operations": "GET /v1/interviewers/me; PATCH /v1/interviewers/me",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "PATCH /v1/interviewers/me; GET profile missing",
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Profile GET missing; saves patch edited fields only. Reload persistence unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "376:1131",
@@ -754,9 +875,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1131",
       "route": "/employer/jobs/[id]?dialog=publish",
       "operations": "POST /v1/jobs/{id}/publish",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:1140",
@@ -767,9 +890,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1140",
       "route": "/employer/jobs/[id]?dialog=archive",
       "operations": "POST /v1/jobs/{id}/archive",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:1149",
@@ -780,9 +905,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1149",
       "route": "/employer/jobs/[id]?dialog=republish",
       "operations": "POST /v1/jobs/{id}/republish",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:1158",
@@ -793,9 +920,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1158",
       "route": "/employer/jobs/[id]?dialog=delete",
       "operations": "DELETE /v1/jobs/{id}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:1167",
@@ -806,9 +935,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1167",
       "route": "/employer/modules/[id]?dialog=publish",
       "operations": "POST /v1/modules/{moduleId}/publish",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:1176",
@@ -819,9 +950,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1176",
       "route": "/employer/modules/[id]?dialog=delete",
       "operations": "DELETE /v1/modules/{moduleId}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:1185",
@@ -832,9 +965,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1185",
       "route": "/employer/feedback/[id]?dialog=release",
       "operations": "POST /v1/stage-executions/{stageExecutionId}/feedback/release",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:1194",
@@ -845,9 +980,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1194",
       "route": "/employer/pipelines/[id]/candidates?dialog=decision",
       "operations": "POST /v1/stage-executions/{stageExecutionId}/decisions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:1203",
@@ -858,9 +995,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1203",
       "route": "/employer/pipelines/[id]/candidates?dialog=override",
       "operations": "POST /v1/stage-executions/{stageExecutionId}/decisions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:1212",
@@ -871,9 +1010,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1212",
       "route": "/employer/offers/new?dialog=capacity",
       "operations": "POST /v1/applications/{applicationId}/offers",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:1221",
@@ -884,9 +1025,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1221",
       "route": "/employer/offers/[id]?dialog=withdraw",
       "operations": "POST /v1/offers/{offerId}/withdrawal",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:1230",
@@ -897,9 +1040,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1230",
       "route": "/employer/offers/[id]?dialog=extend",
       "operations": "POST /v1/offers/{offerId}/deadline-extensions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "377:1082",
@@ -910,9 +1055,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=377-1082",
       "route": "/employer/pipelines/[id]/candidates?dialog=pass",
       "operations": "POST /v1/stage-executions/{stageExecutionId}/decisions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "377:1091",
@@ -923,373 +1070,431 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=377-1091",
       "route": "/employer/pipelines/[id]/candidates?dialog=reject",
       "operations": "POST /v1/stage-executions/{stageExecutionId}/decisions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "393:670",
-      "name": "Module question editor",
+      "name": "05 · Module question editor",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1210,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=393-670",
       "route": "/employer/modules/[id]/questions",
       "operations": "GET /v1/modules/{moduleId}; PUT /v1/modules/{moduleId}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "393:753",
-      "name": "Coding problem library",
+      "name": "06 · Coding problem library",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=393-753",
       "route": "/employer/modules/library/problems",
       "operations": "GET /v1/modules/library/problems",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "393:834",
-      "name": "Copy module to company",
+      "name": "07 · Copy module to company",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=393-834",
       "route": "/employer/modules/library?state=copy",
       "operations": "GET /v1/modules/library; POST /v1/modules/{moduleId}/copy",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "393:913",
-      "name": "Compare applications · 4 candidates",
+      "name": "13 · Compare applications · 4 candidates",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=393-913",
       "route": "/employer/jobs/[id]/comparison?state=four-candidates",
       "operations": "GET /v1/pipelines/{pipelineId}/comparison",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "393:1014",
-      "name": "Interviewer management",
+      "name": "14 · Interviewer management",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=393-1014",
       "route": "/employer/interviewers",
       "operations": "GET /v1/companies/me/interviewers",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "393:1095",
-      "name": "Feedback authoring",
+      "name": "16 · Feedback authoring",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=393-1095",
       "route": "/employer/feedback/[id]",
       "operations": "GET /v1/stage-executions/{stageExecutionId}/feedback; PUT /v1/stage-executions/{stageExecutionId}/feedback",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "393:1176",
-      "name": "Offer capacity confirmation",
+      "name": "18 · Offer capacity confirmation",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=393-1176",
       "route": "/employer/offers/new?state=capacity",
       "operations": "POST /v1/applications/{applicationId}/offers",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "394:1622",
-      "name": "Finalist ranking",
+      "name": "12 · Finalist ranking",
       "page": "Hiring workspace",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=394-1622",
       "route": "/employer/jobs/[id]/finalists?state=ranking",
       "operations": "GET /v1/jobs/{id}/finalists",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:51829",
-      "name": "Assessments — Instances & extensions",
+      "name": "04 · Assessment instances & extensions",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 2413.400146484375,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-51829",
       "route": "/employer/assessments",
       "operations": "GET /v1/applications/{applicationId}/assessment-instances; POST /v1/assessment-attempts/{attemptId}/extensions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:51707",
-      "name": "Candidates — Decision conflict",
+      "name": "19 · Candidate decision conflict",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1423.760009765625,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-51707",
       "route": "/employer/pipelines/[id]/candidates?state=conflict",
-      "operations": "POST /v1/stage-executions/{stageExecutionId}/decisions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "GET /v1/jobs/{id}/pipeline/dashboard; POST /v1/stage-executions/{id}/decisions (409)",
+      "designStatus": "Blocked",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:51586",
-      "name": "Candidates — Override decision",
+      "name": "20 · Candidate decision override",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1356.760009765625,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-51586",
       "route": "/employer/pipelines/[id]/candidates?state=override",
       "operations": "POST /v1/stage-executions/{stageExecutionId}/decisions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:51421",
-      "name": "Candidates — Stage decisions",
+      "name": "10 · Candidate stage decisions",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1677.0399169921875,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-51421",
       "route": "/employer/pipelines/[id]/candidates",
-      "operations": "GET /v1/pipeline-stages/{stageId}/executions; POST /v1/pipeline-stages/{stageId}/decisions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "GET /v1/jobs/{id}/pipeline/dashboard; POST /v1/stage-executions/{id}/decisions; POST /v1/pipeline-stages/{id}/decisions",
+      "designStatus": "Blocked",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:51272",
-      "name": "Interviews — Scorecard & private notes",
+      "name": "14 · Interview scorecard & private notes",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1518.800048828125,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-51272",
       "route": "/interviewer/interviews/[id]/scorecard",
       "operations": "GET /v1/interviews/{interviewId}/feedback/me; PUT /v1/interviews/{interviewId}/feedback/me",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:51106",
-      "name": "Interviews — Scheduling & outcomes",
+      "name": "13 · Interview scheduling & outcomes",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1785.0799560546875,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-51106",
       "route": "/employer/interviews",
       "operations": "GET /v1/interviews; POST /v1/interviews/{interviewId}/outcome",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:50952",
-      "name": "Pipeline — Published version",
+      "name": "08 · Published pipeline version",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1719.8399658203125,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-50952",
       "route": "/employer/pipelines/[id]?state=published",
       "operations": "GET /v1/pipeline-versions/{versionId}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:50812",
-      "name": "Pipeline — Migration review",
+      "name": "07 · Pipeline migration review",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1793,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-50812",
       "route": "/employer/pipelines/[id]?state=migration-review",
       "operations": "POST /v1/pipeline-versions/{versionId}/migration-preview",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:50676",
-      "name": "Pipeline — Migration blocked",
+      "name": "18 · Pipeline migration blocked",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1728.9600830078125,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-50676",
       "route": "/employer/pipelines/[id]?state=migration-blocked",
       "operations": "POST /v1/pipeline-versions/{versionId}/migration-preview",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:50505",
-      "name": "Pipeline — Graph validation errors",
+      "name": "06 · Pipeline graph validation errors",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 2202.39990234375,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-50505",
       "route": "/employer/pipelines/[id]?state=validation",
       "operations": "POST /v1/pipeline-versions/{versionId}/validation",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "125:50340",
-      "name": "Pipeline — Video module setup",
+      "name": "03 · Pipeline video module setup",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1622.47998046875,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=125-50340",
       "route": "/employer/modules/new?type=recorded_video",
       "operations": "POST /v1/modules",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "118:5096",
-      "name": "Pipeline · Designer",
+      "name": "05 · Pipeline designer",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1768.1199951171875,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=118-5096",
       "route": "/employer/pipelines/[id]",
       "operations": "GET/POST /v1/jobs/{id}/pipeline; GET/PUT /v1/pipeline-versions/{versionId}/stages; GET/POST /v1/pipeline-versions/{versionId}/transitions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:770",
-      "name": "Pipeline dashboard",
+      "name": "09 · Pipeline dashboard",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-770",
       "route": "/employer/pipelines/[id]/dashboard",
-      "operations": "GET /v1/pipelines/{pipelineId}/dashboard",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "operations": "GET /v1/jobs/{id}/pipeline/dashboard",
+      "designStatus": "Blocked",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:829",
-      "name": "Compare applications",
+      "name": "11 · Compare applications",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-829",
       "route": "/employer/jobs/[id]/comparison",
       "operations": "GET /v1/pipelines/{pipelineId}/comparison",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:883",
-      "name": "Assessment module library",
+      "name": "01 · Assessment module library",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-883",
       "route": "/employer/pipelines",
       "operations": "GET /v1/modules; GET /v1/modules/library",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:934",
-      "name": "Question module setup",
+      "name": "02 · Question module setup",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1245.3599853515625,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-934",
       "route": "/employer/modules/new",
       "operations": "POST /v1/modules; PUT /v1/modules/{moduleId}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Connected but unverified",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Registered handler and frontend inspected; browser requests use mocks. API startup and anonymous route response verified; authenticated flow remains unverified. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:1003",
-      "name": "Assigned grading",
+      "name": "16 · Assigned grading",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-1003",
       "route": "/interviewer/grading",
       "operations": "GET /v1/grading/submissions; PUT /v1/assessment-submissions/{submissionId}/grade",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:1057",
-      "name": "Interview availability",
+      "name": "12 · Interview availability",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-1057",
       "route": "/interviewer/availability",
       "operations": "GET /v1/interviews/{interviewId}/availability; PUT /v1/interviews/{interviewId}/availability",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:1103",
-      "name": "Review rejection feedback",
+      "name": "17 · Review rejection feedback",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-1103",
       "route": "/employer/feedback/[id]?state=rejection",
       "operations": "GET/PUT /v1/pipeline-executions/{executionId}/rejection-feedback",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:1145",
-      "name": "Application scorecard",
+      "name": "15 · Application scorecard",
       "page": "Pipeline studio",
       "width": 1728,
       "height": 1117,
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-1145",
       "route": "/employer/applications/[id]/scorecard",
       "operations": "GET /v1/applications/{applicationId}/scorecard",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "376:1995",
@@ -1300,9 +1505,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-1995",
       "route": "/employer/pipelines/[id]?dialog=publish",
       "operations": "POST /v1/pipeline-versions/{versionId}/publish",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:2004",
@@ -1313,9 +1520,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-2004",
       "route": "/employer/pipelines/[id]?dialog=migrate",
       "operations": "POST /v1/pipeline-versions/{versionId}/publish",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:2013",
@@ -1326,9 +1535,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-2013",
       "route": "/employer/pipelines/[id]?dialog=discard",
       "operations": "DELETE /v1/pipeline-versions/{versionId}",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "377:1856",
@@ -1339,9 +1550,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=377-1856",
       "route": "/interviewer/interviews/[id]/scorecard?dialog=submit",
       "operations": "POST /v1/interviews/{interviewId}/feedback/me/submission",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "377:1865",
@@ -1352,9 +1565,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=377-1865",
       "route": "/interviewer/grading?dialog=submit",
       "operations": "PUT /v1/assessment-submissions/{submissionId}/grade",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "264:636",
@@ -1365,9 +1580,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-636",
       "route": "/admin/dashboard",
       "operations": "GET /v1/admin/company-registration-requests; POST /v1/admin/company-registration-requests/{requestId}/review",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "264:686",
@@ -1378,9 +1595,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=264-686",
       "route": "/admin/accounts",
       "operations": "GET /v1/admin/accounts; POST /v1/admin/accounts/{accountType}/{accountId}/actions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     },
     {
       "id": "376:2109",
@@ -1391,9 +1610,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-2109",
       "route": "/admin/dashboard?dialog=approve",
       "operations": "POST /v1/admin/company-registration-requests/{requestId}/review",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:2121",
@@ -1404,9 +1625,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-2121",
       "route": "/admin/dashboard?dialog=reject",
       "operations": "POST /v1/admin/company-registration-requests/{requestId}/review",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:2133",
@@ -1417,9 +1640,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-2133",
       "route": "/admin/accounts?dialog=ban",
       "operations": "POST /v1/admin/accounts/{accountType}/{accountId}/actions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:2145",
@@ -1430,9 +1655,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-2145",
       "route": "/admin/accounts?dialog=unban",
       "operations": "POST /v1/admin/accounts/{accountType}/{accountId}/actions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:2157",
@@ -1443,9 +1670,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-2157",
       "route": "/admin/accounts?dialog=deactivate",
       "operations": "POST /v1/admin/accounts/{accountType}/{accountId}/actions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:2169",
@@ -1456,9 +1685,11 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-2169",
       "route": "/admin/accounts?dialog=reactivate",
       "operations": "POST /v1/admin/accounts/{accountType}/{accountId}/actions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
     },
     {
       "id": "376:2181",
@@ -1469,9 +1700,56 @@
       "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=376-2181",
       "route": "/admin/accounts?dialog=delete",
       "operations": "POST /v1/admin/accounts/{accountType}/{accountId}/actions",
-      "designStatus": "Pending implementation",
-      "integrationStatus": "Pending verification",
-      "evidence": "Full-file MCP metadata inventory; current-session frame verification pending."
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. Modal entry, Cancel focus and Escape dismissal passed."
+    },
+    {
+      "id": "446:983",
+      "name": "25 · Offers overview",
+      "page": "Hiring workspace",
+      "width": 1728.0,
+      "height": 1117.0,
+      "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=446-983",
+      "route": "/employer/offers",
+      "operations": "GET /v1/offers",
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
+    },
+    {
+      "id": "446:1085",
+      "name": "26 · Job postings · Empty",
+      "page": "Hiring workspace",
+      "width": 1728.0,
+      "height": 1117.0,
+      "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=446-1085",
+      "route": "/employer/jobs?state=empty",
+      "operations": "GET /v1/jobs",
+      "designStatus": "Blocked",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. JOB/progress authentication is nil in main.go and fails closed; candidate detail feed reads remain connected where applicable. Existing screen/state retained; fresh Figma reference unavailable after Education-plan quota exhaustion.",
+      "referenceStatus": "Blocked: Figma Education-plan MCP quota exhausted",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
+    },
+    {
+      "id": "471:805",
+      "name": "28 · Company profile",
+      "page": "Hiring workspace",
+      "width": 1728.0,
+      "height": 1117.0,
+      "url": "https://www.figma.com/design/5alyud0Z3bCoU3yaV0q5BV/Amara?node-id=471-805",
+      "route": "/employer/profile",
+      "operations": "GET /v1/companies/me (missing); edit links to PATCH /v1/companies/me",
+      "designStatus": "Implemented but unverified",
+      "integrationStatus": "Blocked",
+      "evidence": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks. One or more required operations are unregistered or unavailable; UI keeps incomplete mutations explicit. See INTEGRATION.md. Profile GET missing; saves patch edited fields only. Reload persistence unverified. Fresh Figma context and screenshot retrieved; complete visual parity signoff is outstanding.",
+      "referenceStatus": "Retrieved design context and screenshot",
+      "browserVerification": "Passed route rendering, no page errors, loaded visible images, and no document overflow at 1728px, 1024px, and 375px using mocks."
     }
   ],
   "exclusions": [
@@ -1508,7 +1786,7 @@
     {
       "id": "343:1139",
       "name": "Navigation / Hiring sidebar",
-      "page": "Candidate workspace",
+      "page": "Hiring workspace",
       "reason": "Shared component/navigation sample; represented by the shared workspace shell."
     },
     {
@@ -1516,6 +1794,36 @@
       "name": "Navigation / Administration sidebar",
       "page": "Candidate workspace",
       "reason": "Shared component/navigation sample; represented by the shared workspace shell."
+    },
+    {
+      "id": "445:638",
+      "name": "amara / Secondary action",
+      "page": "Candidate workspace",
+      "reason": "Shared component sample."
+    },
+    {
+      "id": "417:885",
+      "name": "Prototype overlay · Publish posting",
+      "page": "Hiring workspace",
+      "reason": "Duplicate prototype overlay; corresponding product confirmation dialog is inventoried separately."
+    },
+    {
+      "id": "417:894",
+      "name": "Prototype overlay · Archive posting",
+      "page": "Hiring workspace",
+      "reason": "Duplicate prototype overlay; corresponding product confirmation dialog is inventoried separately."
+    },
+    {
+      "id": "417:903",
+      "name": "Prototype overlay · Republish posting",
+      "page": "Hiring workspace",
+      "reason": "Duplicate prototype overlay; corresponding product confirmation dialog is inventoried separately."
+    },
+    {
+      "id": "417:912",
+      "name": "Prototype overlay · Delete posting",
+      "page": "Hiring workspace",
+      "reason": "Duplicate prototype overlay; corresponding product confirmation dialog is inventoried separately."
     }
   ],
   "collections": [
@@ -1531,17 +1839,17 @@
     },
     {
       "id": "376:1129",
-      "name": "Decision dialogs · Company",
+      "name": "24 · Decision dialogs · Company",
       "page": "Hiring workspace"
     },
     {
       "id": "376:1993",
-      "name": "Decision dialogs · Pipeline",
+      "name": "21 · Decision dialogs · Pipeline",
       "page": "Pipeline studio"
     },
     {
       "id": "377:1854",
-      "name": "Decision dialogs · Interviewer",
+      "name": "22 · Decision dialogs · Interviewer",
       "page": "Pipeline studio"
     },
     {
@@ -1551,9 +1859,12 @@
     }
   ],
   "notes": [
-    "All five pages were enumerated and recursively inspected, including frames within dialog collections.",
-    "No distinct mobile product frames or drawers were identified in the accessible metadata. Responsive behavior must be adapted from desktop frames.",
-    "No root frames were labeled as archived explorations. Earlier withdrawal and comparison variants are retained as separate rows until design equivalence is verified.",
-    "frontend-skill installation failed because openai/skills has no matching skill; user authorized proceeding with Figma and the existing design system."
+    "All five pages enumerated recursively through Figma MCP on 2026-11-07, including dialog collection children.",
+    "114 product screen/state frames, 35 dialogs, 12 excluded component samples or duplicate overlays, six collection containers.",
+    "63 fresh design-context/screenshot responses retrieved; the remaining 51 references are blocked by the Education-plan MCP quota.",
+    "No mobile product frames, separate drawers, or archived exploration sections found in current metadata.",
+    "All API success evidence is mocked or code inspection. The documented backend setup now starts after the wildcard fix; live authenticated flow success remains unverified.",
+    "A rendered route or screenshot is not proof of visual fidelity; no full-file implementation completion is claimed.",
+    "Motion fidelity remains unverified: 11 retrieved frames flag animation; separate motion context was unavailable after quota exhaustion. Reduced-motion behavior is covered by browser tests."
   ]
 }

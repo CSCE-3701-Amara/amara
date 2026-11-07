@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -19,6 +20,7 @@ import (
 	authdomain "github.com/CSCE-3701-Amara/amara/internal/auth/domain"
 	authports "github.com/CSCE-3701-Amara/amara/internal/auth/ports"
 	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
+	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/judge0"
 )
 
 type outcomeSessions struct{}
@@ -265,6 +267,8 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		}
 	}
 	codingPath, id, question := start(3)
+	request(http.MethodPut, codingPath+"/submissions/"+question, "candidate",
+		`{"response":{"language":"python","code":"print()"}}`, http.StatusOK)
 	exec("UPDATE assessment_attempts SET deadline = now() - interval '1 second' WHERE id = $1::uuid", id)
 	sweep()
 	_, _, status, auto = load(3)
@@ -299,10 +303,73 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	}
 	failed := 0
 	evidence = append(evidence, database.QuestionEvidence{QuestionID: secondQuestion, PassedCases: &failed, TotalCases: &total})
-	for range 2 {
-		if err := repo.FinalizeEvidence(ctx, id, "", evidence); err != nil {
-			t.Fatal(err)
+	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/unavailable/") {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
 		}
+		switch r.Method {
+		case http.MethodPost:
+			fmt.Fprint(w, `{"token":"test-run"}`)
+		case http.MethodGet:
+			fmt.Fprint(w, `{"status":{"id":3},"stdout":"Cg=="}`)
+		}
+	}))
+	defer provider.Close()
+	unavailable, err := judge0.New(provider.URL+"/unavailable", "", nil, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, unavailable); !claimed || err == nil {
+		t.Fatalf("grade during provider outage: claimed=%v: %v", claimed, err)
+	}
+	runner, err := judge0.New(provider.URL, "", nil, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); claimed || err != nil {
+		t.Fatalf("grading retried before backoff elapsed: claimed=%v: %v", claimed, err)
+	}
+	exec("UPDATE assessment_attempts SET code_grading_retry_at = now() WHERE id = $1::uuid", id)
+	exec(`UPDATE assessment_attempts
+		SET selected_content = jsonb_set(selected_content, '{0,questions,1,format}', '"short_text"')
+		WHERE id = $1::uuid`, id)
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); claimed || err != nil {
+		t.Fatalf("automatic grading claimed an attempt requiring separate scores: claimed=%v: %v", claimed, err)
+	}
+	humanEvidence := fmt.Sprintf(`{"evidence":[{"questionId":%q,"score":80}]}`, secondQuestion)
+	evaluationPath := codingPath + "/evaluation"
+	request(http.MethodPost, evaluationPath, "company",
+		fmt.Sprintf(`{"evidence":[{"questionId":%q,"passedCases":1,"totalCases":1}]}`, question), http.StatusConflict)
+	request(http.MethodPost, evaluationPath, "company", humanEvidence, http.StatusNoContent)
+	_, _, status, _ = load(3)
+	if status != "pending_grading" {
+		t.Fatalf("human evidence alone finalized the attempt: %s", status)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); !claimed || err != nil {
+		t.Fatalf("grade mixed attempt: claimed=%v: %v", claimed, err)
+	}
+	request(http.MethodPost, evaluationPath, "company", humanEvidence, http.StatusNoContent)
+	mixedReview := request(http.MethodGet, evaluationPath, "company", "", http.StatusOK)
+	for _, want := range []string{`"status":"scored"`, `"passedCases":1`, `"score":80`} {
+		if !strings.Contains(string(mixedReview), want) {
+			t.Fatalf("mixed evidence missing %s: %s", want, mixedReview)
+		}
+	}
+	// Restore the original coding fixture for the existing advancement checks.
+	exec(`UPDATE assessment_attempts
+		SET selected_content = jsonb_set(selected_content, '{0,questions,1,format}', '"code"'),
+			status = 'pending_grading', code_grading_retry_at = NULL, non_code_evidence = NULL,
+			evaluated_at = NULL, final_evidence = NULL
+		WHERE id = $1::uuid`, id)
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); !claimed || err != nil {
+		t.Fatalf("grade coding attempt: claimed=%v: %v", claimed, err)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); claimed || err != nil {
+		t.Fatalf("repeat grading sweep: claimed=%v: %v", claimed, err)
+	}
+	if err := repo.FinalizeEvidence(ctx, id, "", evidence); err != nil {
+		t.Fatal(err)
 	}
 	_, _, status, _ = load(3)
 	if status != "scored" {
@@ -492,5 +559,81 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	if err := pool.QueryRow(ctx, `SELECT count(*)=1 FROM pipeline_threshold_changes
 		WHERE previous_threshold=90 AND new_threshold=80`).Scan(&audited); err != nil || !audited {
 		t.Fatalf("threshold audit recorded=%v: %v", audited, err)
+	}
+
+	// Replay stage 5 as the last completion-rule stage with grading outstanding.
+	exec(`
+		UPDATE applications SET status='admitted';
+		UPDATE pipeline_executions SET status='active', completed_at=NULL;
+		UPDATE stage_executions se SET status='pending_grading' FROM pipeline_stages s
+		WHERE se.stage_id=s.id AND s.stage_order=5;
+		UPDATE pipeline_stages SET advancement_rule='completion' WHERE stage_order=5;
+	`)
+	finalAttempt, _, _, _ := load(5)
+	exec(`UPDATE assessment_attempts SET status='pending_grading', evaluated_at=NULL,
+		final_score=NULL, final_evidence=NULL WHERE id=$1::uuid`, finalAttempt)
+	finalStage := stageState(5, "pending_grading")
+	blocker, err := pool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer blocker.Rollback(context.Background())
+	var blockerPID int32
+	if err := blocker.QueryRow(ctx, `SELECT pg_backend_pid() FROM stage_executions
+		WHERE id=$1::uuid FOR UPDATE`, finalStage).Scan(&blockerPID); err != nil {
+		t.Fatal(err)
+	}
+	advanced := make(chan error, 1)
+	go func() {
+		advanced <- database.ReconcileAdvancement(ctx, pool)
+	}()
+	// Advancement holds the application lock once it reaches the blocked stage update.
+	for {
+		var waiting bool
+		err := pool.QueryRow(ctx, `SELECT EXISTS (
+			SELECT 1 FROM pg_stat_activity WHERE $1 = ANY(pg_blocking_pids(pid))
+		)`, blockerPID).Scan(&waiting)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if waiting {
+			break
+		}
+		select {
+		case err := <-advanced:
+			t.Fatalf("advancement returned before updating the locked stage: %v", err)
+		case <-time.After(10 * time.Millisecond):
+		}
+	}
+	score := 80
+	lateEvidence := []database.QuestionEvidence{{Score: &score}}
+	if err := pool.QueryRow(ctx, `SELECT md5($1::text||':1:1')::uuid::text`, finalAttempt).
+		Scan(&lateEvidence[0].QuestionID); err != nil {
+		t.Fatal(err)
+	}
+	gradingCtx, cancelGrading := context.WithTimeout(ctx, 500*time.Millisecond)
+	err = repo.FinalizeEvidence(gradingCtx, finalAttempt, "", lateEvidence)
+	cancelGrading()
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("grading should wait for the advancement transaction, got %v", err)
+	}
+	if err := blocker.Commit(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if err := <-advanced; err != nil {
+		t.Fatal(err)
+	}
+	stageState(5, "passed")
+	var pipelineStatus string
+	if err := pool.QueryRow(ctx, `SELECT status FROM pipeline_executions`).Scan(&pipelineStatus); err != nil || pipelineStatus != "completed" {
+		t.Fatalf("pipeline status after final stage = %s: %v", pipelineStatus, err)
+	}
+	finalPath := "/assessment-attempts/" + finalAttempt
+	request(http.MethodPost, finalPath+"/evaluation", "company",
+		fmt.Sprintf(`{"evidence":[{"questionId":%q,"score":80}]}`, lateEvidence[0].QuestionID), http.StatusNoContent)
+	var persisted bool
+	if err := pool.QueryRow(ctx, `SELECT passed AND score=80 AND scored_at IS NOT NULL
+		FROM assessment_results WHERE attempt_id=$1::uuid`, finalAttempt).Scan(&persisted); err != nil || !persisted {
+		t.Fatalf("late grading result persisted=%v: %v", persisted, err)
 	}
 }

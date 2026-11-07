@@ -135,8 +135,24 @@ An explicitly empty origin or proxy list disables that feature.
 | `CORS_ALLOWED_ORIGINS` | Local Vite origins in development | Comma-separated exact HTTP(S) origins; empty by default in other environments |
 | `HTTP_TRUSTED_PROXIES` | Empty | Comma-separated trusted proxy IP addresses or CIDR ranges |
 | `DATABASE_URL` | Required | PostgreSQL connection string; secrets arrive through Infisical. Use the Supavisor session pooler URL for local runs |
+| `JUDGE0_URL` | Optional | Judge0 CE base URL. Set on the worker to enable automatic code grading |
+| `JUDGE0_AUTH_TOKEN` | Optional | Native Judge0 `X-Auth-Token` credential. Inject through Infisical if the service requires authentication |
+| `JUDGE0_LANGUAGE_IDS` | Optional | JSON map from saved language names to Judge0 language IDs. Defaults to JavaScript 63, TypeScript 74, Python 71, Go 60, and C++ (`cpp`) 54 |
+| `JUDGE0_ALLOW_LOCAL_HTTP` | `false` | Set to `true` in development to allow unauthenticated HTTP to a loopback IP. Credentialed connections always require HTTPS |
 | `AUTH_MFA_ENCRYPTION_KEY` | Required | Exactly 32-byte secret used to encrypt MFA secrets at rest |
 | `DB_POOL_MAX_CONNS` | `4` | Connection pool ceiling per process; shared Supabase plans are small |
+
+Apply the database migrations before enabling Judge0. Use a trusted Judge0 CE
+instance with sandbox networking disabled and check the language IDs against
+that instance's `GET /languages`. The worker grades submitted attempts from
+their saved responses and test-case snapshots, including deadline submissions.
+It sends candidate source and test inputs to Judge0 and compares stdout with
+expected outputs in Amara. Comparison normalizes CRLF and ignores trailing
+newlines. Blank answers earn zero passed cases. Provider errors leave the
+attempt pending for retry, which reruns the attempt's cases.
+For mixed attempts that require human scores, the company submits evidence for
+all non-code questions to the assessment evaluation endpoint. The worker then
+combines that evidence with Judge0 case counts and finalizes the attempt.
 
 Development allows `http://localhost:5173` and `http://127.0.0.1:5173`.
 Cookie credentials are disabled; cross-origin clients can send an `Authorization`

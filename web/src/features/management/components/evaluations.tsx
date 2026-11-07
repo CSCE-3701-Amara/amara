@@ -2,14 +2,13 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { resourceId } from "@/shared/lib/api-client";
+import { apiRequest, resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
+import type { RuntimePipelineDashboard } from "@/features/invw/types/runtime.types";
 import type {
   GradingSubmissionPage,
   InterviewPage,
   InterviewFeedback,
-  StageExecutionPage,
-  PipelineExecutionPage,
 } from "@/shared/lib/contract.types";
 import type {
   AssessmentInstance,
@@ -613,16 +612,16 @@ export function StageDecisions({ id }: { id: string }) {
   const [stage, setStage] = useState(params.get("stage") || "");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
-  const executions = useApiResource<StageExecutionPage>(
-    stage
-      ? `/v1/pipeline-stages/${resourceId(stage)}/executions?limit=100&offset=0`
-      : null,
+  const executions = useApiResource<RuntimePipelineDashboard>(
+    `/v1/jobs/${resourceId(id)}/pipeline/dashboard`,
   );
-  const pipeline = useApiResource<PipelineExecutionPage>(null);
+  const stageId = stage || executions.data?.stages[0]?.id || "";
+  const activeStage = executions.data?.stages.find((row) => row.id === stageId);
   const rows =
-    executions.data?.data.filter((row) =>
-      row.id.toLowerCase().includes(search.toLowerCase()),
+    activeStage?.candidates.filter((row) =>
+      row.candidate.toLowerCase().includes(search.toLowerCase()),
     ) || [];
+  const [decision, setDecision] = useState<"pass" | "reject">("pass");
   return (
     <>
       <ProductHeading
@@ -637,8 +636,9 @@ export function StageDecisions({ id }: { id: string }) {
         <Link href="/employer/assessments">Assessment instances</Link>
       </nav>
       <UnavailableNotice>
-        Stage decisions aren’t available yet. Manual decisions, automatic
-        thresholds, completion rules, and overrides remain distinct.
+        Manual pass and reject decisions are available for active candidates.
+        Automatic thresholds, completion rules, and overrides remain distinct.
+        Decision overrides are not supported yet.
       </UnavailableNotice>
       {params.get("state") === "conflict" && (
         <p className={e.error} role="alert">
@@ -657,17 +657,24 @@ export function StageDecisions({ id }: { id: string }) {
       )}
       <div className={e.grid}>
         <label className={e.field}>
-          Stage ID
-          <input
-            value={stage}
+          Stage
+          <select
+            value={stageId}
             onChange={(event) => {
               setStage(event.target.value);
               setSelected([]);
             }}
-          />
+          >
+            <option value="">Choose a stage</option>
+            {executions.data?.stages.map((row) => (
+              <option key={row.id} value={row.id}>
+                {row.name}
+              </option>
+            ))}
+          </select>
         </label>
         <label className={e.field}>
-          Search application or execution ID
+          Search candidate
           <input
             type="search"
             value={search}
@@ -696,6 +703,7 @@ export function StageDecisions({ id }: { id: string }) {
                   <label className={e.check}>
                     <input
                       type="checkbox"
+                      disabled={!row.active || activeStage?.rule !== "manual"}
                       checked={selected.includes(row.id)}
                       onChange={(event) =>
                         setSelected((ids) =>
@@ -705,7 +713,7 @@ export function StageDecisions({ id }: { id: string }) {
                         )
                       }
                     />
-                    {row.pipelineExecutionId}
+                    {row.candidate}
                   </label>
                 </td>
                 <td>
@@ -714,14 +722,7 @@ export function StageDecisions({ id }: { id: string }) {
                     : `${row.score} / 100`}
                 </td>
                 <td>{row.status}</td>
-                <td>
-                  {row.decisionHistory?.map((decision, index) => (
-                    <p key={index}>
-                      {decision.decisionType} · {decision.decision} ·{" "}
-                      {new Date(decision.decidedAt).toLocaleString()}
-                    </p>
-                  ))}
-                </td>
+                <td>Decision history unavailable</td>
               </tr>
             ))}
           </tbody>
@@ -735,15 +736,25 @@ export function StageDecisions({ id }: { id: string }) {
       )}
       <div className={e.actions}>
         <StatusBadge>{selected.length} selected · Same stage</StatusBadge>
-        <button disabled={!selected.length} onClick={() => setDialog("pass")}>
+        <button
+          disabled={!selected.length || activeStage?.rule !== "manual"}
+          onClick={() => {
+            setDecision("pass");
+            setDialog("pass");
+          }}
+        >
           Pass
         </button>
-        <button disabled={!selected.length} onClick={() => setDialog("reject")}>
+        <button
+          disabled={!selected.length || activeStage?.rule !== "manual"}
+          onClick={() => {
+            setDecision("reject");
+            setDialog("reject");
+          }}
+        >
           Reject
         </button>
-        <button disabled={!selected.length} onClick={() => setDialog("bulk")}>
-          Review bulk decision
-        </button>
+
         <button onClick={() => setSelected([])}>Clear selection</button>
       </div>
       <section className={e.panel}>
@@ -752,7 +763,6 @@ export function StageDecisions({ id }: { id: string }) {
           Completing all required paths marks a candidate as a finalist. Hiring
           is a separate decision outside this pipeline.
         </p>
-        {pipeline.data?.pagination.total}
       </section>
       <WorkspaceFooter />
       {dialog && (
@@ -768,7 +778,46 @@ export function StageDecisions({ id }: { id: string }) {
           confirmLabel="Confirm decision"
           intent={dialog === "reject" ? "danger" : "success"}
           reason
-          unavailable="Stage decisions are not available yet."
+          unavailable={
+            !activeStage || activeStage.rule !== "manual"
+              ? "Select candidates from a manual-decision stage."
+              : undefined
+          }
+          onConfirm={async (reason) => {
+            const chosen = rows.filter((row) => selected.includes(row.id));
+            if (!chosen.length || chosen.some((row) => !row.active))
+              throw new Error(
+                "Select active candidates and refresh changed records before deciding.",
+              );
+            if (chosen.length === 1)
+              await apiRequest(
+                `/v1/stage-executions/${resourceId(chosen[0].id)}/decisions`,
+                {
+                  method: "POST",
+                  body: {
+                    decision,
+                    decisionType: "manual",
+                    reason,
+                    expectedStatus: chosen[0].status,
+                  },
+                },
+              );
+            else
+              await apiRequest(
+                `/v1/pipeline-stages/${resourceId(stageId)}/decisions`,
+                {
+                  method: "POST",
+                  body: {
+                    decision,
+                    decisionType: "manual",
+                    reason,
+                    stageExecutionIds: chosen.map((row) => row.id),
+                  },
+                },
+              );
+            setSelected([]);
+            executions.reload();
+          }}
           onClose={() => setDialog(null)}
         />
       )}

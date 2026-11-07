@@ -20,6 +20,41 @@ func NewProfileService(repository ports.ProfileRepository) (*ProfileService, err
 	return &ProfileService{repository: repository}, nil
 }
 
+func (s *ProfileService) GetCandidate(ctx context.Context, id string) (domain.CandidateProfile, error) {
+	if id == "" {
+		return domain.CandidateProfile{}, domain.ErrProfileNotFound
+	}
+	return s.repository.GetCandidateProfile(ctx, id)
+}
+
+func (s *ProfileService) GetCompany(ctx context.Context, id string, includePrivate bool) (domain.CompanyProfile, error) {
+	if id == "" {
+		return domain.CompanyProfile{}, domain.ErrProfileNotFound
+	}
+	return s.repository.GetCompanyProfile(ctx, id, includePrivate)
+}
+
+func (s *ProfileService) ListCompanyInterviewers(ctx context.Context, companyID string, limit, offset int32) ([]domain.InterviewerProfile, int64, error) {
+	if companyID == "" || limit < 1 || limit > 100 || offset < 0 {
+		return nil, 0, domain.ErrInvalidProfile
+	}
+	return s.repository.ListCompanyInterviewers(ctx, companyID, limit, offset)
+}
+
+func (s *ProfileService) GetInterviewer(ctx context.Context, id string) (domain.InterviewerProfile, error) {
+	if id == "" {
+		return domain.InterviewerProfile{}, domain.ErrProfileNotFound
+	}
+	return s.repository.GetInterviewerProfile(ctx, id)
+}
+
+func (s *ProfileService) GetPublicCompany(ctx context.Context, id string) (domain.CompanyProfile, error) {
+	if id == "" {
+		return domain.CompanyProfile{}, domain.ErrProfileNotFound
+	}
+	return s.repository.GetPublicCompanyProfile(ctx, id)
+}
+
 func (s *ProfileService) UpdateCandidate(ctx context.Context, id string, patch domain.CandidateProfilePatch) (domain.CandidateProfile, error) {
 	if id == "" || patch.Name != nil && !domain.ValidateProfileText(*patch.Name, 100) ||
 		patch.PhoneNumber != nil && len([]rune(*patch.PhoneNumber)) > 50 ||

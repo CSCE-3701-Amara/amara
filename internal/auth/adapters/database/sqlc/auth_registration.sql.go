@@ -129,6 +129,7 @@ func (q *Queries) FindApprovedCompanyBySecret(ctx context.Context, registrationS
 }
 
 const saveEmailVerificationChallenge = `-- name: SaveEmailVerificationChallenge :exec
+
 WITH deleted AS (
     DELETE FROM auth_email_verification_challenges
     WHERE account_id = $1::uuid
@@ -146,6 +147,7 @@ ON CONFLICT (account_id) DO UPDATE SET
     account_type = EXCLUDED.account_type,
     recipient = EXCLUDED.recipient,
     expires_at = EXCLUDED.expires_at
+
 `
 
 type SaveEmailVerificationChallengeParams struct {

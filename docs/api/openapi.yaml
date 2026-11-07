@@ -259,6 +259,32 @@ paths:
 
   # Candidate profile and application history
   /v1/candidates/me:
+    get:
+      summary: Get the authenticated candidate profile
+      operationId: getOwnCandidateProfile
+      tags:
+        - Auth
+      description: Only the authenticated candidate may access their own complete stored profile.
+      x-implementation-status: implemented
+      x-erd-entities:
+        - CANDIDATES
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Get the authenticated candidate profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidateProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     patch:
       summary: Modify the authenticated candidate profile
       operationId: updateCandidateProfile
@@ -344,9 +370,9 @@ paths:
       operationId: getOwnCompanyProfile
       tags:
         - Companies
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain.
-      x-implementation-status: planned
+      description: Company self-service only. Returns the profile of the company bound to the authenticated
+        company session. System administrators are not authorized on this route.
+      x-implementation-status: implemented
       x-erd-entities:
         - COMPANIES
       security:
@@ -417,9 +443,9 @@ paths:
       operationId: listCompanyInterviewers
       tags:
         - Companies
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain.
-      x-implementation-status: planned
+      description: Company self-service only. Lists interviewers of the company bound to the authenticated
+        company session. System administrators are not authorized on this route.
+      x-implementation-status: implemented
       x-erd-entities:
         - INTERVIEWERS
         - COMPANIES
@@ -454,7 +480,7 @@ paths:
         - Companies
       description: Expose only approved, active, unbanned companies and public contact information. Return 404
         for private or unavailable companies.
-      x-implementation-status: planned
+      x-implementation-status: implemented
       x-erd-entities:
         - COMPANIES
       security: []
@@ -479,7 +505,7 @@ paths:
       tags:
         - Interviewers
       description: Only the authenticated interviewer may access their own profile.
-      x-implementation-status: planned
+      x-implementation-status: implemented
       x-erd-entities:
         - INTERVIEWERS
       security:
@@ -3911,6 +3937,7 @@ paths:
           $ref: '#/components/responses/NotFound'
     post:
       summary: Finalize human evaluation of a submitted assessment
+      description: For a mixed attempt that requires human scores, submit evidence for every non-code question. The worker combines it with Judge0 case counts before finalizing.
       operationId: finalizeHumanAssessmentEvaluation
       tags: [Assessments]
       x-implementation-status: implemented
