@@ -1,85 +1,70 @@
 "use client";
 import Link from "next/link";
-import { useRef, useState, type FormEvent } from "react";
-import { queryString } from "@/shared/lib/api-client";
+import { useId, useState, type FormEvent } from "react";
+import { queryString, resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
 import {
   ApiFeedback,
   BusyState,
   workspaceStyles as s,
 } from "@/shared/ui/workspace";
-import { applyToPosting } from "@/features/job/api/job.api";
-import type { ApplicationSubmission } from "@/features/job/types/job.types";
 import type { FeedFilters, FeedJob, FeedPage } from "../types/cand.types";
-
-function JobCard({ job }: { job: FeedJob }) {
-  const [result, setResult] = useState<ApplicationSubmission>();
-  const [error, setError] = useState<Error>();
-  const [busy, setBusy] = useState(false);
-  const pending = useRef(false);
-  async function apply() {
-    if (pending.current) return;
-    pending.current = true;
-    setBusy(true);
-    setError(undefined);
-    try {
-      setResult(await applyToPosting(job.id));
-    } catch (cause) {
-      setError(cause as Error);
-    } finally {
-      pending.current = false;
-      setBusy(false);
-    }
-  }
+import styles from "./candidate.module.css";
+export function salaryLabel(job: FeedJob) {
+  if (
+    !job.salary_visible ||
+    (job.salary_min === null && job.salary_max === null)
+  )
+    return "Salary not disclosed";
+  const format = new Intl.NumberFormat("en", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  });
+  return `${job.currency || ""} ${job.salary_min === null ? "—" : format.format(job.salary_min)}–${job.salary_max === null ? "—" : format.format(job.salary_max)}`.trim();
+}
+export function employmentLabel(value: string | null) {
+  if (!value) return "Employment type not specified";
   return (
-    <article className={s.card}>
-      <h2>{job.title}</h2>
-      <p className={s.muted}>
-        {[job.location, job.employment_type, job.seniority_level]
-          .filter(Boolean)
-          .join(" · ")}
+    value
+      ?.replace("on-site ", "")
+      .replace("remote ", "")
+      .replace("full-time", "Full-time")
+      .replace("part-time", "Part-time") +
+      (value?.startsWith("remote")
+        ? " · Remote"
+        : value?.startsWith("on-site")
+          ? " · On-site"
+          : "") || "Employment type not specified"
+  );
+}
+function JobCard({ job }: { job: FeedJob }) {
+  return (
+    <article className={styles.jobCard} data-figma-node="363:584">
+      <header>
+        <h3>{job.title}</h3>
+        <span>{job.location}</span>
+      </header>
+      <p className={styles.companyName}>
+        {job.company_name || "Company profile unavailable"}
       </p>
-      {job.description && <p>{job.description}</p>}
-      {job.salary_visible &&
-        (job.salary_min !== null || job.salary_max !== null) && (
-          <p>
-            Salary: {job.salary_min ?? "Not specified"} –{" "}
-            {job.salary_max ?? "Not specified"} {job.currency}
-          </p>
-        )}
-      {job.application_deadline && (
-        <p>
-          Apply by {new Date(job.application_deadline).toLocaleDateString()}
-        </p>
-      )}
-      <ApiFeedback error={error} />
-      {result ? (
-        <div className={s.success} role="status">
-          <p>
-            {result.screened_out
-              ? "Your application was submitted but did not pass initial screening."
-              : "Application submitted."}{" "}
-            Reference: {result.reference_number}.
-          </p>
-          {!!result.failed_amarat?.length && (
-            <p>Required skills: {result.failed_amarat.join(", ")}</p>
-          )}
-          <Link href="/candidate/applications">View my applications</Link>
-        </div>
-      ) : (
-        <button
-          type="button"
-          className={s.primary}
-          disabled={busy}
-          onClick={apply}
-        >
-          {busy ? "Submitting…" : "Apply for this role"}
-        </button>
-      )}
+      <p className={styles.salary}>{salaryLabel(job)}</p>
+      <div className={styles.jobTags}>
+        <span>{employmentLabel(job.employment_type)}</span>
+        {job.seniority_level && <span>{job.seniority_level}</span>}
+        {job.language && <span>{job.language}</span>}
+      </div>
+      <Link
+        href={`/candidate/jobs/${resourceId(job.id)}${queryString({ title: job.title })}`}
+        className={s.button}
+      >
+        View opportunity
+      </Link>
     </article>
   );
 }
+/** Candidate feed uses only the registered candidate endpoint and its cursor. */
 export function JobFeed() {
+  const searchId = useId();
   const [filter, setFilter] = useState<FeedFilters>({ limit: 20 });
   const [history, setHistory] = useState<(string | undefined)[]>([]);
   const feed = useApiResource<FeedPage>(`/v1/jobs/feed${queryString(filter)}`);
@@ -105,100 +90,134 @@ export function JobFeed() {
     });
   }
   return (
-    <>
-      <h1>Find your next opportunity</h1>
-      <p className={s.muted}>Explore roles that value what you can do.</p>
-      <form onSubmit={search} className={s.card} aria-label="Filter roles">
-        <div className={s.filters}>
-          <label className={s.field}>
-            Job title
-            <input name="title" type="search" placeholder="Search roles" />
-          </label>
-          <label className={s.field}>
-            Location
-            <input name="location" placeholder="City or region" />
-          </label>
-          <label className={s.field}>
-            Employment type
-            <select name="employment_type">
-              <option value="">All types</option>
-              {[
-                "on-site full-time",
-                "on-site part-time",
-                "remote full-time",
-                "remote part-time",
-              ].map((type) => (
-                <option key={type}>{type}</option>
-              ))}
-            </select>
-          </label>
+    <section data-figma-node="363:495">
+      <header className={styles.feedHeader}>
+        <h1>Find your next opportunity</h1>
+        <p>
+          Explore open roles and find a position that matches your experience.
+        </p>
+      </header>
+      <form onSubmit={search} aria-label="Filter roles">
+        <label htmlFor={searchId} className={styles.searchLabel}>
+          Search
+        </label>
+        <div className={styles.searchRow}>
+          <input
+            id={searchId}
+            name="title"
+            type="search"
+            aria-label="Search job titles"
+            placeholder="Search job titles…"
+          />
           <button className={s.primary} type="submit">
-            Search roles
+            Search jobs
           </button>
         </div>
-        <details>
-          <summary>More filters</summary>
-          <div className={s.filters}>
-            <label className={s.field}>
+        <div className={styles.feedLayout}>
+          <aside className={styles.filterPanel} aria-label="Job filters">
+            <h2>Filters</h2>
+            <label>
               Language
-              <input name="language" />
+              <input name="language" placeholder="Any language" />
             </label>
-            <label className={s.field}>
+            <label>
               Currency
-              <input name="currency" />
+              <input name="currency" placeholder="Any currency" />
             </label>
-            <label className={s.field}>
-              Seniority
-              <input name="seniority_level" />
+            <label>
+              Seniority level
+              <input name="seniority_level" placeholder="Any level" />
             </label>
-            <label className={s.field}>
+            <label>
+              Employment type
+              <select name="employment_type">
+                <option value="">Any type</option>
+                {[
+                  "on-site full-time",
+                  "on-site part-time",
+                  "remote full-time",
+                  "remote part-time",
+                ].map((type) => (
+                  <option key={type}>{type}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Location
+              <input name="location" placeholder="City or remote" />
+            </label>
+            <label>
               Minimum salary
-              <input name="salary_min" type="number" min="0" max="2147483647" />
+              <input
+                name="salary_min"
+                type="number"
+                min="0"
+                max="2147483647"
+                placeholder="No minimum"
+              />
             </label>
-            <label className={s.field}>
+            <label>
               Maximum salary
-              <input name="salary_max" type="number" min="0" max="2147483647" />
+              <input
+                name="salary_max"
+                type="number"
+                min="0"
+                max="2147483647"
+                placeholder="No maximum"
+              />
             </label>
+          </aside>
+          <div className={styles.results}>
+            <BusyState loading={feed.loading} />
+            <ApiFeedback error={feed.error} retry={feed.reload} />
+            {feed.data && (
+              <>
+                <h2>
+                  {feed.data.items.length}{" "}
+                  {feed.data.items.length === 1
+                    ? "opportunity"
+                    : "opportunities"}
+                </h2>
+                <p>Explore roles currently available to apply for.</p>
+                <div className={styles.jobs}>
+                  {feed.data.items.map((job) => (
+                    <JobCard key={job.id} job={job} />
+                  ))}
+                </div>
+                {!feed.data.items.length && (
+                  <p role="status">
+                    No roles match these filters. Try a different search.
+                  </p>
+                )}
+                <div className={styles.pagination}>
+                  {history.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const previous = history.at(-1);
+                        setHistory(history.slice(0, -1));
+                        setFilter({ ...filter, cursor: previous });
+                      }}
+                    >
+                      Previous page
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    disabled={!feed.data.next_cursor}
+                    onClick={() => {
+                      setHistory([...history, filter.cursor]);
+                      setFilter({ ...filter, cursor: feed.data?.next_cursor });
+                    }}
+                  >
+                    Load more opportunities
+                  </button>
+                </div>
+              </>
+            )}
           </div>
-        </details>
+        </div>
       </form>
-      <BusyState loading={feed.loading} />
-      <ApiFeedback error={feed.error} retry={feed.reload} />
-      {feed.data && (
-        <>
-          <div className={s.grid}>
-            {feed.data.items.map((job) => (
-              <JobCard key={job.id} job={job} />
-            ))}
-          </div>
-          {!feed.data.items.length && (
-            <p role="status">
-              No roles match these filters. Try a different search.
-            </p>
-          )}
-          <div className={s.actions}>
-            <button
-              disabled={!history.length}
-              onClick={() => {
-                const previous = history.at(-1);
-                setHistory(history.slice(0, -1));
-                setFilter({ ...filter, cursor: previous });
-              }}
-            >
-              Previous page
-            </button>
-            <button
-              disabled={!feed.data.next_cursor}
-              onClick={() => {
-                setHistory([...history, filter.cursor]);
-                setFilter({ ...filter, cursor: feed.data?.next_cursor });
-              }}
-            >
-              Next page
-            </button>
-          </div>
-        </>
-      )}
-    </>
+    </section>
   );
 }

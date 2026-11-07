@@ -12,6 +12,8 @@ export interface FeedFilters {
   cursor?: string;
 }
 export interface FeedJob {
+  /** Optional enrichment; the current feed does not supply company display names. */
+  company_name?: string;
   id: string;
   company_id: string;
   title: string;
