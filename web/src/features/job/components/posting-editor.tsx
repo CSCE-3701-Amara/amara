@@ -11,11 +11,7 @@ import {
   BusyState,
   workspaceStyles as s,
 } from "@/shared/ui/workspace";
-import {
-  ConfirmDialog,
-  ProductHeading,
-  WorkspaceFooter,
-} from "@/shared/ui/product-ui";
+import { ConfirmDialog, ProductHeading } from "@/shared/ui/product-ui";
 import e from "@/shared/ui/editor.module.css";
 import {
   createPosting,
@@ -401,11 +397,7 @@ export function PostingEditor({ id }: { id?: string }) {
             ? `${posting.data.title} · ${posting.data.status}`
             : "Build a clear role and choose the skills you need."
         }
-        artwork={{
-          src: "/figma/posting-editor.svg",
-          width: 261.6,
-          height: 180,
-        }}
+        className={e.titleBanner}
       />
       <BusyState loading={posting.loading} />
       <ApiFeedback error={posting.error} retry={posting.reload} />
@@ -437,7 +429,6 @@ export function PostingEditor({ id }: { id?: string }) {
           Open Pipeline studio
         </Link>
       </section>
-      <WorkspaceFooter />
     </>
   );
 }

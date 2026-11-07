@@ -11,6 +11,7 @@ export function ProductHeading({
   artwork,
   gradient = false,
   compact = false,
+  className = "",
   children,
 }: {
   title: string;
@@ -18,11 +19,12 @@ export function ProductHeading({
   artwork?: { src: string; width: number; height: number };
   gradient?: boolean;
   compact?: boolean;
+  className?: string;
   children?: ReactNode;
 }) {
   return (
     <header
-      className={`${styles.heading} ${gradient ? styles.gradientHeading : ""} ${artwork ? styles.illustratedHeading : ""} ${compact ? styles.compactHeading : ""}`}
+      className={`${styles.heading} ${gradient ? styles.gradientHeading : ""} ${artwork ? styles.illustratedHeading : ""} ${compact ? styles.compactHeading : ""} ${className}`}
     >
       {artwork && (
         <Image
@@ -77,7 +79,17 @@ export function Stats({
       {items.map((item) => (
         <div key={item.label}>
           <dt>{item.label}</dt>
-          <dd>{item.value}</dd>
+          <dd
+            className={
+              typeof item.value === "string" &&
+              item.value !== "—" &&
+              !Number.isFinite(Number(item.value))
+                ? styles.statNote
+                : undefined
+            }
+          >
+            {item.value}
+          </dd>
         </div>
       ))}
     </dl>

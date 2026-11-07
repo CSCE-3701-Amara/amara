@@ -217,3 +217,25 @@
 .table th {
   overflow-wrap: anywhere;
 }
+
+/* Unillustrated hiring headings in the current Figma product frames. */
+.titleBanner.titleBanner {
+  padding: 28.8px 38.4px;
+  min-height: auto;
+  margin-bottom: 21.6px;
+}
+.titleBanner.titleBanner h1 {
+  font-size: 40.8px;
+  margin: 0 0 12px;
+}
+.previewBanner.previewBanner h1 {
+  font-size: 58.8px;
+}
+@media (max-width: 760px) {
+  .titleBanner.titleBanner {
+    padding: 24px 0;
+  }
+  .titleBanner.titleBanner h1 {
+    font-size: 32px;
+  }
+}

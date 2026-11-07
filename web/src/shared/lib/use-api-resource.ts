@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { apiRequest, ApiError } from "./api-client";
 
 /** Cancel stale reads, including hidden Next.js routes; keep private data uncached. */
-export function useApiResource<T>(path: string | null) {
+export function useApiResource<T>(path: string | null, reloadKey = "") {
   const [revision, setRevision] = useState(0);
-  const key = `${path}:${revision}`;
+  const key = `${path}:${revision}:${reloadKey}`;
   const [result, setResult] = useState<{
     key: string;
     data?: T;

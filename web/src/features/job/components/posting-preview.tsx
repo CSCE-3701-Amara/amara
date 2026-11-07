@@ -8,7 +8,6 @@ import {
   ConfirmDialog,
   ProductHeading,
   StatusBadge,
-  WorkspaceFooter,
 } from "@/shared/ui/product-ui";
 import { transitionPosting } from "../api/job.api";
 import type { Posting } from "../types/job.types";
@@ -20,25 +19,32 @@ export function PostingPreview({
   id: string;
   review?: boolean;
 }) {
-  const posting = useApiResource<Posting>(`/v1/jobs/${resourceId(id)}`);
+  const posting = useApiResource<
+    Omit<Posting, "status" | "amarat"> & {
+      status?: Posting["status"];
+      amarat?: Posting["amarat"];
+    }
+  >(`/v1/jobs/${resourceId(id)}${review ? "" : "/preview"}`);
   const [confirm, setConfirm] = useState(false);
   return (
     <>
       <ProductHeading
-        title={review ? "Ready to publish?" : "Job posting preview"}
+        title={
+          review
+            ? "Ready to publish?"
+            : posting.data?.title || "Job posting details"
+        }
         description={posting.data?.title}
-        artwork={{
-          src: "/figma/publication-review.svg",
-          width: 345.6,
-          height: 238.8,
-        }}
+        className={`${e.titleBanner} ${e.previewBanner}`}
       />
       <BusyState loading={posting.loading} />
       <ApiFeedback error={posting.error} retry={posting.reload} />
       {posting.data && (
         <article className={e.panel}>
           <h2>{review ? "Posting summary" : posting.data.title}</h2>
-          <StatusBadge>{posting.data.status}</StatusBadge>
+          {posting.data.status && (
+            <StatusBadge>{posting.data.status}</StatusBadge>
+          )}
           <h3>
             {posting.data.seniority_level} · {posting.data.employment_type} ·{" "}
             {posting.data.location}
@@ -53,7 +59,7 @@ export function PostingPreview({
           )}
           <h3>Required amarat</h3>
           <ul>
-            {posting.data.amarat.map((amara, index) => (
+            {posting.data.amarat?.map((amara, index) => (
               <li key={amara.id || index}>
                 {amara.title}
                 {amara.description ? ` · ${amara.description}` : ""}
@@ -101,7 +107,6 @@ export function PostingPreview({
           </div>
         </article>
       )}
-      <WorkspaceFooter />
       {confirm && posting.data && (
         <ConfirmDialog
           title="Publish this posting?"

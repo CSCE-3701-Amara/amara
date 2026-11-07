@@ -26,7 +26,7 @@ func NewCandidatePipelineProgressHandler(progress *application.CandidatePipeline
 }
 
 func (h *CandidatePipelineProgressHandler) RegisterRoutes(group *gin.RouterGroup) {
-	route := group.Group("/applications/:application_id/pipeline-progress")
+	route := group.Group("/applications/:applicationId/pipeline-progress")
 	if h.candidateAuth == nil {
 		route.GET("", func(c *gin.Context) {
 			writePipelineProgressError(c, http.StatusUnauthorized, "authentication_required", "Candidate authentication is required.")
@@ -42,7 +42,7 @@ func (h *CandidatePipelineProgressHandler) get(c *gin.Context) {
 		writePipelineProgressError(c, http.StatusUnauthorized, "authentication_required", "Candidate authentication is required.")
 		return
 	}
-	progress, err := h.progress.Get(c.Request.Context(), candidateID, c.Param("application_id"))
+	progress, err := h.progress.Get(c.Request.Context(), candidateID, c.Param("applicationId"))
 	if err != nil {
 		switch {
 		case errors.Is(err, application.ErrInvalidPipelineProgressQuery):
