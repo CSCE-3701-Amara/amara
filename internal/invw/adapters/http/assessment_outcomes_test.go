@@ -20,6 +20,7 @@ import (
 	authdomain "github.com/CSCE-3701-Amara/amara/internal/auth/domain"
 	authports "github.com/CSCE-3701-Amara/amara/internal/auth/ports"
 	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
+	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/judge0"
 )
 
 type outcomeSessions struct{}
@@ -266,6 +267,8 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		}
 	}
 	codingPath, id, question := start(3)
+	request(http.MethodPut, codingPath+"/submissions/"+question, "candidate",
+		`{"response":{"language":"python","code":"print()"}}`, http.StatusOK)
 	exec("UPDATE assessment_attempts SET deadline = now() - interval '1 second' WHERE id = $1::uuid", id)
 	sweep()
 	_, _, status, auto = load(3)
@@ -300,10 +303,73 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	}
 	failed := 0
 	evidence = append(evidence, database.QuestionEvidence{QuestionID: secondQuestion, PassedCases: &failed, TotalCases: &total})
-	for range 2 {
-		if err := repo.FinalizeEvidence(ctx, id, "", evidence); err != nil {
-			t.Fatal(err)
+	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/unavailable/") {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
 		}
+		switch r.Method {
+		case http.MethodPost:
+			fmt.Fprint(w, `{"token":"test-run"}`)
+		case http.MethodGet:
+			fmt.Fprint(w, `{"status":{"id":3},"stdout":"Cg=="}`)
+		}
+	}))
+	defer provider.Close()
+	unavailable, err := judge0.New(provider.URL+"/unavailable", "", nil, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, unavailable); !claimed || err == nil {
+		t.Fatalf("grade during provider outage: claimed=%v: %v", claimed, err)
+	}
+	runner, err := judge0.New(provider.URL, "", nil, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); claimed || err != nil {
+		t.Fatalf("grading retried before backoff elapsed: claimed=%v: %v", claimed, err)
+	}
+	exec("UPDATE assessment_attempts SET code_grading_retry_at = now() WHERE id = $1::uuid", id)
+	exec(`UPDATE assessment_attempts
+		SET selected_content = jsonb_set(selected_content, '{0,questions,1,format}', '"short_text"')
+		WHERE id = $1::uuid`, id)
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); claimed || err != nil {
+		t.Fatalf("automatic grading claimed an attempt requiring separate scores: claimed=%v: %v", claimed, err)
+	}
+	humanEvidence := fmt.Sprintf(`{"evidence":[{"questionId":%q,"score":80}]}`, secondQuestion)
+	evaluationPath := codingPath + "/evaluation"
+	request(http.MethodPost, evaluationPath, "company",
+		fmt.Sprintf(`{"evidence":[{"questionId":%q,"passedCases":1,"totalCases":1}]}`, question), http.StatusConflict)
+	request(http.MethodPost, evaluationPath, "company", humanEvidence, http.StatusNoContent)
+	_, _, status, _ = load(3)
+	if status != "pending_grading" {
+		t.Fatalf("human evidence alone finalized the attempt: %s", status)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); !claimed || err != nil {
+		t.Fatalf("grade mixed attempt: claimed=%v: %v", claimed, err)
+	}
+	request(http.MethodPost, evaluationPath, "company", humanEvidence, http.StatusNoContent)
+	mixedReview := request(http.MethodGet, evaluationPath, "company", "", http.StatusOK)
+	for _, want := range []string{`"status":"scored"`, `"passedCases":1`, `"score":80`} {
+		if !strings.Contains(string(mixedReview), want) {
+			t.Fatalf("mixed evidence missing %s: %s", want, mixedReview)
+		}
+	}
+	// Restore the original coding fixture for the existing advancement checks.
+	exec(`UPDATE assessment_attempts
+		SET selected_content = jsonb_set(selected_content, '{0,questions,1,format}', '"code"'),
+			status = 'pending_grading', code_grading_retry_at = NULL, non_code_evidence = NULL,
+			evaluated_at = NULL, final_evidence = NULL
+		WHERE id = $1::uuid`, id)
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); !claimed || err != nil {
+		t.Fatalf("grade coding attempt: claimed=%v: %v", claimed, err)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); claimed || err != nil {
+		t.Fatalf("repeat grading sweep: claimed=%v: %v", claimed, err)
+	}
+	if err := repo.FinalizeEvidence(ctx, id, "", evidence); err != nil {
+		t.Fatal(err)
 	}
 	_, _, status, _ = load(3)
 	if status != "scored" {
@@ -455,6 +521,44 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		JOIN stage_executions se ON se.pipeline_execution_id=pe.id WHERE se.id=$1::uuid`, interviewStage).
 		Scan(&finalist); err != nil || !finalist {
 		t.Fatalf("finalist after behavioral interview: finalist=%v: %v", finalist, err)
+	}
+	exec(`
+		UPDATE job_postings SET finalist_target=2;
+		UPDATE applications SET status='admitted', nice_to_have_score=75;
+		UPDATE pipeline_executions SET status='active';
+		UPDATE pipeline_stages SET advancement_rule='threshold', score_threshold=90 WHERE stage_order=7;
+		UPDATE stage_executions SET status='held' WHERE stage_id='00000000-0000-0000-0000-000000000017';
+		UPDATE interviews SET status='completed', outcome='held', score=80
+		WHERE id='00000000-0000-0000-0000-000000000031';
+	`)
+	dashboardPath := "/jobs/00000000-0000-0000-0000-000000000003/pipeline/dashboard"
+	request(http.MethodGet, dashboardPath, "candidate", "", http.StatusForbidden)
+	dashboard := string(request(http.MethodGet, dashboardPath, "company", "", http.StatusOK))
+	for _, want := range []string{`"finalistTarget":2`, `"niceToHaveScore":75`, `"percentile":100`} {
+		if !strings.Contains(dashboard, want) {
+			t.Fatalf("dashboard missing %s: %s", want, dashboard)
+		}
+	}
+	if strings.Contains(dashboard, "candidate@example.test") || strings.Contains(dashboard, "00000000-0000-0000-0000-000000000001") {
+		t.Fatalf("dashboard exposes candidate identity: %s", dashboard)
+	}
+	thresholdPath := "/pipeline-stages/00000000-0000-0000-0000-000000000017/threshold"
+	preview := request(http.MethodPost, thresholdPath+"/preview", "company",
+		`{"threshold":80,"expectedThreshold":90}`, http.StatusOK)
+	if !strings.Contains(string(preview), `"status":"passed"`) {
+		t.Fatalf("threshold preview did not project a pass: %s", preview)
+	}
+	stageState(7, "held")
+	request(http.MethodPut, thresholdPath, "company",
+		`{"threshold":80,"expectedThreshold":90,"preview":[]}`, http.StatusConflict)
+	apply := fmt.Sprintf(`{"threshold":80,"expectedThreshold":90,"preview":%s}`, preview)
+	request(http.MethodPut, thresholdPath, "company", apply, http.StatusOK)
+	stageState(7, "passed")
+	request(http.MethodPut, thresholdPath, "company", apply, http.StatusConflict)
+	var audited bool
+	if err := pool.QueryRow(ctx, `SELECT count(*)=1 FROM pipeline_threshold_changes
+		WHERE previous_threshold=90 AND new_threshold=80`).Scan(&audited); err != nil || !audited {
+		t.Fatalf("threshold audit recorded=%v: %v", audited, err)
 	}
 
 	// Replay stage 5 as the last completion-rule stage with grading outstanding.

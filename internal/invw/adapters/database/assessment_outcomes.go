@@ -385,7 +385,8 @@ func (r *AssessmentRepository) ReviewEvaluation(ctx context.Context, attempt, co
 	var result json.RawMessage
 	err := r.pool.QueryRow(ctx, `
 		SELECT jsonb_build_object('status', a.status, 'submittedAt', a.submitted_at,
-			'finalScore', a.final_score, 'evaluatedAt', a.evaluated_at, 'evidence', a.final_evidence,
+			'finalScore', a.final_score, 'evaluatedAt', a.evaluated_at,
+			'evidence', coalesce(a.final_evidence, a.non_code_evidence),
 			'questions', coalesce((
 				SELECT jsonb_agg(jsonb_build_object('id', q.id, 'moduleId', q.module_id,
 					'prompt', q.question->'prompt', 'format', q.question->'format',

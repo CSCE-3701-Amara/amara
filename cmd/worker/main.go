@@ -2,14 +2,18 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
+	"strings"
+	"sync"
 	"syscall"
 	"time"
 
 	invwdatabase "github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
+	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/judge0"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/config"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/database"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/logging"
@@ -43,6 +47,25 @@ func run() error {
 	}
 	defer dbSvc.Close()
 
+	if baseURL := strings.TrimSpace(os.Getenv("JUDGE0_URL")); baseURL != "" {
+		var languages map[string]int
+		if raw := os.Getenv("JUDGE0_LANGUAGE_IDS"); raw != "" {
+			if err := json.Unmarshal([]byte(raw), &languages); err != nil || len(languages) == 0 {
+				return fmt.Errorf("JUDGE0_LANGUAGE_IDS must be a JSON object mapping languages to IDs")
+			}
+		}
+		allowLocalHTTP := cfg.Environment == "development" && os.Getenv("JUDGE0_ALLOW_LOCAL_HTTP") == "true"
+		runner, err := judge0.New(baseURL, os.Getenv("JUDGE0_AUTH_TOKEN"), languages, allowLocalHTTP)
+		if err != nil {
+			return err
+		}
+		var grading sync.WaitGroup
+		grading.Go(func() {
+			gradeCode(ctx, logger, invwdatabase.NewAssessmentRepository(dbSvc.Pool()), runner)
+		})
+		defer grading.Wait()
+	}
+
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
 	for {
@@ -59,4 +82,22 @@ func run() error {
 		}
 	}
 
+}
+
+func gradeCode(ctx context.Context, logger *slog.Logger, repo *invwdatabase.AssessmentRepository, runner invwdatabase.CodeRunner) {
+	for ctx.Err() == nil {
+		claimed, err := repo.GradeNextCodeAttempt(ctx, runner)
+		if err != nil && ctx.Err() == nil {
+			logger.Error("code grading failed", "error", err)
+		}
+		if claimed {
+			continue
+		}
+		timer := time.NewTimer(5 * time.Second)
+		select {
+		case <-ctx.Done():
+		case <-timer.C:
+		}
+		timer.Stop()
+	}
 }
