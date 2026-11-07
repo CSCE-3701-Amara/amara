@@ -59,12 +59,12 @@ Owner: All | Status: Draft | Last updated: 2026-10-18 | Jira: AMARA-32
 #### UC-AUTH-005: Modify Profile
 |Field|Description|
 |-----|-----------|
-|**Actor(s)**| Candidate, System |
-|**Preconditions**| The candidate is authenticated. |
-|**Trigger**| The candidate opens the profile management page. |
-| **Main Flow** | 1. The candidate views their current profile information.<br>2. The candidate edits the profile fields and, if needed, their job preferences.<br>3. The candidate submits the changes.<br>4. The system validates the updated information.<br>5. The system saves the changes and displays a confirmation.|
+|**Actor(s)**| Candidate, Interviewer, Hiring Manager, System |
+|**Preconditions**| The user is authenticated. |
+|**Trigger**| The user opens the profile management page. |
+| **Main Flow** | 1. The user views their current profile information.<br>2. The user edits the profile fields and, for candidates, if needed, their job preferences.<br>3. The user submits the changes.<br>4. The system validates the updated information for the user's profile type.<br>5. The system saves the changes and displays a confirmation.|
 |**Exception Flows**|**Invalid profile information**: The system displays an error message and identifies the fields that need correction.<br>**Unauthorized access**: The system denies the action and does not change the profile.<br>**The changes cannot be saved**: The system displays an error message and preserves the current profile information.|
-|**Postconditions**|The candidate's profile contains the validated changes, or remains unchanged if validation or saving fails.|
+|**Postconditions**|The user's profile contains the validated changes, or remains unchanged if validation or saving fails.|
 
 #### UC-AUTH-006: Deactivate/Delete Account
 |Field|Description|

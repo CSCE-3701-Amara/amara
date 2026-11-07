@@ -5,10 +5,7 @@ info:
   description: |
     AMARA HTTP API specification following RFC 9457 Problem Details for HTTP errors,
     except where an implemented operation documents its existing JSON error shape.
-    New endpoints use the canonical /v1 prefix. Existing AUTH and candidate-profile
-    contract paths under /api/v1 are retained at their documented URLs.
-    On main, registered module routes also have /api/v1 compatibility aliases;
-    login additionally accepts /v1/auth/login and /api/v1/auth/login. Clients should
+    New endpoints use the canonical /v1 prefix. Clients should
     use the exact operation paths below rather than substituting prefixes.
     Operations marked x-implementation-status: planned describe intended behavior;
     their handlers are not registered and requests currently return router 404s.
@@ -45,7 +42,7 @@ tags:
     description: Company registration review and account administration.
 
 # Established paths and payloads take precedence over newer additions.
-# New endpoints use /v1; retained /api/v1 paths and compatibility aliases are described above.
+# Auth routes are registered under /v1.
 paths:
 
   # Health
@@ -75,12 +72,10 @@ paths:
 
 
   # Authentication and account lifecycle
-  /api/v1/auth/registrations:
+  /v1/auth/registrations:
     post:
       summary: Register a candidate or interviewer
       operationId: registerCandidateOrInterviewer
-      description: Planned operation; no registration handler is currently registered.
-      x-implementation-status: planned
       tags:
         - Auth
       requestBody:
@@ -104,15 +99,15 @@ paths:
           $ref: '#/components/responses/UnprocessableContent'
         '429':
           $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/RegistrationUnavailable'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/auth/company-registrations:
+  /v1/auth/company-registrations:
     post:
       summary: Submit a company registration request
       operationId: registerCompany
-      description: Planned operation; no company registration handler is currently registered.
-      x-implementation-status: planned
       tags:
         - Auth
       requestBody:
@@ -139,7 +134,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/auth/sessions:
+  /v1/auth/sessions:
     post:
       summary: Create an authenticated session
       operationId: createSession
@@ -174,12 +169,10 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/auth/sessions/current:
+  /v1/auth/sessions/current:
     delete:
       summary: Terminate the current authenticated session
       operationId: deleteCurrentSession
-      description: Planned operation; no logout handler is currently registered. The 204 response and clearing cookie describe intended behavior.
-      x-implementation-status: planned
       tags:
         - Auth
       security:
@@ -191,16 +184,25 @@ paths:
             Set-Cookie:
               $ref: '#/components/headers/ClearedSessionCookie'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/AuthenticatedUnauthorized'
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          description: Authentication or logout service failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationErrorResponse'
+              example:
+                error:
+                  code: authentication_unavailable
+                  message: Authentication is temporarily unavailable.
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
 
-  /api/v1/auth/account-actions:
+  /v1/auth/account-actions:
     post:
       summary: Deactivate or delete the authenticated candidate profile
       operationId: performAccountAction
-      description: Planned operation; no account-action handler is currently registered.
-      x-implementation-status: planned
       tags:
         - Auth
       security:
@@ -220,7 +222,7 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/AuthenticatedUnauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '422':
@@ -230,12 +232,18 @@ paths:
 
 
   # Candidate profile and application history
-  /api/v1/candidates/me:
+  /v1/candidates/me:
     patch:
       summary: Modify the authenticated candidate profile
       operationId: updateCandidateProfile
-      description: Planned operation; no candidate-profile update handler is currently registered.
-      x-implementation-status: planned
+      description: |
+        Updates any of the candidate's editable fields: name, phoneNumber, githubProfile, linkedinProfile,
+        portfolioLink, gender, birthDate, nationality, address, biography, yearsOfExperience, and available.
+        Omitted fields and explicit null values are unchanged. Unknown fields are rejected. The request must
+        contain exactly one JSON object. Authentication failures from middleware use
+        application/json with {"error":{"code":"...","message":"..."}}; request and handler failures use
+        application/problem+json ProblemDetails.
+      x-implementation-status: implemented
       tags:
         - Auth
       security:
@@ -337,11 +345,15 @@ paths:
       operationId: updateOwnCompanyProfile
       tags:
         - Companies
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain. Omitted properties are unchanged; explicit null clears only
-        nullable properties. Unknown and read-only fields are rejected. Approval and credentials are not editable
-        here.
-      x-implementation-status: planned
+      description: |
+        Updates the editable company fields legalName, displayName, description, websiteLink, logoUrl,
+        contactPhone, contactEmail, and linkedinProfile. Omitted properties are unchanged; explicit null
+        clears nullable company fields (all listed fields except legalName). legalName cannot be null.
+        Unknown and read-only fields are rejected. Approval and credentials are not editable here. The request
+        must contain exactly one JSON object. Authentication failures from middleware use
+        application/json with {"error":{"code":"...","message":"..."}}; request and handler failures use
+        application/problem+json ProblemDetails.
+      x-implementation-status: implemented
       x-erd-entities:
         - COMPANIES
       security:
@@ -368,8 +380,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '409':
-          $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/UnprocessableContent'
         '500':
@@ -468,10 +478,14 @@ paths:
       operationId: updateOwnInterviewerProfile
       tags:
         - Interviewers
-      description: Only the authenticated interviewer may update their profile. Company association, email verification,
-        and account status cannot be changed through this request. Omitted properties are unchanged; explicit
-        null clears only nullable properties. Unknown and read-only fields are rejected.
-      x-implementation-status: planned
+      description: |
+        Updates the authenticated interviewer's name. Company association, email, email verification, and
+        account status cannot be changed through this request. name is required and must be non-blank;
+        omitted or explicit null name values are invalid. Unknown and read-only fields are rejected. The
+        request must contain exactly one JSON object. Authentication failures use application/json with
+        {"error":{"code":"...","message":"..."}}; request and handler failures use
+        application/problem+json ProblemDetails.
+      x-implementation-status: implemented
       x-erd-entities:
         - INTERVIEWERS
       security:
@@ -497,8 +511,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '409':
-          $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/UnprocessableContent'
         '500':
@@ -827,6 +839,67 @@ paths:
         '500':
           $ref: '#/components/responses/PostingError'
 
+  /v1/jobs/{id}/preview:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Preview a saved company posting
+      operationId: previewSavedJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Candidate-facing posting content for feed and detail previews. Hidden salary values are null.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostingPreview'
+        '400':
+          $ref: '#/components/responses/PostingError'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '404':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
+    post:
+      summary: Preview unsaved posting edits
+      operationId: previewEditedJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      description: The JSON object represents the current editor contents. Omitted fields are blank in the preview. Incomplete drafts are accepted and no edits are saved.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPostingPreviewRequest'
+      responses:
+        '200':
+          description: Candidate-facing posting content for feed and detail previews. Hidden salary values are null.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostingPreview'
+        '400':
+          $ref: '#/components/responses/PostingError'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '404':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
   /v1/jobs/{id}/publish:
     parameters:
       - $ref: '#/components/parameters/JobPostingId'
@@ -5877,6 +5950,17 @@ components:
           schema:
             $ref: '#/components/schemas/ProblemDetails'
 
+    AuthenticatedUnauthorized:
+      description: Unauthorized session (legacy authentication error envelope)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthenticationErrorResponse'
+          example:
+            error:
+              code: authentication_required
+              message: Authentication is required.
+
     Forbidden:
       description: Forbidden (RFC 9457)
       content:
@@ -5959,6 +6043,19 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetails'
+
+    RegistrationUnavailable:
+      description: Account registration is temporarily unavailable (RFC 9457)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: about:blank
+            title: Service Unavailable
+            status: 503
+            detail: Account registration is temporarily unavailable.
+            code: registration_unavailable
 
     PostingError:
       description: Posting management error
@@ -6256,6 +6353,26 @@ components:
           description: List of field-level validation errors, present when status is 422.
           items:
             $ref: '#/components/schemas/FieldError'
+
+    AuthenticationErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              example: authentication_required
+            message:
+              type: string
+              example: Authentication is required.
 
 
     # Authentication and account lifecycle
@@ -6674,6 +6791,111 @@ components:
 
 
     # Job postings: original contract
+    JobPostingPreview:
+      type: object
+      properties:
+        id:
+          type: string
+        company_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: [string, 'null']
+        language:
+          type: [string, 'null']
+        currency:
+          type: [string, 'null']
+        seniority_level:
+          type: string
+        employment_type:
+          type: string
+        location:
+          type: [string, 'null']
+        salary_min:
+          type: [integer, 'null']
+        salary_max:
+          type: [integer, 'null']
+        salary_visible:
+          type: [boolean, 'null']
+        open_positions:
+          type: [integer, 'null']
+        application_opening:
+          type: [string, 'null']
+        application_deadline:
+          type: [string, 'null']
+        requirements:
+          type: [array, 'null']
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              text:
+                type: string
+              requirement_type:
+                type: string
+    JobPostingPreviewRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+        description:
+          type: [string, 'null']
+        language:
+          type: [string, 'null']
+        currency:
+          type: [string, 'null']
+        seniority_level:
+          type: string
+        employment_type:
+          type: string
+        location:
+          type: [string, 'null']
+        salary_min:
+          type: [integer, 'null']
+          format: int32
+        salary_max:
+          type: [integer, 'null']
+          format: int32
+        salary_visible:
+          type: [boolean, 'null']
+        open_positions:
+          type: [integer, 'null']
+          format: int32
+        application_opening:
+          type: [string, 'null']
+          format: date-time
+        application_deadline:
+          type: [string, 'null']
+          format: date-time
+        max_applications:
+          type: [integer, 'null']
+          format: int32
+        requirements:
+          type: [array, 'null']
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              text:
+                type: string
+              requirement_type:
+                type: string
+        amarat:
+          type: [array, 'null']
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              title:
+                type: string
+              description:
+                type: [string, 'null']
+
     JobPostingRequest:
       type: object
       additionalProperties: false

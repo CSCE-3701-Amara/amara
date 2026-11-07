@@ -36,6 +36,9 @@ func (r handlerRepository) CreateInterviewer(context.Context, string, string, []
 func (r handlerRepository) SaveVerificationChallenge(context.Context, ports.VerificationChallenge) error {
 	return nil
 }
+func (r handlerRepository) FindPendingVerification(context.Context, string) (ports.PendingVerification, error) {
+	return ports.PendingVerification{}, domain.ErrPendingVerificationNotFound
+}
 
 type handlerChecker struct{}
 
