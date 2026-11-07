@@ -20,7 +20,7 @@ func TestRun(t *testing.T) {
 		{"provider error", 13, false, true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.Header.Get("X-Auth-Token") != "test-token" || r.URL.Query().Get("base64_encoded") != "true" {
 					t.Error("missing authentication or encoding option")
 				}
@@ -43,14 +43,32 @@ func TestRun(t *testing.T) {
 				}
 			}))
 			defer server.Close()
-			client, err := New(server.URL, "test-token", nil)
+			client, err := New(server.URL, "test-token", nil, false)
 			if err != nil {
 				t.Fatal(err)
 			}
+			client.http.Transport = server.Client().Transport
 			output, succeeded, err := client.Run(t.Context(), "python", "print()", "input")
 			if succeeded != tc.succeeded || (err != nil) != tc.wantError || (succeeded && output != "output\n") {
 				t.Fatalf("Run = %q, %v, %v", output, succeeded, err)
 			}
 		})
+	}
+}
+
+func TestNewPlaintextPolicy(t *testing.T) {
+	for _, tc := range []struct {
+		url, token                string
+		allowLocalHTTP, wantError bool
+	}{
+		{"http://127.0.0.1", "secret", true, true},
+		{"http://127.0.0.1", "", false, true},
+		{"http://192.0.2.1", "", true, true},
+		{"http://127.0.0.1", "", true, false},
+		{"https://judge.example", "secret", false, false},
+	} {
+		if _, err := New(tc.url, tc.token, nil, tc.allowLocalHTTP); (err != nil) != tc.wantError {
+			t.Errorf("New(%q, allowLocalHTTP=%v, credentialed=%v) = %v", tc.url, tc.allowLocalHTTP, tc.token != "", err)
+		}
 	}
 }

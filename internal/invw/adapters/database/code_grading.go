@@ -44,7 +44,7 @@ func (r *AssessmentRepository) GradeNextCodeAttempt(ctx context.Context, runner 
 					SELECT 1 FROM (`+snapshotQuestions+`) q
 					WHERE (q.question->>'format' = 'code'
 						AND coalesce(jsonb_array_length(q.question->'test_cases'), 0) = 0)
-						OR (q.question->>'format' <> 'code' AND `+behavioralQuestion+`)
+						OR (q.question->>'format' <> 'code' AND NOT `+behavioralQuestion+`)
 				)
 			ORDER BY a.code_grading_retry_at NULLS FIRST, a.submitted_at, a.id
 			LIMIT 1 FOR UPDATE OF a SKIP LOCKED

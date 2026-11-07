@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -22,11 +23,17 @@ type Client struct {
 }
 
 // New connects to Judge0 CE using its native token authentication.
-func New(baseURL, token string, languages map[string]int) (*Client, error) {
+func New(baseURL, token string, languages map[string]int, allowLocalHTTP bool) (*Client, error) {
 	base, err := url.Parse(baseURL)
 	if err != nil || (base.Scheme != "https" && base.Scheme != "http") ||
 		base.Hostname() == "" || base.User != nil || base.RawQuery != "" || base.Fragment != "" {
 		return nil, errors.New("JUDGE0_URL must be an HTTP(S) base URL")
+	}
+	if base.Scheme == "http" {
+		ip := net.ParseIP(base.Hostname())
+		if token != "" || !allowLocalHTTP || !ip.IsLoopback() {
+			return nil, errors.New("Judge0 requires HTTPS except for explicitly enabled unauthenticated loopback HTTP")
+		}
 	}
 	if languages == nil {
 		languages = map[string]int{"javascript": 63, "typescript": 74, "python": 71, "go": 60, "cpp": 54}

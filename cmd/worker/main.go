@@ -54,7 +54,8 @@ func run() error {
 				return fmt.Errorf("JUDGE0_LANGUAGE_IDS must be a JSON object mapping languages to IDs")
 			}
 		}
-		runner, err := judge0.New(baseURL, os.Getenv("JUDGE0_AUTH_TOKEN"), languages)
+		allowLocalHTTP := cfg.Environment == "development" && os.Getenv("JUDGE0_ALLOW_LOCAL_HTTP") == "true"
+		runner, err := judge0.New(baseURL, os.Getenv("JUDGE0_AUTH_TOKEN"), languages, allowLocalHTTP)
 		if err != nil {
 			return err
 		}

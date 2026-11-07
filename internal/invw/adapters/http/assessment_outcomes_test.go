@@ -304,7 +304,7 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	failed := 0
 	evidence = append(evidence, database.QuestionEvidence{QuestionID: secondQuestion, PassedCases: &failed, TotalCases: &total})
 	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("X-Auth-Token") == "unavailable" {
+		if strings.HasPrefix(r.URL.Path, "/unavailable/") {
 			w.WriteHeader(http.StatusServiceUnavailable)
 			return
 		}
@@ -316,14 +316,14 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		}
 	}))
 	defer provider.Close()
-	unavailable, err := judge0.New(provider.URL, "unavailable", nil)
+	unavailable, err := judge0.New(provider.URL+"/unavailable", "", nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if claimed, err := repo.GradeNextCodeAttempt(ctx, unavailable); !claimed || err == nil {
 		t.Fatalf("grade during provider outage: claimed=%v: %v", claimed, err)
 	}
-	runner, err := judge0.New(provider.URL, "", nil)
+	runner, err := judge0.New(provider.URL, "", nil, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -331,6 +331,15 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		t.Fatalf("grading retried before backoff elapsed: claimed=%v: %v", claimed, err)
 	}
 	exec("UPDATE assessment_attempts SET code_grading_retry_at = now() WHERE id = $1::uuid", id)
+	exec(`UPDATE assessment_attempts
+		SET selected_content = jsonb_set(selected_content, '{0,questions,1,format}', '"short_text"')
+		WHERE id = $1::uuid`, id)
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); claimed || err != nil {
+		t.Fatalf("automatic grading claimed an attempt requiring separate scores: claimed=%v: %v", claimed, err)
+	}
+	exec(`UPDATE assessment_attempts
+		SET selected_content = jsonb_set(selected_content, '{0,questions,1,format}', '"code"')
+		WHERE id = $1::uuid`, id)
 	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); !claimed || err != nil {
 		t.Fatalf("grade coding attempt: claimed=%v: %v", claimed, err)
 	}

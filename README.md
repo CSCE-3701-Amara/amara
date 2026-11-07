@@ -133,6 +133,7 @@ An explicitly empty origin or proxy list disables that feature.
 | `JUDGE0_URL` | Optional | Judge0 CE base URL. Set on the worker to enable automatic code grading |
 | `JUDGE0_AUTH_TOKEN` | Optional | Native Judge0 `X-Auth-Token` credential. Inject through Infisical if the service requires authentication |
 | `JUDGE0_LANGUAGE_IDS` | Optional | JSON map from saved language names to Judge0 language IDs. Defaults to JavaScript 63, TypeScript 74, Python 71, Go 60, and C++ (`cpp`) 54 |
+| `JUDGE0_ALLOW_LOCAL_HTTP` | `false` | Set to `true` in development to allow unauthenticated HTTP to a loopback IP. Credentialed connections always require HTTPS |
 | `AUTH_MFA_ENCRYPTION_KEY` | Required | Exactly 32-byte secret used to encrypt MFA secrets at rest |
 | `DB_POOL_MAX_CONNS` | `4` | Connection pool ceiling per process; shared Supabase plans are small |
 
@@ -144,6 +145,9 @@ It sends candidate source and test inputs to Judge0 and compares stdout with
 expected outputs in Amara. Comparison normalizes CRLF and ignores trailing
 newlines. Blank answers earn zero passed cases. Provider errors leave the
 attempt pending for retry, which reruns the attempt's cases.
+Attempts combining code and questions that require a separate score must be
+graded by a trusted evaluator that submits complete evidence through
+`FinalizeEvidence`.
 
 Development allows `http://localhost:5173` and `http://127.0.0.1:5173`.
 Cookie credentials are disabled; cross-origin clients can send an `Authorization`
