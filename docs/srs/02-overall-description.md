@@ -12,7 +12,7 @@ The product is a new system rather than a replacement for an existing applicant-
 
 | Epic | High-level functions |
 |---|---|
-| AUTH | Register and activate users; authenticate Candidates, Interviewers, and Company Representatives; enforce role/company-scoped permissions; verify companies; manage profiles, documents, reports, and administrative entities. |
+| AUTH | Register and activate users; authenticate Candidates, Interviewers, and Hiring Managers; enforce role/company-scoped permissions; verify companies; manage profiles, documents, reports, and administrative entities. |
 | CAND | Browse, filter, and search opportunities; inspect postings; view submitted applications, progress, outcomes, and feedback; respond to offers; follow companies and save jobs; view earned crests and verified skills; create and view a dynamic resume. |
 | JOB | Create and maintain postings; configure capacity, dates, criteria, and application questions; publish, archive, and republish postings; accept and preserve applications; screen them against Must-have criteria; admit qualifying applications to INVW. |
 | INVW | Design and version a directed acyclic pipeline; configure assessment and interview stages; execute and score work; apply manual or configured advancement rules; manage anonymity; issue feedback and notifications; determine finalists; manage offers and final application states. |
@@ -27,7 +27,7 @@ Functions are subject to each epic's SHALL/SHOULD/COULD priority. For example, t
 | Guest | Register or begin company registration; view public information where available; proceed through sign-in gates when a protected action requires an account. |
 | Candidate | Maintain a profile; find postings; submit applications; complete assessments and interviews; view progress, feedback, final decisions, offers, crests, verified skills, and the dynamic resume. Most candidate interactions are expected to work on mobile devices and variable networks. |
 | Interviewer | Access assigned interviews, publish availability, conduct interviews, and submit notes and scorecards. Access is scoped to the associated company and assigned workflow. |
-| Hiring Manager / Company Representative | Manage company postings, configure and operate pipelines, review candidate evidence and analytics, make permitted advancement decisions, and manage finalists and offers. Company access is company-scoped. |
+| Hiring Manager | Manage company postings, configure and operate pipelines, review candidate evidence and analytics, make permitted advancement decisions, and manage finalists and offers. Company access is company-scoped. |
 | System Administrator | Review company registration requests and administer permitted accounts, entities, taxonomies, and aggregate administrative reports. |
 | System and external actors | Background workers, email and meeting providers, official registries, code evaluators, AI/LLM services, and analytics sources participate through defined system boundaries. They are not interchangeable with human hiring decision-makers. |
 

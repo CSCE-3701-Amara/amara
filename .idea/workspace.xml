@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="987a7326-567e-47f6-9b13-95b7881517e3" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="152" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="GOROOT" url="file://$USER_HOME$/sdk/go1.27.3" />
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="feature/AMARA-1271-View-Candidate-Pipeline-Progress" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.4415373250187602" />
+      <entry key="MS500" value="4.174069142962148" />
+      <entry key="S2" value="9.679894416489066" />
+      <entry key="S5" value="12.451593123359862" />
+      <entry key="S10" value="13.641247999061118" />
+      <entry key="S30" value="14.556002987473901" />
+      <entry key="S60" value="15.956127599171527" />
+      <entry key="M2" value="23.475911266542667" />
+      <entry key="M5" value="45.588141774453376" />
+      <entry key="M10" value="64.6484348512346" />
+      <entry key="M15" value="78.06420390438929" />
+      <entry key="M30" value="127.40447933518992" />
+      <entry key="H1" value="273.0274112497229" />
+      <entry key="H2" value="542.6038360292199" />
+      <entry key="H4" value="865.511074209031" />
+      <entry key="D1" value="1453.7685325082102" />
+      <entry key="W1" value="1820.2644383720233" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.3811893554759223" />
+      <entry key="MS500" value="4.102447510047003" />
+      <entry key="S2" value="9.606463687735355" />
+      <entry key="S5" value="12.409731553256083" />
+      <entry key="S10" value="13.617580073213041" />
+      <entry key="S30" value="14.547424604416014" />
+      <entry key="S60" value="15.95165659639988" />
+      <entry key="M2" value="23.473347435410133" />
+      <entry key="M5" value="45.5867212327105" />
+      <entry key="M10" value="64.64754435119242" />
+      <entry key="M15" value="78.06352109958505" />
+      <entry key="M30" value="127.40398256114227" />
+      <entry key="H1" value="273.026947099339" />
+      <entry key="H2" value="542.6033909266158" />
+      <entry key="H4" value="865.5107107350308" />
+      <entry key="D1" value="1453.7684269951556" />
+      <entry key="W1" value="1820.264420083848" />
+    </decayedShown>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="AISelfReview" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3LQB3RyVZFnLQoqdMLx2b8GOdBZ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Go Test.TestAssessmentResultRouteCoexistsWithAssessmentProgress in github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http.executor&quot;: &quot;Run&quot;,
+    &quot;Go Test.go test github.com/CSCE-3701-Amara/amara/internal/cand/adapters/database.executor&quot;: &quot;Run&quot;,
+    &quot;Go Test.go test github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http.executor&quot;: &quot;Run&quot;,
+    &quot;Go Test.go test github.com/CSCE-3701-Amara/amara/internal/cand/application.executor&quot;: &quot;Run&quot;,
+    &quot;Go Test.go test github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database.executor&quot;: &quot;Run&quot;,
+    &quot;Go Test.go test github.com/CSCE-3701-Amara/amara/internal/invw/adapters/http.executor&quot;: &quot;Run&quot;,
+    &quot;Go Test.go test github.com/CSCE-3701-Amara/amara/internal/invw/application.executor&quot;: &quot;Run&quot;,
+    &quot;Go Test.go test github.com/CSCE-3701-Amara/amara/internal/job/adapters/http.executor&quot;: &quot;Run&quot;,
+    &quot;KEY_CHAT_IN_TOOLWINDOW&quot;: &quot;false&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.GoLinterPluginOnboardingV2&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.GoLinterPluginStorageMigration&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.GoOptimizationToolWindowEnableInLayout.v333333&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.analysis.ui.options.defaults&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/aliahmed/Documents/amara&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.qodana&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="QodanaReportsService">
+    <option name="descriptions">
+      <ReportDescription localRun="true" path="/private/var/folders/bt/2cjlwz3j6fq0s9g4vvctxmj00000gp/T/qodana_output/qodana.sarif.json" reportGuid="0c0c5e8e-2c1b-4822-a739-4bb9bf3108ea" reportId="amara/qodana/2026-10-30" />
+    </option>
+  </component>
+  <component name="RunManager" selected="Go Test.TestAssessmentResultRouteCoexistsWithAssessmentProgress in github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/CSCE-3701-Amara/amara" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build api/" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+      <module name="amara" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/CSCE-3701-Amara/amara/cmd/api" />
+      <directory value="$PROJECT_DIR$" />
+      <auto_managed_config_id value="$PROJECT_DIR$/cmd/api" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build worker/" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+      <module name="amara" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/CSCE-3701-Amara/amara/cmd/worker" />
+      <directory value="$PROJECT_DIR$" />
+      <auto_managed_config_id value="$PROJECT_DIR$/cmd/worker" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestAssessmentResultRouteCoexistsWithAssessmentProgress in github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="amara" />
+      <working_directory value="$PROJECT_DIR$/internal/cand/adapters/http" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestAssessmentResultRouteCoexistsWithAssessmentProgress\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test github.com/CSCE-3701-Amara/amara/internal/cand/adapters/database" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="amara" />
+      <working_directory value="$PROJECT_DIR$/internal/cand/adapters/database" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/CSCE-3701-Amara/amara/internal/cand/adapters/database" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="amara" />
+      <working_directory value="$PROJECT_DIR$/internal/cand/adapters/http" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test github.com/CSCE-3701-Amara/amara/internal/cand/application" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="amara" />
+      <working_directory value="$PROJECT_DIR$/internal/cand/application" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/CSCE-3701-Amara/amara/internal/cand/application" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <working_directory value="$PROJECT_DIR$/internal/invw/adapters/database" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Test.TestAssessmentResultRouteCoexistsWithAssessmentProgress in github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http" />
+        <item itemvalue="Go Test.go test github.com/CSCE-3701-Amara/amara/internal/cand/adapters/database" />
+        <item itemvalue="Go Test.go test github.com/CSCE-3701-Amara/amara/internal/cand/application" />
+        <item itemvalue="Go Test.go test github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http" />
+        <item itemvalue="Go Test.go test github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-gosdk-63c95d513abe-08e7ff217c2b-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-262.10968.67" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-GO-262.10968.67" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="987a7326-567e-47f6-9b13-95b7881517e3" name="Changes" comment="" />
+      <created>1793376212153</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1793376212153</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

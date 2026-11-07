@@ -10,9 +10,9 @@ This glossary defines terms used across the SRS. Epic-specific behavior and auth
 |---|---|
 | Candidate | A person who uses AMARA to maintain a professional profile, apply for postings, complete hiring steps, view outcomes, and manage verified skills or a dynamic resume. Use **Candidate** as the current product term. |
 | Company | An employer organization represented in AUTH and associated with its postings, members, applications, and hiring workflows. |
-| Company Representative | An authenticated user acting for a Company. Company access and available actions are restricted by AUTH role and company scope. |
+| Company Representative | Synonym for Hiring Manager. An authenticated, Company-authorized user whose access and available actions are restricted by AUTH role and company scope. |
 | Guest / Visitor | A person who has not authenticated. A Guest can use public or registration entry points; protected actions may require sign-in. |
-| Hiring Manager | A Company-authorized user who manages postings and the interview workflow, configures pipelines, and makes the manual decisions assigned to that role. |
+| Hiring Manager | The product term for a Company Representative: a Company-authorized user who manages postings and the interview workflow, configures pipelines, and makes the manual decisions assigned to that role. |
 | Interviewer | A user associated with an approved Company and assigned to conduct a live-interview stage or submit its scorecard. |
 | System Administrator (Admin) | A privileged platform operator who performs AUTH-defined account, company, taxonomy, and entity-administration actions. |
 | Tenant / company scope | The Company context used to isolate company-owned records and authorize access. A valid role alone does not permit access to another Company's data. |

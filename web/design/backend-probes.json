@@ -1,0 +1,52 @@
+[
+  {
+    "method": "GET",
+    "endpoint": "/health/ready",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "endpoint": "/v1/jobs/feed",
+    "status": 401
+  },
+  {
+    "method": "GET",
+    "endpoint": "/v1/candidates/me/applications",
+    "status": 401
+  },
+  {
+    "method": "GET",
+    "endpoint": "/v1/jobs",
+    "status": 401
+  },
+  {
+    "method": "GET",
+    "endpoint": "/v1/modules",
+    "status": 401
+  },
+  {
+    "method": "GET",
+    "endpoint": "/v1/interviews",
+    "status": 404
+  },
+  {
+    "method": "GET",
+    "endpoint": "/v1/offers",
+    "status": 404
+  },
+  {
+    "method": "GET",
+    "endpoint": "/v1/companies/me",
+    "status": 404
+  },
+  {
+    "method": "GET",
+    "endpoint": "/v1/admin/accounts",
+    "status": 404
+  },
+  {
+    "method": "GET",
+    "endpoint": "/api/v1/jobs/feed",
+    "status": 404
+  }
+]

@@ -1,0 +1,56 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10.61px;
+  text-decoration: none;
+  color: var(--foreground);
+  font-family: var(--font-funnel-display), sans-serif;
+  font-size: 46.547px;
+  font-weight: 800;
+  line-height: 1;
+  width: max-content;
+}
+.badge {
+  background: var(--background);
+  border-radius: 37.2px;
+  padding: 16.8px 25px 16.8px 20.4px;
+  height: 74.4px;
+}
+.brand img {
+  flex: none;
+}
+.header {
+  font-size: 57.63px;
+}
+.footer {
+  font-size: 49.397px;
+  gap: 17.2235px;
+}
+@media (max-width: 700px) {
+  .brand {
+    font-size: 34px;
+    gap: 8px;
+  }
+  .badge {
+    padding: 10px 18px 10px 14px;
+    height: 60px;
+  }
+}
+
+/* Figma's compact workspace lockup; auth and welcome retain their own variants. */
+.workspace {
+  height: 48.36px;
+  width: 162.2px;
+  gap: 6.9px;
+  padding: 10.92px 13.26px;
+  border-radius: 24.18px;
+  font-size: 30.256px;
+  line-height: 21.746px;
+  background: var(--background);
+}
+@media (max-width: 700px) {
+  .workspace {
+    font-size: 30.256px;
+    gap: 6.9px;
+  }
+}

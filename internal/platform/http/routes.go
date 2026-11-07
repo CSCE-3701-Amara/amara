@@ -11,8 +11,9 @@ import (
 	"github.com/CSCE-3701-Amara/amara/internal/platform/database"
 )
 
-// RouteRegistrar mounts a module's HTTP handlers under /v1. Each module applies
-// its own authentication and authorization middleware to protected routes.
+// RouteRegistrar mounts a module's HTTP handlers under /v1. Each
+// module applies its own authentication and authorization to protected routes;
+// the platform middleware wraps every route.
 type RouteRegistrar func(*gin.RouterGroup)
 
 func newRouter(cfg config.HTTPConfig, logger *slog.Logger, dbSvc database.Service, registrars ...RouteRegistrar) (*gin.Engine, error) {
@@ -23,20 +24,25 @@ func newRouter(cfg config.HTTPConfig, logger *slog.Logger, dbSvc database.Servic
 		return nil, fmt.Errorf("configure trusted proxies: %w", err)
 	}
 
-	router.Use(requestID(), requestLogger(logger), recoverPanic(logger), corsMiddleware(cfg.AllowedOrigins))
+	router.Use(requestID(), requestLogger(logger), Recovery(logger), corsMiddleware(cfg.AllowedOrigins))
 	registerRoutes(router, dbSvc, registrars...)
 	return router, nil
 }
 
 func registerRoutes(router *gin.Engine, dbSvc database.Service, registrars ...RouteRegistrar) {
+	// /health/live reports process liveness without depending on the database.
+	// /health/ready checks database connectivity when the service is wired.
+	// Keep /health as a liveness alias for existing infrastructure probes.
 	liveHandler := func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	}
-	router.GET("/health", liveHandler)
-	router.GET("/health/live", liveHandler)
-	router.GET("/health/ready", func(c *gin.Context) {
+	health := router.Group("/health")
+	health.GET("", liveHandler)
+	health.GET("/live", liveHandler)
+	health.GET("/ready", func(c *gin.Context) {
 		if dbSvc == nil {
-			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "down", "error": "database service is not configured"})
+			// The server can also run in configurations that do not use a database.
+			c.JSON(http.StatusOK, gin.H{"status": "ok"})
 			return
 		}
 		health := dbSvc.Health(c.Request.Context())
@@ -62,16 +68,21 @@ func registerRoutes(router *gin.Engine, dbSvc database.Service, registrars ...Ro
 		register(v1)
 	}
 	router.NoRoute(func(c *gin.Context) {
-		writeError(c, http.StatusNotFound, "not_found", "The requested resource was not found.")
+		WriteProblem(c, ProblemDetails{
+			Type:   "about:blank",
+			Title:  "Not Found",
+			Status: http.StatusNotFound,
+			Detail: "The requested resource was not found.",
+			Code:   "not_found",
+		})
 	})
 	router.NoMethod(func(c *gin.Context) {
-		writeError(c, http.StatusMethodNotAllowed, "method_not_allowed", "The request method is not allowed.")
-	})
-}
-
-func writeError(c *gin.Context, status int, code, message string) {
-	c.AbortWithStatusJSON(status, gin.H{
-		"error":      gin.H{"code": code, "message": message},
-		"request_id": RequestID(c.Request.Context()),
+		WriteProblem(c, ProblemDetails{
+			Type:   "about:blank",
+			Title:  "Method Not Allowed",
+			Status: http.StatusMethodNotAllowed,
+			Detail: "The request method is not allowed.",
+			Code:   "method_not_allowed",
+		})
 	})
 }
