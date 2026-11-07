@@ -321,21 +321,31 @@ func (r *RegistrationRepository) Activate(ctx context.Context, email string, cod
 		  AND c.code_hash = $2
 		  AND c.consumed_at IS NULL
 		FOR UPDATE`, email, codeHash).Scan(&accountID, &accountType, &accountEmail, &expiresAt)
-	if err != nil || !expiresAt.After(now) {
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.Account{}, domain.ErrInvalidVerificationCode
+		}
+		return domain.Account{}, fmt.Errorf("lookup verification challenge: %w", err)
+	}
+	if !expiresAt.After(now) {
 		return domain.Account{}, domain.ErrInvalidVerificationCode
 	}
 
 	var status string
+	var createdAt time.Time
 	switch domain.AccountType(accountType) {
 	case domain.AccountTypeCandidate:
-		err = tx.QueryRow(ctx, `UPDATE candidates SET account_status = 'active' WHERE id = $1::uuid AND account_status = 'pending_verification' RETURNING account_status`, accountID).Scan(&status)
+		err = tx.QueryRow(ctx, `UPDATE candidates SET account_status = 'active' WHERE id = $1::uuid AND account_status = 'pending_verification' RETURNING account_status, created_at`, accountID).Scan(&status, &createdAt)
 	case domain.AccountTypeInterviewer:
-		err = tx.QueryRow(ctx, `UPDATE interviewers SET account_status = 'active' WHERE id = $1::uuid AND account_status = 'pending_verification' RETURNING account_status`, accountID).Scan(&status)
+		err = tx.QueryRow(ctx, `UPDATE interviewers SET account_status = 'active' WHERE id = $1::uuid AND account_status = 'pending_verification' RETURNING account_status, created_at`, accountID).Scan(&status, &createdAt)
 	default:
 		return domain.Account{}, domain.ErrInvalidVerificationCode
 	}
 	if err != nil {
-		return domain.Account{}, domain.ErrInvalidVerificationCode
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.Account{}, domain.ErrInvalidVerificationCode
+		}
+		return domain.Account{}, fmt.Errorf("activate %s account: %w", accountType, err)
 	}
 	if _, err := tx.Exec(ctx, `UPDATE auth_email_verification_challenges SET consumed_at = $1 WHERE account_id = $2::uuid AND account_type = $3 AND consumed_at IS NULL`, now, accountID, accountType); err != nil {
 		return domain.Account{}, fmt.Errorf("consume verification challenge: %w", err)
@@ -343,7 +353,10 @@ func (r *RegistrationRepository) Activate(ctx context.Context, email string, cod
 	if err := tx.Commit(ctx); err != nil {
 		return domain.Account{}, fmt.Errorf("commit account activation: %w", err)
 	}
-	return domain.Account{ID: accountID, Type: domain.AccountType(accountType), Email: accountEmail, Status: status}, nil
+	return domain.Account{
+		ID: accountID, Type: domain.AccountType(accountType), Email: accountEmail,
+		Status: status, CreatedAt: createdAt.UTC().Format(time.RFC3339),
+	}, nil
 }
 
 func (r *RegistrationRepository) RegistrationNumberExists(ctx context.Context, number string) (bool, error) {
