@@ -1,52 +1,13 @@
-[
-  {
-    "method": "GET",
-    "endpoint": "/health/ready",
-    "status": 200
-  },
-  {
-    "method": "GET",
-    "endpoint": "/v1/jobs/feed",
-    "status": 401
-  },
-  {
-    "method": "GET",
-    "endpoint": "/v1/candidates/me/applications",
-    "status": 401
-  },
-  {
-    "method": "GET",
-    "endpoint": "/v1/jobs",
-    "status": 401
-  },
-  {
-    "method": "GET",
-    "endpoint": "/v1/modules",
-    "status": 401
-  },
-  {
-    "method": "GET",
-    "endpoint": "/v1/interviews",
-    "status": 404
-  },
-  {
-    "method": "GET",
-    "endpoint": "/v1/offers",
-    "status": 404
-  },
-  {
-    "method": "GET",
-    "endpoint": "/v1/companies/me",
-    "status": 404
-  },
-  {
-    "method": "GET",
-    "endpoint": "/v1/admin/accounts",
-    "status": 404
-  },
-  {
-    "method": "GET",
-    "endpoint": "/api/v1/jobs/feed",
-    "status": 404
-  }
-]
+{
+  "checkedAt": "2026-11-07",
+  "backendModified": true,
+  "plainStartup": "Failed: DATABASE_URL absent",
+  "documentedSecretStartup": "make run-secrets connected to development database and started HTTP server on :8080 after wildcard fix",
+  "resolvedStartupBlocker": "Pipeline-progress route now uses :applicationId, matching sibling application routes",
+  "liveAuthenticatedFlows": "Not verified: no development account credentials or database writes were used",
+  "databaseWrites": "None performed by verification",
+  "goTests": "go test ./... passed",
+  "directHealthProbe": "GET /health/live returned HTTP 200 with status ok",
+  "anonymousPipelineProgressProbe": "GET /v1/applications/00000000-0000-0000-0000-000000000000/pipeline-progress returned HTTP 401 authentication_required",
+  "frontendProxyHealthProbe": "Not repeated after backend fix; previous HTTP 500 is historical"
+}

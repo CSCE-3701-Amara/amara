@@ -26,3 +26,21 @@ Browser tests run a temporary development server on **3100**, configurable with 
 - Workspace headers: logout through the backend's current-session endpoint.
 
 Current backend blockers and contract discrepancies are recorded in [INTEGRATION.md](./INTEGRATION.md). A connected request can still be rejected by the existing backend; the UI displays the error and supports retry. It never fakes registration, submission, or persistence.
+
+## Figma coverage and production browser checks
+
+The current full-file inventory and per-state implementation/API status are in
+[design/COVERAGE.md](design/COVERAGE.md). Regenerate the Markdown table after
+editing the audited inventory with `python3 scripts/figma-coverage.py`.
+
+To exercise the built frontend with Playwright owning the server process:
+
+```sh
+npm run build
+PLAYWRIGHT_SERVER=production PLAYWRIGHT_PORT=3202 npm run test:e2e
+```
+
+The default test command still starts the development server on port 3100.
+Product-state smoke checks cover 1728px, 1024px, and 375px, with separate DAG
+interaction checks at all three widths. Browser API successes use mocks;
+[INTEGRATION.md](INTEGRATION.md) records why live API verification is blocked.
