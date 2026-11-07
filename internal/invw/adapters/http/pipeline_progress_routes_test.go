@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	candhttp "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http"
 	"github.com/CSCE-3701-Amara/amara/internal/invw/application"
 	"github.com/CSCE-3701-Amara/amara/internal/invw/domain"
 )
@@ -32,8 +33,10 @@ func TestCandidatePipelineProgressCoexistsWithApplicationRoutes(t *testing.T) {
 		v1 := router.Group("/v1")
 		progress := NewCandidatePipelineProgressHandler(nil, nil)
 		registerApplications := func() {
-			v1.GET("/applications/:applicationId", func(c *gin.Context) { c.Status(http.StatusNoContent) })
-			v1.GET("/applications/:applicationId/assessment-instances", func(c *gin.Context) { c.Status(http.StatusNoContent) })
+			candhttp.NewApplicationTrackingHandler(nil, nil).RegisterRoutes(v1)
+			candhttp.NewAssessmentProgressHandler(nil, nil).RegisterRoutes(v1)
+			candhttp.NewAssessmentResultHandler(nil, nil).RegisterRoutes(v1)
+			NewAssessmentHandler(nil, nil).RegisterRoutes(v1)
 		}
 		if progressFirst {
 			progress.RegisterRoutes(v1)

@@ -23,6 +23,7 @@ type CompanyRegistrationRepository interface {
 }
 
 type CompanyRegistrationRecord struct {
+	AutoApprove        bool
 	CompanyName        string
 	RegistrationNumber string
 	Email              string

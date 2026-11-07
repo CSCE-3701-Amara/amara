@@ -33,7 +33,7 @@ func NewApplicationTrackingHandler(reader ApplicationTrackingReader, sessions po
 func (h *ApplicationTrackingHandler) RegisterRoutes(group *gin.RouterGroup) {
 	candidateAuth := authhttp.CandidateAuthWithErrorWriter(h.sessions, writeTrackingError)
 	group.GET("/candidates/me/applications", candidateAuth, h.list)
-	group.GET("/applications/:applicationId", candidateAuth, h.get)
+	group.GET("/applications/:application_id", candidateAuth, h.get)
 }
 
 func (h *ApplicationTrackingHandler) list(c *gin.Context) {
@@ -58,7 +58,7 @@ func (h *ApplicationTrackingHandler) list(c *gin.Context) {
 }
 
 func (h *ApplicationTrackingHandler) get(c *gin.Context) {
-	id := c.Param("applicationId")
+	id := c.Param("application_id")
 	var uuid pgtype.UUID
 	if uuid.Scan(id) != nil || !strings.EqualFold(uuid.String(), id) {
 		writeTrackingError(c, http.StatusBadRequest, "invalid_application_id", "id must be a UUID.")

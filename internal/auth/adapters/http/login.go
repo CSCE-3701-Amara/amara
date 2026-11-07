@@ -79,6 +79,8 @@ func (h *LoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 			status, code = http.StatusForbidden, "account_not_active"
 		case errors.Is(err, domain.ErrAccountForbidden):
 			status, code = http.StatusForbidden, "account_forbidden"
+		case errors.Is(err, domain.ErrEmailMFARequired):
+			status, code = http.StatusForbidden, "email_mfa_required"
 		case errors.Is(err, domain.ErrMFARequired):
 			status, code = http.StatusForbidden, "mfa_required"
 		case errors.Is(err, domain.ErrInvalidMFACode):

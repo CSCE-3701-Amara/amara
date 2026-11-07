@@ -37,13 +37,16 @@ func RegisterPostingPreviewRoutes(group *gin.RouterGroup, service *application.P
 		c.AbortWithStatusJSON(status, gin.H{"error": gin.H{"code": code, "message": message}})
 	})
 	preview := func(c *gin.Context) {
-		identity, _ := authhttp.Identity(c)
+		companyID, ok := companyManager(c)
+		if !ok {
+			return
+		}
 		id := c.Param("id")
 		if !validUUID(id) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"code": "invalid_posting_id", "message": "id must be a UUID."}})
 			return
 		}
-		saved, err := service.Get(c.Request.Context(), identity.AccountID, id)
+		saved, err := service.Get(c.Request.Context(), companyID, id)
 		if err != nil {
 			writePostingError(c, err)
 			return

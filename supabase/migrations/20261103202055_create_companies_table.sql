@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE TABLE companies (
+CREATE TABLE IF NOT EXISTS companies (
     id                  UUID    PRIMARY KEY,
     email               TEXT    NOT NULL,
     password_hash       BYTEA   NOT NULL,

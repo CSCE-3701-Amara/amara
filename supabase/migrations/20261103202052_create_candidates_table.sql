@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE TABLE candidates (
+CREATE TABLE IF NOT EXISTS candidates (
     id                  UUID        PRIMARY KEY,
     name                TEXT        NOT NULL,
     email               TEXT        NOT NULL,

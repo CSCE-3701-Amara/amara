@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE TABLE applications (
+CREATE TABLE IF NOT EXISTS applications (
     id                  UUID    PRIMARY KEY,
     reference_number    INTEGER NOT NULL    UNIQUE,
     posting_id          UUID    NOT NULL    UNIQUE  REFERENCES job_postings(id),

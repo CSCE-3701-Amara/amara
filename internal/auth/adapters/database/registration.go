@@ -370,7 +370,8 @@ func (r *RegistrationRepository) RegistrationNumberExists(ctx context.Context, n
 func (r *RegistrationRepository) CreateCompanyRegistration(ctx context.Context, record ports.CompanyRegistrationRecord) (domain.Account, error) {
 	row, err := r.queries.CreateCompanyRegistration(ctx, sqlc.CreateCompanyRegistrationParams{
 		CompanyName: record.CompanyName, RegistrationNumber: record.RegistrationNumber,
-		Email: record.Email, PasswordHash: record.PasswordHash, Salt: record.Salt,
+		AutoApprove: record.AutoApprove,
+		Email:       record.Email, PasswordHash: record.PasswordHash, Salt: record.Salt,
 		CreatedAt: pgtype.Timestamp{Time: record.CreatedAt, Valid: true},
 	})
 	if err != nil {

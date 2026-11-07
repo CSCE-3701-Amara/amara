@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	authhttp "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/http"
 	"github.com/CSCE-3701-Amara/amara/internal/cand/application"
 	"github.com/CSCE-3701-Amara/amara/internal/cand/domain"
 	httpserver "github.com/CSCE-3701-Amara/amara/internal/platform/http"
@@ -77,6 +78,9 @@ func (h *AssessmentProgressHandler) save(c *gin.Context) {
 }
 
 func authenticatedCandidateID(c *gin.Context) (string, bool) {
+	if identity, ok := authhttp.Identity(c); ok {
+		return identity.AccountID, identity.AccountType == "candidate" && identity.AccountID != ""
+	}
 	value, exists := c.Get(CandidateIDContextKey)
 	if !exists {
 		return "", false
