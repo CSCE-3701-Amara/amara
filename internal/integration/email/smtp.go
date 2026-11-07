@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"html"
 	"net/mail"
 	"net/smtp"
 	"strings"
@@ -62,7 +63,7 @@ func (s *SMTPSender) SendVerificationCode(ctx context.Context, recipient, code s
 	if s.config.Username != "" {
 		auth = smtp.PlainAuth("", s.config.Username, s.config.Password, s.config.Host)
 	}
-	message := buildVerificationMessage(s.config.From, recipient, code)
+	message := buildVerificationMessage(code)
 	return smtp.SendMail(
 		fmt.Sprintf("%s:%s", s.config.Host, s.config.Port),
 		auth,
@@ -86,9 +87,9 @@ func isVerificationCode(code string) bool {
 	return true
 }
 
-func buildVerificationMessage(from, recipient, code string) []byte {
+func buildVerificationMessage(code string) []byte {
 	return []byte(fmt.Sprintf(
-		"From: %s\r\nTo: %s\r\nSubject: AMARA email verification\r\n\r\nYour AMARA verification code is: %s\r\n",
-		from, recipient, code,
+		"Subject: AMARA email verification\r\n\r\nYour AMARA verification code is: %s\r\n",
+		html.EscapeString(code),
 	))
 }

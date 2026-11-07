@@ -44,14 +44,8 @@ func TestIsVerificationCode(t *testing.T) {
 }
 
 func TestBuildVerificationMessage(t *testing.T) {
-	message := string(buildVerificationMessage(
-		"no-reply@example.com",
-		"user@example.com",
-		"deadbeef",
-	))
-	want := "From: no-reply@example.com\r\n" +
-		"To: user@example.com\r\n" +
-		"Subject: AMARA email verification\r\n\r\n" +
+	message := string(buildVerificationMessage("deadbeef"))
+	want := "Subject: AMARA email verification\r\n\r\n" +
 		"Your AMARA verification code is: deadbeef\r\n"
 
 	if message != want {
