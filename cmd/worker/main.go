@@ -42,6 +42,7 @@ func run() error {
 		return fmt.Errorf("connect database: %w", err)
 	}
 	defer dbSvc.Close()
+
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
 	for {
@@ -57,4 +58,5 @@ func run() error {
 		case <-ticker.C:
 		}
 	}
+
 }

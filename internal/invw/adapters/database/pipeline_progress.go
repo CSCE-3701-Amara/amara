@@ -135,6 +135,7 @@ func (r *CandidatePipelineProgressRepository) GetByCandidateApplication(ctx cont
 		return domain.CandidatePipelineProgress{}, fmt.Errorf("query candidate Amara awards: %w", err)
 	}
 	defer rows.Close()
+
 	stages := make(map[string]*domain.PipelineStage, len(result.Stages))
 	for i := range result.Stages {
 		stages[result.Stages[i].ID] = &result.Stages[i]
