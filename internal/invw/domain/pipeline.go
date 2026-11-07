@@ -40,6 +40,7 @@ type Stage struct {
 }
 
 type LiveInterview struct {
+	Behavioral      bool        `json:"behavioral,omitempty"`
 	DurationMinutes int         `json:"durationMinutes"`
 	InterviewerIDs  []string    `json:"interviewerIds"`
 	Threshold       *int        `json:"threshold"`
@@ -83,7 +84,10 @@ func (s Stage) validate() error {
 		if len(i.InterviewerIDs) == 0 || !uniqueIDs(i.InterviewerIDs) {
 			return errors.New("a live interview needs distinct assigned interviewers")
 		}
-		if i.Threshold == nil || *i.Threshold < 0 || *i.Threshold > 100 {
+		if i.Behavioral && i.Threshold != nil {
+			return errors.New("a behavioral interview cannot have a score threshold")
+		}
+		if !i.Behavioral && (i.Threshold == nil || *i.Threshold < 0 || *i.Threshold > 100) {
 			return errors.New("a live interview requires a threshold from 0 to 100")
 		}
 		return validateRubric(i.Rubric, i.Amarat)

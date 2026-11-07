@@ -12,6 +12,11 @@ func fromValues(values map[string]string) (Config, error) {
 		// Supply valid required settings; individual tests override them.
 		"DATABASE_URL":            "postgres://user:pass@localhost:5432/db",
 		"AUTH_MFA_ENCRYPTION_KEY": "0123456789abcdef0123456789abcdef",
+		"SMTP_HOST":               "smtp.example.com",
+		"SMTP_PORT":               "587",
+		"SMTP_USERNAME":           "username",
+		"SMTP_PASSWORD":           "password",
+		"SMTP_FROM":               "no-reply@example.com",
 	}
 	for key, value := range values {
 		merged[key] = value

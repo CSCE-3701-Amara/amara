@@ -225,8 +225,11 @@ func insertStage(ctx context.Context, tx pgx.Tx, version string, position int, s
 	rule := "completion"
 	var threshold *int
 	if stage.Interview != nil {
-		rule = "threshold"
-		threshold = stage.Interview.Threshold
+		rule = "manual"
+		if !stage.Interview.Behavioral {
+			rule = "threshold"
+			threshold = stage.Interview.Threshold
+		}
 	}
 	err := tx.QueryRow(ctx, `
 		INSERT INTO pipeline_stages (id, version_id, name, module_type, stage_order,

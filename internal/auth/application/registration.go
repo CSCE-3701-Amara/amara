@@ -36,6 +36,14 @@ func (s *RegistrationService) Register(ctx context.Context, registration domain.
 		return domain.Account{}, err
 	}
 
+	pending, err := s.repository.FindPendingVerification(ctx, registration.Email)
+	if err == nil {
+		return pending.Account, s.issueVerification(ctx, pending.Account, pending.Recipient, false)
+	}
+	if !errors.Is(err, domain.ErrPendingVerificationNotFound) {
+		return domain.Account{}, fmt.Errorf("find pending verification: %w", err)
+	}
+
 	exists, err := s.repository.EmailExists(ctx, registration.Email)
 	if err != nil {
 		return domain.Account{}, fmt.Errorf("check registration email: %w", err)
@@ -77,22 +85,32 @@ func (s *RegistrationService) Register(ctx context.Context, registration domain.
 		return domain.Account{}, fmt.Errorf("create %s account: %w", registration.AccountType, err)
 	}
 
+	return account, s.issueVerification(ctx, account, registration.Email, true)
+}
+
+func (s *RegistrationService) issueVerification(ctx context.Context, account domain.Account, recipient string, persistBeforeSend bool) error {
 	code := make([]byte, 32)
 	if _, err := rand.Read(code); err != nil {
-		return domain.Account{}, fmt.Errorf("generate verification code: %w", err)
+		return fmt.Errorf("generate verification code: %w", err)
 	}
+	codeText := fmt.Sprintf("%x", code)
 	codeHash := sha256.Sum256(code)
 	challenge := ports.VerificationChallenge{
-		AccountID:   account.ID,
-		AccountType: registration.AccountType,
-		CodeHash:    codeHash[:],
-		ExpiresAt:   createdAt.Add(verificationCodeLifetime),
+		AccountID: account.ID, AccountType: account.Type, Recipient: recipient,
+		CodeHash: codeHash[:], ExpiresAt: s.now().UTC().Add(verificationCodeLifetime),
 	}
-	if err := s.repository.SaveVerificationChallenge(ctx, challenge); err != nil {
-		return domain.Account{}, fmt.Errorf("save verification challenge: %w", err)
+	if persistBeforeSend {
+		if err := s.repository.SaveVerificationChallenge(ctx, challenge); err != nil {
+			return fmt.Errorf("save verification challenge: %w", err)
+		}
 	}
-	if err := s.sender.SendVerificationCode(ctx, registration.Email, fmt.Sprintf("%x", code)); err != nil {
-		return domain.Account{}, fmt.Errorf("send verification code: %w", err)
+	if err := s.sender.SendVerificationCode(ctx, recipient, codeText); err != nil {
+		return fmt.Errorf("send verification code: %w", err)
 	}
-	return account, nil
+	if !persistBeforeSend {
+		if err := s.repository.SaveVerificationChallenge(ctx, challenge); err != nil {
+			return fmt.Errorf("save verification challenge: %w", err)
+		}
+	}
+	return nil
 }
