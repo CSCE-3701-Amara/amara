@@ -169,7 +169,7 @@ func writeAssessment(c *gin.Context, result any, err error) {
 	case errors.Is(err, database.ErrDecisionConflict):
 		writeError(c, http.StatusConflict, "stage_decision_conflict", err.Error())
 	case errors.Is(err, database.ErrThresholdConflict):
-		writeError(c, http.StatusConflict, "stage_threshold_conflict", err.Error())
+		writeError(c, http.StatusConflict, "stage_threshold_conflict", "The threshold or affected candidates changed. Refresh the dashboard and preview again.")
 	case errors.Is(err, database.ErrAssessmentConflict):
 		writeError(c, http.StatusConflict, "assessment_conflict", err.Error())
 	default:

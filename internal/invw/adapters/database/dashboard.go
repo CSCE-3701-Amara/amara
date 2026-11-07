@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-var ErrThresholdConflict = errors.New("The threshold or affected candidates changed. Refresh the dashboard and preview again.")
+var ErrThresholdConflict = errors.New("threshold or affected candidates changed")
 
 func (r *AssessmentRepository) PipelineDashboard(ctx context.Context, posting, company string) (json.RawMessage, error) {
 	var dashboard json.RawMessage
