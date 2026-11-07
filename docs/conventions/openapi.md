@@ -27,12 +27,6 @@ Each API change MUST update its OpenAPI contract and relevant tests in the same 
 
 Canonical base prefix for new endpoints: `/v1`. The version is part of the public API path; compatible additions remain under `/v1`.
 
-### Compatibility paths
-
-Existing AUTH and candidate-profile contract paths under `/api/v1` are retained at their documented URLs. The server on `main` also mounts registered module routes under `/api/v1` as compatibility aliases of `/v1`; this does not make unregistered operations available. Do not use `/api/v1` for new contract paths or assume aliases exist for planned endpoints. Clients MUST use the exact path documented for each operation.
-
-Login also retains `/v1/auth/login` and `/api/v1/auth/login` as aliases of the session-creation operation documented at `POST /api/v1/auth/sessions`.
-
 ### Resource naming
 
 Rules:

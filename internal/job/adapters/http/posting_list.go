@@ -15,7 +15,6 @@ import (
 	httpserver "github.com/CSCE-3701-Amara/amara/internal/platform/http"
 )
 
-// companyIDParam names the company wildcard. Every /company/... route must
 const companyIDParam = "company_id"
 
 // PostingListHandler adapts the company posting list to HTTP.

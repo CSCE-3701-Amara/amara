@@ -161,10 +161,10 @@ keep business logic and authentication policy in the owning module.
 
 `POST /v1/auth/company-registrations` uses the shared database service and
 the HIBP password compromise checker. Candidate/interviewer registration at
-`POST /v1/auth/registrations` returns `503 registration_unavailable` until
-verification email delivery is configured. Requests are rejected before any
-account or verification challenge is written. Both endpoints use the shared
-request ID, logging, recovery, and CORS middleware.
+`POST /v1/auth/registrations` sends verification codes through the configured
+SMTP server. Set `SMTP_HOST`, `SMTP_PORT`, and `SMTP_FROM`; authenticated
+servers also require `SMTP_USERNAME` and `SMTP_PASSWORD`. Both endpoints use
+the shared request ID, logging, recovery, and CORS middleware.
 
 The `gosec` executable must be installed before running `make gosec`.
 [.gosec.json](.gosec.json) excludes only G101 (hardcoded credentials) in the
