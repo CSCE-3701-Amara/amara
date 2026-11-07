@@ -1,0 +1,8 @@
+{
+  "exclude-rules": [
+    {
+      "path": "(^|/)internal/auth/adapters/database/sqlc/(auth_registration|login|mfa)\\.sql\\.go$",
+      "rules": ["G101"]
+    }
+  ]
+}

@@ -30,3 +30,7 @@ LIMIT 1;
 -- name: CreateSession :exec
 INSERT INTO auth_sessions (token, account_id, account_type, expires_at)
 VALUES ($1, $2::uuid, $3, $4);
+
+-- name: TerminateSession :exec
+DELETE FROM auth_sessions
+WHERE token = $1;

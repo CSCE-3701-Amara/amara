@@ -11,8 +11,9 @@ import (
 	"github.com/CSCE-3701-Amara/amara/internal/platform/database"
 )
 
-// RouteRegistrar mounts a module's HTTP handlers under /v1. Each module applies
-// its own authentication and authorization middleware to protected routes.
+// RouteRegistrar mounts a module's HTTP handlers under /v1. Each
+// module applies its own authentication and authorization to protected routes;
+// the platform middleware wraps every route.
 type RouteRegistrar func(*gin.RouterGroup)
 
 func newRouter(cfg config.HTTPConfig, logger *slog.Logger, dbSvc database.Service, registrars ...RouteRegistrar) (*gin.Engine, error) {
@@ -66,24 +67,32 @@ func registerRoutes(router *gin.Engine, dbSvc database.Service, registrars ...Ro
 	for _, register := range registrars {
 		register(v1)
 	}
-	// AUTH is documented under /api/v1 while existing module routes use /v1.
-	// Mounting the same registrars at both prefixes preserves the existing API
-	// while exposing the contract path.
-	apiV1 := router.Group("/api/v1")
-	for _, register := range registrars {
-		register(apiV1)
-	}
 	router.NoRoute(func(c *gin.Context) {
-		writeError(c, http.StatusNotFound, "not_found", "The requested resource was not found.")
+		WriteProblem(c, ProblemDetails{
+			Type:   "about:blank",
+			Title:  "Not Found",
+			Status: http.StatusNotFound,
+			Detail: "The requested resource was not found.",
+			Code:   "not_found",
+		})
 	})
 	router.NoMethod(func(c *gin.Context) {
-		writeError(c, http.StatusMethodNotAllowed, "method_not_allowed", "The request method is not allowed.")
+		WriteProblem(c, ProblemDetails{
+			Type:   "about:blank",
+			Title:  "Method Not Allowed",
+			Status: http.StatusMethodNotAllowed,
+			Detail: "The request method is not allowed.",
+			Code:   "method_not_allowed",
+		})
 	})
 }
 
 func writeError(c *gin.Context, status int, code, message string) {
-	c.AbortWithStatusJSON(status, gin.H{
-		"error":      gin.H{"code": code, "message": message},
-		"request_id": RequestID(c.Request.Context()),
+	WriteProblem(c, ProblemDetails{
+		Type:   "about:blank",
+		Title:  defaultTitle(status),
+		Status: status,
+		Detail: message,
+		Code:   code,
 	})
 }

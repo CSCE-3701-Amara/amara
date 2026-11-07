@@ -4,14 +4,17 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
 	authdatabase "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/database"
 	authhttp "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/http"
+	authpassword "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/password"
 	authapplication "github.com/CSCE-3701-Amara/amara/internal/auth/application"
 	canddatabase "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/database"
 	candhttp "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http"
@@ -66,11 +69,19 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("create auth repository: %w", err)
 	}
-	encryptionKey, err := mfaEncryptionKey()
+	passwordChecker, err := authpassword.NewHIBPChecker(&http.Client{Timeout: 10 * time.Second})
 	if err != nil {
-		return err
+		return fmt.Errorf("create password compromise checker: %w", err)
 	}
-	mfaService, err := authapplication.NewMFAService(authRepo, encryptionKey)
+	companyRegistration, err := authapplication.NewCompanyRegistrationService(authRepo, passwordChecker)
+	if err != nil {
+		return fmt.Errorf("create company registration service: %w", err)
+	}
+	companyRegistrationHandler, err := authhttp.NewCompanyRegistrationHandler(companyRegistration)
+	if err != nil {
+		return fmt.Errorf("create company registration handler: %w", err)
+	}
+	mfaService, err := authapplication.NewMFAService(authRepo, cfg.Auth.MFAEncryptionKey)
 	if err != nil {
 		return fmt.Errorf("create MFA service: %w", err)
 	}
@@ -81,6 +92,14 @@ func run() error {
 	loginHandler, err := authhttp.NewLoginHandlerWithLogger(loginService, logger)
 	if err != nil {
 		return fmt.Errorf("create login handler: %w", err)
+	}
+	logoutService, err := authapplication.NewLogoutService(authRepo)
+	if err != nil {
+		return fmt.Errorf("create logout service: %w", err)
+	}
+	logoutHandler, err := authhttp.NewLogoutHandler(logoutService, authRepo, logger)
+	if err != nil {
+		return fmt.Errorf("create logout handler: %w", err)
 	}
 
 	jobLifecycleRepo := jobdatabase.NewPostingLifecycleRepository(dbSvc.Pool())
@@ -100,26 +119,21 @@ func run() error {
 	)
 	trackingRepo := canddatabase.NewApplicationTrackingRepository(dbSvc.Pool())
 	trackingHandler := candhttp.NewApplicationTrackingHandler(trackingRepo, authRepo)
-	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, loginHandler.RegisterRoutes,
-		feedHandler.RegisterRoutes, postingHandler.RegisterRoutes, applicationHandler.RegisterRoutes, trackingHandler.RegisterRoutes)
+	// Candidate/interviewer registration needs a verification sender. Until that
+	// provider is configured, reject requests before creating unusable accounts.
+	server, err := httpserver.New(cfg.HTTP, logger, dbSvc,
+		authhttp.RegisterUnavailableRegistrationRoutes,
+		companyRegistrationHandler.RegisterRoutes,
+		loginHandler.RegisterRoutes,
+		logoutHandler.RegisterRoutes,
+		feedHandler.RegisterRoutes,
+		postingHandler.RegisterRoutes,
+		applicationHandler.RegisterRoutes,
+		trackingHandler.RegisterRoutes,
+	)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
 	}
 
-	ctx, stop = signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-
 	return server.Run(ctx)
-}
-
-func mfaEncryptionKey() ([32]byte, error) {
-	// MFA secrets are encrypted at rest. The key is supplied by the deployment
-	// environment and intentionally has no source-controlled fallback.
-	var key [32]byte
-	raw := os.Getenv("AUTH_MFA_ENCRYPTION_KEY")
-	if len(raw) != len(key) {
-		return key, fmt.Errorf("AUTH_MFA_ENCRYPTION_KEY must be exactly 32 bytes")
-	}
-	copy(key[:], raw)
-	return key, nil
 }

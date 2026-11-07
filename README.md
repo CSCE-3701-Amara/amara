@@ -6,7 +6,7 @@ Amara's backend is a Go modular monolith using Gin. Business modules live under
 
 ## Run the API
 
-Install Go 1.26 or newer, then run from the repository root:
+Install Go 1.26.10 or newer, then run from the repository root:
 
 ```sh
 go mod download
@@ -39,7 +39,7 @@ Host ports default to `API_PORT=8080` and `WEB_PORT=3000`; set them in the
 shell environment when the defaults collide.
 
 - API: `http://localhost:8080/health`
-- Web: `http://localhost:3000` (nginx serves the SPA and proxies `/v1` to the
+- Web: `http://localhost:3000` (Next.js server with standalone runtime, proxying `/v1` to the
   API, so browser traffic is same-origin)
 - Worker: same image as the API
 
@@ -149,6 +149,8 @@ and path parameter values. Gin prints its route diagnostics in development mode.
 make build          # Build bin/api
 make test           # Run Go tests
 make vet            # Run go vet
+make gosec          # Run gosec with the reviewed false-positive exceptions
+make govulncheck    # Check Go code and both executables' dependency modules
 make fmt            # Format Go packages
 go test -race ./... # Check for data races
 ```
@@ -156,3 +158,44 @@ go test -race ./... # Check for data races
 Business HTTP adapters register routes under `/v1` through the server's
 `RouteRegistrar` functions. Construct their dependencies in `cmd/api/main.go`;
 keep business logic and authentication policy in the owning module.
+
+`POST /v1/auth/company-registrations` uses the shared database service and
+the HIBP password compromise checker. Candidate/interviewer registration at
+`POST /v1/auth/registrations` returns `503 registration_unavailable` until
+verification email delivery is configured. Requests are rejected before any
+account or verification challenge is written. Both endpoints use the shared
+request ID, logging, recovery, and CORS middleware.
+
+The `gosec` executable must be installed before running `make gosec`.
+[.gosec.json](.gosec.json) excludes only G101 (hardcoded credentials) in the
+generated `auth_registration.sql.go`, `login.sql.go`, and `mfa.sql.go` files:
+the four flagged constants are parameterized SQL statements containing column
+names such as `secret` and `password_hash`, with credential values supplied at
+runtime. Other rules still scan these files, and G101 remains enabled elsewhere.
+The configuration survives `sqlc generate` without editing generated code.
+The SHA-1 exceptions are annotated at their exact import/call sites: HIBP uses
+SHA-1 hash prefixes for breach lookups, and TOTP uses HMAC-SHA-1 for existing
+authenticator enrollments. Password storage continues to use Argon2id.
+
+Install `govulncheck` before running `make govulncheck`. It scans all Go packages,
+then checks the API and worker dependency modules, rejecting advisories even
+when the executables do not call the affected functions. CI uses the Go version
+in `go.mod`, and Docker builds use Go 1.26.10.
+The pinned `golang.org/x/crypto` revision removes the unmaintained OpenPGP
+package, addressing [GO-2026-5932](https://pkg.go.dev/vuln/GO-2026-5932) in
+addition to the security fixes included in its preceding release.
+
+CI runs Go vet, Staticcheck, gosec, govulncheck, and Semgrep (`p/default`) on
+pull requests. To run the individual checks locally, install the required tools:
+
+```sh
+go install honnef.co/go/tools/cmd/staticcheck@latest
+go install github.com/securego/gosec/v2/cmd/gosec@latest
+go install golang.org/x/vuln/cmd/govulncheck@latest
+uv tool install semgrep
+make vet
+staticcheck ./...
+make gosec
+make govulncheck
+semgrep scan --config p/default --error --strict --metrics=off .
+```
