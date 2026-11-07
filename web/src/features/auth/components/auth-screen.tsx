@@ -204,7 +204,7 @@ function AuthScreen({
             ? "/employer/jobs"
             : result.user.role === "candidate"
               ? "/candidate/dashboard"
-              : "/",
+              : "/interviewer/interviews",
         );
         router.refresh();
       }
