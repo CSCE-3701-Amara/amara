@@ -5810,7 +5810,11 @@ components:
           type: integer
           minimum: 0
           maximum: 100
-          description: Required at publication for scored modules. Behavioral modules are unscored.
+          description: Legacy score threshold. Required at publication for scored modules without a minimum_tests_passed value. Behavioral modules are unscored.
+        minimum_tests_passed:
+          type: integer
+          minimum: 1
+          description: Minimum number of tests the candidate must pass in a coding or programming-language module. At publication, this cannot exceed the number of authored and selected tests.
         questions:
           type: array
           items:
@@ -5826,6 +5830,10 @@ components:
                 items: {type: string}
               amara: {type: string}
               difficulty: {type: string}
+              minimum_cases_passed:
+                type: integer
+                minimum: 1
+                description: Minimum number of test cases the candidate must pass for this code question. Required on authored questions when the module sets minimum_tests_passed.
               test_cases:
                 type: array
                 items:

@@ -31,15 +31,16 @@ type Module struct {
 }
 
 type Definition struct {
-	Name          string            `json:"name"`
-	Description   string            `json:"description,omitempty"`
-	Type          string            `json:"type"`
-	ActiveMinutes *int              `json:"active_minutes,omitempty"`
-	Threshold     *int              `json:"threshold,omitempty"`
-	Questions     []Question        `json:"questions,omitempty"`
-	Amarat        []Amara           `json:"amarat,omitempty"`
-	Rubric        []Criterion       `json:"rubric,omitempty"`
-	Library       *LibrarySelection `json:"library,omitempty"`
+	Name               string            `json:"name"`
+	Description        string            `json:"description,omitempty"`
+	Type               string            `json:"type"`
+	ActiveMinutes      *int              `json:"active_minutes,omitempty"`
+	Threshold          *int              `json:"threshold,omitempty"`
+	MinimumTestsPassed *int              `json:"minimum_tests_passed,omitempty"`
+	Questions          []Question        `json:"questions,omitempty"`
+	Amarat             []Amara           `json:"amarat,omitempty"`
+	Rubric             []Criterion       `json:"rubric,omitempty"`
+	Library            *LibrarySelection `json:"library,omitempty"`
 }
 
 type Amara struct {
@@ -50,12 +51,13 @@ type Amara struct {
 }
 
 type Question struct {
-	Prompt     string     `json:"prompt"`
-	Format     string     `json:"format"`
-	Options    []string   `json:"options,omitempty"`
-	Amara      string     `json:"amara,omitempty"`
-	Difficulty string     `json:"difficulty,omitempty"`
-	TestCases  []TestCase `json:"test_cases,omitempty"`
+	Prompt             string     `json:"prompt"`
+	Format             string     `json:"format"`
+	Options            []string   `json:"options,omitempty"`
+	Amara              string     `json:"amara,omitempty"`
+	Difficulty         string     `json:"difficulty,omitempty"`
+	TestCases          []TestCase `json:"test_cases,omitempty"`
+	MinimumCasesPassed *int       `json:"minimum_cases_passed,omitempty"`
 }
 
 type TestCase struct {
@@ -102,6 +104,9 @@ func (d Definition) ValidateDraft() error {
 	if d.Threshold != nil && (*d.Threshold < 0 || *d.Threshold > 100 || d.Type == Behavioral) {
 		return errors.New("threshold must be from 0 to 100 and is unavailable for behavioral modules")
 	}
+	if d.MinimumTestsPassed != nil && ((d.Type != Coding && d.Type != ProgrammingLanguage) || *d.MinimumTestsPassed < 1) {
+		return errors.New("minimum tests passed must be positive and is available only for code modules")
+	}
 	return nil
 }
 
@@ -109,7 +114,7 @@ func (d Definition) ValidatePublication(problems []LibraryProblem) error {
 	if err := d.ValidateDraft(); err != nil {
 		return err
 	}
-	if d.Type != Behavioral && d.Threshold == nil {
+	if d.Type != Behavioral && d.Threshold == nil && d.MinimumTestsPassed == nil {
 		return errors.New("scored modules require a threshold")
 	}
 	if len(d.Questions) == 0 && d.Library == nil {
@@ -130,6 +135,9 @@ func (d Definition) ValidatePublication(problems []LibraryProblem) error {
 		if err := question.validate(d.Type); err != nil {
 			return fmt.Errorf("question %d: %w", i+1, err)
 		}
+		if d.MinimumTestsPassed != nil && question.MinimumCasesPassed == nil {
+			return fmt.Errorf("question %d: minimum cases passed is required", i+1)
+		}
 		if code {
 			if err := mappings.mark(question.Amara); err != nil {
 				return fmt.Errorf("question %d: %w", i+1, err)
@@ -148,6 +156,18 @@ func (d Definition) ValidatePublication(problems []LibraryProblem) error {
 		}
 		if err := mappings.mark(d.Library.Amara); err != nil {
 			return err
+		}
+	}
+	if d.MinimumTestsPassed != nil {
+		testCount := len(d.Questions)
+		if d.Library != nil {
+			testCount += len(d.Library.Problems)
+			for _, count := range d.Library.DifficultyMix {
+				testCount += count
+			}
+		}
+		if *d.MinimumTestsPassed > testCount {
+			return errors.New("minimum tests passed exceeds the module test count")
 		}
 	}
 	return mappings.validateUsed(d.Amarat)
@@ -208,6 +228,9 @@ func (q Question) validate(kind string) error {
 	}
 	if q.Format != "code" && len(q.TestCases) > 0 {
 		return errors.New("test cases are only supported for code questions")
+	}
+	if q.MinimumCasesPassed != nil && (q.Format != "code" || *q.MinimumCasesPassed < 1 || *q.MinimumCasesPassed > len(q.TestCases)) {
+		return errors.New("minimum cases passed must be within the code question's test case count")
 	}
 	switch kind {
 	case Coding, ProgrammingLanguage:
