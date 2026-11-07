@@ -18,6 +18,8 @@ type Config struct {
 	LogLevel    slog.Level
 	HTTP        HTTPConfig
 	Database    DatabaseConfig
+	Auth        AuthConfig
+	Email       EmailConfig
 	LogFormat   string
 }
 
@@ -73,6 +75,16 @@ func load(lookup func(string) (string, bool)) (Config, error) {
 		return Config{}, err
 	}
 	cfg.Database = databaseCfg
+	authCfg, err := newAuthConfig(lookup)
+	if err != nil {
+		return Config{}, err
+	}
+	cfg.Auth = authCfg
+	emailCfg, err := newEmailConfig(lookup)
+	if err != nil {
+		return Config{}, err
+	}
+	cfg.Email = emailCfg
 	switch cfg.LogFormat {
 	case "json", "text":
 	default:

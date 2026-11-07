@@ -146,15 +146,15 @@ The INVW epic covers how Hiring Managers design and run a multi-stage interview 
 | ID | Requirement | Related Use Case |
 |---|---|---|
 | FR-INVW-051 | The system *SHALL* require every stage to have exactly one advancement rule: manual decision, automatic score threshold, or automatic on completion. | UC-INVW-006 |
-| FR-INVW-052 | The system *SHALL*, under the manual rule, hold a Candidate at the stage until the Hiring Manager records a pass or a reject. | UC-INVW-006 |
+| FR-INVW-052 | The system *SHALL* hold completed behavioral submissions, including recorded video and held live interviews, for a Hiring Manager pass or reject decision without a numerical score. Other manual stages also hold for a Hiring Manager decision. | UC-INVW-006 |
 | FR-INVW-053 | The system *SHALL* allow only the Hiring Manager to record manual pass or reject decisions; Interviewers provide scorecards only (FR-INVW-034). | UC-INVW-006 |
-| FR-INVW-054 | The system *SHALL*, under the threshold rule, pass a Candidate automatically when the module score is at or above the stage's current threshold from 0 to 100 set by the Hiring Manager. | UC-INVW-006 |
+| FR-INVW-054 | A score threshold *SHALL* be applied only to finalized, valid evaluation evidence. Coding stages configured for manual review *SHALL* wait for the Hiring Manager. For automatic coding decisions the system *SHALL* count questions meeting their published minimum_cases_passed and compare that count with the published minimum_tests_passed. Other score thresholds compare the final score with the configured threshold. | UC-INVW-006 |
 | FR-INVW-055 | The system *SHALL* require the Hiring Manager to choose, for each threshold stage, whether a Candidate below the threshold is rejected automatically or held for the Hiring Manager's decision, with "held for decision" as the default. | UC-INVW-006 |
-| FR-INVW-056 | The system *SHALL*, under the completion rule, pass a Candidate automatically when the module is completed, regardless of score. | UC-INVW-006 |
-| FR-INVW-057 | The system *SHALL* allow the Hiring Manager to override an automatic result at a stage, requiring a written reason. | UC-INVW-006 |
-| FR-INVW-058 | The system *SHALL* record for every stage decision its type (manual, threshold, completion, or override), the decider, the time, and the module score at that time. | UC-INVW-006 |
+| FR-INVW-056 | The system *SHALL* pass a Candidate automatically when a module governed by the completion rule is completed. Missed, behavioral, and coding outcomes follow FR-INVW-060, FR-INVW-052, and FR-INVW-054 respectively. | UC-INVW-006 |
+| FR-INVW-057 | A pass or rejection *SHALL* be final. The system *SHALL* persist the first terminal decision atomically, return it on retry or conflict with another decision, and prevent repeated transition side effects. The AMARA-1263 implementation brief supersedes the earlier automatic-decision override rule and retains manual decisions for held stages. | UC-INVW-006 |
+| FR-INVW-058 | The system *SHALL* record the Candidate, stage assignment, decision, decision type, decider, timestamp, reason where applicable, and score where applicable. | UC-INVW-006 |
 | FR-INVW-059 | The system *SHALL* allow the Hiring Manager to pass or reject several selected Candidates of one stage in a single action. | UC-INVW-006 |
-| FR-INVW-060 | The system *SHALL*, when a Candidate is rejected at any stage, set the application status to "Rejected", remove the Candidate from all other active stages, and start rejection feedback (FR-INVW-080). | UC-INVW-006 |
+| FR-INVW-060 | A missed module *SHALL* reject the application regardless of the stage policy, with the missed module recorded as the reason. On any rejection, the system *SHALL* set the application to Rejected, remove the Candidate from active stages, and start rejection feedback (FR-INVW-080). | UC-INVW-006 |
 
 ### 3.6 Pipeline Dashboard and Insights
 

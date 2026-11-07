@@ -7,7 +7,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
+	invwdatabase "github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/config"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/database"
 	"github.com/CSCE-3701-Amara/amara/internal/platform/logging"
@@ -43,8 +45,26 @@ func run() error {
 		return fmt.Errorf("connect database: %w", err)
 	}
 	defer dbSvc.Close()
+
 	logger.Info("database connection ready", "waiting_for_work", true)
 
 	<-ctx.Done()
 	return nil
+
+	ticker := time.NewTicker(15 * time.Second)
+	defer ticker.Stop()
+	for {
+		if err := invwdatabase.SpawnAssessmentInstances(ctx, dbSvc.Pool()); err != nil && ctx.Err() == nil {
+			logger.Error("assessment instance sweep failed", "error", err)
+		}
+		if err := invwdatabase.ReconcileAdvancement(ctx, dbSvc.Pool()); err != nil && ctx.Err() == nil {
+			logger.Error("stage advancement sweep failed", "error", err)
+		}
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-ticker.C:
+		}
+	}
+
 }

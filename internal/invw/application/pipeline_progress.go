@@ -62,35 +62,27 @@ func (s *CandidatePipelineProgressService) Get(ctx context.Context, candidateID,
 		return CandidatePipelineProgress{}, fmt.Errorf("%w: the published pipeline has no stages", ErrPipelineProgressNotFound)
 	}
 
-	incoming := make(map[string]int, len(pipeline.Stages))
-	passed := make(map[string]bool, len(pipeline.Stages))
-	for _, stage := range pipeline.Stages {
-		if stage.Progress != nil && stage.Progress.CompletedAt != nil {
-			passed[stage.ID] = stage.Progress.Passed
-		}
-	}
-	for _, link := range pipeline.Links {
-		incoming[link.ToStageID]++
+	links := pipeline.Links
+	if len(links) == 0 {
+		links = adjacentStageLinks(pipeline.Stages)
 	}
 
 	result := CandidatePipelineProgress{
 		ApplicationID: pipeline.ApplicationID,
 		Pipeline:      PipelineVersion{ID: pipeline.Pipeline.ID, Version: pipeline.Pipeline.Version, PublishedAt: pipeline.Pipeline.PublishedAt},
 		Stages:        make([]CandidateStage, 0, len(pipeline.Stages)),
-		Links:         nonNilLinks(pipeline.Links),
+		Links:         nonNilLinks(links),
 	}
 	for _, stage := range pipeline.Stages {
 		status := domain.PipelineStageLocked
 		var completedAt *time.Time
 		var stagePassed *bool
-		if stage.Progress != nil && stage.Progress.CompletedAt != nil {
+		if stage.Progress != nil && stage.Progress.Completed {
 			status = domain.PipelineStageCompleted
 			completedAt = stage.Progress.CompletedAt
 			value := stage.Progress.Passed
 			stagePassed = &value
 		} else if stage.Progress != nil && stage.Progress.Active {
-			status = domain.PipelineStageActive
-		} else if incoming[stage.ID] == 0 || allPredecessorsPassed(stage.ID, pipeline.Links, passed) {
 			status = domain.PipelineStageActive
 		}
 		awards := []domain.AmaraAward{}
@@ -107,18 +99,18 @@ func (s *CandidatePipelineProgressService) Get(ctx context.Context, candidateID,
 	return result, nil
 }
 
-func allPredecessorsPassed(stageID string, links []domain.PipelineLink, passed map[string]bool) bool {
-	foundPredecessor := false
-	for _, link := range links {
-		if link.ToStageID != stageID {
-			continue
-		}
-		foundPredecessor = true
-		if !passed[link.FromStageID] {
-			return false
-		}
+func adjacentStageLinks(stages []domain.PipelineStage) []domain.PipelineLink {
+	if len(stages) < 2 {
+		return []domain.PipelineLink{}
 	}
-	return foundPredecessor
+	links := make([]domain.PipelineLink, 0, len(stages)-1)
+	for i := 1; i < len(stages); i++ {
+		links = append(links, domain.PipelineLink{
+			FromStageID: stages[i-1].ID,
+			ToStageID:   stages[i].ID,
+		})
+	}
+	return links
 }
 
 func nonNilAwards(awards []domain.AmaraAward) []domain.AmaraAward {

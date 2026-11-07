@@ -16,6 +16,12 @@ x-backend-env: &backend-env
   LOG_LEVEL: ${LOG_LEVEL:-info}
   HTTP_ADDR: ":8080"
   DATABASE_URL: ${DATABASE_URL:?database credentials are required, run under infisical run --path=/backend or set DATABASE_URL}
+  AUTH_MFA_ENCRYPTION_KEY: ${AUTH_MFA_ENCRYPTION_KEY:?MFA encryption key is required, set a 32-byte secret}
+  SMTP_HOST: ${SMTP_HOST:?SMTP host is required}
+  SMTP_PORT: ${SMTP_PORT:?SMTP port is required}
+  SMTP_USERNAME: ${SMTP_USERNAME:-}
+  SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+  SMTP_FROM: ${SMTP_FROM:?SMTP sender address is required}
   DB_POOL_MAX_CONNS: ${DB_POOL_MAX_CONNS:-4}
   CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
   HTTP_READ_HEADER_TIMEOUT: ${HTTP_READ_HEADER_TIMEOUT:-5s}
@@ -57,7 +63,7 @@ services:
     image: amara-web:dev
     restart: unless-stopped
     ports:
-      - "${WEB_PORT:-3000}:80"
+      - "${WEB_PORT:-3000}:3000"
     depends_on:
       - api
 
