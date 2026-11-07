@@ -55,15 +55,20 @@ func SpawnAssessmentInstances(ctx context.Context, pool *pgxpool.Pool) error {
 			FOR UPDATE OF se SKIP LOCKED
 		), created AS (
 			INSERT INTO assessment_instances (id, application_id, stage_id, status, deadline)
-			SELECT gen_random_uuid(), application_id, stage_id, 'available', deadline AT TIME ZONE 'UTC'
-			FROM eligible WHERE deadline > CURRENT_TIMESTAMP
-			ON CONFLICT (application_id, stage_id) DO NOTHING
-			RETURNING id, application_id, stage_id
+			SELECT gen_random_uuid(), application_id, stage_id,
+				CASE WHEN deadline <= CURRENT_TIMESTAMP THEN 'missed' ELSE 'available' END,
+				deadline AT TIME ZONE 'UTC'
+			FROM eligible
+			ON CONFLICT (application_id, stage_id) DO UPDATE SET
+				status = EXCLUDED.status, deadline = EXCLUDED.deadline
+			WHERE assessment_instances.started_at IS NULL
+				AND assessment_instances.status IN ('available', 'missed')
+			RETURNING id, application_id, stage_id, status
 		)
 		INSERT INTO assessment_attempts
-			(id, stage_execution_id, candidate_id, instance_id, deadline, selected_content, configuration_snapshot)
+			(id, stage_execution_id, candidate_id, instance_id, deadline, status, selected_content, configuration_snapshot)
 		SELECT gen_random_uuid(), e.stage_execution_id, e.cand_id, i.id, e.deadline,
-			content.questions, jsonb_build_object('modules', content.modules)
+			i.status, content.questions, jsonb_build_object('modules', content.modules)
 		FROM created i
 		JOIN eligible e ON e.application_id = i.application_id AND e.stage_id = i.stage_id
 		CROSS JOIN LATERAL (
@@ -96,6 +101,54 @@ func SpawnAssessmentInstances(ctx context.Context, pool *pgxpool.Pool) error {
 		) content
 	`); err != nil {
 		return fmt.Errorf("spawn assessment instances: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `
+		WITH expired AS (
+			UPDATE assessment_attempts a
+			SET status = CASE WHEN started_at IS NULL THEN 'missed'
+				WHEN `+behavioralOnly+` THEN 'submitted' ELSE 'pending_grading' END,
+				submitted_at = CASE WHEN started_at IS NOT NULL THEN deadline END,
+				auto_submitted = started_at IS NOT NULL
+			WHERE a.status IN ('available', 'in_progress') AND a.deadline <= statement_timestamp()
+				AND EXISTS (
+					SELECT 1 FROM stage_executions se
+					JOIN pipeline_executions pe ON pe.id = se.pipeline_execution_id
+					WHERE se.id = a.stage_execution_id AND pe.status = 'active'
+						AND se.status IN ('available', 'in_progress')
+				)
+			RETURNING instance_id, status
+		)
+		UPDATE assessment_instances i SET status = e.status FROM expired e WHERE i.id = e.instance_id
+	`); err != nil {
+		return fmt.Errorf("record expired assessment outcomes: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `
+		UPDATE interviews i SET score = (
+			SELECT round((avg(r.rating::numeric) - 1) * 25)::int
+			FROM interview_feedback f
+			JOIN interviewer_assignments ia USING (interview_id, interviewer_id)
+			CROSS JOIN LATERAL jsonb_each(f.ratings) r(criterion, rating)
+			WHERE f.interview_id = i.id AND f.submitted_at IS NOT NULL AND ia.scorecard_status = 'submitted'
+		), updated_at = statement_timestamp()
+		FROM stage_executions se JOIN pipeline_stages s ON s.id = se.stage_id
+		WHERE i.stage_execution_id = se.id AND i.status = 'completed' AND i.outcome = 'held'
+			AND i.score IS NULL AND (s.interview_configuration->'behavioral' = 'true'::jsonb) IS NOT TRUE
+			AND jsonb_array_length(i.rubric_snapshot) > 0
+			AND EXISTS (SELECT 1 FROM interviewer_assignments ia
+				WHERE ia.interview_id = i.id AND ia.scorecard_status = 'submitted')
+			AND NOT EXISTS (
+				SELECT 1 FROM interviewer_assignments ia
+				LEFT JOIN interview_feedback f USING (interview_id, interviewer_id)
+				WHERE ia.interview_id = i.id AND ia.scorecard_status <> 'waived'
+					AND (ia.scorecard_status <> 'submitted' OR f.submitted_at IS NULL
+						OR nullif(btrim(f.recommendation), '') IS NULL
+						OR (SELECT count(*) FROM jsonb_each(f.ratings)) <> jsonb_array_length(i.rubric_snapshot)
+						OR EXISTS (SELECT 1 FROM jsonb_each(f.ratings) r(criterion, rating)
+							WHERE CASE WHEN jsonb_typeof(r.rating) = 'number' THEN
+								r.rating::numeric NOT IN (1, 2, 3, 4, 5) ELSE true END))
+			)
+	`); err != nil {
+		return fmt.Errorf("record completed interview scores: %w", err)
 	}
 	return tx.Commit(ctx)
 }

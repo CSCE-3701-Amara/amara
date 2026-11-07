@@ -34,6 +34,7 @@ type Definition struct {
 	Name               string            `json:"name"`
 	Description        string            `json:"description,omitempty"`
 	Type               string            `json:"type"`
+	Behavioral         bool              `json:"behavioral,omitempty"`
 	ActiveMinutes      *int              `json:"active_minutes,omitempty"`
 	Threshold          *int              `json:"threshold,omitempty"`
 	MinimumTestsPassed *int              `json:"minimum_tests_passed,omitempty"`
@@ -101,7 +102,10 @@ func (d Definition) ValidateDraft() error {
 	if d.ActiveMinutes != nil && (*d.ActiveMinutes <= 0 || *d.ActiveMinutes > 2147483647 || d.Type == RecordedVideo) {
 		return errors.New("active time must be positive and is available only for non-video modules")
 	}
-	if d.Threshold != nil && (*d.Threshold < 0 || *d.Threshold > 100 || d.Type == Behavioral) {
+	if d.Behavioral && d.Type != RecordedVideo {
+		return errors.New("the behavioral flag is only available for recorded video modules")
+	}
+	if d.Threshold != nil && (*d.Threshold < 0 || *d.Threshold > 100 || d.Type == Behavioral || d.Behavioral) {
 		return errors.New("threshold must be from 0 to 100 and is unavailable for behavioral modules")
 	}
 	if d.MinimumTestsPassed != nil && ((d.Type != Coding && d.Type != ProgrammingLanguage) || *d.MinimumTestsPassed < 1) {
@@ -114,7 +118,7 @@ func (d Definition) ValidatePublication(problems []LibraryProblem) error {
 	if err := d.ValidateDraft(); err != nil {
 		return err
 	}
-	if d.Type != Behavioral && d.Threshold == nil && d.MinimumTestsPassed == nil {
+	if d.Type != Behavioral && !d.Behavioral && d.Threshold == nil && d.MinimumTestsPassed == nil {
 		return errors.New("scored modules require a threshold")
 	}
 	if len(d.Questions) == 0 && d.Library == nil {
