@@ -1,0 +1,88 @@
+.banner.banner {
+  position: relative;
+  background: var(--workspace-field);
+  border-radius: 19.2px;
+  padding: 28.8px 38.4px;
+  margin-bottom: 21.6px;
+  min-height: 112.8px;
+}
+.banner.banner h1 {
+  font-size: 40.8px;
+  margin: 0;
+}
+.banner > div {
+  width: 100%;
+}
+.banner:has(.editLink) h1 {
+  padding-right: 220px;
+}
+.editLink,
+.save.save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56.6px;
+  padding: 16.8px 28.8px;
+  background: var(--accent);
+  color: #111;
+  border: 0;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.editLink {
+  position: absolute;
+  right: 38.4px;
+  top: 28.8px;
+}
+.editLink:hover,
+.save:hover {
+  background: var(--accent-hover);
+}
+.fields {
+  border: 0;
+  padding: 0;
+  margin: 20px 0 0;
+  min-width: 0;
+}
+.overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 32px;
+  margin: 20px 0 0;
+}
+.overview > div {
+  min-height: 90px;
+}
+.overview dt {
+  font-weight: 700;
+  font-size: 16.8px;
+  margin-bottom: 8px;
+}
+.overview dd {
+  margin: 0;
+  font-size: 19.2px;
+  overflow-wrap: anywhere;
+}
+.description {
+  grid-column: 1 / -1;
+}
+@media (max-width: 760px) {
+  .banner {
+    padding: 24px;
+  }
+  .banner.banner h1 {
+    font-size: 32px;
+  }
+  .banner:has(.editLink) h1 {
+    padding: 0;
+  }
+  .editLink {
+    position: static;
+    margin-top: 20px;
+  }
+  .overview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

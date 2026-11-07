@@ -628,3 +628,10 @@
     min-height: 300px;
   }
 }
+
+.profileFields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}

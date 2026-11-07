@@ -1,4 +1,6 @@
 "use client";
+import { useRef } from "react";
+import { submitAssessmentAttempt } from "@/features/cand/api/assessment.api";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ConfirmDialog } from "./product-ui";
 import { dialogRoutes } from "./dialog-routes";
@@ -11,6 +13,8 @@ export function RouteDialog() {
   const path = usePathname();
   const params = useSearchParams();
   const router = useRouter();
+  const navigated = useRef<string | null>(null);
+  const navigationKey = path + "?" + params.toString();
   const action = params.get("dialog");
   if (!action) return null;
   const route = dialogRoutes.find(
@@ -29,7 +33,10 @@ export function RouteDialog() {
     ["publish", "archive", "republish", "delete"].includes(action);
   const moduleAction =
     path.startsWith("/employer/modules/") && action === "publish";
+  const assessment =
+    path.startsWith("/candidate/assessments/") && action === "submit";
   function close() {
+    if (navigated.current === navigationKey) return;
     const next = new URLSearchParams(params.toString());
     next.delete("dialog");
     router.replace(path + (next.size ? "?" + next : ""), { scroll: false });
@@ -37,11 +44,13 @@ export function RouteDialog() {
   async function confirm() {
     if (account) {
       await performAccountAction(action as "delete" | "deactivate");
+      navigated.current = navigationKey;
       router.replace("/login");
       router.refresh();
     } else if (posting && id) {
       if (action === "delete") {
         await deletePosting(id);
+        navigated.current = navigationKey;
         router.replace("/employer/jobs");
       } else {
         await transitionPosting(
@@ -51,6 +60,16 @@ export function RouteDialog() {
         close();
         router.refresh();
       }
+    } else if (assessment) {
+      const instanceId = path.split("/").at(-1)!;
+      const attemptId = params.get("attempt") || instanceId;
+      await submitAssessmentAttempt(attemptId);
+      const next = new URLSearchParams(params.toString());
+      next.delete("dialog");
+      next.set("state", "submitted");
+      next.set("attempt", attemptId);
+      navigated.current = navigationKey;
+      router.replace(path + "?" + next, { scroll: false });
     } else if (moduleAction && id) {
       await publishModule(id);
       close();
@@ -72,7 +91,7 @@ export function RouteDialog() {
       intent={spec.intent}
       reason={spec.requiresReason}
       unavailable={
-        account || posting || moduleAction
+        account || posting || moduleAction || assessment
           ? undefined
           : "This action is not available yet. No changes have been saved."
       }

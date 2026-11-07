@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useProfileUpdate } from "@/shared/lib/use-profile-update";
+import { ApiFeedback } from "@/shared/ui/workspace";
 import { performAccountAction } from "@/features/auth/api/auth.api";
 import {
   ConfirmDialog,
@@ -22,7 +24,7 @@ interface CandidateProfile {
   portfolioLink?: string;
   available?: boolean;
 }
-/** Profile presentation remains editable locally while the profile API is planned. */
+/** Candidate profile editor uses the registered PATCH endpoint; profile reads remain unavailable. */
 export function CandidateProfileScreen({
   edit = false,
   profile,
@@ -31,6 +33,8 @@ export function CandidateProfileScreen({
   profile?: CandidateProfile;
 }) {
   const router = useRouter();
+  const update = useProfileUpdate<CandidateProfile>("/v1/candidates/me");
+  profile = update.saved || profile;
   const [dialog, setDialog] = useState<string | null>(null);
   const [biography, setBiography] = useState(profile?.biography || "");
   const action = dialog === "delete" ? "delete" : "deactivate";
@@ -50,143 +54,159 @@ export function CandidateProfileScreen({
         <h1>{edit ? "Edit profile" : "Your profile"}</h1>
       </header>
       <UnavailableNotice>
-        Your profile information can’t be loaded or saved yet. Account
-        deactivation and deletion are available after signing in.
+        Your current profile can’t be loaded yet. Save only the fields you want
+        to update; other details will be kept.
       </UnavailableNotice>
       {edit ? (
         <form
-          onSubmit={(event) => event.preventDefault()}
+          onSubmit={update.onSubmit}
+          onChange={update.onChange}
+          aria-busy={update.busy}
           className={s.card}
           aria-label="Edit candidate profile"
         >
-          <section className={styles.formSection}>
-            <h2>Personal details</h2>
-            <div className={styles.formGrid}>
-              <label className={s.field}>
-                Name
-                <input
-                  name="name"
-                  autoComplete="name"
-                  required
-                  maxLength={100}
-                  defaultValue={profile?.name}
-                />
-              </label>
-              <label className={s.field}>
-                Phone number
-                <input
-                  name="phoneNumber"
-                  autoComplete="tel"
-                  type="tel"
-                  maxLength={50}
-                  defaultValue={profile?.phoneNumber}
-                />
-              </label>
-              <label className={s.field}>
-                Address
-                <input
-                  name="address"
-                  autoComplete="street-address"
-                  maxLength={500}
-                  defaultValue={profile?.address}
-                />
-              </label>
-              <label className={s.field}>
-                Nationality
-                <input name="nationality" maxLength={100} />
-              </label>
-              <label className={s.field}>
-                Birth date
-                <input name="birthDate" type="date" autoComplete="bday" />
-              </label>
-              <label className={s.field}>
-                Gender
-                <input name="gender" autoComplete="sex" maxLength={50} />
-              </label>
-            </div>
-          </section>
-          <section className={styles.formSection}>
-            <h2>Professional profile</h2>
-            <div className={styles.formGrid}>
-              <label className={s.field}>
-                Years of experience
-                <input
-                  name="yearsOfExperience"
-                  type="number"
-                  min={0}
-                  step={1}
-                />
-              </label>
-              <label className={s.field}>
-                Available for opportunities
-                <select
-                  name="available"
-                  defaultValue={profile?.available ? "true" : "false"}
-                >
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-              </label>
-              <label className={`${s.field} ${styles.fullWidth}`}>
-                Biography
-                <textarea
-                  name="biography"
-                  maxLength={5000}
-                  value={biography}
-                  onChange={(event) => setBiography(event.target.value)}
-                  aria-describedby="biography-hint"
-                />
-              </label>
-              <p id="biography-hint">
-                Up to 5,000 characters. {biography.length.toLocaleString()} /
-                5,000
-              </p>
-            </div>
-          </section>
-          <section className={styles.formSection}>
-            <h2>Professional links</h2>
-            <div className={styles.formGrid}>
-              <label className={s.field}>
-                GitHub profile
-                <input
-                  type="url"
-                  name="githubProfile"
-                  defaultValue={profile?.githubProfile}
-                />
-              </label>
-              <label className={s.field}>
-                LinkedIn profile
-                <input
-                  type="url"
-                  name="linkedinProfile"
-                  defaultValue={profile?.linkedinProfile}
-                />
-              </label>
-              <label className={s.field}>
-                Portfolio
-                <input
-                  type="url"
-                  name="portfolioLink"
-                  defaultValue={profile?.portfolioLink}
-                />
-              </label>
-            </div>
-          </section>
+          <fieldset disabled={update.busy} className={styles.profileFields}>
+            <section className={styles.formSection}>
+              <h2>Personal details</h2>
+              <div className={styles.formGrid}>
+                <label className={s.field}>
+                  Name
+                  <input
+                    name="name"
+                    autoComplete="name"
+                    maxLength={100}
+                    defaultValue={profile?.name}
+                  />
+                </label>
+                <label className={s.field}>
+                  Phone number
+                  <input
+                    name="phoneNumber"
+                    autoComplete="tel"
+                    type="tel"
+                    maxLength={50}
+                    defaultValue={profile?.phoneNumber}
+                  />
+                </label>
+                <label className={s.field}>
+                  Address
+                  <input
+                    name="address"
+                    autoComplete="street-address"
+                    maxLength={500}
+                    defaultValue={profile?.address}
+                  />
+                </label>
+                <label className={s.field}>
+                  Nationality
+                  <input name="nationality" maxLength={100} />
+                </label>
+                <label className={s.field}>
+                  Birth date
+                  <input name="birthDate" type="date" autoComplete="bday" />
+                </label>
+                <label className={s.field}>
+                  Gender
+                  <input name="gender" autoComplete="sex" maxLength={50} />
+                </label>
+              </div>
+            </section>
+            <section className={styles.formSection}>
+              <h2>Professional profile</h2>
+              <div className={styles.formGrid}>
+                <label className={s.field}>
+                  Years of experience
+                  <input
+                    name="yearsOfExperience"
+                    type="number"
+                    min={0}
+                    step={1}
+                  />
+                </label>
+                <label className={s.field}>
+                  Available for opportunities
+                  <select
+                    name="available"
+                    defaultValue={profile?.available ? "true" : "false"}
+                  >
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </select>
+                </label>
+                <label className={`${s.field} ${styles.fullWidth}`}>
+                  Biography
+                  <textarea
+                    name="biography"
+                    maxLength={5000}
+                    value={biography}
+                    onChange={(event) => setBiography(event.target.value)}
+                    aria-describedby="biography-hint"
+                  />
+                </label>
+                <p id="biography-hint">
+                  Up to 5,000 characters. {biography.length.toLocaleString()} /
+                  5,000
+                </p>
+              </div>
+            </section>
+            <section className={styles.formSection}>
+              <h2>Professional links</h2>
+              <div className={styles.formGrid}>
+                <label className={s.field}>
+                  GitHub profile
+                  <input
+                    type="url"
+                    name="githubProfile"
+                    defaultValue={profile?.githubProfile}
+                  />
+                </label>
+                <label className={s.field}>
+                  LinkedIn profile
+                  <input
+                    type="url"
+                    name="linkedinProfile"
+                    defaultValue={profile?.linkedinProfile}
+                  />
+                </label>
+                <label className={s.field}>
+                  Portfolio
+                  <input
+                    type="url"
+                    name="portfolioLink"
+                    defaultValue={profile?.portfolioLink}
+                  />
+                </label>
+              </div>
+            </section>
+          </fieldset>
+          <ApiFeedback error={update.error} />
+          {update.message && <p role="status">{update.message}</p>}
           <div className={s.actions}>
             <button
               className={s.primary}
               type="submit"
-              disabled
+              disabled={update.busy}
               aria-describedby="profile-save-note"
             >
-              Save changes
+              {update.busy ? "Saving…" : "Save changes"}
             </button>
-            <Link href="/candidate/profile" className={s.button}>
+            <Link
+              href="/candidate/profile"
+              onNavigate={(event) => {
+                if (
+                  update.dirty &&
+                  !window.confirm("Discard your unsaved profile changes?")
+                )
+                  event.preventDefault();
+              }}
+              className={s.button}
+            >
               Cancel
             </Link>
           </div>
           <p id="profile-save-note" className={s.muted}>
-            Profile saving isn’t available yet.
+            Only edited fields are sent. Saved details cannot yet be reloaded
+            from your profile.
           </p>
           <div className={s.actions}>
             <button type="button" onClick={() => setDialog("deactivate")}>

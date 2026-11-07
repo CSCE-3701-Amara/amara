@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import inventory from "../../design/figma-inventory.json";
 import { productFixtures, ids } from "./support/product-fixtures";
 const screens = inventory.screens.filter((row) => row.page !== "Login Page");
-for (const width of [1728, 375])
+for (const width of [1728, 1024, 375])
   for (const screen of screens) {
     test(`${screen.id} ${screen.name} at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1117 });
@@ -30,7 +30,7 @@ for (const width of [1728, 375])
         "--workspace-ink",
         "#211813",
       );
-      if (screen.name.startsWith("Dialog")) {
+      if (screen.route.includes("dialog=")) {
         await expect(page.getByRole("dialog")).toBeVisible();
         await expect(
           page
@@ -44,6 +44,21 @@ for (const width of [1728, 375])
         await page.keyboard.press("Escape");
         await expect(page.getByRole("dialog")).toHaveCount(0);
       }
+      for (const asset of await page.locator("main img, aside img").all()) {
+        if (await asset.isVisible()) {
+          await asset.scrollIntoViewIfNeeded();
+          await expect
+            .poll(() =>
+              asset.evaluate(
+                (element) => (element as HTMLImageElement).naturalWidth,
+              ),
+            )
+            .toBeGreaterThan(0);
+        }
+      }
+      await page.evaluate(() =>
+        window.scrollTo({ top: 0, behavior: "instant" }),
+      );
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth > innerWidth + 1,
       );
