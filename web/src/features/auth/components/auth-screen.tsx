@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { AuthError, createSession, registerAccount } from "../api/auth.api";
+import {
+  AuthError,
+  createSession,
+  registerAccount,
+  verifyAccount,
+} from "../api/auth.api";
 import type { AccountKind, AuthState } from "../types/auth.types";
 import { AuthShell } from "./auth-shell";
 import { FormField } from "./form-field";
@@ -83,6 +88,8 @@ function AuthScreen({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verified, setVerified] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [retryAt, setRetryAt] = useState(0);
@@ -94,6 +101,8 @@ function AuthScreen({
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
   const isMfa = state === "mfa" || state === "code-rejected";
+  const awaitingVerification =
+    registration && state === "verification-pending" && !company;
   const loginHref = company ? "/login?account=company" : "/login";
   const registerHref = company ? "/register?account=company" : "/register";
 
@@ -118,10 +127,54 @@ function AuthScreen({
       ?.focus();
   }, [state, isMfa]);
 
+  useEffect(() => {
+    if (verified)
+      screenRef.current
+        ?.querySelector<HTMLElement>("[data-state-title]")
+        ?.focus();
+  }, [verified]);
+
   function backToForm() {
     setState("form");
     setError("");
     setCode("");
+  }
+
+  async function submitVerification(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (inFlight.current) return;
+    setError("");
+    setFieldErrors({});
+    const request = new AbortController();
+    requestRef.current = request;
+    inFlight.current = true;
+    setBusy(true);
+    try {
+      const result = await verifyAccount(
+        { email: email.trim().toLowerCase(), code: verificationCode.trim() },
+        request.signal,
+      );
+      if (request.signal.aborted) return;
+      if (result.status !== "active")
+        throw new Error("Unexpected verification response");
+      setVerificationCode("");
+      setVerified(true);
+    } catch (cause) {
+      if (request.signal.aborted) return;
+      if (cause instanceof AuthError) {
+        if (cause.code === "invalid_verification_code") {
+          setFieldErrors({ verificationCode: cause.message });
+          screenRef.current
+            ?.querySelector<HTMLElement>('[name="verificationCode"]')
+            ?.focus();
+        } else setError(cause.message);
+      } else setError("We couldn’t verify this account. Please try again.");
+    } finally {
+      if (requestRef.current === request) {
+        inFlight.current = false;
+        setBusy(false);
+      }
+    }
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -459,9 +512,15 @@ function AuthScreen({
           aria-live="polite"
         >
           <h1 id={stateTitleId} data-state-title tabIndex={-1}>
-            {states[state].title}
+            {verified ? "Account verified" : states[state].title}
           </h1>
-          <p>{states[state].description}</p>
+          <p>
+            {verified
+              ? "Your account is active. Sign in to continue."
+              : awaitingVerification
+                ? "Enter the code sent to your email to activate your account."
+                : states[state].description}
+          </p>
           {isMfa ? (
             <form onSubmit={submit} aria-busy={busy}>
               <FormField
@@ -505,6 +564,52 @@ function AuthScreen({
                 Back to sign-in
               </button>
             </form>
+          ) : awaitingVerification && !verified ? (
+            <form onSubmit={submitVerification} aria-busy={busy}>
+              <FormField
+                id="verificationEmail"
+                name="verificationEmail"
+                label="Email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+              <FormField
+                id="verificationCode"
+                name="verificationCode"
+                label="Verification code"
+                hint="Enter the 64-character code from your verification email. It expires after 15 minutes."
+                error={fieldErrors.verificationCode}
+                autoComplete="one-time-code"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+                inputMode="text"
+                pattern="[A-Fa-f0-9]{64}"
+                minLength={64}
+                maxLength={64}
+                required
+                value={verificationCode}
+                onChange={(event) => setVerificationCode(event.target.value)}
+              />
+              {error && (
+                <p role="alert" className={styles.error}>
+                  {error}
+                </p>
+              )}
+              <button
+                className={styles.stateAction}
+                type="submit"
+                disabled={busy}
+              >
+                {busy ? "Verifying…" : "Verify account"}
+              </button>
+              <Link className={styles.stateBack} href={loginHref}>
+                Back to sign-in
+              </Link>
+            </form>
           ) : (
             <button
               className={styles.stateAction}
@@ -513,9 +618,11 @@ function AuthScreen({
                 else backToForm();
               }}
             >
-              {state === "review-pending"
-                ? "Back to company sign-in"
-                : "Back to sign-in"}
+              {verified
+                ? "Continue to sign-in"
+                : state === "review-pending"
+                  ? "Back to company sign-in"
+                  : "Back to sign-in"}
             </button>
           )}
         </section>
