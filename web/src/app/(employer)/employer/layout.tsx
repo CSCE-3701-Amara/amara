@@ -1,3 +1,4 @@
+import { Workspace } from "@/shared/ui/workspace";
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <Workspace company>{children}</Workspace>;
 }

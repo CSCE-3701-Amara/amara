@@ -1,3 +1,4 @@
+import { Modules } from "@/features/invw/components/modules";
 export default function Page() {
-  return <div>Placeholder</div>;
+  return <Modules />;
 }

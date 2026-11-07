@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "test-results/**",
+    "playwright-report/**",
+    "tests/artifacts/**",
+    // Verbatim shader module exported by Figma; keep generated WGSL/source intact.
+    "src/shared/lib/figma-shaders/**",
   ]),
 ]);
 
