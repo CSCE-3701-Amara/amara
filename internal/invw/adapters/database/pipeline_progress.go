@@ -56,7 +56,7 @@ func (r *CandidatePipelineProgressRepository) GetByCandidateApplication(ctx cont
 		LEFT JOIN stage_executions execution
 		  ON execution.stage_id = stage.id AND execution.pipeline_execution_id = $2
 		WHERE stage.version_id = $1
-		ORDER BY stage.position, stage.id`, result.Pipeline.ID, pipelineExecutionID)
+		ORDER BY stage.stage_order, stage.id`, result.Pipeline.ID, pipelineExecutionID)
 	if err != nil {
 		return domain.CandidatePipelineProgress{}, fmt.Errorf("query published pipeline stages: %w", err)
 	}
