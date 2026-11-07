@@ -133,6 +133,13 @@ func (r *RegistrationRepository) PerformAccountAction(ctx context.Context, accou
 	defer func() { _ = tx.Rollback(ctx) }()
 
 	queries := r.queries.WithTx(tx)
+	var locked int
+	if err := tx.QueryRow(ctx, "SELECT 1 FROM "+table+" WHERE id = $1::uuid FOR UPDATE", accountID).Scan(&locked); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.ErrInvalidSession
+		}
+		return fmt.Errorf("lock account: %w", err)
+	}
 	if _, err := queries.LockActiveSessionForAccount(ctx, sqlc.LockActiveSessionForAccountParams{
 		Token: sessionToken, Column2: accountUUID, AccountType: sessionType,
 	}); err != nil {
