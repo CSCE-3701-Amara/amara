@@ -103,6 +103,14 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("create logout handler: %w", err)
 	}
+	accountActionService, err := authapplication.NewAccountActionService(authRepo)
+	if err != nil {
+		return fmt.Errorf("create account action service: %w", err)
+	}
+	accountActionHandler, err := authhttp.NewAccountActionHandler(accountActionService, authRepo, logger)
+	if err != nil {
+		return fmt.Errorf("create account action handler: %w", err)
+	}
 
 	jobLifecycleRepo := jobdatabase.NewPostingLifecycleRepository(dbSvc.Pool())
 	jobLifecycle := jobapplication.NewPostingLifecycle(jobLifecycleRepo)
@@ -120,6 +128,8 @@ func run() error {
 		authhttp.CandidateAuth(authRepo),
 	)
 	moduleHandler := invwhttp.NewModuleHandler(invwdatabase.NewModuleRepository(dbSvc.Pool()), authRepo)
+	trackingRepo := canddatabase.NewApplicationTrackingRepository(dbSvc.Pool())
+	trackingHandler := candhttp.NewApplicationTrackingHandler(trackingRepo, authRepo)
 	// Candidate/interviewer registration needs a verification sender. Until that
 	// provider is configured, reject requests before creating unusable accounts.
 	server, err := httpserver.New(cfg.HTTP, logger, dbSvc,
@@ -127,10 +137,12 @@ func run() error {
 		companyRegistrationHandler.RegisterRoutes,
 		loginHandler.RegisterRoutes,
 		logoutHandler.RegisterRoutes,
+		accountActionHandler.RegisterRoutes,
 		feedHandler.RegisterRoutes,
 		postingHandler.RegisterRoutes,
 		applicationHandler.RegisterRoutes,
 		moduleHandler.RegisterRoutes,
+		trackingHandler.RegisterRoutes,
 	)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)

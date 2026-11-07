@@ -32,6 +32,10 @@ type SessionTerminator interface {
 	TerminateSession(context.Context, string) error
 }
 
+type AccountActionRepository interface {
+	PerformAccountAction(context.Context, string, string, domain.AccountType, domain.AccountAction) error
+}
+
 type SessionValidator interface {
 	ValidateSession(context.Context, string) (Identity, error)
 }

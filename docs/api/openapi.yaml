@@ -271,8 +271,8 @@ paths:
       tags:
         - Applications
       description: Authenticated candidate only; records must belong to that candidate. Derive identity from
-        the session.
-      x-implementation-status: planned
+        the session. Results are ordered by submission time (falling back to creation time), newest first.
+      x-implementation-status: implemented
       x-erd-entities:
         - APPLICATIONS
       security:
@@ -2419,11 +2419,11 @@ paths:
       operationId: getApplication
       tags:
         - Applications
-      description: The owning candidate or authorized company Hiring Manager may read the application. Candidates
+      description: The owning candidate may read the application. Hiring Manager access is planned. Candidates
         receive only their own released feedback. Apply pipeline anonymity before identity reveal. Omit candidate
         identity/contact/profile links until reveal; never include private interviewer notes or other candidates'
         data in candidate responses.
-      x-implementation-status: planned
+      x-implementation-status: implemented
       x-erd-entities:
         - APPLICATIONS
       security:
@@ -6736,6 +6736,19 @@ components:
             - string
             - 'null'
           format: date-time
+        jobTitle:
+          type: string
+        companyName:
+          type: string
+        closed:
+          type: boolean
+          description: Whether to show the decision and feedback screen.
+        pipelineExecutionId:
+          type: [string, 'null']
+          format: uuid
+          description: Included in detail responses. Null until a pipeline execution exists.
+        rejectionFeedback:
+          description: Released pipeline rejection feedback. Included only in detail responses after release.
         identityHidden:
           type: boolean
       required:

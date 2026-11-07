@@ -10,7 +10,7 @@ This section describes the human-facing interaction surfaces and their ownership
 
 | User / surface | Main interactions | Representative SRS use cases |
 |---|---|---|
-| Guest / account entry | Register Candidate/Interviewer or Company Representative, activate accounts, enter login, and request password reset. Company verification may remain pending while registry/admin review completes. | `UC-AUTH-001`–`UC-AUTH-003`, `UC-AUTH-010`, `UC-AUTH-015` |
+| Guest / account entry | Register Candidate/Interviewer or Hiring Manager, activate accounts, enter login, and request password reset. Company verification may remain pending while registry/admin review completes. | `UC-AUTH-001`–`UC-AUTH-003`, `UC-AUTH-010`, `UC-AUTH-015` |
 | Candidate workspace | Browse/filter postings; inspect details; apply; track applications and assessments; read permitted feedback and final decisions; respond to offers; view crests, verified skills, and dynamic resume; save postings and follow companies. | `UC-CAND-001`–`UC-CAND-014`; `UC-INVW-014`, `UC-INVW-016`, `UC-INVW-017`; `UC-JOB-16` |
 | Hiring Manager workspace | Manage company postings; view applicants and screened-out reasons; design, publish, and migrate pipelines; configure tests, rubrics, and feedback; review dashboard/insights; make permitted advancement decisions; manage Finalists and offers. | `UC-JOB-01`–`UC-JOB-07`, `UC-JOB-16`–`UC-JOB-17`; `UC-INVW-001`–`UC-INVW-009`, `UC-INVW-015`–`UC-INVW-017` |
 | Interviewer workspace | Publish live-interview availability, open assigned interview details, write private notes, and submit rubric scorecards. Company association and assignment scope are enforced by AUTH/INVW. | `UC-INVW-004`; `UC-AUTH-001`, `UC-AUTH-003`, `UC-AUTH-011` |

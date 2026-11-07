@@ -13,11 +13,16 @@ import (
 const identityContextKey = "amara.identity"
 
 func CandidateAuth(validator ports.SessionValidator) gin.HandlerFunc {
-	return sessionAuth(validator, domain.AccountTypeCandidate)
+	return CandidateAuthWithErrorWriter(validator, writeSessionError)
+}
+
+// CandidateAuthWithErrorWriter applies candidate session checks using the caller's error format.
+func CandidateAuthWithErrorWriter(validator ports.SessionValidator, writeError func(*gin.Context, int, string, string)) gin.HandlerFunc {
+	return sessionAuth(validator, domain.AccountTypeCandidate, writeError)
 }
 
 func AuthenticatedAuth(validator ports.SessionValidator) gin.HandlerFunc {
-	return sessionAuth(validator, "")
+	return sessionAuth(validator, "", writeSessionError)
 }
 
 func CompanyAuth(validator ports.SessionValidator, writeError func(*gin.Context, int, string, string)) gin.HandlerFunc {
@@ -61,9 +66,11 @@ func sessionAuthWithErrors(validator ports.SessionValidator, requiredType domain
 }
 
 func authenticationRequired(c *gin.Context) {
-	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-		"error": gin.H{"code": "authentication_required", "message": "Authentication is required."},
-	})
+	writeSessionError(c, http.StatusUnauthorized, "authentication_required", "Authentication is required.")
+}
+
+func writeSessionError(c *gin.Context, status int, code, message string) {
+	c.AbortWithStatusJSON(status, gin.H{"error": gin.H{"code": code, "message": message}})
 }
 
 func Identity(c *gin.Context) (ports.Identity, bool) {
