@@ -1,3 +1,4 @@
+-- +goose Up
 ALTER TABLE application_assessments
     ADD COLUMN evaluation_status TEXT NOT NULL DEFAULT 'pending'
                                 CHECK (evaluation_status IN ('pending', 'evaluated')),
@@ -22,3 +23,18 @@ ALTER TABLE application_assessments
 CREATE INDEX application_assessments_result_lookup_idx
     ON application_assessments (application_id, created_at, id)
     WHERE status IN ('submitted', 'completed');
+
+-- +goose Down
+DROP INDEX IF EXISTS application_assessments_result_lookup_idx;
+ALTER TABLE application_assessments
+    DROP CONSTRAINT application_assessments_result_disclosure_check,
+    DROP CONSTRAINT application_assessments_evaluation_state_check,
+    DROP COLUMN feedback_disclosed_at,
+    DROP COLUMN feedback_is_ai_generated,
+    DROP COLUMN areas_for_improvement,
+    DROP COLUMN feedback_strengths,
+    DROP COLUMN feedback_text,
+    DROP COLUMN result_disclosed_at,
+    DROP COLUMN evaluated_at,
+    DROP COLUMN passed,
+    DROP COLUMN evaluation_status;
