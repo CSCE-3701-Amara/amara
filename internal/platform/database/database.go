@@ -14,28 +14,25 @@ import (
 )
 
 const (
-	// PingTimeout bounds the startup connectivity check applied to every pool.
 	PingTimeout          = 10 * time.Second
 	defaultHealthTimeout = 5 * time.Second
 )
 
 // Service owns the shared pool lifecycle and reports readiness information.
-// Module repositories receive Pool(); application services use repository
-// interfaces owned by their modules.
+// Module repositories receive Pool(); business application services receive
+// their module-owned repository interfaces instead.
 type Service interface {
-	Health(ctx context.Context) HealthStatus
+	Health(context.Context) HealthStatus
 	Pool() *pgxpool.Pool
 	Close()
 }
 
-// HealthStatus is the result of a database connectivity check.
 type HealthStatus struct {
 	Status string    `json:"status"`
 	Error  string    `json:"error,omitempty"`
 	Stats  PoolStats `json:"stats"`
 }
 
-// PoolStats contains a snapshot of pgxpool counters.
 type PoolStats struct {
 	TotalConns        int32         `json:"total_conns"`
 	AcquiredConns     int32         `json:"acquired_conns"`
@@ -52,8 +49,7 @@ type service struct {
 	healthTimeout time.Duration
 }
 
-// NewService creates a pool, verifies connectivity, and manages the pool's
-// lifecycle. Call Close during process shutdown.
+// NewService creates and verifies the shared pool. Call Close during shutdown.
 func NewService(ctx context.Context, cfg config.DatabaseConfig) (Service, error) {
 	pool, err := newPool(ctx, cfg)
 	if err != nil {
@@ -72,14 +68,10 @@ func (s *service) Health(ctx context.Context) HealthStatus {
 
 	stat := s.pool.Stat()
 	stats := PoolStats{
-		TotalConns:        stat.TotalConns(),
-		AcquiredConns:     stat.AcquiredConns(),
-		IdleConns:         stat.IdleConns(),
-		ConstructingConns: stat.ConstructingConns(),
-		MaxConns:          stat.MaxConns(),
-		AcquireCount:      stat.AcquireCount(),
-		AcquireDuration:   stat.AcquireDuration(),
-		EmptyAcquireCount: stat.EmptyAcquireCount(),
+		TotalConns: stat.TotalConns(), AcquiredConns: stat.AcquiredConns(),
+		IdleConns: stat.IdleConns(), ConstructingConns: stat.ConstructingConns(),
+		MaxConns: stat.MaxConns(), AcquireCount: stat.AcquireCount(),
+		AcquireDuration: stat.AcquireDuration(), EmptyAcquireCount: stat.EmptyAcquireCount(),
 	}
 	if err := s.pool.Ping(pingCtx); err != nil {
 		message := "database ping failed"
@@ -100,16 +92,13 @@ func newPool(ctx context.Context, cfg config.DatabaseConfig) (*pgxpool.Pool, err
 		return nil, fmt.Errorf("parse DATABASE_URL: %w", err)
 	}
 	poolCfg.MaxConns = cfg.MaxConns
-	if cfg.MinConns > 0 {
-		poolCfg.MinConns = cfg.MinConns
-	}
+	poolCfg.MinConns = cfg.MinConns
 	if cfg.MaxConnLifetime > 0 {
 		poolCfg.MaxConnLifetime = cfg.MaxConnLifetime
 	}
 	if cfg.MaxConnIdleTime > 0 {
 		poolCfg.MaxConnIdleTime = cfg.MaxConnIdleTime
 	}
-
 	pool, err := pgxpool.NewWithConfig(ctx, poolCfg)
 	if err != nil {
 		return nil, fmt.Errorf("create database pool: %w", err)
@@ -123,8 +112,8 @@ func newPool(ctx context.Context, cfg config.DatabaseConfig) (*pgxpool.Pool, err
 	return pool, nil
 }
 
-// NewPool is kept for callers that need the raw pool. New composition code
-// should prefer NewService to keep pool ownership and shutdown together.
+// NewPool is retained for existing callers. New composition code should use
+// NewService so the pool lifecycle and health contract remain together.
 func NewPool(ctx context.Context, cfg config.DatabaseConfig) (*pgxpool.Pool, error) {
 	return newPool(ctx, cfg)
 }
