@@ -148,6 +148,7 @@ ON CONFLICT (account_id) DO UPDATE SET
     recipient = EXCLUDED.recipient,
     expires_at = EXCLUDED.expires_at
 
+`
 
 type SaveEmailVerificationChallengeParams struct {
 	Column1     pgtype.UUID

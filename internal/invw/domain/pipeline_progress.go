@@ -37,6 +37,7 @@ type PipelineStage struct {
 }
 
 type StageProgress struct {
+	Completed   bool
 	CompletedAt *time.Time
 	Passed      bool
 	Active      bool
