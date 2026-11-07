@@ -136,14 +136,19 @@ func TestRegisterRetriesPendingVerification(t *testing.T) {
 	repository := &fakeRepository{account: account}
 	sender := &fakeSender{err: errors.New("relay unavailable")}
 	service := newService(t, repository, fakeChecker{}, sender)
+	currentTime := time.Date(2026, 10, 30, 20, 0, 0, 0, time.UTC)
+	service.now = func() time.Time { return currentTime }
 	if _, err := service.Register(context.Background(), validRegistration()); err == nil {
 		t.Fatal("expected the first delivery attempt to fail")
 	}
+	currentTime = currentTime.Add(verificationCodeLifetime + time.Minute)
 	repository.pending = ports.PendingVerification{
-		Account: account, Recipient: repository.challenge.Recipient, Code: repository.challenge.Code,
+		Account: account, Recipient: repository.challenge.Recipient,
+		ExpiresAt: currentTime.Add(-time.Minute),
 	}
 	repository.pendingFound = true
 	sender.err = nil
+	firstHash := append([]byte(nil), repository.challenge.CodeHash...)
 	got, err := service.Register(context.Background(), validRegistration())
 	if err != nil {
 		t.Fatal(err)
@@ -151,8 +156,11 @@ func TestRegisterRetriesPendingVerification(t *testing.T) {
 	if got.ID != account.ID || !repository.createdCandidate {
 		t.Fatalf("unexpected retry result: account=%+v created=%t", got, repository.createdCandidate)
 	}
-	if sender.email != account.Email || sender.code != repository.challenge.Code {
+	if sender.email != account.Email || len(sender.code) != 64 {
 		t.Fatalf("unexpected retry message: email=%q code=%q", sender.email, sender.code)
+	}
+	if string(firstHash) == string(repository.challenge.CodeHash) {
+		t.Fatal("retry reused the expired verification code")
 	}
 }
 

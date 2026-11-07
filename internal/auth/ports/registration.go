@@ -43,7 +43,6 @@ type VerificationChallenge struct {
 	AccountID   string
 	AccountType domain.AccountType
 	Recipient   string
-	Code        string
 	CodeHash    []byte
 	ExpiresAt   time.Time
 }
@@ -51,6 +50,5 @@ type VerificationChallenge struct {
 type PendingVerification struct {
 	Account   domain.Account
 	Recipient string
-	Code      string
 	ExpiresAt time.Time
 }

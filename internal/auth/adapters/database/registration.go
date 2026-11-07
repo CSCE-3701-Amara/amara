@@ -271,7 +271,7 @@ func (r *RegistrationRepository) SaveVerificationChallenge(ctx context.Context, 
 	if err := r.queries.SaveEmailVerificationChallenge(ctx, sqlc.SaveEmailVerificationChallengeParams{
 		Column1: accountUUID, AccountType: string(challenge.AccountType),
 		CodeHash: challenge.CodeHash, ExpiresAt: pgtype.Timestamp{Time: challenge.ExpiresAt, Valid: true},
-		Recipient: challenge.Recipient, Code: challenge.Code,
+		Recipient: challenge.Recipient,
 	}); err != nil {
 		return fmt.Errorf("insert verification challenge: %w", err)
 	}
@@ -293,7 +293,7 @@ func (r *RegistrationRepository) FindPendingVerification(ctx context.Context, em
 			ID: row.ID, Type: accountType, Email: row.Email,
 			Status: row.AccountStatus, CreatedAt: row.CreatedAt.Time.UTC().Format(time.RFC3339),
 		},
-		Recipient: row.Recipient, Code: row.Code,
+		Recipient: row.Recipient,
 		ExpiresAt: row.ExpiresAt.Time.UTC(),
 	}, nil
 }
