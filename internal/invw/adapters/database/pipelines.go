@@ -234,8 +234,8 @@ func insertStage(ctx context.Context, tx pgx.Tx, version string, position int, s
 	err := tx.QueryRow(ctx, `
 		INSERT INTO pipeline_stages (id, version_id, name, module_type, stage_order,
 			scheduled_start_at, scheduled_end_at, interview_configuration, advancement_rule,
-			score_threshold, below_threshold_action)
-		VALUES (gen_random_uuid(), $1::text::uuid, $2, $3, $4, $5, $6, $7, $8, $9, 'reject')
+			score_threshold)
+		VALUES (gen_random_uuid(), $1::text::uuid, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING id::text`, version, stage.Name, stage.Type, position,
 		stage.OpensAt, stage.Deadline, stage.Interview, rule, threshold).Scan(&stage.ID)
 	if err != nil {

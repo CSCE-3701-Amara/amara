@@ -468,17 +468,16 @@ Owner: All | Status: Draft | Last updated: 2026-10-18 | Jira: AMARA-32
 
 #### UC-INVW-006: Advance Candidate Between Stages
 
-| Field             | Description                                  |
-| ----------------- | -------------------------------------------- |
-| Actor(s)          | Hiring Manager, Candidate, System |
-| Description       | The System applies the stage's configured rule to decide whether a Candidate passes, is rejected, or remains held for a Hiring Manager decision. |
-| Preconditions     | A pipeline is published and the Candidate is active in at least one stage. |
-| Trigger           | An assessment is fully scored, a live-interview outcome is recorded, or the Hiring Manager records a manual decision. |
-| Main Flow         | 1. The System applies the stage's configured advancement rule (FR-INVW-051).<br>2. The System records the decision type, decider, time, and score (FR-INVW-058).<br>3. On pass, the System makes linked stages available only when all incoming stages have passed and awards the Amarat associated with the completed assessment (FR-INVW-002, FR-INVW-003, FR-INVW-102).<br>4. On rejection, the System marks the application Rejected, removes the Candidate from all active stages, and starts rejection feedback (FR-INVW-060). |
-| Alternative Flows | 1a. Manual rule: the Hiring Manager records pass or reject (FR-INVW-052, FR-INVW-053).<br>1b. Threshold rule: the System passes at or above the stage's current threshold; below-threshold handling is automatic rejection or hold, with hold as the default. Threshold changes from the dashboard are handled as defined in UC-INVW-007 (FR-INVW-054, FR-INVW-055, FR-INVW-096).<br>1c. Completion rule: the System passes when the module is complete, regardless of score (FR-INVW-056).<br>2a. The Hiring Manager overrides an automatic result with a written reason (FR-INVW-057).<br>2b. The Hiring Manager passes or rejects several selected Candidates at the same stage in one action (FR-INVW-059).<br>3a. The Candidate passes the final outstanding assessment stage on every pipeline path: the System identifies the Candidate as a Finalist and adds them to the Finalist list through UC-INVW-017 (FR-INVW-107). |
-| Exception Flows   | E1. Two simultaneous decisions concern the same Candidate and stage: the System records the first and rejects the second, showing the recorded decision. |
-| Postconditions    | The decision is recorded and the Candidate is advanced, rejected, or held for a Hiring Manager decision. |
-| Business Rules    | Only the Hiring Manager records manual decisions; Interviewers submit scorecards but do not make advancement decisions (FR-INVW-053). Stage advancement is independently configured as manual, threshold-based, or on completion (FR-INVW-051). |
+| Field | Description |
+| ----- | ----------- |
+| Actor(s) | Hiring Manager, Candidate, System |
+| Description | The System consumes assessment outcomes and applies the stage advancement policy. |
+| Preconditions | The Candidate has an assignment in the published pipeline. |
+| Trigger | A module is missed or completed, required grading finishes, or the Hiring Manager records a manual decision. |
+| Main Flow | 1. A missed module takes priority and rejects the application with the missed module recorded as the reason (FR-INVW-060).<br>2. A completed behavioral assessment, including recorded video and live interviews, awaits a Hiring Manager decision and carries no numerical score (FR-INVW-052, FR-INVW-053).<br>3. Other assessments follow the configured manual, threshold or completion rule. A score-based rule waits for valid, finalized evidence (FR-INVW-051, FR-INVW-054, FR-INVW-056).<br>4. The System records the Candidate, assignment, decision, type, decider, time and score when applicable (FR-INVW-058). |
+| Alternative Flows | 1. Below threshold, the stage policy rejects or holds for manual review. Hold is the default (FR-INVW-055).<br>2. The Hiring Manager can decide several selected Candidates at the same stage in one action (FR-INVW-059).<br>3. On pass, the System awards the configured Amarat and unlocks a linked stage when all of its incoming stages have passed. Passing all outstanding stages makes the Candidate a Finalist (FR-INVW-002, FR-INVW-003, FR-INVW-102, FR-INVW-107).<br>4. On rejection, the System marks the application Rejected, removes the Candidate from active stages and starts rejection feedback (FR-INVW-060). |
+| Exception Flows | Concurrent or repeated decisions return the first recorded pass or rejection. Late outcomes cannot advance a rejected application (FR-INVW-057). |
+| Business Rules | Only the Hiring Manager records manual decisions. Interviewers provide evaluations and qualitative notes, which remain available for final hiring review. A coding question passes when it meets its published minimum number of passing cases. The module passes when enough questions pass (FR-INVW-054). |
 
 #### UC-INVW-007: Review Pipeline Dashboard and Insights
 
