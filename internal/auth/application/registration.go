@@ -36,6 +36,17 @@ func (s *RegistrationService) Register(ctx context.Context, registration domain.
 		return domain.Account{}, err
 	}
 
+	pending, err := s.repository.FindPendingVerification(ctx, registration.Email)
+	if err == nil {
+		if err := s.sender.SendVerificationCode(ctx, pending.Recipient, pending.Code); err != nil {
+			return domain.Account{}, fmt.Errorf("send verification code: %w", err)
+		}
+		return pending.Account, nil
+	}
+	if !errors.Is(err, domain.ErrPendingVerificationNotFound) {
+		return domain.Account{}, fmt.Errorf("find pending verification: %w", err)
+	}
+
 	exists, err := s.repository.EmailExists(ctx, registration.Email)
 	if err != nil {
 		return domain.Account{}, fmt.Errorf("check registration email: %w", err)
@@ -85,6 +96,8 @@ func (s *RegistrationService) Register(ctx context.Context, registration domain.
 	challenge := ports.VerificationChallenge{
 		AccountID:   account.ID,
 		AccountType: registration.AccountType,
+		Recipient:   registration.Email,
+		Code:        fmt.Sprintf("%x", code),
 		CodeHash:    codeHash[:],
 		ExpiresAt:   createdAt.Add(verificationCodeLifetime),
 	}

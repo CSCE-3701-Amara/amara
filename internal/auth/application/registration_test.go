@@ -21,6 +21,9 @@ type fakeRepository struct {
 	createdInterviewer       bool
 	challenge                ports.VerificationChallenge
 	challengeErr             error
+	pending                  ports.PendingVerification
+	pendingFound             bool
+	pendingErr               error
 	registrationNumberExists bool
 	registrationNumberErr    error
 	companyRegistrationErr   error
@@ -43,6 +46,12 @@ func (f *fakeRepository) CreateInterviewer(context.Context, string, string, []by
 func (f *fakeRepository) SaveVerificationChallenge(_ context.Context, challenge ports.VerificationChallenge) error {
 	f.challenge = challenge
 	return f.challengeErr
+}
+func (f *fakeRepository) FindPendingVerification(context.Context, string) (ports.PendingVerification, error) {
+	if f.pendingErr == nil && !f.pendingFound {
+		return ports.PendingVerification{}, domain.ErrPendingVerificationNotFound
+	}
+	return f.pending, f.pendingErr
 }
 func (f *fakeRepository) RegistrationNumberExists(context.Context, string) (bool, error) {
 	return f.registrationNumberExists, f.registrationNumberErr
@@ -116,6 +125,34 @@ func TestRegisterCandidate(t *testing.T) {
 	}
 	if repository.challenge.AccountID != account.ID || len(repository.challenge.CodeHash) != 32 {
 		t.Fatalf("unexpected challenge: %+v", repository.challenge)
+	}
+}
+
+func TestRegisterRetriesPendingVerification(t *testing.T) {
+	account := domain.Account{
+		ID: "candidate-id", Type: domain.AccountTypeCandidate, Email: "user@example.com",
+		Status: domain.PendingVerification, CreatedAt: "2026-10-30T20:00:00Z",
+	}
+	repository := &fakeRepository{account: account}
+	sender := &fakeSender{err: errors.New("relay unavailable")}
+	service := newService(t, repository, fakeChecker{}, sender)
+	if _, err := service.Register(context.Background(), validRegistration()); err == nil {
+		t.Fatal("expected the first delivery attempt to fail")
+	}
+	repository.pending = ports.PendingVerification{
+		Account: account, Recipient: repository.challenge.Recipient, Code: repository.challenge.Code,
+	}
+	repository.pendingFound = true
+	sender.err = nil
+	got, err := service.Register(context.Background(), validRegistration())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.ID != account.ID || !repository.createdCandidate {
+		t.Fatalf("unexpected retry result: account=%+v created=%t", got, repository.createdCandidate)
+	}
+	if sender.email != account.Email || sender.code != repository.challenge.Code {
+		t.Fatalf("unexpected retry message: email=%q code=%q", sender.email, sender.code)
 	}
 }
 

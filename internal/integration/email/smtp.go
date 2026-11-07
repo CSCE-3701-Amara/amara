@@ -2,12 +2,15 @@ package email
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"html"
+	"net"
 	"net/mail"
 	"net/smtp"
 	"strings"
+	"time"
 )
 
 type SMTPConfig struct {
@@ -16,6 +19,7 @@ type SMTPConfig struct {
 	Username string
 	Password string
 	From     string
+	Timeout  time.Duration
 }
 
 type SMTPSender struct {
@@ -39,6 +43,9 @@ func NewSMTPSender(config SMTPConfig) (*SMTPSender, error) {
 	if (config.Username == "") != (config.Password == "") {
 		return nil, errors.New("SMTP username and password must be provided together")
 	}
+	if config.Timeout <= 0 {
+		config.Timeout = 30 * time.Second
+	}
 	return &SMTPSender{config: config}, nil
 }
 
@@ -59,18 +66,76 @@ func (s *SMTPSender) SendVerificationCode(ctx context.Context, recipient, code s
 	if !isVerificationCode(code) {
 		return errors.New("verification code must contain only hexadecimal characters")
 	}
-	auth := smtp.Auth(nil)
-	if s.config.Username != "" {
-		auth = smtp.PlainAuth("", s.config.Username, s.config.Password, s.config.Host)
-	}
 	message := buildVerificationMessage(code)
-	return smtp.SendMail(
-		fmt.Sprintf("%s:%s", s.config.Host, s.config.Port),
-		auth,
-		s.config.From,
-		[]string{recipient},
-		message,
-	)
+	address := net.JoinHostPort(s.config.Host, s.config.Port)
+	dialer := net.Dialer{Timeout: s.config.Timeout}
+	conn, err := dialer.DialContext(ctx, "tcp", address)
+	if err != nil {
+		return fmt.Errorf("connect to SMTP relay: %w", err)
+	}
+	done := make(chan struct{})
+	defer close(done)
+	go closeOnContextCancellation(ctx, conn, done)
+	if err := conn.SetDeadline(time.Now().Add(s.config.Timeout)); err != nil {
+		_ = conn.Close()
+		return fmt.Errorf("set SMTP deadline: %w", err)
+	}
+	client, err := smtp.NewClient(conn, s.config.Host)
+	if err != nil {
+		_ = conn.Close()
+		return fmt.Errorf("create SMTP client: %w", err)
+	}
+	defer client.Close()
+	if err := client.Hello(s.config.Host); err != nil {
+		return fmt.Errorf("SMTP hello: %w", err)
+	}
+	if ok, _ := client.Extension("STARTTLS"); !ok {
+		return errors.New("SMTP relay does not advertise STARTTLS")
+	}
+	if err := client.StartTLS(&tls.Config{
+		ServerName: s.config.Host,
+		MinVersion: tls.VersionTLS12,
+	}); err != nil {
+		return fmt.Errorf("start SMTP TLS: %w", err)
+	}
+	if state, ok := client.TLSConnectionState(); !ok || !state.HandshakeComplete {
+		return errors.New("SMTP TLS handshake was not completed")
+	}
+	if s.config.Username != "" {
+		auth := smtp.PlainAuth("", s.config.Username, s.config.Password, s.config.Host)
+		if err := client.Auth(auth); err != nil {
+			return fmt.Errorf("authenticate with SMTP relay: %w", err)
+		}
+	}
+	if err := client.Mail(s.config.From); err != nil {
+		return fmt.Errorf("set SMTP sender: %w", err)
+	}
+	if err := client.Rcpt(recipient); err != nil {
+		return fmt.Errorf("set SMTP recipient: %w", err)
+	}
+	writer, err := client.Data()
+	if err != nil {
+		return fmt.Errorf("start SMTP message: %w", err)
+	}
+	if _, err := writer.Write(message); err != nil {
+		_ = writer.Close()
+		return fmt.Errorf("write SMTP message: %w", err)
+	}
+	if err := writer.Close(); err != nil {
+		return fmt.Errorf("finish SMTP message: %w", err)
+	}
+	if err := client.Quit(); err != nil {
+		return fmt.Errorf("close SMTP session: %w", err)
+	}
+	return nil
+}
+
+func closeOnContextCancellation(ctx context.Context, conn net.Conn, done <-chan struct{}) {
+	select {
+	case <-ctx.Done():
+		_ = conn.Close()
+	case <-done:
+	}
 }
 
 func isVerificationCode(code string) bool {

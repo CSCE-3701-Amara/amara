@@ -139,6 +139,8 @@ type SaveEmailVerificationChallengeParams struct {
 	AccountType string
 	CodeHash    []byte
 	ExpiresAt   pgtype.Timestamp
+	Recipient   string
+	Code        string
 }
 
 func (q *Queries) SaveEmailVerificationChallenge(ctx context.Context, arg SaveEmailVerificationChallengeParams) error {
@@ -147,6 +149,47 @@ func (q *Queries) SaveEmailVerificationChallenge(ctx context.Context, arg SaveEm
 		arg.AccountType,
 		arg.CodeHash,
 		arg.ExpiresAt,
+		arg.Recipient,
+		arg.Code,
 	)
 	return err
+}
+
+const findPendingVerification = `-- name: FindPendingVerification :one
+SELECT c.id::text, c.email, c.account_status, c.created_at,
+       d.account_type, d.recipient, d.code, d.expires_at
+FROM auth_email_verification_deliveries d
+JOIN candidates c ON d.account_id = c.id
+WHERE d.account_type = 'candidate'
+  AND lower(c.email) = lower($1)
+  AND c.account_status = 'pending_verification'
+  AND d.expires_at > now()
+UNION ALL
+SELECT i.id::text, i.email, i.account_status, i.created_at,
+       d.account_type, d.recipient, d.code, d.expires_at
+FROM auth_email_verification_deliveries d
+JOIN interviewers i ON d.account_id = i.id
+WHERE d.account_type = 'interviewer'
+  AND lower(i.email) = lower($1)
+  AND i.account_status = 'pending_verification'
+  AND d.expires_at > now()
+LIMIT 1
+`
+
+type FindPendingVerificationRow struct {
+	ID            string
+	Email         string
+	AccountStatus string
+	CreatedAt     pgtype.Timestamp
+	AccountType   string
+	Recipient     string
+	Code          string
+	ExpiresAt     pgtype.Timestamp
+}
+
+func (q *Queries) FindPendingVerification(ctx context.Context, email string) (FindPendingVerificationRow, error) {
+	row := q.db.QueryRow(ctx, findPendingVerification, email)
+	var i FindPendingVerificationRow
+	err := row.Scan(&i.ID, &i.Email, &i.AccountStatus, &i.CreatedAt, &i.AccountType, &i.Recipient, &i.Code, &i.ExpiresAt)
+	return i, err
 }

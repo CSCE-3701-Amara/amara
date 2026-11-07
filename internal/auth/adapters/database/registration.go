@@ -271,10 +271,31 @@ func (r *RegistrationRepository) SaveVerificationChallenge(ctx context.Context, 
 	if err := r.queries.SaveEmailVerificationChallenge(ctx, sqlc.SaveEmailVerificationChallengeParams{
 		Column1: accountUUID, AccountType: string(challenge.AccountType),
 		CodeHash: challenge.CodeHash, ExpiresAt: pgtype.Timestamp{Time: challenge.ExpiresAt, Valid: true},
+		Recipient: challenge.Recipient, Code: challenge.Code,
 	}); err != nil {
 		return fmt.Errorf("insert verification challenge: %w", err)
 	}
+
 	return nil
+}
+
+func (r *RegistrationRepository) FindPendingVerification(ctx context.Context, email string) (ports.PendingVerification, error) {
+	row, err := r.queries.FindPendingVerification(ctx, email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ports.PendingVerification{}, domain.ErrPendingVerificationNotFound
+		}
+		return ports.PendingVerification{}, fmt.Errorf("query pending verification: %w", err)
+	}
+	accountType := domain.AccountType(row.AccountType)
+	return ports.PendingVerification{
+		Account: domain.Account{
+			ID: row.ID, Type: accountType, Email: row.Email,
+			Status: row.AccountStatus, CreatedAt: row.CreatedAt.Time.UTC().Format(time.RFC3339),
+		},
+		Recipient: row.Recipient, Code: row.Code,
+		ExpiresAt: row.ExpiresAt.Time.UTC(),
+	}, nil
 }
 
 func (r *RegistrationRepository) RegistrationNumberExists(ctx context.Context, number string) (bool, error) {

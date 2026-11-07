@@ -13,6 +13,7 @@ type AccountRepository interface {
 	CreateCandidate(context.Context, string, string, []byte, []byte, time.Time) (domain.Account, error)
 	CreateInterviewer(context.Context, string, string, []byte, []byte, string, time.Time) (domain.Account, error)
 	SaveVerificationChallenge(context.Context, VerificationChallenge) error
+	FindPendingVerification(context.Context, string) (PendingVerification, error)
 }
 
 type CompanyRegistrationRepository interface {
@@ -41,6 +42,15 @@ type VerificationSender interface {
 type VerificationChallenge struct {
 	AccountID   string
 	AccountType domain.AccountType
+	Recipient   string
+	Code        string
 	CodeHash    []byte
 	ExpiresAt   time.Time
+}
+
+type PendingVerification struct {
+	Account   domain.Account
+	Recipient string
+	Code      string
+	ExpiresAt time.Time
 }
