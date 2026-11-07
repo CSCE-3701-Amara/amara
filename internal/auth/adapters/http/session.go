@@ -26,13 +26,11 @@ func AuthenticatedAuth(validator ports.SessionValidator) gin.HandlerFunc {
 }
 
 func CompanyAuth(validator ports.SessionValidator, writeError func(*gin.Context, int, string, string)) gin.HandlerFunc {
-	return sessionAuthWithErrors(validator, domain.AccountTypeCompany)
+	return sessionAuth(validator, domain.AccountTypeCompany)
 }
 
 func sessionAuth(validator ports.SessionValidator, requiredType domain.AccountType) gin.HandlerFunc {
-	return sessionAuthWithErrors(validator, requiredType, func(c *gin.Context, status int, code, message string) {
-		c.AbortWithStatusJSON(status, gin.H{"error": gin.H{"code": code, "message": message}})
-	})
+	return sessionAuthWithErrors(validator, requiredType, writeSessionError)
 }
 
 func sessionAuthWithErrors(validator ports.SessionValidator, requiredType domain.AccountType,
