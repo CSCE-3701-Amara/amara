@@ -73,10 +73,12 @@ type fakeSender struct {
 	email string
 	code  string
 	err   error
+	sends int
 }
 
 func (f *fakeSender) SendVerificationCode(_ context.Context, email, code string) error {
 	f.email, f.code = email, code
+	f.sends++
 	return f.err
 }
 
@@ -161,6 +163,57 @@ func TestRegisterRetriesPendingVerification(t *testing.T) {
 	}
 	if string(firstHash) == string(repository.challenge.CodeHash) {
 		t.Fatal("retry reused the expired verification code")
+	}
+}
+
+func TestRegisterRecoversWhenInitialChallengeSaveFails(t *testing.T) {
+	account := domain.Account{
+		ID: "candidate-id", Type: domain.AccountTypeCandidate, Email: "user@example.com",
+		Status: domain.PendingVerification, CreatedAt: "2026-10-30T20:00:00Z",
+	}
+	repository := &fakeRepository{account: account, challengeErr: errors.New("database unavailable")}
+	service := newService(t, repository, fakeChecker{}, &fakeSender{})
+	if _, err := service.Register(context.Background(), validRegistration()); err == nil {
+		t.Fatal("expected the initial challenge save to fail")
+	}
+
+	repository.challengeErr = nil
+	repository.pending = ports.PendingVerification{Account: account, Recipient: account.Email}
+	repository.pendingFound = true
+	sender := &fakeSender{}
+	service = newService(t, repository, fakeChecker{}, sender)
+	got, err := service.Register(context.Background(), validRegistration())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.ID != account.ID || !repository.createdCandidate || sender.sends != 1 {
+		t.Fatalf("unexpected recovery result: account=%+v created=%t sends=%d", got, repository.createdCandidate, sender.sends)
+	}
+}
+
+func TestRegisterDoesNotReplaceValidChallengeWhenResendIsAttempted(t *testing.T) {
+	account := domain.Account{
+		ID: "candidate-id", Type: domain.AccountTypeCandidate, Email: "user@example.com",
+		Status: domain.PendingVerification, CreatedAt: "2026-10-30T20:00:00Z",
+	}
+	repository := &fakeRepository{account: account}
+	sender := &fakeSender{}
+	service := newService(t, repository, fakeChecker{}, sender)
+	if _, err := service.Register(context.Background(), validRegistration()); err != nil {
+		t.Fatal(err)
+	}
+	originalHash := append([]byte(nil), repository.challenge.CodeHash...)
+	repository.pending = ports.PendingVerification{
+		Account: account, Recipient: account.Email,
+		ExpiresAt: time.Date(2026, 10, 30, 20, 10, 0, 0, time.UTC),
+	}
+	repository.pendingFound = true
+	sender.err = errors.New("relay unavailable")
+	if _, err := service.Register(context.Background(), validRegistration()); err == nil {
+		t.Fatal("expected resend to fail")
+	}
+	if sender.sends != 2 || string(repository.challenge.CodeHash) != string(originalHash) {
+		t.Fatalf("valid challenge was replaced after failed resend: sends=%d challenge=%+v", sender.sends, repository.challenge)
 	}
 }
 

@@ -38,7 +38,7 @@ func (s *RegistrationService) Register(ctx context.Context, registration domain.
 
 	pending, err := s.repository.FindPendingVerification(ctx, registration.Email)
 	if err == nil {
-		return pending.Account, s.issueVerification(ctx, pending.Account, pending.Recipient)
+		return pending.Account, s.issueVerification(ctx, pending.Account, pending.Recipient, false)
 	}
 	if !errors.Is(err, domain.ErrPendingVerificationNotFound) {
 		return domain.Account{}, fmt.Errorf("find pending verification: %w", err)
@@ -85,10 +85,10 @@ func (s *RegistrationService) Register(ctx context.Context, registration domain.
 		return domain.Account{}, fmt.Errorf("create %s account: %w", registration.AccountType, err)
 	}
 
-	return account, s.issueVerification(ctx, account, registration.Email)
+	return account, s.issueVerification(ctx, account, registration.Email, true)
 }
 
-func (s *RegistrationService) issueVerification(ctx context.Context, account domain.Account, recipient string) error {
+func (s *RegistrationService) issueVerification(ctx context.Context, account domain.Account, recipient string, persistBeforeSend bool) error {
 	code := make([]byte, 32)
 	if _, err := rand.Read(code); err != nil {
 		return fmt.Errorf("generate verification code: %w", err)
@@ -99,11 +99,18 @@ func (s *RegistrationService) issueVerification(ctx context.Context, account dom
 		AccountID: account.ID, AccountType: account.Type, Recipient: recipient,
 		CodeHash: codeHash[:], ExpiresAt: s.now().UTC().Add(verificationCodeLifetime),
 	}
-	if err := s.repository.SaveVerificationChallenge(ctx, challenge); err != nil {
-		return fmt.Errorf("save verification challenge: %w", err)
+	if persistBeforeSend {
+		if err := s.repository.SaveVerificationChallenge(ctx, challenge); err != nil {
+			return fmt.Errorf("save verification challenge: %w", err)
+		}
 	}
 	if err := s.sender.SendVerificationCode(ctx, recipient, codeText); err != nil {
 		return fmt.Errorf("send verification code: %w", err)
+	}
+	if !persistBeforeSend {
+		if err := s.repository.SaveVerificationChallenge(ctx, challenge); err != nil {
+			return fmt.Errorf("save verification challenge: %w", err)
+		}
 	}
 	return nil
 }

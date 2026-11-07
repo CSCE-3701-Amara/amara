@@ -50,18 +50,18 @@ INSERT INTO auth_email_verification_deliveries
 
 -- name: FindPendingVerification :one
 SELECT c.id::text, c.email, c.account_status, c.created_at,
-       d.account_type, d.recipient, d.expires_at
-FROM auth_email_verification_deliveries d
-JOIN candidates c ON d.account_id = c.id
-WHERE d.account_type = 'candidate'
-  AND lower(c.email) = lower($1)
+       'candidate', c.email, d.expires_at
+FROM candidates c
+LEFT JOIN auth_email_verification_deliveries d
+  ON d.account_id = c.id AND d.account_type = 'candidate'
+WHERE lower(c.email) = lower($1)
   AND c.account_status = 'pending_verification'
 UNION ALL
 SELECT i.id::text, i.email, i.account_status, i.created_at,
-       d.account_type, d.recipient, d.expires_at
-FROM auth_email_verification_deliveries d
-JOIN interviewers i ON d.account_id = i.id
-WHERE d.account_type = 'interviewer'
-  AND lower(i.email) = lower($1)
+       'interviewer', i.email, d.expires_at
+FROM interviewers i
+LEFT JOIN auth_email_verification_deliveries d
+  ON d.account_id = i.id AND d.account_type = 'interviewer'
+WHERE lower(i.email) = lower($1)
   AND i.account_status = 'pending_verification'
 LIMIT 1;
