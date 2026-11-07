@@ -18,14 +18,23 @@ func CandidateAuth(validator ports.SessionValidator) gin.HandlerFunc {
 
 // CandidateAuthWithErrorWriter applies candidate session checks using the caller's error format.
 func CandidateAuthWithErrorWriter(validator ports.SessionValidator, writeError func(*gin.Context, int, string, string)) gin.HandlerFunc {
-	return sessionAuth(validator, domain.AccountTypeCandidate, writeError)
+	return sessionAuthWithErrors(validator, domain.AccountTypeCandidate, writeError)
 }
 
 func AuthenticatedAuth(validator ports.SessionValidator) gin.HandlerFunc {
-	return sessionAuth(validator, "", writeSessionError)
+	return sessionAuth(validator, "")
 }
 
-func sessionAuth(validator ports.SessionValidator, requiredType domain.AccountType, writeError func(*gin.Context, int, string, string)) gin.HandlerFunc {
+func CompanyAuth(validator ports.SessionValidator, writeError func(*gin.Context, int, string, string)) gin.HandlerFunc {
+	return sessionAuthWithErrors(validator, domain.AccountTypeCompany, writeError)
+}
+
+func sessionAuth(validator ports.SessionValidator, requiredType domain.AccountType) gin.HandlerFunc {
+	return sessionAuthWithErrors(validator, requiredType, writeSessionError)
+}
+
+func sessionAuthWithErrors(validator ports.SessionValidator, requiredType domain.AccountType,
+	writeError func(*gin.Context, int, string, string)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if validator == nil {
 			writeError(c, http.StatusUnauthorized, "authentication_required", "Authentication is required.")

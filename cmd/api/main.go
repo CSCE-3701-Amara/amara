@@ -19,6 +19,8 @@ import (
 	canddatabase "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/database"
 	candhttp "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http"
 	candapplication "github.com/CSCE-3701-Amara/amara/internal/cand/application"
+	invwdatabase "github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
+	invwhttp "github.com/CSCE-3701-Amara/amara/internal/invw/adapters/http"
 	jobdatabase "github.com/CSCE-3701-Amara/amara/internal/job/adapters/database"
 	jobhttp "github.com/CSCE-3701-Amara/amara/internal/job/adapters/http"
 	jobapplication "github.com/CSCE-3701-Amara/amara/internal/job/application"
@@ -125,6 +127,7 @@ func run() error {
 		candapplication.NewJobFeed(feedRepo, jobLifecycle),
 		authhttp.CandidateAuth(authRepo),
 	)
+	moduleHandler := invwhttp.NewModuleHandler(invwdatabase.NewModuleRepository(dbSvc.Pool()), authRepo)
 	trackingRepo := canddatabase.NewApplicationTrackingRepository(dbSvc.Pool())
 	trackingHandler := candhttp.NewApplicationTrackingHandler(trackingRepo, authRepo)
 	// Candidate/interviewer registration needs a verification sender. Until that
@@ -138,6 +141,7 @@ func run() error {
 		feedHandler.RegisterRoutes,
 		postingHandler.RegisterRoutes,
 		applicationHandler.RegisterRoutes,
+		moduleHandler.RegisterRoutes,
 		trackingHandler.RegisterRoutes,
 	)
 	if err != nil {

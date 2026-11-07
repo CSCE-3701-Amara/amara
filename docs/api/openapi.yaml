@@ -891,50 +891,24 @@ paths:
   # Assessment module and question authoring
   /v1/modules:
     get:
-      summary: List accessible platform and company modules
+      summary: List your company’s assessment modules
       operationId: listAssessmentModules
       tags:
         - Modules
-      description: Hiring Managers may list their company library and published platform modules. System administrators
-        may inspect platform drafts. Other companies' private content is excluded.
-      x-implementation-status: planned
+      description: Returns private drafts, published definitions, and locked copies owned by the authenticated company.
       x-erd-entities:
         - MODULES
       security:
         - SessionCookie: []
-      parameters:
-        - $ref: '#/components/parameters/Limit'
-        - $ref: '#/components/parameters/Offset'
-        - name: source
-          in: query
-          required: false
-          description: Module source.
-          schema:
-            type: string
-            enum:
-              - platform
-              - company
-        - name: type
-          in: query
-          required: false
-          description: Module type.
-          schema:
-            type: string
-        - name: published
-          in: query
-          required: false
-          description: Publication filter.
-          schema:
-            type: boolean
       responses:
         '200':
-          description: List accessible platform and company modules.
+          description: List your company’s assessment modules.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AssessmentModulePage'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModuleAuthoringSummary'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -942,14 +916,11 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
-      summary: Create an assessment module draft
+      summary: Create a private assessment module draft
       operationId: createAssessmentModule
       tags:
         - Modules
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain. source=platform is restricted to system administrators; all
-        other modules belong to the current company. New modules are unpublished.
-      x-implementation-status: planned
+      description: Creates a company-owned draft. Questions and grading settings can be completed before publishing.
       x-erd-entities:
         - MODULES
       security:
@@ -959,38 +930,81 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AssessmentModuleWrite'
-            example:
-              name: Backend skills
-              type: coding
-              source: company
-              selectionMode: specific
-              difficultyMix: {}
-              amaraDefinitions: []
-              rubric: []
+              $ref: '#/components/schemas/ModuleAuthoringInput'
       responses:
         '201':
-          description: Create an assessment module draft.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AssessmentModule'
+          description: Create a private assessment module draft.
           headers:
             Location:
-              description: URI of the new module under /v1/modules/{moduleId}.
               schema:
                 type: string
                 format: uri-reference
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModuleAuthoringDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '409':
-          $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/UnprocessableContent'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/modules/library:
+    get:
+      summary: List published modules
+      operationId: listPublishedAssessmentModules
+      tags:
+        - Modules
+      description: Returns summaries of published modules available for copying across companies.
+      x-erd-entities:
+        - MODULES
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: List published modules.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModuleAuthoringSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/modules/library/problems:
+    get:
+      summary: List published coding problems
+      operationId: listPublishedCodingProblems
+      tags:
+        - Modules
+      description: Returns prompts and difficulty from published modules. Hidden test cases are omitted.
+      x-erd-entities:
+        - MODULES
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: List published coding problems.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModuleLibraryProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -998,24 +1012,22 @@ paths:
     parameters:
       - $ref: '#/components/parameters/ModuleId'
     get:
-      summary: Get an accessible module definition
+      summary: Get a company-owned module
       operationId: getAssessmentModule
       tags:
         - Modules
-      description: 'Authoring access only: owning Hiring Managers or system administrators; published platform
-        library access is allowed to Hiring Managers. Candidate assessment views use attempts instead.'
-      x-implementation-status: planned
+      description: Returns the definition, including grading material, to the authenticated owner company.
       x-erd-entities:
         - MODULES
       security:
         - SessionCookie: []
       responses:
         '200':
-          description: Get an accessible module definition.
+          description: Get a company-owned module.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AssessmentModule'
+                $ref: '#/components/schemas/ModuleAuthoringDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1027,15 +1039,11 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     put:
-      summary: Replace an unpublished module definition
+      summary: Replace a private module draft
       operationId: replaceAssessmentModule
       tags:
         - Modules
-      description: 'Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain. Draft definitions only. Published definitions are immutable;
-        changes require a new version. Deleting referenced or in-use content returns 409. This is a full replacement:
-        omitted nullable fields are cleared.'
-      x-implementation-status: planned
+      description: Replaces the full definition of a company-owned draft. Published definitions and copies are locked.
       x-erd-entities:
         - MODULES
       security:
@@ -1045,14 +1053,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AssessmentModuleWrite'
+              $ref: '#/components/schemas/ModuleAuthoringInput'
       responses:
         '200':
-          description: Replace an unpublished module definition.
+          description: Replace a private module draft.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AssessmentModule'
+                $ref: '#/components/schemas/ModuleAuthoringDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1423,14 +1431,9 @@ paths:
       operationId: publishAssessmentModule
       tags:
         - Modules
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain. Validate content, scoring configuration, timing, all Amara mappings
-        and level bands; AI-generated questions must be reviewed first. Invalid definitions remain unpublished
-        and return 422 with field/stage errors.
-      x-implementation-status: planned
+      description: Validates questions, grading settings, and required Amara mappings. Publishes an owned draft to the shared library.
       x-erd-entities:
         - MODULES
-        - ASSESSMENT_QUESTIONS
       security:
         - SessionCookie: []
       responses:
@@ -1439,7 +1442,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AssessmentModule'
+                $ref: '#/components/schemas/ModuleAuthoringDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1452,6 +1455,42 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/UnprocessableContent'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/modules/{moduleId}/copy:
+    parameters:
+      - $ref: '#/components/parameters/ModuleId'
+    post:
+      summary: Copy a published module
+      operationId: copyPublishedAssessmentModule
+      tags:
+        - Modules
+      description: Creates a locked private copy for the authenticated company, including the original grading configuration.
+      x-erd-entities:
+        - MODULES
+      security:
+        - SessionCookie: []
+      responses:
+        '201':
+          description: Copy a published module.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri-reference
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModuleAuthoringDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -5678,6 +5717,122 @@ components:
             $ref: '#/components/schemas/PostingErrorResponse'
 
   schemas:
+    ModuleAuthoringSummary:
+      type: object
+      required: [id, name, description, type, published]
+      properties:
+        id: {type: string, format: uuid}
+        name: {type: string}
+        description: {type: string}
+        type:
+          type: string
+          enum: [coding, programming_language, behavioral, recorded_video]
+        published: {type: boolean}
+    ModuleAuthoringInput:
+      type: object
+      required: [name, type]
+      properties:
+        name: {type: string}
+        description: {type: string}
+        type:
+          type: string
+          enum: [coding, programming_language, behavioral, recorded_video]
+        active_minutes:
+          type: integer
+          minimum: 1
+          description: Optional active timer for non-video modules.
+        threshold:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Required at publication for scored modules. Behavioral modules are unscored.
+        questions:
+          type: array
+          items:
+            type: object
+            required: [prompt, format]
+            properties:
+              prompt: {type: string}
+              format:
+                type: string
+                enum: [multiple_choice, short_text, long_text, code, video]
+              options:
+                type: array
+                items: {type: string}
+              amara: {type: string}
+              difficulty: {type: string}
+              test_cases:
+                type: array
+                items:
+                  type: object
+                  required: [input, expected_output, weight]
+                  properties:
+                    input: {type: string}
+                    expected_output: {type: string}
+                    weight: {type: integer, minimum: 1}
+        amarat:
+          type: array
+          items:
+            type: object
+            required: [name, crest, domain, description]
+            properties:
+              name: {type: string}
+              crest: {type: string}
+              domain: {type: string}
+              description: {type: string}
+        rubric:
+          type: array
+          items:
+            type: object
+            required: [description, amara]
+            properties:
+              description: {type: string}
+              amara: {type: string}
+        library:
+          type: object
+          required: [amara]
+          description: Choose specific published problems or a random difficulty mix.
+          properties:
+            amara: {type: string}
+            problems:
+              type: array
+              items:
+                $ref: '#/components/schemas/ModuleProblemReference'
+            difficulty_mix:
+              type: object
+              additionalProperties: {type: integer, minimum: 1}
+            pool:
+              type: array
+              readOnly: true
+              items:
+                $ref: '#/components/schemas/ModuleProblemReference'
+    ModuleAuthoringDetails:
+      allOf:
+        - $ref: '#/components/schemas/ModuleAuthoringInput'
+        - type: object
+          required: [id, company_id, published]
+          properties:
+            id: {type: string, format: uuid}
+            company_id: {type: string, format: uuid}
+            copied_from_module_id: {type: string, format: uuid}
+            published: {type: boolean}
+    ModuleProblemReference:
+      type: object
+      required: [module_id, position]
+      properties:
+        module_id: {type: string, format: uuid}
+        position:
+          type: integer
+          minimum: 0
+          description: Zero-based question position in the published module.
+    ModuleLibraryProblem:
+      allOf:
+        - $ref: '#/components/schemas/ModuleProblemReference'
+        - type: object
+          required: [prompt, difficulty]
+          properties:
+            prompt: {type: string}
+            difficulty: {type: string}
 
     # Shared pagination, validation and command payloads
     Pagination:
