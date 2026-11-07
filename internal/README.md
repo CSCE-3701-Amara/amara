@@ -76,6 +76,8 @@ server; the worker currently has no queue consumption and exits after shutdown.
 
 - `platform/config/config.go` reads process environment variables. Infisical
   injects secrets before startup; the API does not load `.env` files.
+- `platform/config/database.go` defines database pool limits, lifetimes, and
+  health check timeouts.
 - `platform/database/database.go` owns the shared pgx pool lifecycle and
   readiness checks. `cmd/api` passes `dbSvc.Pool()` only to module database
   adapters; application services depend on module-owned repository ports.
@@ -94,8 +96,18 @@ adapter with the signature `func(*gin.RouterGroup)`. Construct the adapter and
 its application dependencies in `cmd/api`, then pass the registration method
 to `httpserver.New(cfg.HTTP, logger, dbSvc, handler.RegisterRoutes)`. Registrars receive
 the `/v1` group, so registering `/jobs` exposes `/v1/jobs`.
+Registration, login, and company registration use these same registrars and
+receive the platform middleware. Company registration uses the shared database
+pool and the HIBP password checker. Candidate/interviewer registration returns
+`503 registration_unavailable` at startup until a verification sender is
+configured; no account is created in that case. With a sender available,
+construct `auth/application.RegistrationService` and its HTTP handler and pass
+`handler.RegisterRoutes` in place of `RegisterUnavailableRegistrationRoutes`.
 
 The adapter must apply AUTH's authentication and authorization middleware to
 protected routes. Schema migrations live in `supabase/migrations/` and are
 applied with the Supabase CLI. SQL belongs in module database adapters; cross-
-epic writes use the owning epic's application contract or an event.
+epic writes use the owning epic's application contract or an event. The shared
+pool is managed by `internal/platform/database.Service` and supplied to module
+repository adapters via `dbSvc.Pool()`; application services depend on
+epic-owned ports, not pgxpool.

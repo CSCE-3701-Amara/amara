@@ -10,14 +10,14 @@ Figure 1. AUTH logical components and dependencies. [PlantUML source](../src/04-
 
 | Component in source diagram | Responsibility in the modular monolith |
 |---|---|
-| Registration Service | Validates Candidate, Interviewer, and Company Representative registration commands and starts activation/verification flows. |
+| Registration Service | Validates Candidate, Interviewer, and Hiring Manager registration commands and starts activation/verification flows. |
 | Account Activation | Verifies activation codes and controls whether an account can sign in. |
 | Company Registration & Verification | Stores company registration requests and coordinates official-registry and admin review. |
 | Authentication & Session Manager | Authenticates direct/social-login credentials and establishes sessions with role and company context. |
-| MFA Manager | Manages optional account MFA and the mandatory Company Representative/Interviewer rules in AUTH. |
+| MFA Manager | Manages optional account MFA and the mandatory Hiring Manager/Interviewer rules in AUTH. |
 | Password Manager | Applies the password policy, reset workflow, and session invalidation on credential change. |
 | Access Control (RBAC) | Supplies the shared `IAccessControl` contract. Protected module operations check permissions and company scope here. |
-| Profile Management | Owns Candidate profile data and the account-level profile operations specified by AUTH. |
+| Profile Management | Owns Candidate profile data and the account-level profile and self-service lifecycle operations specified by AUTH for Candidates, Interviewers, and Hiring Managers. |
 | Document Upload & Extraction | Validates and stores supported documents; extracted values are applied only after user confirmation. |
 | Public Company Profile | Supplies public company information to authorized/public profile views as allowed by AUTH. |
 | Reporting & Rating | Records reports/ratings and routes them to the permitted administrative review flow. |
@@ -31,7 +31,7 @@ Figure 1. AUTH logical components and dependencies. [PlantUML source](../src/04-
 - Registration, activation, password reset, and notification messages are commands/events handled by AUTH and its worker-facing adapters. Email delivery failures do not roll back a committed account or reset state.
 - Company checks use the registry adapter and may be completed through the admin review path when needed. A failed/unavailable registry check is not treated as proof that a company is verified.
 - Login produces identity, role, activation state, and company context. The shared access-control contract is consumed by CAND, JOB, INVW, and ANA; company-scoped data access is enforced by the receiving module as well as the shared policy.
-- Company Representatives must use MFA; Interviewer login enforces the interviewer MFA requirement. These AUTH rules are the source of truth rather than duplicating MFA policy in other epics.
+- Hiring Managers must use MFA; Interviewer login enforces the interviewer MFA requirement. These AUTH rules are the source of truth rather than duplicating MFA policy in other epics.
 - Administrative actions against postings, tests, or other epic-owned entities are delegated through the owning module's operation so AUTH does not become a cross-epic table writer.
 
 ### Architectural decision
