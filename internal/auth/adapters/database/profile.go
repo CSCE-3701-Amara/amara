@@ -156,7 +156,7 @@ func candidateDate(value *time.Time) pgtype.Date {
 	return pgtype.Date{Time: *value, Valid: true}
 }
 
-func candidateInt(value *int) int32 {
+func candidateInt(value *int32) int32 {
 	if value == nil {
 		return 0
 	}

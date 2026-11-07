@@ -69,7 +69,7 @@ func TestProfileServiceRejectsInvalidUpdates(t *testing.T) {
 	long := string(make([]rune, 101))
 	badURL := "not a URL"
 	badEmail := "not an email"
-	negative := -1
+	negative := int32(-1)
 	tests := []struct {
 		name string
 		call func() error

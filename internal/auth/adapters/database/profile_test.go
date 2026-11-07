@@ -155,7 +155,7 @@ func TestProfileConversionHelpers(t *testing.T) {
 	if !candidateDate(&date).Valid || candidateDate(nil).Valid {
 		t.Fatal("date conversion failed")
 	}
-	experience := 4
+	experience := int32(4)
 	available := true
 	if candidateInt(&experience) != 4 || candidateInt(nil) != 0 || !candidateBool(&available) || candidateBool(nil) {
 		t.Fatal("scalar conversion failed")

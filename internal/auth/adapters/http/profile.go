@@ -45,7 +45,7 @@ type candidateProfileRequest struct {
 	Nationality       *string `json:"nationality"`
 	Address           *string `json:"address"`
 	Biography         *string `json:"biography"`
-	YearsOfExperience *int    `json:"yearsOfExperience"`
+	YearsOfExperience *int32  `json:"yearsOfExperience"`
 	Available         *bool   `json:"available"`
 }
 

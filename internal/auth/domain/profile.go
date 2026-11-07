@@ -41,7 +41,7 @@ type CandidateProfilePatch struct {
 	Nationality       *string
 	Address           *string
 	Biography         *string
-	YearsOfExperience *int
+	YearsOfExperience *int32
 	Available         *bool
 }
 
