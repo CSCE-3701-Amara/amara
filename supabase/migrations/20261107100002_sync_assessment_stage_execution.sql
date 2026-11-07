@@ -1,5 +1,3 @@
--- +goose Up
--- +goose StatementBegin
 CREATE FUNCTION sync_assessment_stage_execution() RETURNS trigger
 LANGUAGE plpgsql AS $$
 BEGIN
@@ -20,7 +18,6 @@ BEGIN
     RETURN NEW;
 END;
 $$;
--- +goose StatementEnd
 
 -- A held assessment is ready for advancement to apply the configured decision.
 CREATE TRIGGER assessment_attempt_sync_stage
@@ -29,7 +26,3 @@ FOR EACH ROW EXECUTE FUNCTION sync_assessment_stage_execution();
 
 -- Replay the projection for attempts recorded before the trigger existed.
 UPDATE assessment_attempts SET status = status;
-
--- +goose Down
-DROP TRIGGER assessment_attempt_sync_stage ON assessment_attempts;
-DROP FUNCTION sync_assessment_stage_execution();

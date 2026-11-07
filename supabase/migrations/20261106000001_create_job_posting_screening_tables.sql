@@ -1,4 +1,3 @@
--- +goose Up
 CREATE TABLE job_posting_requirements (
     id                  UUID    PRIMARY KEY DEFAULT gen_random_uuid(),
     posting_id          UUID    NOT NULL REFERENCES job_postings(id) ON DELETE CASCADE,
@@ -19,10 +18,3 @@ CREATE TABLE job_posting_amarat (
 
 CREATE INDEX job_posting_amarat_posting_idx ON job_posting_amarat(posting_id);
 CREATE UNIQUE INDEX job_posting_amarat_title_idx ON job_posting_amarat(posting_id, lower(amara_title));
-
--- +goose Down
-DROP INDEX IF EXISTS job_posting_amarat_title_idx;
-DROP INDEX IF EXISTS job_posting_amarat_posting_idx;
-DROP TABLE IF EXISTS job_posting_amarat;
-DROP INDEX IF EXISTS job_posting_requirements_posting_idx;
-DROP TABLE IF EXISTS job_posting_requirements;

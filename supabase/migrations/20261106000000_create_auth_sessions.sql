@@ -1,4 +1,3 @@
--- +goose Up
 CREATE TABLE auth_sessions (
     token        TEXT        PRIMARY KEY,
     account_id   UUID        NOT NULL,
@@ -9,6 +8,3 @@ CREATE TABLE auth_sessions (
 
 CREATE INDEX auth_sessions_account_idx ON auth_sessions (account_id, account_type);
 CREATE INDEX auth_sessions_expiry_idx ON auth_sessions (expires_at);
-
--- +goose Down
-DROP TABLE auth_sessions;

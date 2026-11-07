@@ -1,4 +1,3 @@
--- +goose Up
 ALTER TABLE candidates
     ADD COLUMN account_status TEXT NOT NULL DEFAULT 'pending_verification';
 
@@ -25,14 +24,3 @@ CREATE TABLE auth_email_verification_challenges (
 
 CREATE INDEX auth_email_verification_challenges_account_idx
     ON auth_email_verification_challenges (account_id, account_type);
-
--- +goose Down
-DROP TABLE auth_email_verification_challenges;
-DROP INDEX companies_email_lower_idx;
-DROP INDEX interviewers_email_lower_idx;
-DROP INDEX candidates_email_lower_idx;
-ALTER TABLE companies
-    DROP COLUMN registration_secret_hash,
-    DROP COLUMN approved;
-ALTER TABLE interviewers DROP COLUMN account_status;
-ALTER TABLE candidates DROP COLUMN account_status;

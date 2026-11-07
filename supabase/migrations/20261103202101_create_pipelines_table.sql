@@ -1,5 +1,3 @@
--- +goose Up
--- +goose StatementBegin
 CREATE TABLE pipeline_versions (
     id              UUID        PRIMARY KEY,
     version_number  INTEGER     NOT NULL,
@@ -21,7 +19,3 @@ CREATE TABLE pipeline_stages (
     name            TEXT        NOT NULL,
     module_type     TEXT        NOT NULL
 );
--- +goose StatementEnd
-
--- +goose Down
-DROP TABLE pipeline_versions, pipelines, pipeline_stages;

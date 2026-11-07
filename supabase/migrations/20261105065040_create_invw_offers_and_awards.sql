@@ -1,5 +1,3 @@
--- +goose Up
--- +goose StatementBegin
 CREATE TABLE identity_reveal_records (
     id UUID PRIMARY KEY,
     candidate_id UUID NOT NULL REFERENCES candidates(id),
@@ -53,23 +51,3 @@ CREATE UNIQUE INDEX offers_one_pending_application_idx
     ON offers (application_id) WHERE status = 'pending';
 CREATE INDEX offers_pending_deadline_idx ON offers (response_deadline) WHERE status = 'pending';
 CREATE INDEX candidate_amarat_candidate_awarded_idx ON candidate_amarat (cand_id, awarded_at);
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-DROP TABLE offers, identity_reveal_records;
-DROP INDEX candidate_amarat_candidate_awarded_idx;
-ALTER TABLE candidate_amarat
-    DROP COLUMN awarded_at,
-    DROP COLUMN pass_decision,
-    DROP COLUMN areas_for_development,
-    DROP COLUMN strengths,
-    DROP COLUMN level,
-    DROP COLUMN score,
-    DROP COLUMN definition_snapshot,
-    DROP COLUMN definition_version,
-    DROP COLUMN source_stage_execution_id,
-    DROP COLUMN application_id,
-    DROP COLUMN company_id,
-    DROP COLUMN id;
--- +goose StatementEnd

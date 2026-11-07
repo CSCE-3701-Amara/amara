@@ -1,4 +1,3 @@
--- +goose Up
 CREATE TABLE modules (
     id                  UUID    PRIMARY KEY,
     name                TEXT    NOT NULL,
@@ -8,6 +7,3 @@ CREATE TABLE modules (
     active_time_limit   INTERVAL,
     published           BOOLEAN
 );
-
--- +goose Down
-DROP TABLE modules;
