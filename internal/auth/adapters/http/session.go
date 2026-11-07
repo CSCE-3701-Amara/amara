@@ -18,15 +18,15 @@ func CandidateAuth(validator ports.SessionValidator) gin.HandlerFunc {
 
 // CandidateAuthWithErrorWriter applies candidate session checks using the caller's error format.
 func CandidateAuthWithErrorWriter(validator ports.SessionValidator, writeError func(*gin.Context, int, string, string)) gin.HandlerFunc {
-	return sessionAuth(validator, domain.AccountTypeCandidate, writeError)
+	return sessionAuth(validator, domain.AccountTypeCandidate)
 }
 
 func AuthenticatedAuth(validator ports.SessionValidator) gin.HandlerFunc {
-	return sessionAuth(validator, "", writeSessionError)
+	return sessionAuth(validator, "")
 }
 
 func CompanyAuth(validator ports.SessionValidator, writeError func(*gin.Context, int, string, string)) gin.HandlerFunc {
-	return sessionAuthWithErrors(validator, domain.AccountTypeCompany, writeError)
+	return sessionAuthWithErrors(validator, domain.AccountTypeCompany)
 }
 
 func sessionAuth(validator ports.SessionValidator, requiredType domain.AccountType) gin.HandlerFunc {
