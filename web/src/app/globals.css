@@ -1,26 +1,79 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --background: #fffdf9;
+  --foreground: #010101;
+  --surface: #ffffff;
+  --surface-muted: #f8f6f2;
+  --surface-secondary: #f1eee8;
+  --accent-hover: #58ef3f;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --border: #8b8176;
+  --text-muted: #55504c;
+  --accent: #66fe4c;
+  --accent-soft: #a1ff6e;
+  --orange: #ff8e2e;
+  --coral: #ff4d2c;
+  --card-shadow:
+    0 3.6px 7.2px rgb(87 48 21 / 6%), 0 28.8px 39px rgb(87 48 21 / 13%);
+  --radius-card: 36px;
+  --radius-field: 15.6px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-funnel-sans);
 }
 
 body {
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-funnel-sans), sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+button,
+input {
+  font: inherit;
+}
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+a {
+  touch-action: manipulation;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 3px solid #111;
+  box-shadow: 0 0 0 6px #fff !important;
+  outline-offset: 5px;
+}
+input:focus-visible {
+  outline-offset: 2px;
+}
+::selection {
+  background: #b6ffa9;
+  color: #010101;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

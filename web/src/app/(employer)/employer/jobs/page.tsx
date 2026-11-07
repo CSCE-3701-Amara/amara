@@ -1,3 +1,4 @@
+import { Postings } from "@/features/job/components/postings";
 export default function Page() {
-  return <div>Placeholder</div>;
+  return <Postings />;
 }

@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Amara frontend
 
-## Getting Started
+Next.js App Router frontend. Run commands from `web/`:
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```sh
+npm ci
+API_URL=http://127.0.0.1:8080 npm run dev
+npm run lint
+npm run build
+npm run test:e2e
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`API_URL` is a **server-only origin**, configured when Next.js starts in development or builds for production. The development default is `http://127.0.0.1:8080`; the production default is Docker's `http://api:8080`. Set the origin before building if your production API runs elsewhere. Do not include `/v1` in the origin. No browser-exposed API URL or token is needed.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The browser calls same-origin `/v1/...`; Next.js rewrites these requests to the Go API, forwarding cookies and `Set-Cookie`. `/health` and `/health/*` are proxied too. Preserve the backend's Secure, HttpOnly session cookie; use HTTPS outside localhost. Do not run a development server on port 3000 while Docker publishes that port.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Browser tests run a temporary development server on **3100**, configurable with `PLAYWRIGHT_PORT`. Install Chromium once using `npx playwright install chromium`. Tests mock authenticated API responses; read-only backend probes are described in [INTEGRATION.md](./INTEGRATION.md).
 
-## Learn More
+## Connected screens
 
-To learn more about Next.js, take a look at the following resources:
+- `/login`, `/register`: sessions, MFA, registration, and backend error states.
+- `/candidate/dashboard`: filtered, cursor-paginated candidate feed and application submission.
+- `/candidate/applications`: offset-paginated history and application details.
+- `/employer/jobs`, `/employer/jobs/new`, `/employer/jobs/[id]`: posting reads, creation, replacement, publication, archiving, deletion, and per-posting pipeline drafts.
+- `/employer/pipelines`: assessment drafts, editing, publication, and copying from the published library.
+- Workspace headers: logout through the backend's current-session endpoint.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Current backend blockers and contract discrepancies are recorded in [INTEGRATION.md](./INTEGRATION.md). A connected request can still be rejected by the existing backend; the UI displays the error and supports retry. It never fakes registration, submission, or persistence.
