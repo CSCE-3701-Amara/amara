@@ -1,0 +1,630 @@
+.feedHeader h1 {
+  margin: 0 0 8px;
+}
+.feedHeader > p {
+  margin: 0 0 10px;
+  color: var(--workspace-muted);
+  font-size: 20.4px;
+  line-height: 1.35;
+}
+.searchLabel {
+  font-size: 14.4px;
+  font-weight: 700;
+  color: var(--workspace-muted);
+  display: block;
+  margin-bottom: 2px;
+}
+.searchRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1015px) 190px;
+  gap: 20px;
+  max-width: 1225px;
+}
+.searchRow input {
+  height: 56px;
+  width: 100%;
+  min-width: 0;
+  border-radius: 11.52px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  background: var(--workspace-field);
+  font-size: 16px;
+}
+.searchRow button {
+  min-height: 56px;
+}
+.feedLayout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 30px;
+  margin-top: 24px;
+  align-items: start;
+}
+.filterPanel {
+  padding: 20px 23px;
+  border: 1px solid #e9e1d8;
+  border-radius: 12px;
+  background: white;
+  display: grid;
+  gap: 7px;
+}
+.filterPanel h2 {
+  font-size: 21.6px;
+  margin: 0 0 8px;
+}
+.filterPanel label {
+  display: grid;
+  gap: 3px;
+  font-size: 14.4px;
+  font-weight: 700;
+  color: var(--workspace-muted);
+}
+.filterPanel input,
+.filterPanel select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 11.52px;
+  padding: 9px 10px;
+  background: var(--workspace-field);
+  font-size: 14.4px;
+  font-weight: 400;
+  color: #333;
+}
+.results h2 {
+  font-size: 25.2px;
+  margin: 0;
+  line-height: 1.35;
+}
+.results > p {
+  color: var(--workspace-muted);
+  font-size: 16.8px;
+  margin: 0 0 24px;
+}
+.jobs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 320px));
+  gap: 20px;
+}
+.jobCard {
+  background: white;
+  border: 1px solid var(--workspace-border);
+  border-radius: 14px;
+  padding: 20px 12px;
+  min-width: 0;
+  min-height: 217px;
+  display: flex;
+  flex-direction: column;
+}
+.jobCard header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
+}
+.jobCard h3 {
+  font-size: 20px;
+  line-height: 1.3;
+}
+.jobCard header span {
+  font-size: 13px;
+  color: var(--workspace-muted);
+  max-width: 85px;
+  text-align: right;
+}
+.jobCard .companyName {
+  font-size: 14px;
+  margin: 6px 0 12px;
+  color: var(--workspace-muted);
+}
+.jobCard .salary {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+.jobTags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: auto 0 13px;
+}
+.jobTags > span {
+  padding: 5px 8px;
+  border-radius: 10px;
+  font-size: 13.2px;
+  background: var(--workspace-sidebar);
+  color: var(--workspace-muted);
+  font-weight: 700;
+}
+.jobCard > a {
+  min-height: 44px;
+  font-size: 15.6px;
+  padding: 10px;
+}
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block: 20px 24px;
+}
+.tabs button[aria-pressed="true"] {
+  background: #111;
+  color: white;
+}
+.applications {
+  padding: 24px 28.8px;
+  border-bottom: 1px solid #e3d4c4;
+}
+.applicationRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(180px, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 0;
+}
+.applicationRow h3 {
+  font-size: 21.6px;
+}
+.applicationRow p {
+  color: var(--workspace-muted);
+  font-size: 15.6px;
+  margin: 6px 0 0;
+}
+.applicationRow a {
+  min-width: 168px;
+}
+.applicationState {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+.applicationState small {
+  color: var(--workspace-muted);
+  font-size: 14.4px;
+}
+.listSummary {
+  color: var(--workspace-muted);
+  font-size: 14.4px;
+  margin-top: 24px;
+}
+.detailGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr);
+  gap: 28.8px;
+  align-items: start;
+}
+.panel {
+  border: 1px solid var(--workspace-border);
+  border-radius: 14px;
+  padding: 28.8px;
+  background: white;
+  min-width: 0;
+}
+.panel h2 {
+  font-size: 25.2px;
+  margin: 0 0 16px;
+}
+.panel p {
+  font-size: 18px;
+  color: var(--workspace-muted);
+}
+.contactPanel {
+  background: linear-gradient(118deg, #ffe7c0, #ff9a84);
+  border: none;
+}
+.contactPanel p,
+.contactPanel a {
+  color: #211813;
+  font-size: 16.8px;
+}
+.earned {
+  margin-top: 28.8px;
+}
+.earned h3 {
+  font-size: 16px;
+}
+.earnedGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.award {
+  display: flex;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 14px;
+  background: #faf6ee;
+}
+.award > span {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff0d1;
+  font-size: 18px;
+  font-weight: 700;
+  color: #835322;
+}
+.award p {
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+.formSection {
+  padding-bottom: 28px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid #e3d4c4;
+}
+.formSection h2 {
+  margin-bottom: 24px;
+}
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.formGrid label {
+  min-width: 0;
+}
+.fullWidth {
+  grid-column: 1 / -1;
+}
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0;
+}
+.timeline li {
+  position: relative;
+  padding: 0 0 28px 28px;
+  border-left: 2px solid #e3dbd1;
+  margin-left: 8px;
+}
+.timeline li::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: -7px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #fffdf9;
+}
+.timeline time {
+  font-size: 14px;
+  color: var(--workspace-muted);
+}
+.timeline h3 {
+  margin: 6px 0;
+}
+.timeline p {
+  margin: 0;
+}
+.statusPanel {
+  background: #f7f2e9;
+  border: 1px solid #e3dbd1;
+  padding: 28px;
+  border-radius: 14px;
+}
+.statusPanel h2 {
+  font-size: 30px;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+.assessmentGrid {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 24px;
+}
+.problemList {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+.problemList button {
+  justify-content: start;
+  text-align: left;
+}
+.problemList button[aria-current="true"] {
+  background: #111;
+  color: white;
+}
+.codeArea {
+  width: 100%;
+  min-height: 320px;
+  background: #171211;
+  color: #fff5e9;
+  font:
+    15px/1.6 ui-monospace,
+    monospace;
+  border: 1px solid #8b8176;
+  padding: 20px;
+  border-radius: 12px;
+  resize: vertical;
+  tab-size: 2;
+}
+.videoPreview {
+  background: #211813;
+  border-radius: 14px;
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  color: white;
+}
+.videoPreview video {
+  max-width: 100%;
+  max-height: 420px;
+  border-radius: 14px;
+}
+.schedule {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+}
+.slots {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.slots button[aria-pressed="true"] {
+  background: #111;
+  color: white;
+}
+@media (max-width: 1450px) {
+  .jobs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .feedLayout {
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 20px;
+  }
+  .applicationRow {
+    grid-template-columns: minmax(0, 1fr) minmax(160px, 0.8fr) auto;
+  }
+  .applicationRow a {
+    min-width: 130px;
+  }
+}
+@media (max-width: 1100px) {
+  .feedLayout {
+    grid-template-columns: 1fr;
+  }
+  .filterPanel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .filterPanel h2 {
+    grid-column: 1 / -1;
+  }
+  .applicationRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .applicationState {
+    grid-row: 2;
+  }
+  .applicationRow > a {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+  .detailGrid,
+  .schedule {
+    grid-template-columns: 1fr;
+  }
+  .earnedGrid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .searchRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+  .searchRow button {
+    padding-inline: 16px;
+    font-size: 14px;
+  }
+  .jobs {
+    grid-template-columns: 1fr;
+  }
+  .filterPanel {
+    padding: 18px;
+    gap: 12px;
+  }
+  .filterPanel label {
+    font-size: 13px;
+  }
+  .feedHeader > p {
+    font-size: 18px;
+  }
+  .applications {
+    padding: 0 0 20px;
+  }
+  .applicationRow {
+    gap: 12px;
+  }
+  .applicationRow a {
+    min-width: 0;
+    padding-inline: 14px;
+    font-size: 14px;
+  }
+  .applicationRow h3 {
+    font-size: 19px;
+  }
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    padding: 20px;
+  }
+  .assessmentGrid {
+    grid-template-columns: 1fr;
+  }
+  .problemList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.clock {
+  display: block;
+  font-size: 36px;
+  line-height: 1.25;
+  font-weight: 700;
+  margin: 12px 0;
+}
+.choiceGroup {
+  display: grid;
+  gap: 8px;
+  border: 0;
+  padding: 0;
+}
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  border: 1px solid #d4c9bd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--workspace-field);
+}
+.choice:has(input:checked) {
+  background: #e9f9df;
+  border-color: #86bd6c;
+}
+.choice input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  accent-color: #26781a;
+}
+.questionPanel {
+  margin-bottom: 24px;
+}
+.questionPanel h2 {
+  font-size: 21.6px;
+}
+.questionMeta {
+  text-transform: uppercase;
+  font-size: 13px !important;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.journey {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 20px 0;
+  max-width: 100%;
+}
+.journeyStep {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: none;
+}
+.journeyStep article {
+  width: 260px;
+  min-height: 230px;
+}
+.journeyStep img {
+  flex: none;
+}
+
+.advancedAssessment {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.74fr) minmax(230px, 1.1fr) minmax(
+      280px,
+      1.42fr
+    );
+  gap: 15px;
+  align-items: start;
+}
+.advancedAssessment .panel {
+  padding: 22px;
+  margin: 0 0 20px;
+}
+.advancedAssessment h2 {
+  font-size: 20px;
+}
+.advancedAssessment p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.advancedAssessment .problemList button {
+  border-radius: 8px;
+  text-align: left;
+  justify-content: flex-start;
+  min-height: 44px;
+  white-space: normal;
+}
+.advancedAssessment .problemList button[aria-pressed="true"] {
+  background: #e6f8db;
+  border: 1px solid #7bb666;
+}
+.publicPrompt {
+  white-space: pre-wrap;
+}
+.advancedScreen > header h1 {
+  font-size: 30px !important;
+}
+.advancedAssessment textarea.code {
+  min-height: 380px;
+  background: #100f0e;
+  color: #f4f0e8;
+  border-color: #49413a;
+  font: 14px/1.7 monospace;
+  tab-size: 2;
+}
+.advancedAssessment .field {
+  min-width: 0;
+}
+@media (max-width: 1250px) {
+  .advancedAssessment {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+  .advancedAssessment > aside {
+    grid-row: span 2;
+  }
+  .advancedAssessment > div:last-child {
+    grid-column: 2;
+  }
+}
+@media (max-width: 760px) {
+  .advancedAssessment {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .advancedAssessment > aside {
+    grid-row: auto;
+  }
+  .advancedAssessment > div:last-child {
+    grid-column: auto;
+  }
+  .advancedAssessment textarea.code {
+    min-height: 300px;
+  }
+}

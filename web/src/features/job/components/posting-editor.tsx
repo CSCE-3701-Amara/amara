@@ -1,7 +1,9 @@
 "use client";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { PostingPreview } from "./posting-preview";
 import { useRouter } from "next/navigation";
-import { useRef, useState, type FormEvent } from "react";
+import { useId, useRef, useState, type FormEvent } from "react";
 import { resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
 import {
@@ -9,7 +11,12 @@ import {
   BusyState,
   workspaceStyles as s,
 } from "@/shared/ui/workspace";
-import { PipelineEditor } from "@/features/invw/components/pipeline-editor";
+import {
+  ConfirmDialog,
+  ProductHeading,
+  WorkspaceFooter,
+} from "@/shared/ui/product-ui";
+import e from "@/shared/ui/editor.module.css";
 import {
   createPosting,
   updatePosting,
@@ -25,12 +32,20 @@ function localDate(value?: string | null) {
     .toISOString()
     .slice(0, 16);
 }
-function PostingForm({ initial }: { initial?: Posting }) {
+function PostingForm({
+  initial,
+  onSaved,
+}: {
+  initial?: Posting;
+  onSaved?: () => void;
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<Error>();
   const [message, setMessage] = useState("");
   const pending = useRef(false);
+  const errorId = useId();
+  const [invalidField, setInvalidField] = useState("");
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending.current) return;
@@ -77,6 +92,7 @@ function PostingForm({ initial }: { initial?: Posting }) {
       })),
     };
     setError(undefined);
+    setInvalidField("");
     setMessage("");
     if (
       body.salary_min !== null &&
@@ -84,6 +100,10 @@ function PostingForm({ initial }: { initial?: Posting }) {
       body.salary_min! > body.salary_max!
     ) {
       setError(new Error("Minimum salary cannot exceed maximum salary."));
+      setInvalidField("salary_max");
+      event.currentTarget
+        .querySelector<HTMLInputElement>('[name="salary_max"]')
+        ?.focus();
       return;
     }
     if (
@@ -91,6 +111,10 @@ function PostingForm({ initial }: { initial?: Posting }) {
       body.application_deadline &&
       body.application_deadline <= body.application_opening
     ) {
+      setInvalidField("application_deadline");
+      event.currentTarget
+        .querySelector<HTMLInputElement>('[name="application_deadline"]')
+        ?.focus();
       setError(
         new Error("The application deadline must be after the opening time."),
       );
@@ -111,7 +135,10 @@ function PostingForm({ initial }: { initial?: Posting }) {
         ? await updatePosting(initial.id, body)
         : await createPosting(body);
       if (!initial) router.push(`/employer/jobs/${resourceId(saved.id)}`);
-      else setMessage("Posting saved.");
+      else {
+        setMessage("Posting saved.");
+        onSaved?.();
+      }
     } catch (cause) {
       setError(cause as Error);
     } finally {
@@ -120,24 +147,29 @@ function PostingForm({ initial }: { initial?: Posting }) {
     }
   }
   return (
-    <form onSubmit={submit} className={`${s.card} ${s.form}`} aria-busy={busy}>
+    <form
+      onSubmit={submit}
+      className={`${e.section} ${s.form}`}
+      aria-busy={busy}
+    >
       <p>
         Title, seniority level, employment type, and required skills are
         required.
       </p>
-      <label className={s.field}>
+      <h2>Role details</h2>
+      <label className={e.field}>
         Job title
         <input name="title" required defaultValue={initial?.title} />
       </label>
-      <label className={s.field}>
+      <label className={e.field}>
         Description
         <textarea
           name="description"
           defaultValue={initial?.description ?? ""}
         />
       </label>
-      <div className={s.grid}>
-        <label className={s.field}>
+      <div className={e.grid}>
+        <label className={e.field}>
           Seniority level
           <input
             name="seniority_level"
@@ -145,7 +177,7 @@ function PostingForm({ initial }: { initial?: Posting }) {
             defaultValue={initial?.seniority_level}
           />
         </label>
-        <label className={s.field}>
+        <label className={e.field}>
           Employment type
           <select
             name="employment_type"
@@ -161,15 +193,15 @@ function PostingForm({ initial }: { initial?: Posting }) {
             ))}
           </select>
         </label>
-        <label className={s.field}>
+        <label className={e.field}>
           Location
           <input name="location" defaultValue={initial?.location ?? ""} />
         </label>
-        <label className={s.field}>
+        <label className={e.field}>
           Language
           <input name="language" defaultValue={initial?.language ?? ""} />
         </label>
-        <label className={s.field}>
+        <label className={e.field}>
           Currency
           <input name="currency" defaultValue={initial?.currency ?? ""} />
         </label>
@@ -181,10 +213,12 @@ function PostingForm({ initial }: { initial?: Posting }) {
             ["max_applications", "Application limit", 1],
           ] as const
         ).map(([name, label, min]) => (
-          <label key={name} className={s.field}>
+          <label key={name} className={e.field}>
             {label}
             <input
               name={name}
+              aria-invalid={invalidField === name || undefined}
+              aria-describedby={invalidField === name ? errorId : undefined}
               type="number"
               min={min}
               max="2147483647"
@@ -192,7 +226,7 @@ function PostingForm({ initial }: { initial?: Posting }) {
             />
           </label>
         ))}
-        <label className={s.field}>
+        <label className={e.field}>
           Applications open
           <input
             name="application_opening"
@@ -200,10 +234,14 @@ function PostingForm({ initial }: { initial?: Posting }) {
             defaultValue={localDate(initial?.application_opening)}
           />
         </label>
-        <label className={s.field}>
+        <label className={e.field}>
           Application deadline
           <input
             name="application_deadline"
+            aria-invalid={invalidField === "application_deadline" || undefined}
+            aria-describedby={
+              invalidField === "application_deadline" ? errorId : undefined
+            }
             type="datetime-local"
             defaultValue={localDate(initial?.application_deadline)}
           />
@@ -217,8 +255,8 @@ function PostingForm({ initial }: { initial?: Posting }) {
         />
         Show salary to candidates
       </label>
-      <label className={s.field}>
-        Required skills (Amarat), one per line
+      <label className={e.field}>
+        Required skills (amarat), one per line
         <textarea
           name="amarat"
           required
@@ -226,8 +264,8 @@ function PostingForm({ initial }: { initial?: Posting }) {
           placeholder={"React\nTypeScript"}
         />
       </label>
-      <div className={s.grid}>
-        <label className={s.field}>
+      <div className={e.grid}>
+        <label className={e.field}>
           Must-have requirements, one per line
           <textarea
             name="must_have"
@@ -237,7 +275,7 @@ function PostingForm({ initial }: { initial?: Posting }) {
               .join("\n")}
           />
         </label>
-        <label className={s.field}>
+        <label className={e.field}>
           Nice-to-have requirements, one per line
           <textarea
             name="nice_to_have"
@@ -248,7 +286,13 @@ function PostingForm({ initial }: { initial?: Posting }) {
           />
         </label>
       </div>
-      <ApiFeedback error={error} />
+      {invalidField && error ? (
+        <p id={errorId} className={s.error} role="alert">
+          {error.message}
+        </p>
+      ) : (
+        <ApiFeedback error={error} />
+      )}
       {message && (
         <p className={s.success} role="status">
           {message}
@@ -269,14 +313,12 @@ function PostingActions({
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<Error>();
+  const [confirm, setConfirm] = useState<
+    "publish" | "republish" | "archive" | "delete"
+  >();
   const router = useRouter();
   async function act(action: "publish" | "republish" | "archive" | "delete") {
     if (busy) return;
-    if (
-      action === "delete" &&
-      !window.confirm(`Delete “${posting.title}”? This cannot be undone.`)
-    )
-      return;
     setBusy(true);
     setError(undefined);
     try {
@@ -289,6 +331,7 @@ function PostingActions({
       }
     } catch (cause) {
       setError(cause as Error);
+      throw cause;
     } finally {
       setBusy(false);
     }
@@ -301,7 +344,9 @@ function PostingActions({
             className={s.primary}
             disabled={busy}
             onClick={() =>
-              act(posting.status === "archived" ? "republish" : "publish")
+              setConfirm(
+                posting.status === "archived" ? "republish" : "publish",
+              )
             }
           >
             {posting.status === "archived"
@@ -310,39 +355,89 @@ function PostingActions({
           </button>
         )}
         {posting.status === "published" && (
-          <button disabled={busy} onClick={() => act("archive")}>
+          <button disabled={busy} onClick={() => setConfirm("archive")}>
             Archive posting
           </button>
         )}
         <button
           className={s.danger}
           disabled={busy}
-          onClick={() => act("delete")}
+          onClick={() => setConfirm("delete")}
         >
           Delete posting
         </button>
       </div>
       <ApiFeedback error={error} />
+      {confirm && (
+        <ConfirmDialog
+          title={`${confirm[0].toUpperCase() + confirm.slice(1)} this posting?`}
+          description={`Review “${posting.title}” before continuing. This changes the posting’s availability to candidates.`}
+          confirmLabel={confirm === "delete" ? "Delete posting" : "Confirm"}
+          intent={confirm === "delete" ? "danger" : "warning"}
+          onClose={() => setConfirm(undefined)}
+          onConfirm={async () => {
+            await act(confirm);
+            setConfirm(undefined);
+          }}
+        />
+      )}
     </>
   );
 }
 export function PostingEditor({ id }: { id?: string }) {
+  const params = useSearchParams();
   const posting = useApiResource<Posting>(
     id ? `/v1/jobs/${resourceId(id)}` : null,
   );
+  if (id && params.get("state") === "publication-review")
+    return <PostingPreview id={id} review />;
   return (
     <>
       <Link href="/employer/jobs">Back to postings</Link>
-      <h1>{id ? "Manage job posting" : "Create a job posting"}</h1>
+      <ProductHeading
+        title={id ? "Edit job posting" : "Create job posting"}
+        description={
+          posting.data
+            ? `${posting.data.title} · ${posting.data.status}`
+            : "Build a clear role and choose the skills you need."
+        }
+        artwork={{
+          src: "/figma/posting-editor.svg",
+          width: 261.6,
+          height: 180,
+        }}
+      />
       <BusyState loading={posting.loading} />
       <ApiFeedback error={posting.error} retry={posting.reload} />
       {(!id || posting.data) && (
         <PostingForm key={posting.data?.id || "new"} initial={posting.data} />
       )}
+      {id && (
+        <div className={e.actions}>
+          <Link href={`/employer/jobs/${resourceId(id)}/preview`}>Preview</Link>
+          <Link
+            href={`/employer/jobs/${resourceId(id)}?state=publication-review`}
+          >
+            Review publication
+          </Link>
+        </div>
+      )}
       {posting.data && (
         <PostingActions posting={posting.data} reload={posting.reload} />
       )}
-      {id && <PipelineEditor postingId={id} />}
+      <section className={e.section}>
+        <h2>Hiring pipeline</h2>
+        <p>Set up assessments and interviews in Pipeline studio.</p>
+        <Link
+          href={
+            id ? `/employer/pipelines/${resourceId(id)}` : "/employer/pipelines"
+          }
+          className={s.button}
+        >
+          Open Pipeline studio
+        </Link>
+      </section>
+      <WorkspaceFooter />
     </>
   );
 }

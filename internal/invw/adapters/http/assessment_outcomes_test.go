@@ -162,6 +162,7 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	repo := database.NewAssessmentRepository(pool)
 	router := gin.New()
 	NewAssessmentHandler(repo, outcomeSessions{}).RegisterRoutes(router.Group("/v1"))
+	NewPipelineHandler(nil, outcomeSessions{}).RegisterRoutes(router.Group("/v1"))
 	request := func(method, path, token, body string, status int) []byte {
 		t.Helper()
 		req := httptest.NewRequest(method, "/v1"+path, strings.NewReader(body))
