@@ -267,6 +267,39 @@ func (r *AssessmentRepository) FinalizeEvidence(ctx context.Context, attemptID, 
 	return tx.Commit(ctx)
 }
 
+func (r *AssessmentRepository) ReleaseAssessmentResult(ctx context.Context, attemptID, company, feedback string, aiGenerated bool) error {
+	tag, err := r.pool.Exec(ctx, `
+		UPDATE assessment_results ar
+		SET feedback = $3,
+			feedback_is_ai_generated = $4,
+			feedback_approved_at = coalesce(ar.feedback_approved_at, statement_timestamp()),
+			disclosed_at = coalesce(ar.disclosed_at, statement_timestamp()),
+			is_disclosed = true
+		FROM assessment_attempts t
+		JOIN assessment_instances i ON i.id = t.instance_id
+		JOIN stage_executions se ON se.id = t.stage_execution_id
+		JOIN pipeline_executions pe ON pe.id = se.pipeline_execution_id
+		JOIN applications app ON app.id = pe.application_id
+		JOIN job_postings j ON j.id = app.posting_id
+		WHERE t.id = $1::uuid AND j.company_id::text = $2
+			AND ar.instance_id = i.id
+			AND t.status = 'scored' AND t.evaluated_at IS NOT NULL
+			AND se.status IN ('passed', 'rejected')
+			AND ar.passed = (se.status = 'passed')
+			AND (
+				(ar.disclosed_at IS NULL AND ar.is_disclosed IS NOT TRUE)
+				OR (ar.feedback IS NOT DISTINCT FROM $3 AND ar.feedback_is_ai_generated = $4)
+			)
+	`, attemptID, company, feedback, aiGenerated)
+	if err != nil {
+		return fmt.Errorf("release candidate assessment result: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return ErrAssessmentConflict
+	}
+	return nil
+}
+
 func (r *AssessmentRepository) RecordInterviewOutcome(ctx context.Context, interview, company, interviewer, outcome string) (json.RawMessage, error) {
 	var result json.RawMessage
 	err := r.pool.QueryRow(ctx, `

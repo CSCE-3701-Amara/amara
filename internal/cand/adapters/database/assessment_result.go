@@ -25,7 +25,7 @@ func (r *AssessmentResultRepository) ListByCandidateApplication(ctx context.Cont
 	}
 	rows, err := r.pool.Query(ctx, `
 		SELECT i.id::text,
-		       CASE WHEN ar.id IS NOT NULL OR t.evaluated_at IS NOT NULL THEN 'evaluated' ELSE 'pending' END,
+		       CASE WHEN ar.id IS NOT NULL THEN 'evaluated' ELSE 'pending' END,
 		       CASE WHEN ar.disclosed_at IS NOT NULL OR ar.is_disclosed IS TRUE
 		            THEN ar.passed ELSE NULL END,
 		       CASE WHEN ar.disclosed_at IS NOT NULL OR ar.is_disclosed IS TRUE

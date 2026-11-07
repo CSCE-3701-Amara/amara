@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
@@ -37,6 +38,7 @@ func (h *AssessmentHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 	v1.PUT("/assessment-attempts/:attemptId/submissions/:questionId", candidate, h.save)
 	v1.POST("/assessment-attempts/:attemptId/evaluation", authhttp.CompanyAuth(h.sessions, writeError), h.evaluate)
 	v1.GET("/assessment-attempts/:attemptId/evaluation", authhttp.CompanyAuth(h.sessions, writeError), h.review)
+	v1.POST("/assessment-attempts/:attemptId/result-disclosure", authhttp.CompanyAuth(h.sessions, writeError), h.releaseResult)
 	v1.POST("/interviews/:interviewId/outcome", authhttp.AuthenticatedAuth(h.sessions), h.interviewOutcome)
 }
 
@@ -118,6 +120,33 @@ func (h *AssessmentHandler) review(c *gin.Context) {
 	identity, _ := authhttp.Identity(c)
 	result, err := h.repo.ReviewEvaluation(c.Request.Context(), id, identity.CompanyID)
 	writeAssessment(c, result, err)
+}
+
+func (h *AssessmentHandler) releaseResult(c *gin.Context) {
+	id, ok := assessmentID(c, "attemptId")
+	if !ok {
+		return
+	}
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 1<<20)
+	var body struct {
+		Feedback    string `json:"feedback" binding:"required"`
+		AIGenerated bool   `json:"aiGenerated"`
+	}
+	if c.ShouldBindJSON(&body) != nil || strings.TrimSpace(body.Feedback) == "" {
+		writeError(c, http.StatusBadRequest, "invalid_assessment_feedback", "Candidate-facing feedback is required.")
+		return
+	}
+	identity, _ := authhttp.Identity(c)
+	if identity.CompanyID == "" {
+		writeError(c, http.StatusForbidden, "forbidden", "A company account is required.")
+		return
+	}
+	err := h.repo.ReleaseAssessmentResult(c.Request.Context(), id, identity.CompanyID, strings.TrimSpace(body.Feedback), body.AIGenerated)
+	if err != nil {
+		writeAssessment(c, nil, err)
+		return
+	}
+	c.Status(http.StatusNoContent)
 }
 
 func (h *AssessmentHandler) interviewOutcome(c *gin.Context) {
