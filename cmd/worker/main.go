@@ -37,19 +37,11 @@ func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	// Queue consumption is not implemented yet; the worker process keeps its
-	// shared database connection warm so module job handlers can register in
-	// later work without changing the lifecycle wiring.
 	dbSvc, err := database.NewService(ctx, cfg.Database)
 	if err != nil {
 		return fmt.Errorf("connect database: %w", err)
 	}
 	defer dbSvc.Close()
-
-	logger.Info("database connection ready", "waiting_for_work", true)
-
-	<-ctx.Done()
-	return nil
 
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()

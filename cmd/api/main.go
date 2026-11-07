@@ -12,11 +12,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-
-	canddatabase "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/database"
-	candhttp "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http"
-	candapplication "github.com/CSCE-3701-Amara/amara/internal/cand/application"
-
 	authdatabase "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/database"
 	authhttp "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/http"
 	authpassword "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/password"
@@ -75,23 +70,7 @@ func run() error {
 	defer dbSvc.Close()
 	logger.Info("database connection ready")
 
-
-	jobLifecycleRepo := jobdatabase.NewPostingLifecycleRepository(dbSvc.Pool())
-	jobLifecycle := jobapplication.NewPostingLifecycle(jobLifecycleRepo)
-	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
-	feedHandler := candhttp.NewJobFeedHandler(candapplication.NewJobFeed(feedRepo, jobLifecycle), nil)
-	assessmentProgressRepo := canddatabase.NewAssessmentProgressRepository(dbSvc.Pool())
-	assessmentProgressHandler := candhttp.NewAssessmentProgressHandler(candapplication.NewAssessmentProgress(assessmentProgressRepo), nil)
-	assessmentResultRepo := canddatabase.NewAssessmentResultRepository(dbSvc.Pool())
-	assessmentResultHandler := candhttp.NewAssessmentResultHandler(candapplication.NewAssessmentResults(assessmentResultRepo), nil)
-	pipelineProgressRepo := invwdatabase.NewCandidatePipelineProgressRepository(dbSvc.Pool())
-	pipelineProgressHandler := invwhttp.NewCandidatePipelineProgressHandler(invwapplication.NewCandidatePipelineProgress(pipelineProgressRepo), nil)
-	postingListRepo := jobdatabase.NewCompanyPostingListRepository(dbSvc.Pool())
-	postingListHandler := jobhttp.NewPostingListHandler(jobapplication.NewCompanyPostingList(postingListRepo, jobLifecycle), nil)
-	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, feedHandler.RegisterRoutes, assessmentProgressHandler.RegisterRoutes, assessmentResultHandler.RegisterRoutes, pipelineProgressHandler.RegisterRoutes, postingListHandler.RegisterRoutes)
-
 	authRepo, err := authdatabase.NewRegistrationRepository(dbSvc.Pool())
-
 	if err != nil {
 		return fmt.Errorf("create auth repository: %w", err)
 	}
@@ -178,10 +157,21 @@ func run() error {
 	applicationService := jobapplication.NewApplicationAdmission(applicationRepo)
 	applicationHandler := jobhttp.NewApplicationHandler(applicationService, nil)
 
+	candidateAuth := authhttp.CandidateAuth(authRepo)
 	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
 	feedHandler := candhttp.NewJobFeedHandler(
 		candapplication.NewJobFeed(feedRepo, jobLifecycle),
-		authhttp.CandidateAuth(authRepo),
+		candidateAuth,
+	)
+	assessmentProgressRepo := canddatabase.NewAssessmentProgressRepository(dbSvc.Pool())
+	assessmentProgressHandler := candhttp.NewAssessmentProgressHandler(
+		candapplication.NewAssessmentProgress(assessmentProgressRepo),
+		candidateAuth,
+	)
+	assessmentResultRepo := canddatabase.NewAssessmentResultRepository(dbSvc.Pool())
+	assessmentResultHandler := candhttp.NewAssessmentResultHandler(
+		candapplication.NewAssessmentResults(assessmentResultRepo),
+		candidateAuth,
 	)
 	pipelineHandler := invwhttp.NewPipelineHandler(invwdatabase.NewPipelineRepository(dbSvc.Pool()), authRepo)
 	moduleHandler := invwhttp.NewModuleHandler(invwdatabase.NewModuleRepository(dbSvc.Pool()), authRepo)
@@ -192,7 +182,7 @@ func run() error {
 	pipelineProgressRepo := invwdatabase.NewCandidatePipelineProgressRepository(dbSvc.Pool())
 	pipelineProgressHandler := invwhttp.NewCandidatePipelineProgressHandler(
 		invwapplication.NewCandidatePipelineProgress(pipelineProgressRepo),
-		nil,
+		candidateAuth,
 	)
 
 	// Candidate/interviewer registration needs a verification sender. Until that
@@ -205,6 +195,8 @@ func run() error {
 		accountActionHandler.RegisterRoutes,
 		profileHandler.RegisterRoutes,
 		feedHandler.RegisterRoutes,
+		assessmentProgressHandler.RegisterRoutes,
+		assessmentResultHandler.RegisterRoutes,
 		postingHandler.RegisterRoutes,
 		func(group *gin.RouterGroup) { jobhttp.RegisterPostingPreviewRoutes(group, postingService, authRepo) },
 		postingListHandler.RegisterRoutes,
