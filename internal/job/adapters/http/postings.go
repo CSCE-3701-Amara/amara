@@ -245,10 +245,10 @@ func (h *PostingHandler) delete(c *gin.Context) {
 }
 
 func decodePostingRequest(c *gin.Context) (postingRequest, bool) {
-	var request postingRequest
+	var request *postingRequest
 	decoder := json.NewDecoder(http.MaxBytesReader(c.Writer, c.Request.Body, 1<<20))
 	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&request); err != nil {
+	if err := decoder.Decode(&request); err != nil || request == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"code": "invalid_request", "message": "Request body must contain valid posting JSON."}})
 		return postingRequest{}, false
 	}
@@ -256,7 +256,7 @@ func decodePostingRequest(c *gin.Context) (postingRequest, bool) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"code": "invalid_request", "message": "Request body must contain one JSON object."}})
 		return postingRequest{}, false
 	}
-	return request, true
+	return *request, true
 }
 
 func authenticatedAccount(c *gin.Context) (string, bool) {
