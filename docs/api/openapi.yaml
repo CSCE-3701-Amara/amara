@@ -232,7 +232,7 @@ paths:
 
 
   # Candidate profile and application history
-  /v1/candidates/me:
+  /api/v1/candidates/me:
     patch:
       summary: Modify the authenticated candidate profile
       operationId: updateCandidateProfile
