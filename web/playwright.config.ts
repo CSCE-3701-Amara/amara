@@ -14,11 +14,7 @@ export default defineConfig({
     launchOptions: {
       args: [
         "--enable-unsafe-webgpu",
-        "--enable-features=Vulkan",
-        "--use-angle=vulkan",
-        "--use-vulkan=swiftshader",
-        "--use-webgpu-adapter=swiftshader",
-        "--disable-vulkan-surface",
+        "--use-angle=swiftshader",
       ],
     },
     trace: "retain-on-failure",
