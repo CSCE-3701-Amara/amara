@@ -115,7 +115,7 @@ func run() error {
 	jobLifecycleRepo := jobdatabase.NewPostingLifecycleRepository(dbSvc.Pool())
 	jobLifecycle := jobapplication.NewPostingLifecycle(jobLifecycleRepo)
 	postingListRepo := jobdatabase.NewCompanyPostingListRepository(dbSvc.Pool())
-	postingListHandler := jobhttp.NewPostingListHandler(jobapplication.NewCompanyPostingList(postingListRepo, jobLifecycle), nil)
+	postingListHandler := jobhttp.NewPostingListHandler(jobapplication.NewCompanyPostingList(postingListRepo, jobLifecycle), authRepo)
 	postingRepo := jobdatabase.NewPostingManagementRepository(dbSvc.Pool())
 	postingService := jobapplication.NewPostingManagement(postingRepo)
 	// AUTH integration placeholder: the current checkout has no session middleware.
