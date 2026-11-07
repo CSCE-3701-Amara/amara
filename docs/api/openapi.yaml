@@ -370,8 +370,8 @@ paths:
       operationId: getOwnCompanyProfile
       tags:
         - Companies
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain.
+      description: Company self-service only. Returns the profile of the company bound to the authenticated
+        company session. System administrators are not authorized on this route.
       x-implementation-status: implemented
       x-erd-entities:
         - COMPANIES
@@ -443,8 +443,8 @@ paths:
       operationId: listCompanyInterviewers
       tags:
         - Companies
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain.
+      description: Company self-service only. Lists interviewers of the company bound to the authenticated
+        company session. System administrators are not authorized on this route.
       x-implementation-status: implemented
       x-erd-entities:
         - INTERVIEWERS

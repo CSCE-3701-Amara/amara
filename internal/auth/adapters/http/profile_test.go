@@ -21,6 +21,7 @@ type profileHandlerRepository struct {
 	company         domain.CompanyProfilePatch
 	interviewerName string
 	updateCalls     int
+	readCalls       int
 	err             error
 }
 
@@ -29,9 +30,11 @@ func (r *profileHandlerRepository) GetCandidateProfile(_ context.Context, _ stri
 }
 
 func (r *profileHandlerRepository) GetCompanyProfile(_ context.Context, _ string, _ bool) (domain.CompanyProfile, error) {
+	r.readCalls++
 	return domain.CompanyProfile{ID: "company-id", LegalName: "Example", Approved: true}, r.err
 }
 func (r *profileHandlerRepository) ListCompanyInterviewers(_ context.Context, _ string, _, _ int32) ([]domain.InterviewerProfile, int64, error) {
+	r.readCalls++
 	return []domain.InterviewerProfile{{ID: "interviewer-id", CompanyID: "company-id", Name: "Mona", Email: "mona@example.com", AccountStatus: "active"}}, 1, r.err
 }
 func (r *profileHandlerRepository) GetInterviewerProfile(_ context.Context, _ string) (domain.InterviewerProfile, error) {
@@ -118,6 +121,22 @@ func TestProfileHandlerGetsProfiles(t *testing.T) {
 	if recorder := requestProfile(t, router, http.MethodGet, "/v1/interviewers/me", ""); recorder.Code != http.StatusOK ||
 		!strings.Contains(recorder.Body.String(), `"name":"Mona"`) {
 		t.Fatalf("interviewer profile status = %d, body = %s", recorder.Code, recorder.Body.String())
+	}
+}
+
+func TestProfileHandlerDeniesSystemAdministratorOnCompanySelfService(t *testing.T) {
+	repository := &profileHandlerRepository{}
+	_, router := newProfileTestHandler(t, repository, ports.Identity{
+		AccountID: "admin-id", AccountType: domain.AccountType("system_admin"),
+	})
+	for _, path := range []string{"/v1/companies/me", "/v1/companies/me/interviewers"} {
+		recorder := requestProfile(t, router, http.MethodGet, path, "")
+		if recorder.Code != http.StatusForbidden {
+			t.Errorf("%s: status = %d, want %d, body = %s", path, recorder.Code, http.StatusForbidden, recorder.Body.String())
+		}
+	}
+	if repository.readCalls != 0 {
+		t.Fatalf("company data reads = %d, want 0", repository.readCalls)
 	}
 }
 
