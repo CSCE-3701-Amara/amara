@@ -27,30 +27,43 @@ type previewRepository struct {
 }
 
 func (r previewRepository) Get(_ context.Context, companyID, id string) (domain.Posting, error) {
-	if companyID != r.posting.CompanyID || id != r.posting.ID {
+	if companyID != r.posting.CompanyID || (id != r.posting.ID && id != previewVisibleID) {
 		return domain.Posting{}, domain.ErrPostingNotFound
 	}
-	return r.posting, nil
+	posting := r.posting
+	posting.ID = id
+	visible := id == previewVisibleID
+	posting.SalaryVisible = &visible
+	return posting, nil
 }
+
+const previewVisibleID = "00000000-0000-0000-0000-000000000003"
 
 func TestPostingPreview(t *testing.T) {
 	const id = "00000000-0000-0000-0000-000000000001"
 	const owner = "00000000-0000-0000-0000-000000000002"
-	repo := previewRepository{posting: domain.Posting{ID: id, CompanyID: owner, Title: "Saved draft", Status: domain.PostingDraft}}
+	minSalary, maxSalary := int32(100), int32(200)
+	repo := previewRepository{posting: domain.Posting{ID: id, CompanyID: owner, Title: "Saved draft", Status: domain.PostingDraft, SalaryMin: &minSalary, SalaryMax: &maxSalary}}
 	router := gin.New()
 	RegisterPostingPreviewRoutes(router.Group("/v1"), application.NewPostingManagement(repo), previewSession{})
 	for _, tc := range []struct {
-		name, method, session, body, expected string
-		status                                int
+		name, method, session, postingID, body, expected string
+		status                                           int
+		salaryVisible                                    bool
 	}{
-		{"saved draft", http.MethodGet, owner, "", `"title":"Saved draft"`, 200},
-		{"incomplete edits", http.MethodPost, owner, `{"title":" Edited ","salary_min":100}`, `"title":"Edited"`, 200},
-		{"cross company", http.MethodPost, id, `{"title":"Edited"}`, "", 404},
-		{"unauthenticated", http.MethodGet, "", "", "", 401},
-		{"malformed", http.MethodPost, owner, `{"title":`, "", 400},
+		{"saved hidden", http.MethodGet, owner, id, "", `"title":"Saved draft"`, 200, false},
+		{"saved visible", http.MethodGet, owner, previewVisibleID, "", `"title":"Saved draft"`, 200, true},
+		{"edited hidden", http.MethodPost, owner, id, `{"title":" Edited ","salary_min":100,"salary_max":200,"salary_visible":false}`, `"title":"Edited"`, 200, false},
+		{"edited visible", http.MethodPost, owner, id, `{"salary_min":100,"salary_max":200,"salary_visible":true}`, "", 200, true},
+		{"visibility omitted", http.MethodPost, owner, id, `{"salary_min":100,"salary_max":200}`, "", 200, false},
+		{"empty object", http.MethodPost, owner, id, `{}`, `"title":""`, 200, false},
+		{"null body", http.MethodPost, owner, id, `null`, `"code":"invalid_request"`, 400, false},
+		{"cross company", http.MethodPost, id, id, `{"title":"Edited"}`, "", 404, false},
+		{"unauthenticated", http.MethodGet, "", id, "", "", 401, false},
+		{"malformed", http.MethodPost, owner, id, `{"title":`, "", 400, false},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			req := httptest.NewRequest(tc.method, "/v1/jobs/"+id+"/preview", strings.NewReader(tc.body))
+			req := httptest.NewRequest(tc.method, "/v1/jobs/"+tc.postingID+"/preview", strings.NewReader(tc.body))
 			if tc.session != "" {
 				req.AddCookie(&http.Cookie{Name: "amara_session", Value: tc.session})
 			}
@@ -60,7 +73,14 @@ func TestPostingPreview(t *testing.T) {
 			if response.Code != tc.status || !strings.Contains(body, tc.expected) {
 				t.Fatalf("got %d %s, want %d containing %q", response.Code, body, tc.status, tc.expected)
 			}
-			if tc.status == 200 && (!strings.Contains(body, `"salary_min":null`) || response.Header().Get("Cache-Control") != "no-store") {
+			if tc.status != http.StatusOK {
+				return
+			}
+			min, max := `"salary_min":null`, `"salary_max":null`
+			if tc.salaryVisible {
+				min, max = `"salary_min":100`, `"salary_max":200`
+			}
+			if !strings.Contains(body, min) || !strings.Contains(body, max) || response.Header().Get("Cache-Control") != "no-store" {
 				t.Fatalf("unexpected preview body or headers: %s %v", body, response.Header())
 			}
 		})
