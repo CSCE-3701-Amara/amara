@@ -5,10 +5,7 @@ info:
   description: |
     AMARA HTTP API specification following RFC 9457 Problem Details for HTTP errors,
     except where an implemented operation documents its existing JSON error shape.
-    New endpoints use the canonical /v1 prefix. Existing AUTH and candidate-profile
-    contract paths under /api/v1 are retained at their documented URLs.
-    On main, registered module routes also have /api/v1 compatibility aliases;
-    login additionally accepts /v1/auth/login and /api/v1/auth/login. Clients should
+    New endpoints use the canonical /v1 prefix. Clients should
     use the exact operation paths below rather than substituting prefixes.
     Operations marked x-implementation-status: planned describe intended behavior;
     their handlers are not registered and requests currently return router 404s.
@@ -45,7 +42,7 @@ tags:
     description: Company registration review and account administration.
 
 # Established paths and payloads take precedence over newer additions.
-# New endpoints use /v1; retained /api/v1 paths and compatibility aliases are described above.
+# Auth routes are registered under /v1.
 paths:
 
   # Health
@@ -75,12 +72,10 @@ paths:
 
 
   # Authentication and account lifecycle
-  /api/v1/auth/registrations:
+  /v1/auth/registrations:
     post:
       summary: Register a candidate or interviewer
       operationId: registerCandidateOrInterviewer
-      description: Planned operation; no registration handler is currently registered.
-      x-implementation-status: planned
       tags:
         - Auth
       requestBody:
@@ -107,12 +102,10 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/auth/company-registrations:
+  /v1/auth/company-registrations:
     post:
       summary: Submit a company registration request
       operationId: registerCompany
-      description: Planned operation; no company registration handler is currently registered.
-      x-implementation-status: planned
       tags:
         - Auth
       requestBody:
@@ -139,7 +132,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/auth/sessions:
+  /v1/auth/sessions:
     post:
       summary: Create an authenticated session
       operationId: createSession
@@ -174,12 +167,10 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/auth/sessions/current:
+  /v1/auth/sessions/current:
     delete:
       summary: Terminate the current authenticated session
       operationId: deleteCurrentSession
-      description: Planned operation; no logout handler is currently registered. The 204 response and clearing cookie describe intended behavior.
-      x-implementation-status: planned
       tags:
         - Auth
       security:
@@ -195,12 +186,10 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/auth/account-actions:
+  /v1/auth/account-actions:
     post:
       summary: Deactivate or delete the authenticated candidate profile
       operationId: performAccountAction
-      description: Planned operation; no account-action handler is currently registered.
-      x-implementation-status: planned
       tags:
         - Auth
       security:
@@ -230,7 +219,7 @@ paths:
 
 
   # Candidate profile and application history
-  /api/v1/candidates/me:
+  /v1/candidates/me:
     patch:
       summary: Modify the authenticated candidate profile
       operationId: updateCandidateProfile
