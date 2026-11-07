@@ -24,19 +24,27 @@ func (r *AssessmentResultRepository) ListByCandidateApplication(ctx context.Cont
 		return nil, false, fmt.Errorf("candidate assessment result database is not configured")
 	}
 	rows, err := r.pool.Query(ctx, `
-		SELECT aa.assessment_id::text, aa.evaluation_status,
-		       CASE WHEN aa.result_disclosed_at IS NOT NULL AND aa.evaluation_status = 'evaluated'
-	            THEN aa.passed ELSE NULL END,
-		       CASE WHEN aa.result_disclosed_at IS NOT NULL AND aa.evaluation_status = 'evaluated'
-	            THEN aa.evaluated_at ELSE NULL END,
-		       CASE WHEN aa.feedback_disclosed_at IS NOT NULL THEN aa.feedback_text ELSE NULL END,
-		       CASE WHEN aa.feedback_disclosed_at IS NOT NULL THEN aa.feedback_strengths ELSE NULL END,
-		       CASE WHEN aa.feedback_disclosed_at IS NOT NULL THEN aa.areas_for_improvement ELSE NULL END,
-		       CASE WHEN aa.feedback_disclosed_at IS NOT NULL THEN aa.feedback_is_ai_generated ELSE NULL END
+		SELECT i.id::text,
+		       CASE WHEN ar.id IS NOT NULL OR t.evaluated_at IS NOT NULL THEN 'evaluated' ELSE 'pending' END,
+		       CASE WHEN ar.disclosed_at IS NOT NULL OR ar.is_disclosed IS TRUE
+		            THEN ar.passed ELSE NULL END,
+		       CASE WHEN ar.disclosed_at IS NOT NULL OR ar.is_disclosed IS TRUE
+		            THEN coalesce(ar.scored_at, t.evaluated_at) ELSE NULL END,
+		       CASE WHEN ar.feedback_approved_at IS NOT NULL
+		                  AND (ar.disclosed_at IS NOT NULL OR ar.is_disclosed IS TRUE)
+		            THEN ar.feedback ELSE NULL END,
+		       '[]'::jsonb,
+		       '[]'::jsonb,
+		       CASE WHEN ar.feedback_approved_at IS NOT NULL
+		                  AND (ar.disclosed_at IS NOT NULL OR ar.is_disclosed IS TRUE)
+		            THEN ar.feedback_is_ai_generated ELSE NULL END
 		FROM applications a
-		JOIN application_assessments aa ON aa.application_id = a.id
-		WHERE a.id = $1 AND a.cand_id = $2 AND aa.status IN ('submitted', 'completed')
-		ORDER BY aa.created_at, aa.id`, applicationID, candidateID)
+		JOIN assessment_instances i ON i.application_id = a.id
+		LEFT JOIN assessment_attempts t ON t.instance_id = i.id
+		LEFT JOIN assessment_results ar ON ar.instance_id = i.id
+		WHERE a.id = $1 AND a.cand_id = $2
+		  AND (t.submitted_at IS NOT NULL OR ar.id IS NOT NULL)
+		ORDER BY coalesce(t.submitted_at, i.deadline), i.id`, applicationID, candidateID)
 	if err != nil {
 		return nil, false, fmt.Errorf("query candidate assessment results: %w", err)
 	}
