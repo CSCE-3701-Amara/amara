@@ -17,9 +17,13 @@ test("DAG joins remain explicit, cycles are rejected, and nodes support keyboard
   await expect
     .poll(async () => Math.round((await node.boundingBox())!.x))
     .toBe(Math.round(before!.x + 20));
-  await page
-    .getByRole("button", { name: /^Live interview, 3 incoming/ })
-    .click();
+  await page.getByRole("button", { name: /^Live interview, 3 incoming/ }).click();
+  await expect(
+    page.getByRole("group", { name: "Interview setup" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("No assessment modules are available yet."),
+  ).toHaveCount(0);
   await page.getByLabel("Connect to stage").selectOption("stage-1");
   await page
     .getByRole("button", { name: "Add connection", exact: true })
@@ -33,6 +37,88 @@ test("DAG joins remain explicit, cycles are rejected, and nodes support keyboard
     page.getByRole("button", { name: "Save graph draft" }),
   ).toBeDisabled();
 });
+
+test("creates a pipeline draft through the supported API from the empty state", async ({
+  page,
+}) => {
+  await productFixtures(page);
+  let created = false;
+  await page.route(`**/v1/jobs/${ids.job}/pipeline`, async (route) => {
+    if (route.request().method() === "POST") {
+      created = true;
+      return route.fulfill({
+        status: 201,
+        json: {
+          id: ids.job,
+          postingId: ids.job,
+          versionId: ids.version,
+          versionNumber: 2,
+        },
+      });
+    }
+    if (created) {
+      return route.fulfill({
+        json: {
+          id: ids.job,
+          postingId: ids.job,
+          versionId: ids.version,
+          versionNumber: 2,
+        },
+      });
+    }
+    return route.fulfill({
+      status: 404,
+      json: { detail: "This job does not have a pipeline draft." },
+    });
+  });
+  await page.goto(`/employer/pipelines/${ids.job}`);
+  await expect(page.getByRole("heading", { name: "Start a pipeline draft" }))
+    .toBeVisible();
+  await page.getByRole("button", { name: "Create pipeline draft" }).click();
+  await expect(page.getByText("Draft 2", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /^English check, 0 incoming/ }),
+  ).toBeVisible();
+  expect(created).toBe(true);
+});
+
+test("pipeline lifecycle dialogs support deep links and clear on dismissal", async ({
+  page,
+}) => {
+  await productFixtures(page);
+  await page.goto(
+    `/employer/pipelines/${ids.job}?state=migration-review&dialog=migrate`,
+  );
+  const dialog = page.getByRole("dialog");
+  await expect(
+    dialog.getByRole("heading", { name: "Confirm pipeline migration?" }),
+  ).toBeVisible();
+  await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page).toHaveURL(
+    `/employer/pipelines/${ids.job}?state=migration-review`,
+  );
+});
+
+test("published view does not present draft data as a published version", async ({
+  page,
+}) => {
+  await productFixtures(page);
+  let pipelineReads = 0;
+  await page.route(`**/v1/jobs/${ids.job}/pipeline`, async (route) => {
+    pipelineReads += 1;
+    return route.fulfill({ json: {} });
+  });
+  await page.goto(`/employer/pipelines/${ids.job}?state=published`);
+  await expect(
+    page.getByRole("heading", { name: "Published pipeline version" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/No draft data is shown as a published pipeline/),
+  ).toBeVisible();
+  expect(pipelineReads).toBe(0);
+});
+
 test("failed lifecycle confirmation stays open and returns focus on cancellation", async ({
   page,
 }) => {

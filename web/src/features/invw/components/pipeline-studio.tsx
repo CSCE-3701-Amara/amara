@@ -1,22 +1,27 @@
 "use client";
 import Link from "next/link";
-import { useRef, useState, type PointerEvent, type KeyboardEvent } from "react";
-import { useSearchParams } from "next/navigation";
+import {
+  useRef,
+  useState,
+  type PointerEvent,
+  type KeyboardEvent,
+} from "react";
+import {
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
-import type {
-  StageTransition,
-  PipelineMigrationPreview,
-} from "@/shared/lib/contract.types";
+import type { StageTransition } from "@/shared/lib/contract.types";
 import { ApiFeedback, BusyState } from "@/shared/ui/workspace";
 import {
-  ConfirmDialog,
   ProductHeading,
   StatusBadge,
   UnavailableNotice,
   WorkspaceFooter,
 } from "@/shared/ui/product-ui";
-import { PipelineEditor } from "./pipeline-editor";
+import { createPipeline } from "../api/invw.api";
 import type {
   PipelineDraft,
   PipelineStage,
@@ -26,15 +31,29 @@ import e from "@/shared/ui/editor.module.css";
 import s from "./pipeline-studio.module.css";
 type GraphNode = { id: string; stage: PipelineStage; x: number; y: number };
 type Edge = { from: string; to: string };
+type PipelineDialog = "publish" | "migrate" | "discard";
+
+const stageOptions: readonly [PipelineStage["type"], string][] = [
+  ["assessment", "Question assessment"],
+  ["live_interview", "Live interview"],
+];
+
+function localDate(value: string) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? ""
+    : new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+}
+
 /** A real DAG model: branches and joins stay explicit, independent of stage ordering. */
 function GraphEditor({
   initial,
   transitions,
-  published,
 }: {
   initial: PipelineStage[];
   transitions?: StageTransition[];
-  published: boolean;
 }) {
   const [nodes, setNodes] = useState<GraphNode[]>(() =>
     initial.map((stage, index) => ({
@@ -132,7 +151,7 @@ function GraphEditor({
       ArrowUp: [0, -20],
       ArrowDown: [0, 20],
     };
-    if (!event.altKey || !shifts[event.key] || published) return;
+    if (!event.altKey || !shifts[event.key]) return;
     event.preventDefault();
     const [x, y] = shifts[event.key];
     setNodes((items) =>
@@ -145,7 +164,6 @@ function GraphEditor({
   }
   function start(node: GraphNode, event: PointerEvent<HTMLButtonElement>) {
     setSelected(node.id);
-    if (published) return;
     drag.current = {
       id: node.id,
       x: event.clientX,
@@ -185,15 +203,11 @@ function GraphEditor({
       </p>
       <div className={s.editor}>
         <aside className={s.palette} aria-label="Stage palette">
-          <h2>Assessment modules</h2>
-          {Object.entries({
-            assessment: "Question assessment",
-            live_interview: "Live interview",
-          }).map(([type, label]) => (
+          <h2>Add a stage</h2>
+          {stageOptions.map(([type, label]) => (
             <button
               key={type}
-              disabled={published}
-              onClick={() => add(type as PipelineStage["type"])}
+              onClick={() => add(type)}
             >
               {label}
             </button>
@@ -316,7 +330,13 @@ function GraphEditor({
                         : "LIVE INTERVIEW"}
                     </small>
                     <h3>{n.stage.name}</h3>
-                    <p>{n.stage.moduleIds?.length || 0} modules</p>
+                    <p>
+                      {n.stage.type === "assessment"
+                        ? `${n.stage.moduleIds?.length || 0} modules`
+                        : n.stage.interview
+                          ? `${n.stage.interview.durationMinutes} min interview`
+                          : "Interview setup"}
+                    </p>
                     <small>
                       {edges.filter((edge) => edge.to === n.id).length > 1
                         ? "Join · All incoming stages must pass"
@@ -347,35 +367,51 @@ function GraphEditor({
                 Unique stage name
                 <input
                   value={active.stage.name}
-                  readOnly={published}
                   onChange={(event) => patch({ name: event.target.value })}
                 />
               </label>
-              <fieldset>
-                <legend>Assessment modules</legend>
-                <ApiFeedback error={modules.error} retry={modules.reload} />
-                {modules.data?.map((module) => (
-                  <label className={e.check} key={module.id}>
-                    <input
-                      type="checkbox"
-                      disabled={published}
-                      checked={
-                        active.stage.moduleIds?.includes(module.id) || false
-                      }
-                      onChange={(event) =>
-                        patch({
-                          moduleIds: event.target.checked
-                            ? [...(active.stage.moduleIds || []), module.id]
-                            : active.stage.moduleIds?.filter(
-                                (id) => id !== module.id,
-                              ),
-                        })
-                      }
-                    />
-                    {module.name}
-                  </label>
-                ))}
-              </fieldset>
+              {active.stage.type === "assessment" ? (
+                <fieldset>
+                  <legend>Assessment modules</legend>
+                  <ApiFeedback error={modules.error} retry={modules.reload} />
+                  {modules.data?.length ? (
+                    modules.data.map((module) => (
+                      <label className={e.check} key={module.id}>
+                        <input
+                          type="checkbox"
+                          checked={
+                            active.stage.moduleIds?.includes(module.id) || false
+                          }
+                          onChange={(event) =>
+                            patch({
+                              moduleIds: event.target.checked
+                                ? [...(active.stage.moduleIds || []), module.id]
+                                : active.stage.moduleIds?.filter(
+                                    (id) => id !== module.id,
+                                  ),
+                            })
+                          }
+                        />
+                        {module.name}
+                      </label>
+                    ))
+                  ) : (
+                    !modules.loading &&
+                    !modules.error && (
+                      <p>No assessment modules are available yet.</p>
+                    )
+                  )}
+                </fieldset>
+              ) : (
+                <fieldset>
+                  <legend>Interview setup</legend>
+                  <p>
+                    Interview duration, assignments, and rubric can’t be
+                    changed because the API doesn’t support graph-stage
+                    configuration yet.
+                  </p>
+                </fieldset>
+              )}
               <fieldset>
                 <legend>Schedule & timing</legend>
                 {(["scheduledStartAt", "scheduledEndAt"] as const).map(
@@ -384,12 +420,7 @@ function GraphEditor({
                       {index ? "Stage ends" : "Stage starts"}
                       <input
                         type="datetime-local"
-                        disabled={published}
-                        value={
-                          active.stage[key]
-                            ? active.stage[key].slice(0, 16)
-                            : ""
-                        }
+                        value={localDate(active.stage[key])}
                         onChange={(event) =>
                           patch({
                             [key]: event.target.value
@@ -412,7 +443,6 @@ function GraphEditor({
                   Connect to stage
                   <select
                     value={target}
-                    disabled={published}
                     onChange={(event) => setTarget(event.target.value)}
                   >
                     <option value="">Choose a stage</option>
@@ -425,7 +455,7 @@ function GraphEditor({
                       ))}
                   </select>
                 </label>
-                <button disabled={!target || published} onClick={connect}>
+                <button disabled={!target} onClick={connect}>
                   Add connection
                 </button>
                 {edges
@@ -434,7 +464,6 @@ function GraphEditor({
                     <p key={edge.to}>
                       → {nodes.find((n) => n.id === edge.to)?.stage.name}{" "}
                       <button
-                        disabled={published}
                         aria-label={`Remove connection to ${nodes.find((n) => n.id === edge.to)?.stage.name}`}
                         onClick={() =>
                           setEdges((items) =>
@@ -455,7 +484,6 @@ function GraphEditor({
                 </p>
               </fieldset>
               <button
-                disabled={published}
                 onClick={() => {
                   setNodes((items) => items.filter((n) => n.id !== selected));
                   setEdges((items) =>
@@ -478,48 +506,91 @@ function GraphEditor({
     </>
   );
 }
-function Draft({
-  pipeline,
-  published,
-}: {
-  pipeline: PipelineDraft;
-  published: boolean;
-}) {
+function Draft({ pipeline }: { pipeline: PipelineDraft }) {
   const stages = useApiResource<PipelineStage[] | null>(
     `/v1/pipeline-versions/${resourceId(pipeline.versionId)}/stages`,
   );
   const transitions = useApiResource<StageTransition[]>(
     `/v1/pipeline-versions/${resourceId(pipeline.versionId)}/transitions`,
   );
+  const transitionsUnavailable =
+    transitions.error && transitions.error.status !== 404;
   return (
     <>
       <BusyState loading={stages.loading || transitions.loading} />
       <ApiFeedback error={stages.error} retry={stages.reload} />
-      {transitions.error?.status !== 404 && (
+      {transitionsUnavailable && (
         <ApiFeedback error={transitions.error} retry={transitions.reload} />
       )}
-      <StatusBadge>
-        {published ? "Published version" : "Draft"} {pipeline.versionNumber}
-      </StatusBadge>
-      {stages.data && !transitions.loading && (
-        <GraphEditor
-          key={pipeline.versionId}
-          initial={stages.data}
-          transitions={transitions.data}
-          published={published}
-        />
+      {transitions.error?.status === 404 && (
+        <UnavailableNotice>
+          Saved graph connections are not available from the current API. The
+          displayed stages have no server-provided edges.
+        </UnavailableNotice>
       )}
+      <StatusBadge>
+        Draft {pipeline.versionNumber}
+      </StatusBadge>
+      {stages.data &&
+        !stages.loading &&
+        !transitions.loading &&
+        !transitionsUnavailable && (
+          <GraphEditor
+            key={pipeline.versionId}
+            initial={stages.data}
+            transitions={transitions.data}
+          />
+        )}
     </>
   );
 }
 export function PipelineStudio({ postingId }: { postingId: string }) {
   const params = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
   const state = params.get("state");
-  const [dialog, setDialog] = useState<string | null>(null);
   const pipeline = useApiResource<PipelineDraft>(
-    `/v1/jobs/${resourceId(postingId)}/pipeline`,
+    state === "published"
+      ? null
+      : `/v1/jobs/${resourceId(postingId)}/pipeline`,
   );
-  const migration = useApiResource<PipelineMigrationPreview>(null);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<Error>();
+  const createPending = useRef(false);
+  function updateDialog(value: PipelineDialog | null) {
+    const query = new URLSearchParams(params.toString());
+    if (value) query.set("dialog", value);
+    else query.delete("dialog");
+    const suffix = query.toString();
+    router.replace(suffix ? `${pathname}?${suffix}` : pathname, {
+      scroll: false,
+    });
+  }
+  function updateState(value: string) {
+    const query = new URLSearchParams(params.toString());
+    query.set("state", value);
+    query.delete("dialog");
+    router.replace(`${pathname}?${query.toString()}`, { scroll: false });
+  }
+  async function createDraft() {
+    if (createPending.current) return;
+    createPending.current = true;
+    setCreating(true);
+    setCreateError(undefined);
+    try {
+      await createPipeline(postingId);
+      pipeline.reload();
+    } catch (cause) {
+      setCreateError(
+        cause instanceof Error
+          ? cause
+          : new Error("The pipeline draft could not be created."),
+      );
+    } finally {
+      createPending.current = false;
+      setCreating(false);
+    }
+  }
   return (
     <>
       <ProductHeading
@@ -530,7 +601,11 @@ export function PipelineStudio({ postingId }: { postingId: string }) {
               ? "Pipeline · Migration review"
               : "Pipeline designer"
         }
-        description="Draft changes are private until explicitly published."
+        description={
+          state === "published"
+            ? "Published pipeline version"
+            : "Draft changes are private until explicitly published."
+        }
         compact
         artwork={{
           src: "/figma/hiring-dag.svg",
@@ -556,14 +631,37 @@ export function PipelineStudio({ postingId }: { postingId: string }) {
           Dashboard
         </Link>
       </nav>
-      <div className={e.actions}>
-        <button disabled>Save graph draft</button>
-        <button onClick={() => setDialog("validate")}>Validate</button>
-        <button className={e.primary} onClick={() => setDialog("publish")}>
-          Review publication
-        </button>
-        <button onClick={() => setDialog("discard")}>Discard draft</button>
-      </div>
+      {state !== "published" && (
+        <>
+          <div className={e.actions}>
+            <button
+              type="button"
+              disabled
+              aria-describedby="pipeline-save-unavailable"
+              title="The current API does not save graph connections."
+            >
+              Save graph draft
+            </button>
+            <button type="button" onClick={() => updateState("validation")}>
+              Validate
+            </button>
+            <button
+              type="button"
+              className={e.primary}
+              onClick={() => updateDialog("publish")}
+            >
+              Review publication
+            </button>
+            <button type="button" onClick={() => updateDialog("discard")}>
+              Discard draft
+            </button>
+          </div>
+          <p id="pipeline-save-unavailable" className={e.note}>
+            Saving graph connections is not supported by the current API.
+            Local graph edits are not persisted.
+          </p>
+        </>
+      )}
       {state === "validation" && (
         <section className={s.state}>
           <h2>Graph validation</h2>
@@ -584,52 +682,45 @@ export function PipelineStudio({ postingId }: { postingId: string }) {
             Active candidate placements must be checked against the new graph
             before publication. No migration preview can be loaded yet.
           </p>
-          {migration.data?.affectedExecutions}
-          <button disabled>Confirm migration</button>
+          <button type="button" onClick={() => updateDialog("migrate")}>
+            Review migration
+          </button>
         </section>
       )}
       <BusyState loading={pipeline.loading} />
       {pipeline.error?.status !== 404 && (
         <ApiFeedback error={pipeline.error} retry={pipeline.reload} />
-      )}{" "}
-      {pipeline.data ? (
-        <Draft pipeline={pipeline.data} published={state === "published"} />
-      ) : (
-        !pipeline.loading && <GraphEditor initial={[]} published={false} />
       )}
-      <details>
-        <summary>Server-supported stage configuration</summary>
-        <p>
-          This existing editor saves stage definitions through the current API.
-          It does not save graph connections.
-        </p>
-        <PipelineEditor postingId={postingId} />
-      </details>
+      {state === "published" && (
+        <section className={s.state} aria-labelledby="published-pipeline-title">
+          <h2 id="published-pipeline-title">Published pipeline version</h2>
+          <UnavailableNotice>
+            The current API doesn’t expose the published version for this job.
+            No draft data is shown as a published pipeline.
+          </UnavailableNotice>
+        </section>
+      )}
+      {pipeline.error?.status === 404 && !pipeline.loading && (
+        <section className={s.emptyState} aria-labelledby="pipeline-empty-title">
+          <h2 id="pipeline-empty-title">Start a pipeline draft</h2>
+          <p>
+            Create a draft for this job before adding stages to its pipeline.
+          </p>
+          <ApiFeedback error={createError} />
+          <button
+            type="button"
+            className={e.primary}
+            disabled={creating}
+            onClick={createDraft}
+          >
+            {creating ? "Creating draft…" : "Create pipeline draft"}
+          </button>
+        </section>
+      )}
+      {state !== "published" && pipeline.data && (
+        <Draft pipeline={pipeline.data} />
+      )}
       <WorkspaceFooter />
-      {dialog && (
-        <ConfirmDialog
-          title={
-            dialog === "discard"
-              ? "Discard pipeline draft?"
-              : dialog === "migrate"
-                ? "Confirm pipeline migration?"
-                : dialog === "validate"
-                  ? "Validate pipeline graph?"
-                  : "Publish pipeline version?"
-          }
-          description="Review the graph, schedules, candidate placements, and required stage configuration before proceeding."
-          confirmLabel={
-            dialog === "discard"
-              ? "Discard draft"
-              : dialog === "validate"
-                ? "Validate"
-                : "Confirm publication"
-          }
-          intent={dialog === "discard" ? "danger" : "warning"}
-          unavailable="The required graph operation is not available yet. Your local graph has not been published or discarded."
-          onClose={() => setDialog(null)}
-        />
-      )}
     </>
   );
 }

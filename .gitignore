@@ -41,6 +41,11 @@ go.work.sum
 # Frontend dependencies and build output
 web/node_modules/
 web/dist/
+web/.next/
+web/.turbo/
+web/playwright-report/
+web/test-results/
+web/coverage/
 
 # TypeScript/Vite generated files
 *.tsbuildinfo

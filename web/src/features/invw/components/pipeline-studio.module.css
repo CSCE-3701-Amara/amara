@@ -151,6 +151,28 @@
   border-radius: 8px;
   background: #fff0e8;
 }
+.emptyState {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  max-width: 720px;
+  margin: 32px auto;
+  padding: 32px;
+  border: 1px solid #ded8cf;
+  border-radius: 12px;
+  background: #fffdf9;
+}
+.emptyState h2,
+.emptyState p {
+  margin: 0;
+}
+.emptyState h2 {
+  font-size: 24px;
+}
+.emptyState p {
+  color: #655d55;
+  line-height: 1.5;
+}
 @media (max-width: 1250px) {
   .editor {
     grid-template-columns: 150px minmax(0, 1fr);
