@@ -9,20 +9,43 @@ import (
 var ErrApplicationNotFound = errors.New("application not found")
 
 type ApplicationSummary struct {
-	ID              string     `json:"id"`
-	ReferenceNumber int32      `json:"reference_number"`
-	PostingID       string     `json:"posting_id"`
-	JobTitle        string     `json:"job_title"`
-	CompanyName     string     `json:"company_name"`
-	SubmittedAt     *time.Time `json:"submitted_at"`
-	Status          string     `json:"status"`
-	Closed          bool       `json:"closed"`
+	ID                   string     `json:"id"`
+	ReferenceNumber      int32      `json:"referenceNumber"`
+	PostingID            string     `json:"postingId"`
+	JobTitle             string     `json:"jobTitle"`
+	CompanyName          string     `json:"companyName"`
+	CreatedAt            *time.Time `json:"createdAt"`
+	UpdatedAt            *time.Time `json:"updatedAt"`
+	SubmittedAt          *time.Time `json:"submittedAt"`
+	WithdrawnAt          *time.Time `json:"withdrawnAt"`
+	ScreenedOut          *bool      `json:"screenedOut"`
+	ScreeningCompletedAt *time.Time `json:"screeningCompletedAt"`
+	Status               string     `json:"status"`
+	Closed               bool       `json:"closed"`
+	IdentityHidden       bool       `json:"identityHidden"`
 }
 
 type ApplicationDetail struct {
 	ApplicationSummary
-	PipelineExecutionID *string         `json:"pipeline_execution_id"`
-	FinalDecision       *bool           `json:"final_decision"`
-	FinalFeedback       *string         `json:"final_feedback"`
-	RejectionFeedback   json.RawMessage `json:"rejection_feedback"`
+	PipelineExecutionID *string         `json:"pipelineExecutionId"`
+	FinalDecision       *bool           `json:"finalDecision"`
+	FinalFeedback       *string         `json:"finalFeedback,omitempty"`
+	RejectionFeedback   json.RawMessage `json:"rejectionFeedback,omitempty"`
+}
+
+type ApplicationFilter struct {
+	Limit  int
+	Offset int
+	Status string
+}
+
+type ApplicationPage struct {
+	Data       []ApplicationSummary  `json:"data"`
+	Pagination ApplicationPagination `json:"pagination"`
+}
+
+type ApplicationPagination struct {
+	Limit  int   `json:"limit"`
+	Offset int   `json:"offset"`
+	Total  int64 `json:"total"`
 }
