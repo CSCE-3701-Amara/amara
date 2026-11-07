@@ -24,7 +24,7 @@ func newRouter(cfg config.HTTPConfig, logger *slog.Logger, dbSvc database.Servic
 		return nil, fmt.Errorf("configure trusted proxies: %w", err)
 	}
 
-	router.Use(requestID(), requestLogger(logger), recoverPanic(logger), corsMiddleware(cfg.AllowedOrigins))
+	router.Use(requestID(), requestLogger(logger), Recovery(logger), corsMiddleware(cfg.AllowedOrigins))
 	registerRoutes(router, dbSvc, registrars...)
 	return router, nil
 }
@@ -84,15 +84,5 @@ func registerRoutes(router *gin.Engine, dbSvc database.Service, registrars ...Ro
 			Detail: "The request method is not allowed.",
 			Code:   "method_not_allowed",
 		})
-	})
-}
-
-func writeError(c *gin.Context, status int, code, message string) {
-	WriteProblem(c, ProblemDetails{
-		Type:   "about:blank",
-		Title:  defaultTitle(status),
-		Status: status,
-		Detail: message,
-		Code:   code,
 	})
 }
