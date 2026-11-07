@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE TABLE job_postings (
+CREATE TABLE IF NOT EXISTS job_postings (
     id                      UUID    PRIMARY KEY,
     company_id              UUID    NOT NULL    REFERENCES companies(id),
     title                   TEXT    NOT NULL,

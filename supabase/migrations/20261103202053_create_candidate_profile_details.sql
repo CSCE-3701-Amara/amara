@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE candidate_education (
+CREATE TABLE IF NOT EXISTS candidate_education (
     cand_id     UUID    REFERENCES candidates(id),
     degree_type TEXT,
     provider    TEXT,
@@ -9,7 +9,7 @@ CREATE TABLE candidate_education (
     summary     TEXT
 );
 
-CREATE TABLE candidate_work_experience (
+CREATE TABLE IF NOT EXISTS candidate_work_experience (
     cand_id         UUID    REFERENCES candidates(id),
     position        TEXT,
     company_name    TEXT,
@@ -18,7 +18,7 @@ CREATE TABLE candidate_work_experience (
     summary         TEXT
 );
 
-CREATE TABLE candidate_languages (
+CREATE TABLE IF NOT EXISTS candidate_languages (
     cand_id     UUID    REFERENCES candidates(id),
     language    TEXT    NOT NULL,
     level       TEXT

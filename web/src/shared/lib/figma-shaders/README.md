@@ -15,3 +15,17 @@ a supported browser and a secure context (localhost is supported).
 Reduced motion freezes shader time and the auth-panel animations. Browsers
 without a WebGPU adapter retain the hero's orange base surface. The browser
 shader check verifies the GPU workload completes without validation errors.
+
+## Maintenance
+
+Keep generated shader source isolated from application code. If the Figma
+export changes, replace the generated file as a whole and update the
+component wrapper only when the exported `setup` or `render` contract changes.
+Do not add secrets, remote shader URLs, or browser storage to this directory.
+
+Validate the welcome screen from `web/` with:
+
+```sh
+npm run build
+npm run test:e2e
+```

@@ -14,7 +14,7 @@ npm run test:e2e
 
 The browser calls same-origin `/v1/...`; Next.js rewrites these requests to the Go API, forwarding cookies and `Set-Cookie`. `/health` and `/health/*` are proxied too. Preserve the backend's Secure, HttpOnly session cookie; use HTTPS outside localhost. Do not run a development server on port 3000 while Docker publishes that port.
 
-Browser tests run a temporary development server on **3100**, configurable with `PLAYWRIGHT_PORT`. Install Chromium once using `npx playwright install chromium`. Tests mock authenticated API responses; read-only backend probes are described in [INTEGRATION.md](./INTEGRATION.md).
+Browser tests run a temporary development server on **3100**, configurable with `PLAYWRIGHT_PORT`. Install Chromium once using `npx playwright install chromium`. Tests mock authenticated API responses; use the backend health endpoints in the root [README](../README.md) for read-only connectivity checks.
 
 ## Connected screens
 
@@ -25,4 +25,21 @@ Browser tests run a temporary development server on **3100**, configurable with 
 - `/employer/pipelines`: assessment drafts, editing, publication, and copying from the published library.
 - Workspace headers: logout through the backend's current-session endpoint.
 
-Current backend blockers and contract discrepancies are recorded in [INTEGRATION.md](./INTEGRATION.md). A connected request can still be rejected by the existing backend; the UI displays the error and supports retry. It never fakes registration, submission, or persistence.
+Backend blockers and contract discrepancies should be recorded alongside the
+owning API or feature documentation. A connected request can still be rejected
+by the existing backend; the UI displays the error and supports retry. It never
+fakes registration, submission, or persistence.
+
+## Source layout
+
+- `src/app/`: App Router pages and role-specific layouts.
+- `src/features/<epic>/`: API functions, types, components, and feature
+  documentation for `auth`, `cand`, `job`, `invw`, and `ana`.
+- `src/shared/`: API client, reusable UI, error handling, and cross-feature
+  hooks.
+- `tests/browser/`: Playwright flows covering connected screens and important
+  error or confirmation states.
+
+Feature APIs should call `src/shared/lib/api-client.ts`; it enforces relative
+`/v1` paths, sends credentials, and maps the backend's JSON error shape to
+`ApiError`. Do not put session tokens in browser storage or URL parameters.
