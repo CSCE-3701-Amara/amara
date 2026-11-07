@@ -89,14 +89,14 @@ func (s advancementStage) automaticDecision() stageDecision {
 	// The external evaluator must call UC-010 FinalizeEvidence with trusted
 	// per-question results. Until it is connected, coding attempts stay pending.
 	coding, valid, passed := s.codingThreshold()
-	if coding {
-		if !valid {
-			return stageDecision{status: "pending_grading"}
-		}
-		return s.thresholdDecision(passed)
+	if coding && !valid {
+		return stageDecision{status: "pending_grading"}
 	}
 	if s.rule == "manual" {
 		return stageDecision{status: "held", score: s.score}
+	}
+	if coding {
+		return s.thresholdDecision(passed)
 	}
 	if s.rule == "threshold" {
 		// Live scores are populated by UC-010 from submitted human scorecards.

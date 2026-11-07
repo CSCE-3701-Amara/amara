@@ -355,11 +355,25 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		JOIN pipeline_stages n ON n.version_id=p.version_id AND n.stage_order=5
 		WHERE p.stage_order IN (2,3);
 	`)
+	exec(`UPDATE pipeline_stages SET advancement_rule='manual' WHERE stage_order=3`)
+	reconcile()
+	manualCoding := "/stage-executions/" + stageState(3, "held") + "/decisions"
+	stageState(5, "locked")
+	pass := `{"decision":"pass","decisionType":"manual","reason":"reviewed","expectedStatus":"held"}`
+	request(http.MethodPost, manualCoding, "company", pass, http.StatusOK)
+	stageState(3, "passed")
+	stageState(5, "locked")
+	// Replay the finalized evidence in a fresh automatic-decision fixture.
+	exec(`
+		UPDATE stage_executions se SET status='held', decided_at=NULL, decided_by=NULL,
+			decision_type=NULL, decision_reason=NULL, decision_history='[]'
+		FROM pipeline_stages s WHERE se.stage_id=s.id AND s.stage_order=3;
+		UPDATE pipeline_stages SET advancement_rule='completion' WHERE stage_order=3;
+	`)
 	reconcile()
 	stageState(3, "passed")
 	stageState(5, "locked")
 	manualPath := "/stage-executions/" + stageState(2, "held") + "/decisions"
-	pass := `{"decision":"pass","decisionType":"manual","reason":"reviewed","expectedStatus":"held"}`
 	reject := `{"decision":"reject","decisionType":"manual","reason":"reviewed","expectedStatus":"held"}`
 	type response struct {
 		code int
