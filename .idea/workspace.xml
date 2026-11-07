@@ -138,7 +138,8 @@
   <component name="RunManager" selected="Go Test.TestAssessmentResultRouteCoexistsWithAssessmentProgress in github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <working_directory value="$PROJECT_DIR$" />
-      <kind />
+      <kind value="PACKAGE" />
+      <package value="github.com/CSCE-3701-Amara/amara" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <method v="2" />
@@ -175,7 +176,7 @@
     </configuration>
     <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
       <working_directory value="$PROJECT_DIR$" />
-      <kind />
+      <kind value="DIRECTORY" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />

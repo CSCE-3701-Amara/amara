@@ -171,22 +171,7 @@ func applyAdvancement(ctx context.Context, tx pgx.Tx, id, actor string, s advanc
 		return err
 	}
 	if d.status == "passed" || d.status == "rejected" {
-		_, err = tx.Exec(ctx, `
-			INSERT INTO assessment_results (
-				id, instance_id, passed, score, is_disclosed, attempt_id, scored_at
-			)
-			SELECT gen_random_uuid(), i.id, $2 = 'passed', t.final_score, false, t.id, t.evaluated_at
-			FROM assessment_attempts t
-			JOIN assessment_instances i ON i.id = t.instance_id
-			WHERE t.stage_execution_id = $1::uuid
-				AND t.status = 'scored' AND t.evaluated_at IS NOT NULL
-			ON CONFLICT (instance_id) DO UPDATE SET
-				passed = EXCLUDED.passed,
-				score = EXCLUDED.score,
-				attempt_id = EXCLUDED.attempt_id,
-				scored_at = EXCLUDED.scored_at
-		`, id, d.status)
-		if err != nil {
+		if err := persistAssessmentResult(ctx, tx, s.attempt); err != nil {
 			return err
 		}
 	}

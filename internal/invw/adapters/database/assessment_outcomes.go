@@ -265,7 +265,34 @@ func (r *AssessmentRepository) FinalizeEvidence(ctx context.Context, attemptID, 
 	if !finalized {
 		return ErrAssessmentConflict
 	}
+	if err := persistAssessmentResult(ctx, tx, attemptID); err != nil {
+		return fmt.Errorf("persist finalized assessment result: %w", err)
+	}
 	return tx.Commit(ctx)
+}
+
+func persistAssessmentResult(ctx context.Context, tx pgx.Tx, attemptID string) error {
+	if attemptID == "" {
+		return nil
+	}
+	_, err := tx.Exec(ctx, `
+		INSERT INTO assessment_results (
+			id, instance_id, passed, score, is_disclosed, attempt_id, scored_at
+		)
+		SELECT gen_random_uuid(), i.id, se.status = 'passed', t.final_score, false, t.id, t.evaluated_at
+		FROM assessment_attempts t
+		JOIN assessment_instances i ON i.id = t.instance_id
+		JOIN stage_executions se ON se.id = t.stage_execution_id
+		WHERE t.id = $1::uuid
+			AND t.status = 'scored' AND t.evaluated_at IS NOT NULL
+			AND se.status IN ('passed', 'rejected')
+		ON CONFLICT (instance_id) DO UPDATE SET
+			passed = EXCLUDED.passed,
+			score = EXCLUDED.score,
+			attempt_id = EXCLUDED.attempt_id,
+			scored_at = EXCLUDED.scored_at
+	`, attemptID)
+	return err
 }
 
 func (r *AssessmentRepository) ReleaseAssessmentResult(ctx context.Context, attemptID, company, feedback string, aiGenerated bool) error {
