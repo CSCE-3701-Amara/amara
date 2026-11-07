@@ -15,6 +15,19 @@ type profileRepository struct {
 	err             error
 }
 
+func (r *profileRepository) GetCompanyProfile(context.Context, string, bool) (domain.CompanyProfile, error) {
+	return domain.CompanyProfile{LegalName: "Example"}, r.err
+}
+func (r *profileRepository) ListCompanyInterviewers(context.Context, string, int32, int32) ([]domain.InterviewerProfile, int64, error) {
+	return nil, 0, r.err
+}
+func (r *profileRepository) GetInterviewerProfile(context.Context, string) (domain.InterviewerProfile, error) {
+	return domain.InterviewerProfile{Name: "Mona"}, r.err
+}
+func (r *profileRepository) GetPublicCompanyProfile(context.Context, string) (domain.CompanyProfile, error) {
+	return domain.CompanyProfile{LegalName: "Example"}, r.err
+}
+
 func (r *profileRepository) UpdateCandidateProfile(_ context.Context, _ string, patch domain.CandidateProfilePatch) (domain.CandidateProfile, error) {
 	r.candidate = patch
 	return domain.CandidateProfile{Name: "Mona"}, r.err

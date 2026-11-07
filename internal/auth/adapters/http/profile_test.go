@@ -24,6 +24,19 @@ type profileHandlerRepository struct {
 	err             error
 }
 
+func (r *profileHandlerRepository) GetCompanyProfile(_ context.Context, _ string, _ bool) (domain.CompanyProfile, error) {
+	return domain.CompanyProfile{ID: "company-id", LegalName: "Example", Approved: true}, r.err
+}
+func (r *profileHandlerRepository) ListCompanyInterviewers(_ context.Context, _ string, _, _ int32) ([]domain.InterviewerProfile, int64, error) {
+	return []domain.InterviewerProfile{{ID: "interviewer-id", CompanyID: "company-id", Name: "Mona", Email: "mona@example.com", AccountStatus: "active"}}, 1, r.err
+}
+func (r *profileHandlerRepository) GetInterviewerProfile(_ context.Context, _ string) (domain.InterviewerProfile, error) {
+	return domain.InterviewerProfile{ID: "interviewer-id", CompanyID: "company-id", Name: "Mona", Email: "mona@example.com", AccountStatus: "active"}, r.err
+}
+func (r *profileHandlerRepository) GetPublicCompanyProfile(_ context.Context, _ string) (domain.CompanyProfile, error) {
+	return domain.CompanyProfile{ID: "company-id", LegalName: "Example", Approved: true}, r.err
+}
+
 func (r *profileHandlerRepository) UpdateCandidateProfile(_ context.Context, _ string, patch domain.CandidateProfilePatch) (domain.CandidateProfile, error) {
 	r.updateCalls++
 	r.candidate = patch
@@ -73,6 +86,28 @@ func TestProfileHandlerUpdatesCandidate(t *testing.T) {
 	}
 	if !strings.Contains(recorder.Body.String(), `"birthDate":"2000-01-02"`) {
 		t.Fatalf("response = %s", recorder.Body.String())
+	}
+}
+
+func TestProfileHandlerGetsProfiles(t *testing.T) {
+	repository := &profileHandlerRepository{}
+	_, router := newProfileTestHandler(t, repository, ports.Identity{AccountID: "company-id", AccountType: domain.AccountTypeCompany})
+	if recorder := requestProfile(t, router, http.MethodGet, "/v1/companies/me", ""); recorder.Code != http.StatusOK ||
+		!strings.Contains(recorder.Body.String(), `"legalName":"Example"`) {
+		t.Fatalf("company profile status = %d, body = %s", recorder.Code, recorder.Body.String())
+	}
+	if recorder := requestProfile(t, router, http.MethodGet, "/v1/companies/company-id", ""); recorder.Code != http.StatusOK {
+		t.Fatalf("public company profile status = %d, body = %s", recorder.Code, recorder.Body.String())
+	}
+	if recorder := requestProfile(t, router, http.MethodGet, "/v1/companies/me/interviewers?limit=10&offset=0", ""); recorder.Code != http.StatusOK ||
+		!strings.Contains(recorder.Body.String(), `"total":1`) {
+		t.Fatalf("interviewer list status = %d, body = %s", recorder.Code, recorder.Body.String())
+	}
+
+	_, router = newProfileTestHandler(t, &profileHandlerRepository{}, ports.Identity{AccountID: "interviewer-id", AccountType: domain.AccountTypeInterviewer})
+	if recorder := requestProfile(t, router, http.MethodGet, "/v1/interviewers/me", ""); recorder.Code != http.StatusOK ||
+		!strings.Contains(recorder.Body.String(), `"name":"Mona"`) {
+		t.Fatalf("interviewer profile status = %d, body = %s", recorder.Code, recorder.Body.String())
 	}
 }
 
