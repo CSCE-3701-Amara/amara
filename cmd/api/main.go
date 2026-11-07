@@ -143,6 +143,7 @@ func run() error {
 		accountActionHandler.RegisterRoutes,
 		feedHandler.RegisterRoutes,
 		postingHandler.RegisterRoutes,
+		func(group *gin.RouterGroup) { jobhttp.RegisterPostingPreviewRoutes(group, postingService, authRepo) },
 		postingListHandler.RegisterRoutes,
 		applicationHandler.RegisterRoutes,
 		moduleHandler.RegisterRoutes,

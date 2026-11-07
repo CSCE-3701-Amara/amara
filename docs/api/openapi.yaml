@@ -826,6 +826,67 @@ paths:
         '500':
           $ref: '#/components/responses/PostingError'
 
+  /v1/jobs/{id}/preview:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Preview a saved company posting
+      operationId: previewSavedJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Candidate-facing posting content for feed and detail previews. Hidden salary values are null.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostingPreview'
+        '400':
+          $ref: '#/components/responses/PostingError'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '404':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
+    post:
+      summary: Preview unsaved posting edits
+      operationId: previewEditedJobPosting
+      tags: [Jobs]
+      security:
+        - SessionCookie: []
+      description: The JSON object represents the current editor contents. Omitted fields are blank in the preview. Incomplete drafts are accepted and no edits are saved.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobPostingPreviewRequest'
+      responses:
+        '200':
+          description: Candidate-facing posting content for feed and detail previews. Hidden salary values are null.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPostingPreview'
+        '400':
+          $ref: '#/components/responses/PostingError'
+        '401':
+          $ref: '#/components/responses/PostingError'
+        '403':
+          $ref: '#/components/responses/PostingError'
+        '404':
+          $ref: '#/components/responses/PostingError'
+        '500':
+          $ref: '#/components/responses/PostingError'
   /v1/jobs/{id}/publish:
     parameters:
       - $ref: '#/components/parameters/JobPostingId'
@@ -6458,6 +6519,111 @@ components:
 
 
     # Job postings: original contract
+    JobPostingPreview:
+      type: object
+      properties:
+        id:
+          type: string
+        company_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: [string, 'null']
+        language:
+          type: [string, 'null']
+        currency:
+          type: [string, 'null']
+        seniority_level:
+          type: string
+        employment_type:
+          type: string
+        location:
+          type: [string, 'null']
+        salary_min:
+          type: [integer, 'null']
+        salary_max:
+          type: [integer, 'null']
+        salary_visible:
+          type: [boolean, 'null']
+        open_positions:
+          type: [integer, 'null']
+        application_opening:
+          type: [string, 'null']
+        application_deadline:
+          type: [string, 'null']
+        requirements:
+          type: [array, 'null']
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              text:
+                type: string
+              requirement_type:
+                type: string
+    JobPostingPreviewRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+        description:
+          type: [string, 'null']
+        language:
+          type: [string, 'null']
+        currency:
+          type: [string, 'null']
+        seniority_level:
+          type: string
+        employment_type:
+          type: string
+        location:
+          type: [string, 'null']
+        salary_min:
+          type: [integer, 'null']
+          format: int32
+        salary_max:
+          type: [integer, 'null']
+          format: int32
+        salary_visible:
+          type: [boolean, 'null']
+        open_positions:
+          type: [integer, 'null']
+          format: int32
+        application_opening:
+          type: [string, 'null']
+          format: date-time
+        application_deadline:
+          type: [string, 'null']
+          format: date-time
+        max_applications:
+          type: [integer, 'null']
+          format: int32
+        requirements:
+          type: [array, 'null']
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              text:
+                type: string
+              requirement_type:
+                type: string
+        amarat:
+          type: [array, 'null']
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              title:
+                type: string
+              description:
+                type: [string, 'null']
+
     JobPostingRequest:
       type: object
       additionalProperties: false
