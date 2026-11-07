@@ -223,21 +223,23 @@ func validateInterviewers(ctx context.Context, tx pgx.Tx, company string, ids []
 
 func insertStage(ctx context.Context, tx pgx.Tx, version string, position int, stage *domain.Stage, definitions map[string]domain.Definition) error {
 	rule := "completion"
+	belowThreshold := "hold"
 	var threshold *int
 	if stage.Interview != nil {
 		rule = "manual"
 		if !stage.Interview.Behavioral {
 			rule = "threshold"
 			threshold = stage.Interview.Threshold
+			belowThreshold = "reject"
 		}
 	}
 	err := tx.QueryRow(ctx, `
 		INSERT INTO pipeline_stages (id, version_id, name, module_type, stage_order,
 			scheduled_start_at, scheduled_end_at, interview_configuration, advancement_rule,
 			score_threshold, below_threshold_action)
-		VALUES (gen_random_uuid(), $1::text::uuid, $2, $3, $4, $5, $6, $7, $8, $9, 'reject')
+		VALUES (gen_random_uuid(), $1::text::uuid, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 		RETURNING id::text`, version, stage.Name, stage.Type, position,
-		stage.OpensAt, stage.Deadline, stage.Interview, rule, threshold).Scan(&stage.ID)
+		stage.OpensAt, stage.Deadline, stage.Interview, rule, threshold, belowThreshold).Scan(&stage.ID)
 	if err != nil {
 		return err
 	}

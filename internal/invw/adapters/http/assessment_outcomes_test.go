@@ -106,16 +106,20 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 			'Stage ' || n, 'assessment', n, now() - interval '2 hours',
 			now() + CASE WHEN n = 1 THEN interval '-1 hour' ELSE interval '1 hour' END
 		FROM generate_series(1, 5) n;
+		UPDATE pipeline_stages SET advancement_rule='completion' WHERE stage_order=3;
 		INSERT INTO modules (id, name, type, published)
 		VALUES ('00000000-0000-0000-0000-000000000020', 'Module', 'behavioral', true);
 		INSERT INTO test_configurations (id, stage_id, test_module_id, configuration)
 		SELECT gen_random_uuid(), id, '00000000-0000-0000-0000-000000000020',
 			jsonb_build_object('definition', CASE stage_order
-				WHEN 3 THEN '{"type":"coding","minimum_tests_passed":1,"questions":[{"prompt":"Code","format":"code","minimum_cases_passed":1,"test_cases":[{"input":"secret"}]}]}'::jsonb
+				WHEN 3 THEN '{"type":"coding","minimum_tests_passed":1,"questions":[{"prompt":"Code","format":"code","minimum_cases_passed":1,"test_cases":[{"input":"secret"}]},{"prompt":"Code again","format":"code","minimum_cases_passed":1,"test_cases":[{"input":"secret"}]}]}'::jsonb
 				WHEN 4 THEN '{"type":"recorded_video","behavioral":true,"questions":[{"prompt":"Video","format":"video"}]}'::jsonb
 				WHEN 5 THEN '{"type":"recorded_video","questions":[{"prompt":"Video","format":"video"}]}'::jsonb
 				ELSE '{"type":"behavioral","questions":[{"prompt":"Describe","format":"long_text"}]}'::jsonb END)
 		FROM pipeline_stages;
+		UPDATE test_configurations SET configuration = jsonb_set(configuration, '{definition,amarat}',
+			'[{"name":"Communication","description":"Behavioral assessment award"}]')
+		WHERE stage_id = '00000000-0000-0000-0000-000000000012';
 		INSERT INTO pipeline_stages (id, version_id, name, module_type, stage_order,
 			scheduled_start_at, scheduled_end_at, interview_configuration)
 		VALUES ('00000000-0000-0000-0000-000000000016', '00000000-0000-0000-0000-000000000006',
@@ -209,7 +213,7 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		var response struct {
 			Questions []struct{ ID string }
 		}
-		if err := json.Unmarshal(raw, &response); err != nil || len(response.Questions) != 1 || strings.Contains(string(raw), "secret") {
+		if err := json.Unmarshal(raw, &response); err != nil || len(response.Questions) == 0 || strings.Contains(string(raw), "secret") {
 			t.Fatalf("unsafe or invalid candidate content: %s (%v)", raw, err)
 		}
 		assertStage(stage, "in_progress", nil)
@@ -276,7 +280,24 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	if status != "pending_grading" {
 		t.Fatalf("invalid evidence changed status to %s", status)
 	}
+
+	exec(`UPDATE stage_executions SET status='locked' WHERE stage_id IN (
+		SELECT id FROM pipeline_stages WHERE stage_order=1)`)
+	if err := database.ReconcileAdvancement(ctx, pool); err != nil {
+		t.Fatal(err)
+	}
+	var codingStageStatus string
+	if err := pool.QueryRow(ctx, `SELECT se.status FROM stage_executions se JOIN assessment_attempts a
+		ON a.stage_execution_id=se.id WHERE a.id=$1::uuid`, id).Scan(&codingStageStatus); err != nil || codingStageStatus != "pending_grading" {
+		t.Fatalf("pending coding outcome advanced: %s (%v)", codingStageStatus, err)
+	}
 	passed = 1
+	var secondQuestion string
+	if err := pool.QueryRow(ctx, `SELECT md5($1::text||':1:2')::uuid::text`, id).Scan(&secondQuestion); err != nil {
+		t.Fatal(err)
+	}
+	failed := 0
+	evidence = append(evidence, database.QuestionEvidence{QuestionID: secondQuestion, PassedCases: &failed, TotalCases: &total})
 	for range 2 {
 		if err := repo.FinalizeEvidence(ctx, id, "", evidence); err != nil {
 			t.Fatal(err)
@@ -309,5 +330,114 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 			(suffix == "1" && (interviewScore == nil || *interviewScore != 75)) {
 			t.Fatalf("interview %s outcome=%s score=%v", suffix, outcome, interviewScore)
 		}
+	}
+	reconcile := func() {
+		t.Helper()
+		if err := database.ReconcileAdvancement(ctx, pool); err != nil {
+			t.Fatal(err)
+		}
+	}
+	stageState := func(order int, want string) string {
+		t.Helper()
+		var id, status string
+		err := pool.QueryRow(ctx, `SELECT se.id::text,se.status FROM stage_executions se
+			JOIN pipeline_stages s ON s.id=se.stage_id WHERE s.stage_order=$1`, order).Scan(&id, &status)
+		if err != nil || status != want {
+			t.Fatalf("stage %d: got %s, want %s: %v", order, status, want, err)
+		}
+		return id
+	}
+	exec(`
+		UPDATE stage_executions SET status='locked' WHERE stage_id IN (
+			SELECT id FROM pipeline_stages WHERE stage_order IN (1,5));
+		INSERT INTO stage_transitions (id,pipeline_version_id,from_stage_id,to_stage_id)
+		SELECT gen_random_uuid(), p.version_id, p.id, n.id FROM pipeline_stages p
+		JOIN pipeline_stages n ON n.version_id=p.version_id AND n.stage_order=5
+		WHERE p.stage_order IN (2,3);
+	`)
+	reconcile()
+	stageState(3, "passed")
+	stageState(5, "locked")
+	manualPath := "/stage-executions/" + stageState(2, "held") + "/decisions"
+	pass := `{"decision":"pass","decisionType":"manual","reason":"reviewed","expectedStatus":"held"}`
+	reject := `{"decision":"reject","decisionType":"manual","reason":"reviewed","expectedStatus":"held"}`
+	type response struct {
+		code int
+		body string
+	}
+	replies := make(chan response, 2)
+	for range 2 {
+		go func() {
+			req := httptest.NewRequest(http.MethodPost, "/v1"+manualPath, strings.NewReader(pass))
+			req.Header.Set("Content-Type", "application/json")
+			req.AddCookie(&http.Cookie{Name: "amara_session", Value: "company"})
+			res := httptest.NewRecorder()
+			router.ServeHTTP(res, req)
+			replies <- response{res.Code, res.Body.String()}
+		}()
+	}
+	first, second := <-replies, <-replies
+	if first.code != 200 || first != second || !strings.Contains(first.body, `"scoreAtDecision":null`) {
+		t.Fatalf("concurrent behavioral pass: %+v vs %+v", first, second)
+	}
+	if retry := request(http.MethodPost, manualPath, "company", reject, http.StatusOK); string(retry) != first.body {
+		t.Fatalf("opposite decision changed the result: %s", retry)
+	}
+	var awards int
+	if err := pool.QueryRow(ctx, `SELECT count(*) FROM candidate_amarat
+		WHERE amara_title='Communication' AND score IS NULL`).Scan(&awards); err != nil || awards != 1 {
+		t.Fatalf("scoreless award count = %d: %v", awards, err)
+	}
+	request(http.MethodPost, manualPath, "company",
+		`{"decision":"reject","decisionType":"override","reason":"reviewed","expectedStatus":"held"}`, http.StatusBadRequest)
+	stageState(5, "available")
+	rejected := request(http.MethodPost, "/stage-executions/"+stageState(4, "held")+"/decisions", "company", reject, http.StatusOK)
+	if !strings.Contains(string(rejected), `"status":"rejected"`) || !strings.Contains(string(rejected), `"scoreAtDecision":null`) {
+		t.Fatalf("behavioral rejection: %s", rejected)
+	}
+	reconcile()
+	stageState(5, "cancelled")
+
+	// Reset the fixture to exercise the independent missed-outcome scenario.
+	exec(`
+		UPDATE applications SET status='admitted';
+		UPDATE pipeline_executions SET status='active',rejection_feedback=NULL;
+		UPDATE stage_executions se SET status='available' FROM pipeline_stages s
+		WHERE s.id=se.stage_id AND s.stage_order=1;
+		UPDATE pipeline_stages SET advancement_rule='threshold', score_threshold=90,
+			below_threshold_action='hold' WHERE stage_order=1;
+	`)
+	reconcile()
+	reconcile()
+	stageState(1, "rejected")
+	var rejectedApp bool
+	if err := pool.QueryRow(ctx, `SELECT a.status='rejected' AND se.decision_type='missed'
+		AND jsonb_array_length(se.decision_history)=1 AND pe.rejection_feedback->>'status'='pending'
+		FROM applications a JOIN pipeline_executions pe ON pe.application_id=a.id
+		JOIN stage_executions se ON se.pipeline_execution_id=pe.id
+		JOIN pipeline_stages s ON s.id=se.stage_id WHERE s.stage_order=1`).Scan(&rejectedApp); err != nil || !rejectedApp {
+		t.Fatalf("missed outcome under hold policy: rejected=%v: %v", rejectedApp, err)
+	}
+
+	// Simulate a separate run with only the completed behavioral interview outstanding.
+	exec(`
+		UPDATE applications SET status='admitted';
+		UPDATE pipeline_executions SET status='active',rejection_feedback=NULL;
+		UPDATE stage_executions se SET status=CASE WHEN s.stage_order=6 THEN 'held' ELSE 'passed' END
+		FROM pipeline_stages s WHERE s.id=se.stage_id;
+	`)
+	interviewStage := stageState(6, "held")
+	bulk := fmt.Sprintf(`{"stageExecutionIds":[%q],"decision":"pass","decisionType":"manual","reason":"reviewed"}`, interviewStage)
+	bulkPath := "/pipeline-stages/00000000-0000-0000-0000-000000000016/decisions"
+	request(http.MethodPost, bulkPath, "company", bulk, http.StatusOK)
+	request(http.MethodPost, bulkPath, "company", bulk, http.StatusOK)
+	reconcile()
+	var finalist bool
+	if err := pool.QueryRow(ctx, `SELECT a.status='finalist' AND pe.status='completed'
+		AND jsonb_array_length(se.decision_history)=1 AND se.score_at_decision IS NULL
+		FROM applications a JOIN pipeline_executions pe ON pe.application_id=a.id
+		JOIN stage_executions se ON se.pipeline_execution_id=pe.id WHERE se.id=$1::uuid`, interviewStage).
+		Scan(&finalist); err != nil || !finalist {
+		t.Fatalf("finalist after behavioral interview: finalist=%v: %v", finalist, err)
 	}
 }

@@ -3222,16 +3222,15 @@ paths:
     parameters:
       - $ref: '#/components/parameters/StageExecutionId'
     post:
-      summary: Record a manual stage decision or override
+      summary: Record a manual stage decision
       operationId: recordStageDecision
       tags:
         - Pipeline execution
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain. Lock/check current state; first valid concurrent decision wins
-        and a stale request returns 409. A pass unlocks all eligible outgoing stages and awards configured Amarat.
-        Rejection cancels other active stages and starts rejection feedback. Record decision actor, time, reason,
-        and score snapshot. Do not allow interviewers to advance candidates.
-      x-implementation-status: planned
+      description: The owning company's Hiring Manager can pass or reject a held stage.
+        The first terminal decision wins and retries return it. A pass awards configured Amarat
+        and unlocks outgoing stages whose prerequisites have all passed. A rejection cancels
+        active stages and starts rejection feedback. The decision includes a nullable score.
+      x-implementation-status: implemented
       x-erd-entities:
         - STAGE_EXECUTIONS
         - CANDIDATE_STAGE_PROGRESS
@@ -3252,7 +3251,7 @@ paths:
               expectedStatus: held
       responses:
         '200':
-          description: Record a manual stage decision or override.
+          description: Record a manual stage decision.
           content:
             application/json:
               schema:
@@ -3280,12 +3279,10 @@ paths:
       operationId: recordBulkStageDecisions
       tags:
         - Pipeline execution
-      description: Owning-company Hiring Manager or authorized system administrator only; validate ownership
-        through the resource relationship chain. All selected executions must belong to this stage and be eligible
-        for the same decision. Apply all decisions atomically or return 409 without partial changes. Record each
-        actor/time/score/reason separately and apply the same advancement/award/rejection rules as individual
-        decisions.
-      x-implementation-status: planned
+      description: The owning company's Hiring Manager can decide multiple executions of the same stage.
+        Eligible executions are processed atomically. Terminal executions return their recorded decision.
+        An ineligible execution returns 409 and rolls back the batch.
+      x-implementation-status: implemented
       x-erd-entities:
         - STAGE_EXECUTIONS
         - APPLICATIONS
@@ -8376,12 +8373,19 @@ components:
       type: object
       additionalProperties: false
       properties:
+        candidateId:
+          type: string
+          format: uuid
+        stageExecutionId:
+          type: string
+          format: uuid
         decisionType:
           type: string
           enum:
             - manual
             - threshold
             - completion
+            - missed
             - override
         decision:
           type: string
@@ -8518,7 +8522,6 @@ components:
           type: string
           enum:
             - manual
-            - override
         reason:
           type: string
           minLength: 1
@@ -8540,7 +8543,7 @@ components:
         - reason
         - expectedStatus
       description: Only Hiring Managers may decide. Client cannot impersonate automatic threshold/completion decisions.
-        Overrides require a recorded nonblank reason. expectedStatus must match under lock.
+        Manual decisions require a nonblank reason. A terminal decision is returned on retry.
 
     BulkStageDecisionRequest:
       type: object
@@ -8563,7 +8566,6 @@ components:
           type: string
           enum:
             - manual
-            - override
         reason:
           type: string
           minLength: 1
