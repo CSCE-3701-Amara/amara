@@ -2,6 +2,8 @@ name: frontend-ci
 
 permissions:
   contents: read
+  actions: read
+  statuses: write
 
 on:
   pull_request:
@@ -19,6 +21,11 @@ jobs:
         working-directory: web
 
     steps:
+      - name: Notify Vercel
+        uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: "Vercel - amara: frontend-ci"
+
       - name: Check out code
         uses: actions/checkout@v6
 
