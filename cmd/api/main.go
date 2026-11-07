@@ -127,6 +127,7 @@ func run() error {
 		candapplication.NewJobFeed(feedRepo, jobLifecycle),
 		authhttp.CandidateAuth(authRepo),
 	)
+	pipelineHandler := invwhttp.NewPipelineHandler(invwdatabase.NewPipelineRepository(dbSvc.Pool()), authRepo)
 	moduleHandler := invwhttp.NewModuleHandler(invwdatabase.NewModuleRepository(dbSvc.Pool()), authRepo)
 	trackingRepo := canddatabase.NewApplicationTrackingRepository(dbSvc.Pool())
 	trackingHandler := candhttp.NewApplicationTrackingHandler(trackingRepo, authRepo)
@@ -143,6 +144,7 @@ func run() error {
 		applicationHandler.RegisterRoutes,
 		moduleHandler.RegisterRoutes,
 		trackingHandler.RegisterRoutes,
+		pipelineHandler.RegisterRoutes,
 	)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
