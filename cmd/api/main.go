@@ -22,6 +22,7 @@ import (
 	authemail "github.com/CSCE-3701-Amara/amara/internal/integration/email"
 	invwdatabase "github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
 	invwhttp "github.com/CSCE-3701-Amara/amara/internal/invw/adapters/http"
+	invwapplication "github.com/CSCE-3701-Amara/amara/internal/invw/application"
 	jobdatabase "github.com/CSCE-3701-Amara/amara/internal/job/adapters/database"
 	jobhttp "github.com/CSCE-3701-Amara/amara/internal/job/adapters/http"
 	jobapplication "github.com/CSCE-3701-Amara/amara/internal/job/application"
@@ -131,6 +132,7 @@ func run() error {
 
 	jobLifecycleRepo := jobdatabase.NewPostingLifecycleRepository(dbSvc.Pool())
 	jobLifecycle := jobapplication.NewPostingLifecycle(jobLifecycleRepo)
+
 	postingListRepo := jobdatabase.NewCompanyPostingListRepository(dbSvc.Pool())
 	postingListHandler := jobhttp.NewPostingListHandler(jobapplication.NewCompanyPostingList(postingListRepo, jobLifecycle), authRepo)
 	postingRepo := jobdatabase.NewPostingManagementRepository(dbSvc.Pool())
@@ -141,6 +143,7 @@ func run() error {
 	applicationRepo := jobdatabase.NewApplicationRepository(dbSvc.Pool())
 	applicationService := jobapplication.NewApplicationAdmission(applicationRepo)
 	applicationHandler := jobhttp.NewApplicationHandler(applicationService, nil)
+
 	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
 	feedHandler := candhttp.NewJobFeedHandler(
 		candapplication.NewJobFeed(feedRepo, jobLifecycle),
@@ -151,6 +154,15 @@ func run() error {
 	assessmentHandler := invwhttp.NewAssessmentHandler(invwdatabase.NewAssessmentRepository(dbSvc.Pool()), authRepo)
 	trackingRepo := canddatabase.NewApplicationTrackingRepository(dbSvc.Pool())
 	trackingHandler := candhttp.NewApplicationTrackingHandler(trackingRepo, authRepo)
+
+	pipelineProgressRepo := invwdatabase.NewCandidatePipelineProgressRepository(dbSvc.Pool())
+	pipelineProgressHandler := invwhttp.NewCandidatePipelineProgressHandler(
+		invwapplication.NewCandidatePipelineProgress(pipelineProgressRepo),
+		nil,
+	)
+
+	// Candidate/interviewer registration needs a verification sender. Until that
+	// provider is configured, reject requests before creating unusable accounts.
 	server, err := httpserver.New(cfg.HTTP, logger, dbSvc,
 		registrationHandler.RegisterRoutes,
 		companyRegistrationHandler.RegisterRoutes,
@@ -166,6 +178,7 @@ func run() error {
 		assessmentHandler.RegisterRoutes,
 		trackingHandler.RegisterRoutes,
 		pipelineHandler.RegisterRoutes,
+		pipelineProgressHandler.RegisterRoutes,
 	)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
