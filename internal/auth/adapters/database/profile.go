@@ -15,13 +15,26 @@ import (
 	"github.com/CSCE-3701-Amara/amara/internal/auth/domain"
 )
 
-type ProfileRepository struct{ queries *sqlc.Queries }
+type profileQueries interface {
+	UpdateCandidateProfile(context.Context, sqlc.UpdateCandidateProfileParams) (sqlc.UpdateCandidateProfileRow, error)
+	UpdateCompanyProfile(context.Context, sqlc.UpdateCompanyProfileParams) (sqlc.UpdateCompanyProfileRow, error)
+	UpdateInterviewerProfile(context.Context, sqlc.UpdateInterviewerProfileParams) (sqlc.UpdateInterviewerProfileRow, error)
+}
+
+type ProfileRepository struct{ queries profileQueries }
 
 func NewProfileRepository(pool *pgxpool.Pool) (*ProfileRepository, error) {
 	if pool == nil {
 		return nil, errors.New("database pool must not be nil")
 	}
 	return &ProfileRepository{queries: sqlc.New(pool)}, nil
+}
+
+func NewProfileRepositoryWithQueries(queries profileQueries) (*ProfileRepository, error) {
+	if queries == nil {
+		return nil, errors.New("database queries must not be nil")
+	}
+	return &ProfileRepository{queries: queries}, nil
 }
 
 func (r *ProfileRepository) UpdateCandidateProfile(ctx context.Context, id string, p domain.CandidateProfilePatch) (domain.CandidateProfile, error) {
