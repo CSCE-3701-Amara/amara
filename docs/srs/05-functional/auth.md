@@ -21,8 +21,8 @@ This subsystem offers the following functionality:
 |-------------|-------------|------------------|------|
 | FR-AUTH-001 | The system **SHALL** create the account when all validations succeed. | UC-AUTH-001, UC-AUTH-002, UC-AUTH-013 | TBD |
 | FR-AUTH-002 | The system **SHALL** create an authenticated session upon successful login. | UC-AUTH-003 | TBD |
-| FR-AUTH-003 | The system **SHALL** display an appropriate error message when authentication, validation, or verification fail. | UC-AUTH-001, UC-AUTH-002, UC-AUTH-003, UC-AUTH-004, UC-AUTH-005, UC-AUTH-006, UC-AUTH-007, UC-AUTH-008, UC-AUTH-009, UC-AUTH-010, UC-AUTH-011, UC-AUTH-012, UC-AUTH-013, UC-AUTH-014, UC-AUTH-015, UC-AUTH-016, UC-AUTH-017 | TBD |
-| FR-AUTH-004 | The system **SHALL** implement a Role-Based Access Control (RBAC) system to avoid unauthorized access to resources and services. | UC-AUTH-003 to UC-AUTH-017 | TBD |
+| FR-AUTH-003 | The system **SHALL** display an appropriate error message when authentication, validation, or verification fail. | UC-AUTH-001, UC-AUTH-002, UC-AUTH-003, UC-AUTH-004, UC-AUTH-005, UC-AUTH-006, UC-AUTH-007, UC-AUTH-008, UC-AUTH-009, UC-AUTH-010, UC-AUTH-011, UC-AUTH-012, UC-AUTH-013, UC-AUTH-014, UC-AUTH-015, UC-AUTH-016, UC-AUTH-017, UC-AUTH-018 | TBD |
+| FR-AUTH-004 | The system **SHALL** implement a Role-Based Access Control (RBAC) system to avoid unauthorized access to resources and services. | UC-AUTH-003 to UC-AUTH-018 | TBD |
 | FR-AUTH-005 | The system **SHALL** validate passwords according to the defined password policy. | UC-AUTH-001, UC-AUTH-010, UC-AUTH-013 | TBD |
 | FR-AUTH-006 | The system **SHALL** allow all users, including interviewers, to log out at any time, upon which their authenticated session **SHALL** be terminated. | UC-AUTH-011 | TBD |
 | FR-AUTH-007 | The system **SHOULD** allow all user accounts to set up MFA. | UC-AUTH-001, UC-AUTH-003 | TBD |
@@ -71,11 +71,11 @@ This subsystem offers the following functionality:
 #### 5.1.3.8 Profile Management
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
-| FR-AUTH-024 | The system **SHALL** allow candidates, interviewers, and hiring managers to view and edit their profiles at any time. | UC-AUTH-005 | TBD |
+| FR-AUTH-024 | The system **SHALL** allow candidates, interviewers, and hiring managers to view and edit their profiles at any time. | UC-AUTH-005, UC-AUTH-018 | TBD |
 | FR-AUTH-025 | The system **SHALL** allow candidates, interviewers, and hiring managers to deactivate or delete their own accounts at any time, subject to applicable retention and lifecycle rules. | UC-AUTH-006 | TBD |
 | FR-AUTH-026 | The system **SHOULD** allow candidates to share their profiles via links/QR codes. | UC-AUTH-007 | TBD |
 | FR-AUTH-027 | The system **SHOULD** allow users to reset their passwords. | UC-AUTH-010, UC-AUTH-013 | TBD |
-| FR-AUTH-028 | The system **SHALL** provide a public company profile page that shows the information related to the company and their job postings. | UC-AUTH-012 | TBD |
+| FR-AUTH-028 | The system **SHALL** provide a public company profile page that shows the information related to the company and their job postings. | UC-AUTH-012, UC-AUTH-018 | TBD |
 | FR-AUTH-029 | The system **COULD** allow candidates to set job preferences that the system can use to recommend job positions. | UC-AUTH-005 | TBD |
 
 #### 5.1.3.9 Account Activation
@@ -105,3 +105,10 @@ This subsystem offers the following functionality:
 |-------------|-------------|------------------|------|
 | FR-AUTH-040 | The system **SHALL** validate and record the interviewer's association with an approved company before activating the interviewer account. | UC-AUTH-001 | TBD |
 | FR-AUTH-041 | The system **SHALL** require interviewers to set up MFA and use MFA verification on every login. | UC-AUTH-001, UC-AUTH-003 | TBD |
+
+#### 5.1.3.13 Profile Viewing
+|     ID      | Requirement | Related Use Case(s) | Jira |
+|-------------|-------------|------------------|------|
+| FR-AUTH-042 | The system **SHALL** authorize profile viewing according to the viewer's role, company scope, target profile visibility, and applicable hiring-stage privacy rules before retrieving or displaying profile information. | UC-AUTH-018 | TBD |
+| FR-AUTH-043 | The system **SHALL** display only the profile fields permitted for the viewer and the target profile, while allowing an authenticated user to view the complete profile information stored for their own account. | UC-AUTH-018 | TBD |
+| FR-AUTH-044 | The system **SHALL** return an appropriate error or not-found response when a profile is unavailable, inaccessible, or cannot be retrieved, and **SHALL NOT** disclose private profile information in that response. | UC-AUTH-018 | TBD |

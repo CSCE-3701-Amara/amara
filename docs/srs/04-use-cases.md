@@ -193,6 +193,17 @@ Owner: All | Status: Draft | Last updated: 2026-10-18 | Jira: AMARA-32
 |**Exception Flows**|**Unauthorized access**: The system denies access to administrative reports.<br>**Data unavailable**: The system displays an error message and indicates that the report cannot currently be generated.<br>**Report generation fails**: The system displays an error message and does not display incomplete results.|
 |**Postconditions**|The system admin has viewed the requested aggregate job-posting data, or no incomplete report is presented.|
 
+#### UC-AUTH-018: View Profile
+|Field|Description|
+|-----|-----------|
+|**Actor(s)**| Candidate, Hiring Manager, Interviewer, System Admin, Guest, System |
+|**Preconditions**| The target profile exists. The viewer is authenticated when the profile is not public, and the viewer is authorized to access the target profile. |
+|**Trigger**| The viewer opens a profile page or profile link. |
+| **Main Flow** | 1. The viewer opens the profile page or link.<br>2. The system identifies the target profile and evaluates the viewer's access permissions.<br>3. The system retrieves the profile fields permitted for the viewer and the target profile's visibility settings.<br>4. The system displays the permitted profile information.<br>5. The viewer reviews the profile without changing it. |
+|**Alternative Flows**|**Own profile**: The system displays the authenticated user's stored profile information, including fields hidden from other viewers.<br>**Public company profile**: A guest or authenticated user views the company's public information and available job postings.<br>**Shared candidate profile**: The system displays only the candidate information included in the active shareable representation.<br>**Authorized candidate or interviewer profile**: The system displays only information permitted by the viewer's role, company scope, and applicable hiring-stage privacy rules.|
+|**Exception Flows**|**Unauthorized access**: The system denies the request and does not disclose profile information.<br>**Profile not found or unavailable**: The system displays a not-found or unavailable message and does not expose private information.<br>**Profile retrieval fails**: The system displays an error message and does not display incomplete profile data.|
+|**Postconditions**|The viewer sees the permitted profile information, or no profile information is disclosed when access is denied or retrieval fails.|
+
 ---
 
 ### 4.3 CAND Use Cases
