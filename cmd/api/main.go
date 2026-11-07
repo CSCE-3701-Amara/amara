@@ -129,6 +129,18 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("create account action handler: %w", err)
 	}
+	profileRepo, err := authdatabase.NewProfileRepository(dbSvc.Pool())
+	if err != nil {
+		return fmt.Errorf("create profile repository: %w", err)
+	}
+	profileService, err := authapplication.NewProfileService(profileRepo)
+	if err != nil {
+		return fmt.Errorf("create profile service: %w", err)
+	}
+	profileHandler, err := authhttp.NewProfileHandler(profileService, authRepo)
+	if err != nil {
+		return fmt.Errorf("create profile handler: %w", err)
+	}
 
 	jobLifecycleRepo := jobdatabase.NewPostingLifecycleRepository(dbSvc.Pool())
 	jobLifecycle := jobapplication.NewPostingLifecycle(jobLifecycleRepo)
@@ -169,6 +181,7 @@ func run() error {
 		loginHandler.RegisterRoutes,
 		logoutHandler.RegisterRoutes,
 		accountActionHandler.RegisterRoutes,
+		profileHandler.RegisterRoutes,
 		feedHandler.RegisterRoutes,
 		postingHandler.RegisterRoutes,
 		func(group *gin.RouterGroup) { jobhttp.RegisterPostingPreviewRoutes(group, postingService, authRepo) },

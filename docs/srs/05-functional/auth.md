@@ -71,7 +71,7 @@ This subsystem offers the following functionality:
 #### 5.1.3.8 Profile Management
 |     ID      | Requirement | Related Use Case(s) | Jira |
 |-------------|-------------|------------------|------|
-| FR-AUTH-024 | The system **SHALL** allow candidates to view and edit their profiles at any time. | UC-AUTH-005 | TBD |
+| FR-AUTH-024 | The system **SHALL** allow candidates, interviewers, and hiring managers to view and edit their profiles at any time. | UC-AUTH-005 | TBD |
 | FR-AUTH-025 | The system **SHALL** allow candidates, interviewers, and hiring managers to deactivate or delete their own accounts at any time, subject to applicable retention and lifecycle rules. | UC-AUTH-006 | TBD |
 | FR-AUTH-026 | The system **SHOULD** allow candidates to share their profiles via links/QR codes. | UC-AUTH-007 | TBD |
 | FR-AUTH-027 | The system **SHOULD** allow users to reset their passwords. | UC-AUTH-010, UC-AUTH-013 | TBD |
