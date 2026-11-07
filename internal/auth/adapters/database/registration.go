@@ -285,8 +285,10 @@ func (r *RegistrationRepository) FindPendingVerification(ctx context.Context, em
 		if errors.Is(err, pgx.ErrNoRows) {
 			return ports.PendingVerification{}, domain.ErrPendingVerificationNotFound
 		}
+
 		return ports.PendingVerification{}, fmt.Errorf("query pending verification: %w", err)
 	}
+
 	accountType := domain.AccountType(row.AccountType)
 	return ports.PendingVerification{
 		Account: domain.Account{
@@ -296,6 +298,52 @@ func (r *RegistrationRepository) FindPendingVerification(ctx context.Context, em
 		Recipient: row.Recipient,
 		ExpiresAt: row.ExpiresAt.Time.UTC(),
 	}, nil
+}
+
+func (r *RegistrationRepository) Activate(ctx context.Context, email string, codeHash []byte, now time.Time) (domain.Account, error) {
+	if r == nil || r.pool == nil {
+		return domain.Account{}, errors.New("account activation database is not configured")
+	}
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return domain.Account{}, fmt.Errorf("begin account activation: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	var accountID, accountType, accountEmail string
+	var expiresAt time.Time
+	err = tx.QueryRow(ctx, `
+		SELECT c.account_id::text, c.account_type, d.recipient, c.expires_at
+		FROM auth_email_verification_challenges c
+		JOIN auth_email_verification_deliveries d
+		  ON d.account_id = c.account_id AND d.account_type = c.account_type
+		WHERE lower(d.recipient) = lower($1)
+		  AND c.code_hash = $2
+		  AND c.consumed_at IS NULL
+		FOR UPDATE`, email, codeHash).Scan(&accountID, &accountType, &accountEmail, &expiresAt)
+	if err != nil || !expiresAt.After(now) {
+		return domain.Account{}, domain.ErrInvalidVerificationCode
+	}
+
+	var status string
+	switch domain.AccountType(accountType) {
+	case domain.AccountTypeCandidate:
+		err = tx.QueryRow(ctx, `UPDATE candidates SET account_status = 'active' WHERE id = $1::uuid AND account_status = 'pending_verification' RETURNING account_status`, accountID).Scan(&status)
+	case domain.AccountTypeInterviewer:
+		err = tx.QueryRow(ctx, `UPDATE interviewers SET account_status = 'active' WHERE id = $1::uuid AND account_status = 'pending_verification' RETURNING account_status`, accountID).Scan(&status)
+	default:
+		return domain.Account{}, domain.ErrInvalidVerificationCode
+	}
+	if err != nil {
+		return domain.Account{}, domain.ErrInvalidVerificationCode
+	}
+	if _, err := tx.Exec(ctx, `UPDATE auth_email_verification_challenges SET consumed_at = $1 WHERE account_id = $2::uuid AND account_type = $3 AND consumed_at IS NULL`, now, accountID, accountType); err != nil {
+		return domain.Account{}, fmt.Errorf("consume verification challenge: %w", err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return domain.Account{}, fmt.Errorf("commit account activation: %w", err)
+	}
+	return domain.Account{ID: accountID, Type: domain.AccountType(accountType), Email: accountEmail, Status: status}, nil
 }
 
 func (r *RegistrationRepository) RegistrationNumberExists(ctx context.Context, number string) (bool, error) {

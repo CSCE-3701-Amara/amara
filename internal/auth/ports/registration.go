@@ -39,6 +39,10 @@ type VerificationSender interface {
 	SendVerificationCode(context.Context, string, string) error
 }
 
+type ActivationRepository interface {
+	Activate(context.Context, string, []byte, time.Time) (domain.Account, error)
+}
+
 type VerificationChallenge struct {
 	AccountID   string
 	AccountType domain.AccountType

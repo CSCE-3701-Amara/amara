@@ -93,6 +93,14 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("create registration handler: %w", err)
 	}
+	verification, err := authapplication.NewVerificationService(authRepo)
+	if err != nil {
+		return fmt.Errorf("create verification service: %w", err)
+	}
+	verificationHandler, err := authhttp.NewVerificationHandler(verification)
+	if err != nil {
+		return fmt.Errorf("create verification handler: %w", err)
+	}
 	companyRegistration, err := authapplication.NewCompanyRegistrationService(authRepo, passwordChecker)
 	if err != nil {
 		return fmt.Errorf("create company registration service: %w", err)
@@ -177,6 +185,7 @@ func run() error {
 	// provider is configured, reject requests before creating unusable accounts.
 	server, err := httpserver.New(cfg.HTTP, logger, dbSvc,
 		registrationHandler.RegisterRoutes,
+		verificationHandler.RegisterRoutes,
 		companyRegistrationHandler.RegisterRoutes,
 		loginHandler.RegisterRoutes,
 		logoutHandler.RegisterRoutes,
