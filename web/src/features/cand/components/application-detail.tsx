@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { CandidateStageProgressView } from "@/shared/lib/contract.types";
+import type { AssessmentInstance } from "../types/product.types";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { resourceId } from "@/shared/lib/api-client";
@@ -33,8 +34,36 @@ export function ApplicationDetail({
   const detail = useApiResource<ApplicationDetailData>(
     `/v1/applications/${resourceId(id)}`,
   );
-  const stages = useApiResource<CandidateStageProgressView[]>(
-    progress ? `/v1/applications/${resourceId(id)}/stage-progress` : null,
+  const stageProgress = useApiResource<{
+    stages: {
+      id: string;
+      name: string;
+      status: string;
+      passed?: boolean;
+      completed_at?: string;
+    }[];
+  }>(progress ? `/v1/applications/${resourceId(id)}/pipeline-progress` : null);
+  const stages = {
+    ...stageProgress,
+    data: stageProgress.data?.stages.map(
+      (stage): CandidateStageProgressView => ({
+        id: stage.id,
+        stageId: stage.id,
+        name: stage.name,
+        status:
+          stage.status === "completed"
+            ? stage.passed
+              ? "passed"
+              : "rejected"
+            : stage.status === "active"
+              ? "in_progress"
+              : stage.status,
+        completedAt: stage.completed_at,
+      }),
+    ),
+  };
+  const assessments = useApiResource<AssessmentInstance[]>(
+    `/v1/applications/${resourceId(id)}/assessment-instances`,
   );
   const withdrawn =
     params.get("state") === "withdrawn" || detail.data?.status === "withdrawn";
@@ -79,10 +108,13 @@ export function ApplicationDetail({
               {progress ? (
                 <>
                   <h2>Your hiring journey</h2>
-                  <UnavailableNotice>
-                    Stage-by-stage progress isn’t available yet. Your recorded
-                    application status is shown below.
-                  </UnavailableNotice>
+                  {!stages.data && (
+                    <UnavailableNotice>
+                      Stage-by-stage progress cannot be loaded. Your recorded
+                      application status is shown below.
+                    </UnavailableNotice>
+                  )}
+                  <ApiFeedback error={stages.error} retry={stages.reload} />
                   <p>
                     {stages.data
                       ? `${stages.data.filter((stage) => stage.status === "passed").length} of ${stages.data.length} stages completed`
@@ -192,6 +224,27 @@ export function ApplicationDetail({
                   ? "Application closed"
                   : "Your application is in progress"}
               </h2>
+              <h3>Assessments</h3>
+              <BusyState loading={assessments.loading} />
+              <ApiFeedback
+                error={assessments.error}
+                retry={assessments.reload}
+              />
+              {assessments.data?.map((instance) => (
+                <p key={instance.id}>
+                  <Link
+                    href={`/candidate/assessments/${resourceId(instance.id)}?state=availability&application=${resourceId(id)}`}
+                  >
+                    {instance.status === "in_progress"
+                      ? "Continue assessment"
+                      : "Review assessment"}
+                  </Link>{" "}
+                  · {instance.status.replaceAll("_", " ")}
+                </p>
+              ))}
+              {assessments.data?.length === 0 && (
+                <p>No assessments assigned.</p>
+              )}
               {detail.data.finalFeedback && (
                 <>
                   <h3>Hiring team feedback</h3>

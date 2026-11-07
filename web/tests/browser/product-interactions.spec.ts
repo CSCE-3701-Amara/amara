@@ -4,35 +4,39 @@ import {
   moduleDefinition,
   productFixtures,
 } from "./support/product-fixtures";
-test("DAG joins remain explicit, cycles are rejected, and nodes support keyboard positioning", async ({
-  page,
-}) => {
-  await productFixtures(page);
-  await page.goto(`/employer/pipelines/${ids.job}`);
-  const node = page.getByRole("button", { name: /^English check, 0 incoming/ });
-  await expect(node).toBeVisible();
-  const before = await node.boundingBox();
-  await node.focus();
-  await page.keyboard.press("Alt+ArrowRight");
-  await expect
-    .poll(async () => Math.round((await node.boundingBox())!.x))
-    .toBe(Math.round(before!.x + 20));
-  await page
-    .getByRole("button", { name: /^Live interview, 3 incoming/ })
-    .click();
-  await page.getByLabel("Connect to stage").selectOption("stage-1");
-  await page
-    .getByRole("button", { name: "Add connection", exact: true })
-    .click();
-  await expect(
-    page.getByRole("status").filter({ hasText: "would create a cycle" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Zoom out", exact: true }).click();
-  await expect(page.locator("output")).toHaveText("90%");
-  await expect(
-    page.getByRole("button", { name: "Save graph draft" }),
-  ).toBeDisabled();
-});
+for (const width of [1728, 1024, 375])
+  test(`DAG joins remain explicit, cycles are rejected, and nodes support keyboard positioning at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1117 });
+    await productFixtures(page);
+    await page.goto(`/employer/pipelines/${ids.job}`);
+    const node = page.getByRole("button", {
+      name: /^English check, 0 incoming/,
+    });
+    await expect(node).toBeVisible();
+    const before = await node.boundingBox();
+    await node.focus();
+    await page.keyboard.press("Alt+ArrowRight");
+    await expect
+      .poll(async () => Math.round((await node.boundingBox())!.x))
+      .toBe(Math.round(before!.x + 20));
+    await page
+      .getByRole("button", { name: /^Live interview, 3 incoming/ })
+      .click();
+    await page.getByLabel("Connect to stage").selectOption("stage-1");
+    await page
+      .getByRole("button", { name: "Add connection", exact: true })
+      .click();
+    await expect(
+      page.getByRole("status").filter({ hasText: "would create a cycle" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Zoom out", exact: true }).click();
+    await expect(page.locator("output")).toHaveText("90%");
+    await expect(
+      page.getByRole("button", { name: "Save graph draft" }),
+    ).toBeDisabled();
+  });
 test("failed lifecycle confirmation stays open and returns focus on cancellation", async ({
   page,
 }) => {

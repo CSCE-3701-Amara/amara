@@ -253,7 +253,9 @@ export type PipelineMigrationPreview = {
 };
 
 export type StageDecisionRecord = {
-  decisionType: "manual" | "threshold" | "completion" | "override";
+  candidateId?: string;
+  stageExecutionId?: string;
+  decisionType: "manual" | "threshold" | "completion" | "missed" | "override";
   decision: "pass" | "reject";
   decidedBy?: string | null;
   decidedAt: string;

@@ -157,6 +157,11 @@ export async function productFixtures(page: Page) {
         status: 501,
         json: { detail: "Fixture does not simulate successful writes" },
       });
+    if (p === "/v1/jobs" && pageState === "error")
+      return route.fulfill({
+        status: 503,
+        json: { detail: "Postings are temporarily unavailable." },
+      });
     let body: unknown;
     if (p === "/v1/jobs/feed")
       body = {
@@ -165,12 +170,15 @@ export async function productFixtures(page: Page) {
       };
     else if (p === "/v1/jobs")
       body = {
-        items: [
-          {
-            ...posting,
-            status: pageState === "published" ? "published" : "draft",
-          },
-        ],
+        items:
+          pageState === "empty"
+            ? []
+            : [
+                {
+                  ...posting,
+                  status: pageState === "published" ? "published" : "draft",
+                },
+              ],
       };
     else if (p.endsWith("/pipeline"))
       body = {
@@ -223,6 +231,47 @@ export async function productFixtures(page: Page) {
           meanScore: 78,
         },
       ];
+    else if (p.match(/^\/v1\/jobs\/[^/]+\/preview$/)) {
+      const { status, amarat, ...preview } = posting;
+      void status;
+      void amarat;
+      body = preview;
+    } else if (p.endsWith("/pipeline-progress"))
+      body = {
+        stages: stages.map((s, i) => ({
+          id: s.id,
+          name: s.name,
+          status: i === 0 ? "completed" : i === 1 ? "active" : "locked",
+          passed: i === 0,
+        })),
+      };
+    else if (p.endsWith("/assessment-instances")) body = [];
+    else if (p.match(/^\/v1\/jobs\/[^/]+\/pipeline\/dashboard$/))
+      body = {
+        active: 40,
+        finalistTarget: 5,
+        links: [],
+        stages: stages.map((s) => ({
+          id: s.id,
+          name: s.name,
+          rule: "manual",
+          threshold: null,
+          active: 8,
+          passed: 32,
+          rejected: 1,
+          candidates: [
+            {
+              id: ids.application,
+              candidate: "Candidate 042",
+              status: "held",
+              active: true,
+              score: 80,
+              percentile: 85,
+              niceToHaveScore: null,
+            },
+          ],
+        })),
+      };
     else if (p.includes("/pipelines/") && p.endsWith("/dashboard"))
       body = {
         pipelineId: ids.job,
