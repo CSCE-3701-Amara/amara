@@ -181,6 +181,23 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		}
 		return
 	}
+	assertStage := func(stage int, wantStatus string, wantScore *int) {
+		t.Helper()
+		var matches bool
+		err := pool.QueryRow(ctx, `
+			SELECT se.status = $2 AND se.started_at IS NOT DISTINCT FROM a.started_at
+				AND se.deadline IS NOT DISTINCT FROM a.deadline
+				AND se.completed_at IS NOT DISTINCT FROM
+					CASE WHEN a.status = 'missed' THEN a.deadline ELSE a.submitted_at END
+				AND se.score IS NOT DISTINCT FROM $3::int
+			FROM assessment_attempts a JOIN stage_executions se ON se.id = a.stage_execution_id
+			JOIN pipeline_stages s ON s.id = se.stage_id WHERE s.stage_order = $1
+		`, stage, wantStatus, wantScore).Scan(&matches)
+		if err != nil || !matches {
+			t.Fatalf("stage %d did not mirror the attempt as %s with score %v: %v", stage, wantStatus, wantScore, err)
+		}
+	}
+	assertStage(1, "missed", nil)
 	_, _, status, auto := load(1)
 	if status != "missed" || auto {
 		t.Fatalf("unspawned expiry: %s, auto=%v", status, auto)
@@ -195,6 +212,7 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		if err := json.Unmarshal(raw, &response); err != nil || len(response.Questions) != 1 || strings.Contains(string(raw), "secret") {
 			t.Fatalf("unsafe or invalid candidate content: %s (%v)", raw, err)
 		}
+		assertStage(stage, "in_progress", nil)
 		return "/assessment-attempts/" + id, id, response.Questions[0].ID
 	}
 	for _, stage := range []int{2, 4, 5} {
@@ -213,6 +231,11 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		if submittedStatus != wantStatus || wasAutomatic {
 			t.Fatalf("stage %d submitted with status=%s, automatic=%v", stage, submittedStatus, wasAutomatic)
 		}
+		stageStatus := "held"
+		if wantStatus == "pending_grading" {
+			stageStatus = "pending_grading"
+		}
+		assertStage(stage, stageStatus, nil)
 		retry := request(http.MethodPost, path+"/submission", "candidate", "", http.StatusOK)
 		if string(first) != string(retry) {
 			t.Fatalf("submission retry changed attempt: %s vs %s", first, retry)
@@ -224,10 +247,14 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		request(http.MethodPost, path+"/evaluation", "company", evidence, http.StatusNoContent)
 		request(http.MethodPost, path+"/evaluation", "company", evidence, http.StatusNoContent)
 		review := request(http.MethodGet, path+"/evaluation", "company", "", http.StatusOK)
+		var score *int
 		want := `"finalScore":null`
 		if stage == 5 {
+			value := 80
+			score = &value
 			want = `"finalScore":80`
 		}
+		assertStage(stage, "held", score)
 		if !strings.Contains(string(review), want) {
 			t.Fatalf("unexpected review: %s", review)
 		}
@@ -239,6 +266,7 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	if status != "pending_grading" || !auto {
 		t.Fatalf("started expiry: %s, auto=%v", status, auto)
 	}
+	assertStage(3, "pending_grading", nil)
 	passed, total := 2, 1
 	evidence := []database.QuestionEvidence{{QuestionID: question, PassedCases: &passed, TotalCases: &total}}
 	if err := repo.FinalizeEvidence(ctx, id, "", evidence); err != database.ErrAssessmentConflict {
@@ -258,6 +286,7 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	if status != "scored" {
 		t.Fatalf("expected finalized coding evidence, got %s", status)
 	}
+	assertStage(3, "held", nil)
 	review := request(http.MethodGet, codingPath+"/evaluation", "company", "", http.StatusOK)
 	for _, want := range []string{`"finalScore":null`, `"passedCases":1`, `"totalCases":1`, question} {
 		if !strings.Contains(string(review), want) {
