@@ -13,6 +13,17 @@ func TestNewSMTPSenderRejectsHeaderInjectionInFrom(t *testing.T) {
 	}
 }
 
+func TestNewSMTPSenderRejectsInvalidFrom(t *testing.T) {
+	_, err := NewSMTPSender(SMTPConfig{
+		Host: "smtp.example.com",
+		Port: "587",
+		From: "not-an-email",
+	})
+	if err == nil {
+		t.Fatal("NewSMTPSender() accepted an invalid From value")
+	}
+}
+
 func TestIsVerificationCode(t *testing.T) {
 	for _, test := range []struct {
 		name string

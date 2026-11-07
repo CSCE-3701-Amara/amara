@@ -32,6 +32,9 @@ func NewSMTPSender(config SMTPConfig) (*SMTPSender, error) {
 	if strings.ContainsAny(config.From, "\r\n") {
 		return nil, errors.New("SMTP from contains invalid characters")
 	}
+	if address, err := mail.ParseAddress(config.From); err != nil || address.Address != config.From {
+		return nil, errors.New("SMTP from must be a valid email address")
+	}
 	if (config.Username == "") != (config.Password == "") {
 		return nil, errors.New("SMTP username and password must be provided together")
 	}
