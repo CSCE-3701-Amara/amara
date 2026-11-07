@@ -6,7 +6,7 @@ const baseURL = `http://127.0.0.1:${port}`;
 export default defineConfig({
   testDir: "./tests/browser",
   fullyParallel: true,
-  workers: 2,
+  workers: process.env.CI ? 1 : 2,
   use: {
     baseURL,
     viewport: { width: 1728, height: 1117 },
