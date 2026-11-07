@@ -4,15 +4,23 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
+	authdatabase "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/database"
+	authhttp "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/http"
+	authpassword "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/password"
+	authapplication "github.com/CSCE-3701-Amara/amara/internal/auth/application"
 	canddatabase "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/database"
 	candhttp "github.com/CSCE-3701-Amara/amara/internal/cand/adapters/http"
 	candapplication "github.com/CSCE-3701-Amara/amara/internal/cand/application"
+	invwdatabase "github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
+	invwhttp "github.com/CSCE-3701-Amara/amara/internal/invw/adapters/http"
 	jobdatabase "github.com/CSCE-3701-Amara/amara/internal/job/adapters/database"
 	jobhttp "github.com/CSCE-3701-Amara/amara/internal/job/adapters/http"
 	jobapplication "github.com/CSCE-3701-Amara/amara/internal/job/application"
@@ -59,19 +67,89 @@ func run() error {
 	defer dbSvc.Close()
 	logger.Info("database connection ready")
 
+	authRepo, err := authdatabase.NewRegistrationRepository(dbSvc.Pool())
+	if err != nil {
+		return fmt.Errorf("create auth repository: %w", err)
+	}
+	passwordChecker, err := authpassword.NewHIBPChecker(&http.Client{Timeout: 10 * time.Second})
+	if err != nil {
+		return fmt.Errorf("create password compromise checker: %w", err)
+	}
+	companyRegistration, err := authapplication.NewCompanyRegistrationService(authRepo, passwordChecker)
+	if err != nil {
+		return fmt.Errorf("create company registration service: %w", err)
+	}
+	companyRegistrationHandler, err := authhttp.NewCompanyRegistrationHandler(companyRegistration)
+	if err != nil {
+		return fmt.Errorf("create company registration handler: %w", err)
+	}
+	mfaService, err := authapplication.NewMFAService(authRepo, cfg.Auth.MFAEncryptionKey)
+	if err != nil {
+		return fmt.Errorf("create MFA service: %w", err)
+	}
+	loginService, err := authapplication.NewLoginService(authRepo, authRepo, mfaService)
+	if err != nil {
+		return fmt.Errorf("create login service: %w", err)
+	}
+	loginHandler, err := authhttp.NewLoginHandlerWithLogger(loginService, logger)
+	if err != nil {
+		return fmt.Errorf("create login handler: %w", err)
+	}
+	logoutService, err := authapplication.NewLogoutService(authRepo)
+	if err != nil {
+		return fmt.Errorf("create logout service: %w", err)
+	}
+	logoutHandler, err := authhttp.NewLogoutHandler(logoutService, authRepo, logger)
+	if err != nil {
+		return fmt.Errorf("create logout handler: %w", err)
+	}
+	accountActionService, err := authapplication.NewAccountActionService(authRepo)
+	if err != nil {
+		return fmt.Errorf("create account action service: %w", err)
+	}
+	accountActionHandler, err := authhttp.NewAccountActionHandler(accountActionService, authRepo, logger)
+	if err != nil {
+		return fmt.Errorf("create account action handler: %w", err)
+	}
+
 	jobLifecycleRepo := jobdatabase.NewPostingLifecycleRepository(dbSvc.Pool())
 	jobLifecycle := jobapplication.NewPostingLifecycle(jobLifecycleRepo)
-	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
-	feedHandler := candhttp.NewJobFeedHandler(candapplication.NewJobFeed(feedRepo, jobLifecycle), nil)
 	postingListRepo := jobdatabase.NewCompanyPostingListRepository(dbSvc.Pool())
 	postingListHandler := jobhttp.NewPostingListHandler(jobapplication.NewCompanyPostingList(postingListRepo, jobLifecycle), nil)
-	server, err := httpserver.New(cfg.HTTP, logger, dbSvc, feedHandler.RegisterRoutes, postingListHandler.RegisterRoutes)
+	postingRepo := jobdatabase.NewPostingManagementRepository(dbSvc.Pool())
+	postingService := jobapplication.NewPostingManagement(postingRepo)
+	// AUTH integration placeholder: the current checkout has no session middleware.
+	// The handler fails closed until AUTH supplies a middleware that sets its principal.
+	postingHandler := jobhttp.NewPostingHandler(postingService, nil)
+	applicationRepo := jobdatabase.NewApplicationRepository(dbSvc.Pool())
+	applicationService := jobapplication.NewApplicationAdmission(applicationRepo)
+	applicationHandler := jobhttp.NewApplicationHandler(applicationService, nil)
+	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
+	feedHandler := candhttp.NewJobFeedHandler(
+		candapplication.NewJobFeed(feedRepo, jobLifecycle),
+		authhttp.CandidateAuth(authRepo),
+	)
+	moduleHandler := invwhttp.NewModuleHandler(invwdatabase.NewModuleRepository(dbSvc.Pool()), authRepo)
+	trackingRepo := canddatabase.NewApplicationTrackingRepository(dbSvc.Pool())
+	trackingHandler := candhttp.NewApplicationTrackingHandler(trackingRepo, authRepo)
+	// Candidate/interviewer registration needs a verification sender. Until that
+	// provider is configured, reject requests before creating unusable accounts.
+	server, err := httpserver.New(cfg.HTTP, logger, dbSvc,
+		authhttp.RegisterUnavailableRegistrationRoutes,
+		companyRegistrationHandler.RegisterRoutes,
+		loginHandler.RegisterRoutes,
+		logoutHandler.RegisterRoutes,
+		accountActionHandler.RegisterRoutes,
+		feedHandler.RegisterRoutes,
+		postingHandler.RegisterRoutes,
+		postingListHandler.RegisterRoutes,
+		applicationHandler.RegisterRoutes,
+		moduleHandler.RegisterRoutes,
+		trackingHandler.RegisterRoutes,
+	)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
 	}
-
-	ctx, stop = signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
 
 	return server.Run(ctx)
 }

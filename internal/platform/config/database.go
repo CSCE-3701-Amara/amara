@@ -11,12 +11,17 @@ import (
 // DatabaseConfig holds the shared database connection settings used by every
 // process of the backend. The URL carries credentials and is never logged.
 type DatabaseConfig struct {
-	URL             string
-	MaxConns        int32
-	MinConns        int32
+	URL      string
+	MaxConns int32
+	// MinConns is the minimum number of connections kept alive in the pool.
+	// Zero lets pgxpool manage the idle floor automatically.
+	MinConns int32
+	// MaxConnLifetime overrides pgxpool's default connection lifetime when positive.
 	MaxConnLifetime time.Duration
+	// MaxConnIdleTime overrides pgxpool's default idle time when positive.
 	MaxConnIdleTime time.Duration
-	HealthTimeout   time.Duration
+	// HealthTimeout bounds the ping issued by the database health check.
+	HealthTimeout time.Duration
 }
 
 func newDatabaseConfig(lookup func(string) (string, bool)) (DatabaseConfig, error) {
@@ -72,6 +77,7 @@ func newDatabaseConfig(lookup func(string) (string, bool)) (DatabaseConfig, erro
 	if cfg.MinConns > cfg.MaxConns {
 		return DatabaseConfig{}, fmt.Errorf("DB_POOL_MIN_CONNS must not exceed DB_POOL_MAX_CONNS")
 	}
+
 	for _, setting := range []struct {
 		name   string
 		target *time.Duration

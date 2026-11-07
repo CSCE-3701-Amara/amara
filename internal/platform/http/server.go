@@ -22,6 +22,9 @@ type Server struct {
 
 // New composes the router and HTTP server. Module dependencies are constructed
 // in cmd/api and supplied through route registrars.
+//
+// dbSvc may be nil when no database service is available; the /health/ready
+// endpoint will respond as healthy in that case.
 func New(cfg config.HTTPConfig, logger *slog.Logger, dbSvc database.Service, registrars ...RouteRegistrar) (*Server, error) {
 	if logger == nil {
 		logger = slog.Default()
