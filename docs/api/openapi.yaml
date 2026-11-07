@@ -184,9 +184,20 @@ paths:
             Set-Cookie:
               $ref: '#/components/headers/ClearedSessionCookie'
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/AuthenticatedUnauthorized'
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          description: Authentication or logout service failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationErrorResponse'
+              example:
+                error:
+                  code: authentication_unavailable
+                  message: Authentication is temporarily unavailable.
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
 
   /v1/auth/account-actions:
     post:
