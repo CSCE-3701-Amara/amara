@@ -16,6 +16,12 @@ import (
 )
 
 type profileQueries interface {
+	GetCandidateProfile(context.Context, pgtype.UUID) (sqlc.GetCandidateProfileRow, error)
+	GetCompanyProfile(context.Context, sqlc.GetCompanyProfileParams) (sqlc.GetCompanyProfileRow, error)
+	GetPublicCompanyProfile(context.Context, pgtype.UUID) (sqlc.GetPublicCompanyProfileRow, error)
+	GetInterviewerProfile(context.Context, pgtype.UUID) (sqlc.GetInterviewerProfileRow, error)
+	ListCompanyInterviewers(context.Context, sqlc.ListCompanyInterviewersParams) ([]sqlc.ListCompanyInterviewersRow, error)
+	CountCompanyInterviewers(context.Context, pgtype.UUID) (int64, error)
 	UpdateCandidateProfile(context.Context, sqlc.UpdateCandidateProfileParams) (sqlc.UpdateCandidateProfileRow, error)
 	UpdateCompanyProfile(context.Context, sqlc.UpdateCompanyProfileParams) (sqlc.UpdateCompanyProfileRow, error)
 	UpdateInterviewerProfile(context.Context, sqlc.UpdateInterviewerProfileParams) (sqlc.UpdateInterviewerProfileRow, error)
@@ -35,6 +41,88 @@ func NewProfileRepositoryWithQueries(queries profileQueries) (*ProfileRepository
 		return nil, errors.New("database queries must not be nil")
 	}
 	return &ProfileRepository{queries: queries}, nil
+}
+
+func (r *ProfileRepository) GetCandidateProfile(ctx context.Context, id string) (domain.CandidateProfile, error) {
+	accountID, err := parseUUID(id)
+	if err != nil {
+		return domain.CandidateProfile{}, domain.ErrProfileNotFound
+	}
+	row, err := r.queries.GetCandidateProfile(ctx, accountID)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.CandidateProfile{}, domain.ErrProfileNotFound
+	}
+	if err != nil {
+		return domain.CandidateProfile{}, fmt.Errorf("get candidate profile: %w", err)
+	}
+	return mapCandidateProfileRow(row), nil
+}
+
+func (r *ProfileRepository) GetCompanyProfile(ctx context.Context, id string, includePrivate bool) (domain.CompanyProfile, error) {
+	accountID, err := parseUUID(id)
+	if err != nil {
+		return domain.CompanyProfile{}, domain.ErrProfileNotFound
+	}
+	row, err := r.queries.GetCompanyProfile(ctx, sqlc.GetCompanyProfileParams{ID: accountID, IncludePrivate: includePrivate})
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.CompanyProfile{}, domain.ErrProfileNotFound
+	}
+	if err != nil {
+		return domain.CompanyProfile{}, fmt.Errorf("get company profile: %w", err)
+	}
+	return mapCompanyProfileRow(row), nil
+}
+
+func (r *ProfileRepository) GetPublicCompanyProfile(ctx context.Context, id string) (domain.CompanyProfile, error) {
+	accountID, err := parseUUID(id)
+	if err != nil {
+		return domain.CompanyProfile{}, domain.ErrProfileNotFound
+	}
+	row, err := r.queries.GetPublicCompanyProfile(ctx, accountID)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.CompanyProfile{}, domain.ErrProfileNotFound
+	}
+	if err != nil {
+		return domain.CompanyProfile{}, fmt.Errorf("get public company profile: %w", err)
+	}
+	return mapPublicCompanyProfileRow(row), nil
+}
+
+func (r *ProfileRepository) GetInterviewerProfile(ctx context.Context, id string) (domain.InterviewerProfile, error) {
+	accountID, err := parseUUID(id)
+	if err != nil {
+		return domain.InterviewerProfile{}, domain.ErrProfileNotFound
+	}
+	row, err := r.queries.GetInterviewerProfile(ctx, accountID)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.InterviewerProfile{}, domain.ErrProfileNotFound
+	}
+	if err != nil {
+		return domain.InterviewerProfile{}, fmt.Errorf("get interviewer profile: %w", err)
+	}
+	return mapInterviewerProfileValues(row.IID, row.ICompanyID, row.Name, row.Email, row.AccountStatus, row.CreatedAt, row.UpdatedAt), nil
+}
+
+func (r *ProfileRepository) ListCompanyInterviewers(ctx context.Context, companyID string, limit, offset int32) ([]domain.InterviewerProfile, int64, error) {
+	id, err := parseUUID(companyID)
+	if err != nil {
+		return nil, 0, domain.ErrProfileNotFound
+	}
+	rows, err := r.queries.ListCompanyInterviewers(ctx, sqlc.ListCompanyInterviewersParams{
+		CompanyID: id, PageLimit: limit, PageOffset: offset,
+	})
+	if err != nil {
+		return nil, 0, fmt.Errorf("list company interviewers: %w", err)
+	}
+	total, err := r.queries.CountCompanyInterviewers(ctx, id)
+	if err != nil {
+		return nil, 0, fmt.Errorf("count company interviewers: %w", err)
+	}
+	profiles := make([]domain.InterviewerProfile, 0, len(rows))
+	for _, row := range rows {
+		profiles = append(profiles, mapInterviewerProfileValues(row.IID, row.ICompanyID, row.Name, row.Email, row.AccountStatus, row.CreatedAt, row.UpdatedAt))
+	}
+	return profiles, total, nil
 }
 
 func (r *ProfileRepository) UpdateCandidateProfile(ctx context.Context, id string, p domain.CandidateProfilePatch) (domain.CandidateProfile, error) {
@@ -111,24 +199,51 @@ func (r *ProfileRepository) UpdateInterviewerProfile(ctx context.Context, id, na
 }
 
 func mapCandidateProfile(row sqlc.UpdateCandidateProfileRow) domain.CandidateProfile {
+	return mapCandidateProfileValues(row.ID, row.Name, row.Email, row.CreatedAt, row.UpdatedAt, row.PhoneNumber, row.GithubProfile, row.LinkedinProfile, row.PortfolioLink, row.Gender, row.BirthDate, row.Nationality, row.Address, row.Biography, row.YearsOfExperience, row.Available)
+}
+
+func mapCandidateProfileRow(row sqlc.GetCandidateProfileRow) domain.CandidateProfile {
+	return mapCandidateProfileValues(row.ID, row.Name, row.Email, row.CreatedAt, row.UpdatedAt, row.PhoneNumber, row.GithubProfile, row.LinkedinProfile, row.PortfolioLink, row.Gender, row.BirthDate, row.Nationality, row.Address, row.Biography, row.YearsOfExperience, row.Available)
+}
+
+func mapCandidateProfileValues(id, name, email string, createdAt, updatedAt pgtype.Timestamp, phoneNumber, githubProfile, linkedinProfile, portfolioLink, gender pgtype.Text, birthDate pgtype.Date, nationality, address, biography pgtype.Text, yearsOfExperience pgtype.Int4, available pgtype.Bool) domain.CandidateProfile {
 	return domain.CandidateProfile{
-		ID: row.ID, Name: row.Name, Email: row.Email, CreatedAt: row.CreatedAt.Time,
-		UpdatedAt: timestampPtr(row.UpdatedAt), PhoneNumber: row.PhoneNumber.String,
-		GithubProfile: row.GithubProfile.String, LinkedinProfile: row.LinkedinProfile.String,
-		PortfolioLink: row.PortfolioLink.String, Gender: row.Gender.String,
-		BirthDate: datePtr(row.BirthDate), Nationality: row.Nationality.String,
-		Address: row.Address.String, Biography: row.Biography.String,
-		YearsOfExperience: intPtr(row.YearsOfExperience), Available: boolPtr(row.Available),
+		ID: id, Name: name, Email: email, CreatedAt: createdAt.Time,
+		UpdatedAt: timestampPtr(updatedAt), PhoneNumber: phoneNumber.String,
+		GithubProfile: githubProfile.String, LinkedinProfile: linkedinProfile.String,
+		PortfolioLink: portfolioLink.String, Gender: gender.String,
+		BirthDate: datePtr(birthDate), Nationality: nationality.String,
+		Address: address.String, Biography: biography.String,
+		YearsOfExperience: intPtr(yearsOfExperience), Available: boolPtr(available),
 	}
 }
 
 func mapCompanyProfile(row sqlc.UpdateCompanyProfileRow) domain.CompanyProfile {
+	return mapCompanyProfileValues(row.ID, row.LegalName, row.DisplayName, row.Description, row.WebsiteLink, row.LogoUrl, row.ContactPhone, row.ContactEmail, row.LinkedinProfile, row.Approved)
+}
+
+func mapCompanyProfileRow(row sqlc.GetCompanyProfileRow) domain.CompanyProfile {
+	return mapCompanyProfileValues(row.ID, row.LegalName, row.DisplayName, row.Description, row.WebsiteLink, row.LogoUrl, row.ContactPhone, row.ContactEmail, row.LinkedinProfile, row.Approved)
+}
+
+func mapPublicCompanyProfileRow(row sqlc.GetPublicCompanyProfileRow) domain.CompanyProfile {
+	return mapCompanyProfileValues(row.ID, row.LegalName, row.DisplayName, row.Description, row.WebsiteLink, row.LogoUrl, row.ContactPhone, row.ContactEmail, row.LinkedinProfile, row.Approved)
+}
+
+func mapCompanyProfileValues(id, legalName string, displayName, description, websiteLink, logoURL, contactPhone, contactEmail, linkedinProfile pgtype.Text, approved bool) domain.CompanyProfile {
 	return domain.CompanyProfile{
-		ID: row.ID, LegalName: row.LegalName, DisplayName: textPtr(row.DisplayName),
-		Description: textPtr(row.Description), WebsiteLink: textPtr(row.WebsiteLink),
-		LogoURL: textPtr(row.LogoUrl), ContactPhone: textPtr(row.ContactPhone),
-		ContactEmail: textPtr(row.ContactEmail), LinkedinProfile: textPtr(row.LinkedinProfile),
-		Approved: row.Approved,
+		ID: id, LegalName: legalName, DisplayName: textPtr(displayName),
+		Description: textPtr(description), WebsiteLink: textPtr(websiteLink),
+		LogoURL: textPtr(logoURL), ContactPhone: textPtr(contactPhone),
+		ContactEmail: textPtr(contactEmail), LinkedinProfile: textPtr(linkedinProfile),
+		Approved: approved,
+	}
+}
+
+func mapInterviewerProfileValues(id, companyID, name, email, status string, createdAt, updatedAt pgtype.Timestamp) domain.InterviewerProfile {
+	return domain.InterviewerProfile{
+		ID: id, CompanyID: companyID, Name: name, Email: email,
+		AccountStatus: status, CreatedAt: createdAt.Time, UpdatedAt: timestampPtr(updatedAt),
 	}
 }
 

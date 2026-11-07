@@ -22,9 +22,13 @@ passwords and tokens are never written to browser storage or URL parameters.
 Errors are rendered from Problem Details or the existing JSON error shape.
 The rate-limit state respects the server's `Retry-After` header.
 
-Registration posts to the existing candidate or company endpoint. The backend
-currently returns `registration_unavailable` for candidate registration. The
-form displays that response; it only shows a pending screen after API success.
+Registration posts to the candidate or company endpoint. Candidate registration
+opens the verification form after API success. The form sends the email and
+64-character code to `POST /v1/auth/verifications`, displays rejected or expired
+codes beside the field, and opens sign-in after the backend confirms activation.
+The code stays in component memory and is cleared after success. A directly
+opened pending state asks for the email again. Company registration still waits
+for review and does not use the verification endpoint.
 
 The following `state` query values make each designed state directly reviewable:
 
@@ -43,8 +47,9 @@ The following `state` query values make each designed state directly reviewable:
 | `/register?account=company&state=review-pending` | Review pending       | `268:772`   |
 
 A directly opened MFA view has no stored credentials. Return to sign-in to enter
-them before verification. The URL states are presentation views; they do not
-create a session, verify an account, or bypass the API.
+them before verification. The pending verification URL opens the real candidate
+verification form; other URL states are presentation views and do not create a
+session or bypass the API.
 
 ## Ownership and API surface
 

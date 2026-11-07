@@ -51,10 +51,12 @@ services:
   worker:
     <<: *backend
     command: ["/worker"]
-    environment: *backend-env
-    # The worker is a stub that exits until its queue work is implemented;
-    # enable unless-stopped alongside the queue consumer work.
-    restart: "no"
+    environment:
+      <<: *backend-env
+      JUDGE0_URL: ${JUDGE0_URL:-}
+      JUDGE0_AUTH_TOKEN: ${JUDGE0_AUTH_TOKEN:-}
+      JUDGE0_LANGUAGE_IDS: ${JUDGE0_LANGUAGE_IDS:-}
+      JUDGE0_ALLOW_LOCAL_HTTP: ${JUDGE0_ALLOW_LOCAL_HTTP:-false}
 
   web:
     build:

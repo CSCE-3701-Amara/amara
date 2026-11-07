@@ -1,8 +1,9 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { useUnsavedChanges } from "@/shared/lib/use-unsaved-changes";
 import { resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
 import {
@@ -25,6 +26,11 @@ import type {
   CandidateSubmission,
 } from "../types/product.types";
 import styles from "./candidate.module.css";
+import {
+  startAssessment,
+  saveAssessmentAnswer,
+  submitAssessmentAttempt,
+} from "../api/assessment.api";
 
 function AttemptClock({
   deadline,
@@ -214,12 +220,16 @@ function QuestionInput({
       </fieldset>
     );
   return (
-    <label className={s.field}>
-      Your answer
+    <div className={s.field}>
+      <label htmlFor={`${questionId}-answer`}>Your answer</label>
       <textarea
+        id={`${questionId}-answer`}
         className={
           question.responseFormat === "code" ? styles.codeArea : undefined
         }
+        name={questionId}
+        autoComplete="off"
+        spellCheck={question.responseFormat !== "code"}
         value={typeof value === "string" ? value : ""}
         onChange={(event) => onChange(event.target.value)}
         maxLength={question.responseFormat === "code" ? undefined : 2000}
@@ -244,7 +254,7 @@ function QuestionInput({
           {typeof value === "string" ? value.length : 0} / 2,000 characters
         </small>
       )}
-    </label>
+    </div>
   );
 }
 function AdvancedAssessment({
@@ -256,6 +266,10 @@ function AdvancedAssessment({
   onSubmit,
   prefix,
   savedLanguage,
+  onSave,
+  busy,
+  canEdit,
+  onLanguageChange,
 }: {
   questions: CandidateQuestion[];
   attempt?: AssessmentAttempt;
@@ -265,6 +279,10 @@ function AdvancedAssessment({
   onSubmit: () => void;
   prefix: string;
   savedLanguage: (question: CandidateQuestion) => string;
+  onSave: (question: CandidateQuestion, language: string) => Promise<void>;
+  busy: boolean;
+  canEdit: boolean;
+  onLanguageChange: (id: string, language: string) => void;
 }) {
   const [index, setIndex] = useState(0);
   const [languages, setLanguages] = useState<Record<string, string>>({});
@@ -351,19 +369,21 @@ function AdvancedAssessment({
             <>
               {variant === "coding" && (
                 <label className={s.field}>
-                  Language (local draft)
+                  Language
                   <select
+                    disabled={busy || !canEdit}
                     value={
                       languages[question.id] ||
                       savedLanguage(question) ||
                       "javascript"
                     }
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      onLanguageChange(question.id, event.target.value);
                       setLanguages((values) => ({
                         ...values,
                         [question.id]: event.target.value,
-                      }))
-                    }
+                      }));
+                    }}
                   >
                     {["javascript", "typescript", "python", "go", "cpp"].map(
                       (language) => (
@@ -378,14 +398,30 @@ function AdvancedAssessment({
                 question={question}
                 value={answer(question)}
                 onChange={(value) => onAnswer(question.id, value)}
-                disabled={false}
+                disabled={busy || !canEdit}
                 questionId={`${prefix}-${question.id}`}
               />
             </>
           )}
-          <p className={s.muted}>Your local answer has not been saved.</p>
-          <button type="button" disabled>
-            Save {variant === "coding" ? "answer" : "recording"}
+          <p className={s.muted}>
+            Save your answer before leaving this assessment.
+          </p>
+          <button
+            type="button"
+            disabled={busy || !canEdit || !question || variant === "video"}
+            onClick={() =>
+              question &&
+              void onSave(
+                question,
+                languages[question.id] ||
+                  savedLanguage(question) ||
+                  "javascript",
+              )
+            }
+          >
+            {busy
+              ? "Saving…"
+              : `Save ${variant === "coding" ? "answer" : "recording"}`}
           </button>
         </section>
         <section className={styles.panel}>
@@ -394,7 +430,12 @@ function AdvancedAssessment({
             Submission applies to this instance only. Saved responses would be
             locked for evaluation. This is separate from a hiring decision.
           </p>
-          <button type="button" className={s.primary} onClick={onSubmit}>
+          <button
+            type="button"
+            className={s.primary}
+            disabled={busy || !canEdit}
+            onClick={onSubmit}
+          >
             Review submission
           </button>
         </section>
@@ -411,39 +452,49 @@ export function CandidateAssessment({
   variant?: "questions" | "coding" | "video";
 }) {
   const params = useSearchParams();
+  const router = useRouter();
   const state = params.get("state");
   const attemptId = params.get("attempt") || id;
   const prefix = useId();
   const [dialog, setDialog] = useState<string | null>(null);
+  const pending = useRef(false);
+  const answerLanguages = useRef<Record<string, string>>({});
+  const dirtyQuestions = useRef(new Set<string>());
+  const [dirty, setDirty] = useState(false);
+  useUnsavedChanges(dirty);
+  const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState<Error>();
+  const [message, setMessage] = useState("");
+  const [savedAnswers, setSavedAnswers] = useState<CandidateSubmission[]>([]);
+  const [submission, setSubmission] = useState<AssessmentAttempt>();
+  const applicationId = params.get("application");
+  const instances = useApiResource<AssessmentInstance[]>(
+    state === "availability" && applicationId
+      ? `/v1/applications/${resourceId(applicationId)}/assessment-instances`
+      : null,
+  );
   const [answers, setAnswers] = useState<Record<string, string | number[]>>({});
   const attempt = useApiResource<AssessmentAttempt>(
     state === "availability" || state === "result"
       ? null
       : `/v1/assessment-attempts/${resourceId(attemptId)}`,
+    state || "",
   );
-  const saved = useApiResource<CandidateSubmission[]>(
-    state === "availability" || state === "result"
-      ? null
-      : `/v1/assessment-attempts/${resourceId(attemptId)}/submissions`,
-  );
-  const instance = useApiResource<AssessmentInstance>(
-    state === "availability"
-      ? `/v1/assessment-instances/${resourceId(id)}`
-      : null,
-  );
+  const attemptData = submission?.id === attemptId ? submission : attempt.data;
+  const instanceData = instances.data?.find((item) => item.id === id);
   const result = useApiResource<AssessmentResult>(
     state === "result"
       ? `/v1/assessment-instances/${resourceId(id)}/result`
       : null,
   );
-  const error = attempt.error || instance.error || result.error;
-  const loading = attempt.loading || instance.loading || result.loading;
+  const error = attempt.error || instances.error || result.error;
+  const loading = attempt.loading || instances.loading || result.loading;
   const locked =
-    !!attempt.data &&
+    !!attemptData &&
     ["submitted", "pending_grading", "scored", "missed"].includes(
-      attempt.data.status,
+      attemptData.status,
     );
-  const questions = (attempt.data?.questions || []).filter((question) =>
+  const questions = (attemptData?.questions || []).filter((question) =>
     variant === "coding"
       ? question.responseFormat === "code"
       : variant === "video"
@@ -452,13 +503,108 @@ export function CandidateAssessment({
   );
   function answer(question: CandidateQuestion): string | number[] {
     if (Object.hasOwn(answers, question.id)) return answers[question.id];
-    const response = saved.data?.find(
+    const response = savedAnswers?.find(
       (value) => value.questionId === question.id,
     )?.response;
     if (typeof response === "string" || Array.isArray(response))
       return response;
     if (response && "code" in response) return response.code;
     return "";
+  }
+  const canEdit = attemptData?.status === "in_progress";
+  async function writeAnswers(only?: CandidateQuestion, language?: string) {
+    const targets = only
+      ? [only]
+      : questions.filter((question) => dirtyQuestions.current.has(question.id));
+    const results = await Promise.allSettled(
+      targets
+        .filter((question) => question.responseFormat !== "video")
+        .map((question) => {
+          const value = answer(question);
+          return saveAssessmentAnswer(
+            attemptId,
+            question.id,
+            question.responseFormat === "code"
+              ? {
+                  language:
+                    language ||
+                    answerLanguages.current[question.id] ||
+                    "javascript",
+                  code: typeof value === "string" ? value : "",
+                }
+              : value,
+          );
+        }),
+    );
+    const responses = results.flatMap((result) =>
+      result.status === "fulfilled" ? [result.value] : [],
+    );
+    responses.forEach((response) =>
+      dirtyQuestions.current.delete(response.questionId),
+    );
+    setDirty(dirtyQuestions.current.size > 0);
+    setSavedAnswers((previous) => [
+      ...previous.filter(
+        (value) =>
+          !responses.some((row) => row.questionId === value.questionId),
+      ),
+      ...responses,
+    ]);
+    const failure = results.find((result) => result.status === "rejected");
+    if (failure?.status === "rejected") throw failure.reason;
+  }
+  async function saveProgress(question?: CandidateQuestion, language?: string) {
+    if (pending.current || !canEdit) return;
+    if (!question && dirtyQuestions.current.size === 0) {
+      setMessage("No changes to save.");
+      return;
+    }
+    pending.current = true;
+    setBusy(true);
+    setActionError(undefined);
+    setMessage("");
+    try {
+      await writeAnswers(question, language);
+      setMessage("Progress saved.");
+    } catch (cause) {
+      setActionError(cause as Error);
+    } finally {
+      pending.current = false;
+      setBusy(false);
+    }
+  }
+  async function openAttempt() {
+    if (pending.current) return;
+    pending.current = true;
+    setBusy(true);
+    setActionError(undefined);
+    try {
+      const opened = await startAssessment(id);
+      router.replace(
+        `/candidate/assessments/${resourceId(id)}?attempt=${resourceId(opened.id)}${applicationId ? "&application=" + resourceId(applicationId) : ""}`,
+      );
+    } catch (cause) {
+      setActionError(cause as Error);
+    } finally {
+      pending.current = false;
+      setBusy(false);
+    }
+  }
+  async function confirmSubmission() {
+    if (pending.current || !canEdit)
+      throw new Error("This attempt is not open for submission.");
+    pending.current = true;
+    setBusy(true);
+    try {
+      await writeAnswers();
+      setSubmission(await submitAssessmentAttempt(attemptId));
+      router.replace(
+        `/candidate/assessments/${resourceId(id)}?attempt=${resourceId(attemptId)}&state=submitted`,
+      );
+    } finally {
+      pending.current = false;
+      setBusy(false);
+    }
   }
   const title =
     state === "availability"
@@ -500,16 +646,19 @@ export function CandidateAssessment({
         }
       />
       <UnavailableNotice>
-        Assessment delivery and answer submission aren’t available yet. Changes
-        on this screen are local drafts and won’t be submitted or saved.
+        Saved answers cannot yet be restored after reloading because the
+        answer-read endpoint is unavailable. Save before leaving. Video uploads
+        and result disclosure are not available yet.
       </UnavailableNotice>
+      <ApiFeedback error={actionError} />
+      {message && <p role="status">{message}</p>}
       <BusyState loading={loading} />
       {error?.status !== 404 && (
         <ApiFeedback
           error={error}
           retry={() => {
             attempt.reload();
-            instance.reload();
+            instances.reload();
             result.reload();
           }}
         />
@@ -573,12 +722,12 @@ export function CandidateAssessment({
         <>
           <section className={styles.panel}>
             <StatusBadge>
-              {instance.data?.status || "Availability unavailable"}
+              {instanceData?.status || "Availability unavailable"}
             </StatusBadge>
             <h2>Technical skills assessment</h2>
             <p>
-              {instance.data?.deadline
-                ? `Available until ${new Date(instance.data.deadline).toLocaleString()}`
+              {instanceData?.deadline
+                ? `Available until ${new Date(instanceData.deadline).toLocaleString()}`
                 : "Assessment availability will appear here when it is released."}
             </p>
           </section>
@@ -588,8 +737,14 @@ export function CandidateAssessment({
               <p>
                 Your saved answers can be restored while the attempt is active.
               </p>
-              <button type="button" disabled>
-                Resume assessment
+              <button
+                type="button"
+                disabled={
+                  busy || !instanceData || instanceData.status !== "in_progress"
+                }
+                onClick={() => void openAttempt()}
+              >
+                {busy ? "Opening…" : "Resume assessment"}
               </button>
             </section>
             <section className={styles.panel}>
@@ -598,17 +753,25 @@ export function CandidateAssessment({
                 Check your connection, available time, and the completion
                 deadline before starting.
               </p>
-              <button type="button" className={s.primary} disabled>
-                Start assessment
+              <button
+                type="button"
+                className={s.primary}
+                disabled={
+                  busy ||
+                  (!!instanceData && instanceData.status !== "available")
+                }
+                onClick={() => void openAttempt()}
+              >
+                {busy ? "Opening…" : "Start assessment"}
               </button>
             </section>
           </div>
           <section className={styles.panel}>
             <h2>Countdown and auto-submit</h2>
             <p>
-              Assessment timing and automatic submission require the assessment
-              service. No timer or submission is started by opening this
-              preview.
+              Starting begins the active timer. The server enforces the
+              completion deadline and locks closed attempts. Opening this
+              overview does not start an attempt.
             </p>
           </section>
         </>
@@ -622,17 +785,16 @@ export function CandidateAssessment({
                   : "Submission status unavailable"}
               </h2>
               <StatusBadge>
-                {attempt.data?.status || "Not confirmed"}
+                {attemptData?.status || "Not confirmed"}
               </StatusBadge>
               <p>
                 {locked
                   ? "This attempt is closed. Its saved responses can no longer be edited."
                   : "A submission can only be confirmed by the assessment service."}
               </p>
-              {attempt.data?.submittedAt && (
+              {attemptData?.submittedAt && (
                 <p>
-                  Submitted{" "}
-                  {new Date(attempt.data.submittedAt).toLocaleString()}
+                  Submitted {new Date(attemptData.submittedAt).toLocaleString()}
                 </p>
               )}
             </section>
@@ -656,16 +818,26 @@ export function CandidateAssessment({
       ) : variant !== "questions" ? (
         <AdvancedAssessment
           questions={questions}
-          attempt={attempt.data}
+          attempt={attemptData}
           variant={variant}
           answer={answer}
-          onAnswer={(id, value) =>
-            setAnswers((previous) => ({ ...previous, [id]: value }))
-          }
+          onAnswer={(id, value) => {
+            dirtyQuestions.current.add(id);
+            setDirty(true);
+            setAnswers((previous) => ({ ...previous, [id]: value }));
+          }}
           onSubmit={() => setDialog("submit")}
           prefix={prefix}
+          onSave={saveProgress}
+          busy={busy}
+          canEdit={canEdit}
+          onLanguageChange={(id, language) => {
+            answerLanguages.current[id] = language;
+            dirtyQuestions.current.add(id);
+            setDirty(true);
+          }}
           savedLanguage={(question) => {
-            const response = saved.data?.find(
+            const response = savedAnswers?.find(
               (row) => row.questionId === question.id,
             )?.response;
             return response &&
@@ -693,8 +865,8 @@ export function CandidateAssessment({
               ))}
             </div>
             <AttemptClock
-              deadline={attempt.data?.deadline}
-              active={attempt.data?.status === "in_progress"}
+              deadline={attemptData?.deadline}
+              active={attemptData?.status === "in_progress"}
             />
           </aside>
           <div>
@@ -721,32 +893,40 @@ export function CandidateAssessment({
                   <QuestionInput
                     question={question}
                     value={answer(question)}
-                    onChange={(value) =>
+                    onChange={(value) => {
+                      dirtyQuestions.current.add(question.id);
+                      setDirty(true);
                       setAnswers((previous) => ({
                         ...previous,
                         [question.id]: value,
-                      }))
-                    }
-                    disabled={locked}
+                      }));
+                    }}
+                    disabled={locked || busy || !canEdit}
                     questionId={`${prefix}-${question.id}`}
                   />
                 </section>
               ))
             )}
             <div className={s.actions}>
-              <button type="button" disabled>
-                Save progress
+              <button
+                type="button"
+                disabled={busy || !canEdit}
+                onClick={() => void saveProgress()}
+              >
+                {busy ? "Saving…" : "Save progress"}
               </button>
               <button
                 type="button"
                 className={s.primary}
+                disabled={busy || !canEdit}
                 onClick={() => setDialog("submit")}
               >
                 Submit assessment
               </button>
             </div>
             <p className={s.muted}>
-              Local edits haven’t been saved to your assessment.
+              Save progress to store your edited answers. Submission saves
+              current edits before locking the attempt.
             </p>
           </div>
         </div>
@@ -763,7 +943,10 @@ export function CandidateAssessment({
           description="Submitting sends your saved responses for evaluation and locks your answers. It is separate from a stage or hiring decision."
           confirmLabel="Submit assessment"
           intent="warning"
-          unavailable="Assessment submission isn’t available yet. No answers will be submitted."
+          unavailable={
+            !canEdit ? "This attempt is not open for submission." : undefined
+          }
+          onConfirm={confirmSubmission}
           onClose={() => setDialog(null)}
         />
       )}

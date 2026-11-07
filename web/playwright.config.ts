@@ -2,6 +2,7 @@ import { defineConfig } from "@playwright/test";
 
 const port = process.env.PLAYWRIGHT_PORT || "3100";
 const baseURL = `http://127.0.0.1:${port}`;
+const production = process.env.PLAYWRIGHT_SERVER === "production";
 
 export default defineConfig({
   testDir: "./tests/browser",
@@ -24,8 +25,8 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: `npm run dev -- --hostname 127.0.0.1 --port ${port}`,
+    command: `npm run ${production ? "start" : "dev"} -- --hostname 127.0.0.1 --port ${port}`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !production && !process.env.CI,
   },
 });

@@ -13,15 +13,49 @@ import (
 )
 
 type fakeProfileQueries struct {
-	candidate      sqlc.UpdateCandidateProfileParams
-	company        sqlc.UpdateCompanyProfileParams
-	interviewer    sqlc.UpdateInterviewerProfileParams
-	candidateRow   sqlc.UpdateCandidateProfileRow
-	companyRow     sqlc.UpdateCompanyProfileRow
-	interviewerRow sqlc.UpdateInterviewerProfileRow
-	candidateErr   error
-	companyErr     error
-	interviewerErr error
+	candidateGet      sqlc.GetCandidateProfileRow
+	candidateGetErr   error
+	companyGet        sqlc.GetCompanyProfileParams
+	companyRowGet     sqlc.GetCompanyProfileRow
+	publicCompany     sqlc.GetPublicCompanyProfileRow
+	interviewerGet    sqlc.GetInterviewerProfileRow
+	interviewers      []sqlc.ListCompanyInterviewersRow
+	interviewerTotal  int64
+	companyGetErr     error
+	publicCompanyErr  error
+	interviewerGetErr error
+	interviewersErr   error
+	countErr          error
+	candidate         sqlc.UpdateCandidateProfileParams
+	company           sqlc.UpdateCompanyProfileParams
+	interviewer       sqlc.UpdateInterviewerProfileParams
+	candidateRow      sqlc.UpdateCandidateProfileRow
+	companyRow        sqlc.UpdateCompanyProfileRow
+	interviewerRow    sqlc.UpdateInterviewerProfileRow
+	candidateErr      error
+	companyErr        error
+	interviewerErr    error
+}
+
+func (f *fakeProfileQueries) GetCandidateProfile(_ context.Context, _ pgtype.UUID) (sqlc.GetCandidateProfileRow, error) {
+	return f.candidateGet, f.candidateGetErr
+}
+
+func (f *fakeProfileQueries) GetCompanyProfile(_ context.Context, params sqlc.GetCompanyProfileParams) (sqlc.GetCompanyProfileRow, error) {
+	f.companyGet = params
+	return f.companyRowGet, f.companyGetErr
+}
+func (f *fakeProfileQueries) GetPublicCompanyProfile(_ context.Context, _ pgtype.UUID) (sqlc.GetPublicCompanyProfileRow, error) {
+	return f.publicCompany, f.publicCompanyErr
+}
+func (f *fakeProfileQueries) GetInterviewerProfile(_ context.Context, _ pgtype.UUID) (sqlc.GetInterviewerProfileRow, error) {
+	return f.interviewerGet, f.interviewerGetErr
+}
+func (f *fakeProfileQueries) ListCompanyInterviewers(_ context.Context, _ sqlc.ListCompanyInterviewersParams) ([]sqlc.ListCompanyInterviewersRow, error) {
+	return f.interviewers, f.interviewersErr
+}
+func (f *fakeProfileQueries) CountCompanyInterviewers(_ context.Context, _ pgtype.UUID) (int64, error) {
+	return f.interviewerTotal, f.countErr
 }
 
 func (f *fakeProfileQueries) UpdateCandidateProfile(_ context.Context, params sqlc.UpdateCandidateProfileParams) (sqlc.UpdateCandidateProfileRow, error) {
@@ -50,6 +84,7 @@ func TestProfileRepositoryUsesGeneratedQueries(t *testing.T) {
 	now := time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)
 	id := "00000000-0000-0000-0000-000000000001"
 	queries := &fakeProfileQueries{
+		candidateGet:   sqlc.GetCandidateProfileRow{ID: id, Name: "Mona", Email: "mona@example.com", CreatedAt: pgtype.Timestamp{Time: now, Valid: true}},
 		candidateRow:   sqlc.UpdateCandidateProfileRow{ID: id, Name: "Mona", Email: "mona@example.com", CreatedAt: pgtype.Timestamp{Time: now, Valid: true}},
 		companyRow:     sqlc.UpdateCompanyProfileRow{ID: id, LegalName: "Example", Approved: true},
 		interviewerRow: sqlc.UpdateInterviewerProfileRow{ID: id, CompanyID: "company-id", Name: "Mona", Email: "mona@example.com", AccountStatus: "active", CreatedAt: pgtype.Timestamp{Time: now, Valid: true}},
@@ -57,6 +92,9 @@ func TestProfileRepositoryUsesGeneratedQueries(t *testing.T) {
 	repository, err := NewProfileRepositoryWithQueries(queries)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if profile, err := repository.GetCandidateProfile(context.Background(), id); err != nil || profile.Name != "Mona" {
+		t.Fatalf("candidate profile = %+v, error = %v", profile, err)
 	}
 	name := "Mona"
 	if _, err := repository.UpdateCandidateProfile(context.Background(), id, domain.CandidateProfilePatch{Name: &name}); err != nil {

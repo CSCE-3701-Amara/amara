@@ -30,6 +30,7 @@ VALUES (gen_random_uuid(), $1::uuid, $2, $3, $4, $5, $6, 'pending_verification')
 RETURNING id::text, email, account_status, created_at;
 
 -- name: SaveEmailVerificationChallenge :exec
+
 WITH deleted AS (
     DELETE FROM auth_email_verification_challenges
     WHERE account_id = $1::uuid
@@ -65,3 +66,4 @@ LEFT JOIN auth_email_verification_deliveries d
 WHERE lower(i.email) = lower($1)
   AND i.account_status = 'pending_verification'
 LIMIT 1;
+

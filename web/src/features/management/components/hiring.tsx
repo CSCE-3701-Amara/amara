@@ -8,10 +8,10 @@ import type {
   ApplicationScorecard,
   FinalistPage,
   ManagedApplicationPage,
-  PipelineDashboard,
   FeedbackView,
   InterviewerPage,
 } from "@/shared/lib/contract.types";
+import type { RuntimePipelineDashboard } from "@/features/invw/types/runtime.types";
 import type { PipelineDraft } from "@/features/invw/types/invw.types";
 import type { Offer, OfferPage } from "@/features/cand/types/product.types";
 import { ApiFeedback, BusyState } from "@/shared/ui/workspace";
@@ -57,9 +57,7 @@ export function HiringApplications({
   const [dialog, setDialog] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const pipeline = useApiResource<PipelineDraft>(
-    view === "comparison" || view === "dashboard"
-      ? `/v1/jobs/${resourceId(id)}/pipeline`
-      : null,
+    view === "comparison" ? `/v1/jobs/${resourceId(id)}/pipeline` : null,
   );
   const list = useApiResource<ManagedApplicationPage>(
     view === "applications"
@@ -81,9 +79,9 @@ export function HiringApplications({
       ? `/v1/pipelines/${resourceId(pipeline.data.id)}/comparison${selected.length ? "?" + selected.map((value) => `applicationIds=${resourceId(value)}`).join("&") : ""}`
       : null,
   );
-  const dashboard = useApiResource<PipelineDashboard>(
-    view === "dashboard" && pipeline.data
-      ? `/v1/pipelines/${resourceId(pipeline.data.id)}/dashboard`
+  const dashboard = useApiResource<RuntimePipelineDashboard>(
+    view === "dashboard"
+      ? `/v1/jobs/${resourceId(id)}/pipeline/dashboard`
       : null,
   );
   const ranking = params.get("state") === "ranking";
@@ -135,11 +133,19 @@ export function HiringApplications({
               : undefined
         }
         compact
-        artwork={art}
+        artwork={
+          view === "applications" || view === "finalists" ? undefined : art
+        }
+        className={
+          view === "applications" || view === "finalists"
+            ? e.titleBanner
+            : undefined
+        }
       />
       <UnavailableNotice>
-        This hiring view is not available yet. Recorded data can’t be changed.
-        Identity stays hidden until the server authorizes its release.
+        {view === "dashboard"
+          ? "Offer counts are not available yet. Select a stage to review its candidates."
+          : "This hiring view is not available yet. Recorded data can’t be changed. Identity stays hidden until the server authorizes its release."}
       </UnavailableNotice>
       <PlannedRead
         loading={loading}
@@ -295,11 +301,17 @@ export function HiringApplications({
             </thead>
             <tbody>
               {dashboard.data?.stages.map((stage) => (
-                <tr key={stage.stageId}>
-                  <td>{stage.name}</td>
-                  <td>{stage.activeCount}</td>
-                  <td>{stage.passedCount}</td>
-                  <td>{stage.rejectedCount}</td>
+                <tr key={stage.id}>
+                  <td>
+                    <Link
+                      href={`/employer/pipelines/${resourceId(id)}/candidates?stage=${resourceId(stage.id)}`}
+                    >
+                      {stage.name}
+                    </Link>
+                  </td>
+                  <td>{stage.active}</td>
+                  <td>{stage.passed}</td>
+                  <td>{stage.rejected}</td>
                 </tr>
               ))}
             </tbody>
@@ -344,15 +356,15 @@ export function HiringApplications({
             items={[
               {
                 label: "Active candidates",
-                value: dashboard.data?.activeCandidates ?? "—",
+                value: dashboard.data?.active ?? "—",
               },
               {
                 label: "Pending offers",
-                value: dashboard.data?.pendingOffers ?? "—",
+                value: "Unavailable",
               },
               {
                 label: "Accepted offers",
-                value: dashboard.data?.acceptedOffers ?? "—",
+                value: "Unavailable",
               },
             ]}
           />

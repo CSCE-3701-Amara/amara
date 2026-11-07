@@ -31,6 +31,16 @@ export function registerAccount(
     },
   );
 }
+export function verifyAccount(
+  input: { email: string; code: string },
+  signal?: AbortSignal,
+) {
+  return apiRequest<RegistrationResponse>("/v1/auth/verifications", {
+    method: "POST",
+    body: input,
+    signal,
+  });
+}
 export function deleteCurrentSession() {
   return apiRequest<void>("/v1/auth/sessions/current", { method: "DELETE" });
 }
