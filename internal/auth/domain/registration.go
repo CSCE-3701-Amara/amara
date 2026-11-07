@@ -19,10 +19,11 @@ const (
 const PendingVerification = "pending_verification"
 
 var (
-	ErrInvalidRegistration       = errors.New("invalid registration")
-	ErrEmailAlreadyExists        = errors.New("email already registered")
-	ErrCompanyNotFound           = errors.New("approved company association not found")
-	ErrCompanyRegistrationExists = errors.New("company registration already exists")
+	ErrInvalidRegistration         = errors.New("invalid registration")
+	ErrEmailAlreadyExists          = errors.New("email already registered")
+	ErrCompanyNotFound             = errors.New("approved company association not found")
+	ErrCompanyRegistrationExists   = errors.New("company registration already exists")
+	ErrPendingVerificationNotFound = errors.New("pending verification not found")
 )
 
 type Registration struct {

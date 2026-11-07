@@ -47,6 +47,9 @@ func (d *registrationDependencies) CreateInterviewer(_ context.Context, _, email
 func (d *registrationDependencies) SaveVerificationChallenge(context.Context, ports.VerificationChallenge) error {
 	return nil
 }
+func (d *registrationDependencies) FindPendingVerification(context.Context, string) (ports.PendingVerification, error) {
+	return ports.PendingVerification{}, domain.ErrPendingVerificationNotFound
+}
 
 func (d *registrationDependencies) RegistrationNumberExists(context.Context, string) (bool, error) {
 	return false, nil
