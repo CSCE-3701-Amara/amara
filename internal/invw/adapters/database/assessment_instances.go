@@ -8,7 +8,7 @@ import (
 )
 
 // SpawnAssessmentInstances admits screened-in applications to their published
-// linear pipeline and snapshots the content of each available assessment.
+// pipeline and snapshots the content of each available assessment.
 func SpawnAssessmentInstances(ctx context.Context, pool *pgxpool.Pool) error {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
@@ -17,21 +17,28 @@ func SpawnAssessmentInstances(ctx context.Context, pool *pgxpool.Pool) error {
 	defer tx.Rollback(ctx)
 
 	if _, err := tx.Exec(ctx, `
-		WITH admitted AS (
+		WITH entry_stages AS (
+			SELECT s.* FROM pipeline_stages s
+			WHERE CASE WHEN EXISTS (
+				SELECT 1 FROM stage_transitions WHERE pipeline_version_id = s.version_id
+			) THEN NOT EXISTS (
+				SELECT 1 FROM stage_transitions WHERE pipeline_version_id = s.version_id AND to_stage_id = s.id
+			) ELSE s.stage_order = 1 END
+		), admitted AS (
 			INSERT INTO pipeline_executions (id, application_id, pipeline_version_id)
 			SELECT gen_random_uuid(), a.id, v.id
 			FROM applications a
 			JOIN pipelines p ON p.posting_id = a.posting_id
 			JOIN pipeline_versions v ON v.id = p.published_version_id AND v.pipeline_id = p.id
 			WHERE a.status = 'admitted' AND a.screened_out IS FALSE
-				AND EXISTS (SELECT 1 FROM pipeline_stages s WHERE s.version_id = v.id AND s.stage_order = 1)
+				AND EXISTS (SELECT 1 FROM entry_stages s WHERE s.version_id = v.id)
 			ON CONFLICT (application_id) DO NOTHING
 			RETURNING id, pipeline_version_id, started_at
 		)
 		INSERT INTO stage_executions (id, pipeline_execution_id, stage_id, status, available_at, deadline)
 		SELECT gen_random_uuid(), a.id, s.id, 'available',
 			greatest(a.started_at, s.scheduled_start_at), s.scheduled_end_at
-		FROM admitted a JOIN pipeline_stages s ON s.version_id = a.pipeline_version_id AND s.stage_order = 1
+		FROM admitted a JOIN entry_stages s ON s.version_id = a.pipeline_version_id
 	`); err != nil {
 		return fmt.Errorf("admit applications to published pipelines: %w", err)
 	}

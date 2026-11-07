@@ -48,6 +48,9 @@ func run() error {
 		if err := invwdatabase.SpawnAssessmentInstances(ctx, dbSvc.Pool()); err != nil && ctx.Err() == nil {
 			logger.Error("assessment instance sweep failed", "error", err)
 		}
+		if err := invwdatabase.ReconcileAdvancement(ctx, dbSvc.Pool()); err != nil && ctx.Err() == nil {
+			logger.Error("stage advancement sweep failed", "error", err)
+		}
 		select {
 		case <-ctx.Done():
 			return nil
