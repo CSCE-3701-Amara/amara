@@ -131,6 +131,7 @@ func run() error {
 	)
 	pipelineHandler := invwhttp.NewPipelineHandler(invwdatabase.NewPipelineRepository(dbSvc.Pool()), authRepo)
 	moduleHandler := invwhttp.NewModuleHandler(invwdatabase.NewModuleRepository(dbSvc.Pool()), authRepo)
+	assessmentHandler := invwhttp.NewAssessmentHandler(invwdatabase.NewAssessmentRepository(dbSvc.Pool()), authRepo)
 	trackingRepo := canddatabase.NewApplicationTrackingRepository(dbSvc.Pool())
 	trackingHandler := candhttp.NewApplicationTrackingHandler(trackingRepo, authRepo)
 	// Candidate/interviewer registration needs a verification sender. Until that
@@ -146,6 +147,7 @@ func run() error {
 		postingListHandler.RegisterRoutes,
 		applicationHandler.RegisterRoutes,
 		moduleHandler.RegisterRoutes,
+		assessmentHandler.RegisterRoutes,
 		trackingHandler.RegisterRoutes,
 		pipelineHandler.RegisterRoutes,
 	)

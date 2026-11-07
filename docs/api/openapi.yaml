@@ -3342,7 +3342,7 @@ paths:
       description: Authenticated candidate only; records must belong to that candidate. Derive identity from
         the session. Return the complete set of visible current/completed assessment instances, not future hidden
         stages.
-      x-implementation-status: planned
+      x-implementation-status: implemented
       x-erd-entities:
         - ASSESSMENT_INSTANCES
       security:
@@ -3412,7 +3412,7 @@ paths:
         the session. On first permitted start, atomically establish the timer and stable selected content. Repeated
         starts return the same attempt/content without resetting time. Reject locked, missed, expired, or unavailable
         stages. Continue timing across disconnects and compute the effective deadline server-side.
-      x-implementation-status: planned
+      x-implementation-status: implemented
       x-erd-entities:
         - ASSESSMENT_INSTANCES
         - ASSESSMENT_ATTEMPTS
@@ -3449,7 +3449,7 @@ paths:
         - Assessments
       description: Authenticated candidate only; records must belong to that candidate. Derive identity from
         the session. Reading never resets the timer or reselects questions. Return only delivery-safe content.
-      x-implementation-status: planned
+      x-implementation-status: implemented
       x-erd-entities:
         - ASSESSMENT_ATTEMPTS
         - ASSESSMENT_QUESTIONS
@@ -3522,7 +3522,7 @@ paths:
         the session. Idempotently upsert one answer. The question must be in this attempt's selected content,
         response must match its format, and the effective deadline must not have passed. Reject edits after final/automatic
         submission with 409. Return 200 even for the first saved answer.
-      x-implementation-status: planned
+      x-implementation-status: implemented
       x-erd-entities:
         - ASSESSMENT_SUBMISSIONS
         - ASSESSMENT_ATTEMPTS
@@ -3637,7 +3637,7 @@ paths:
         the session. Accept one final submission from saved answers and make them immutable. Repeated calls return
         the same finalized attempt without duplicate evaluation work. Missing provider results remain pending,
         never score zero. The server also performs automatic submission at the effective deadline.
-      x-implementation-status: planned
+      x-implementation-status: implemented
       x-erd-entities:
         - ASSESSMENT_ATTEMPTS
         - ASSESSMENT_SUBMISSIONS
@@ -3663,6 +3663,56 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
+  /v1/assessment-attempts/{attemptId}/evaluation:
+    parameters:
+      - $ref: '#/components/parameters/AttemptId'
+    get:
+      summary: Review a submitted assessment and its evaluation
+      operationId: reviewAssessmentEvaluation
+      tags: [Assessments]
+      x-implementation-status: implemented
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: Owning-company view of submitted responses, question identities and available evaluation evidence.
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Finalize human evaluation of a submitted assessment
+      operationId: finalizeHumanAssessmentEvaluation
+      tags: [Assessments]
+      x-implementation-status: implemented
+      security:
+        - SessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [evidence]
+              properties:
+                evidence:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [questionId]
+                    properties:
+                      questionId: {type: string, format: uuid}
+                      score:
+                        type: integer
+                        minimum: 0
+                        maximum: 100
+                        description: Required for scored questions and omitted for behavioral questions.
+                      notes: {type: string}
+      responses:
+        '204':
+          description: Complete human evidence persisted or an identical evaluation already exists.
+        '409':
+          $ref: '#/components/responses/Conflict'
 
   /v1/assessment-attempts/{attemptId}/extensions:
     parameters:
@@ -4242,8 +4292,8 @@ paths:
       tags:
         - Interviews
       description: Only an assigned interviewer or owning company Hiring Manager may record the outcome. Do not
-        accept a client-supplied score. Absence holds the candidate for Hiring Manager review and triggers notification.
-      x-implementation-status: planned
+        accept a client-supplied score. UC-INVW-006 consumes the recorded outcome for stage decisions and notifications.
+      x-implementation-status: implemented
       x-erd-entities:
         - INTERVIEWS
         - STAGE_EXECUTIONS
@@ -5809,7 +5859,7 @@ components:
         interview:
           description: Required for a live interview stage, which has no test modules.
           type: object
-          required: [durationMinutes, interviewerIds, threshold, rubric, amarat]
+          required: [durationMinutes, interviewerIds, rubric, amarat]
           properties:
             durationMinutes: {type: integer, minimum: 1}
             interviewerIds:
@@ -5817,7 +5867,14 @@ components:
               minItems: 1
               uniqueItems: true
               items: {type: string, format: uuid}
-            threshold: {type: integer, minimum: 0, maximum: 100}
+            behavioral:
+              type: boolean
+              description: Marks the interview as unscored behavioral evaluation.
+            threshold:
+              type: [integer, 'null']
+              minimum: 0
+              maximum: 100
+              description: Required for scored interviews and omitted for behavioral interviews.
             rubric:
               type: array
               minItems: 1
@@ -5858,6 +5915,9 @@ components:
         type:
           type: string
           enum: [coding, programming_language, behavioral, recorded_video]
+        behavioral:
+          type: boolean
+          description: Marks a recorded-video module as unscored behavioral evaluation.
         active_minutes:
           type: integer
           minimum: 1
@@ -5866,7 +5926,11 @@ components:
           type: integer
           minimum: 0
           maximum: 100
-          description: Required at publication for scored modules. Behavioral modules are unscored.
+          description: Legacy score threshold. Required at publication for scored modules without a minimum_tests_passed value. Behavioral modules are unscored.
+        minimum_tests_passed:
+          type: integer
+          minimum: 1
+          description: Minimum number of tests the candidate must pass in a coding or programming-language module. At publication, this cannot exceed the number of authored and selected tests.
         questions:
           type: array
           items:
@@ -5882,6 +5946,10 @@ components:
                 items: {type: string}
               amara: {type: string}
               difficulty: {type: string}
+              minimum_cases_passed:
+                type: integer
+                minimum: 1
+                description: Minimum number of test cases the candidate must pass for this code question. Required on authored questions when the module sets minimum_tests_passed.
               test_cases:
                 type: array
                 items:
@@ -8862,7 +8930,7 @@ components:
         - questions
       description: Candidate delivery projection. Configuration snapshots and selected_content are converted into
         safe question DTOs, never serialized as raw JSON. The effective deadline incorporates the active limit,
-        stage end, completion window and permitted extensions.
+        stage end and completion window.
 
     AssessmentExtensionRequest:
       type: object

@@ -97,8 +97,7 @@ func (r *ApplicationRepository) Apply(ctx context.Context, postingID, candidateI
 	if err := tx.Commit(ctx); err != nil {
 		return domain.Application{}, fmt.Errorf("commit submission: %w", err)
 	}
-	// TODO(INVW): send admitted applications into the published pipeline. This checkout
-	// has no JOB-to-INVW admission event/outbox consumer; JOB admission is recorded only.
+	// The INVW worker picks up admitted applications after commit.
 	return result, nil
 }
 
