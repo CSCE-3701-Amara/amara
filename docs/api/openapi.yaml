@@ -721,6 +721,7 @@ paths:
                     open_positions: 2
                     application_opening: null
                     application_deadline: '2026-12-01T12:30:00Z'
+                    finalist_target: 5
                     max_applications: 50
                     status: published
                     last_autosaved_at: null
@@ -2925,6 +2926,139 @@ paths:
 
 
   # Pipeline execution, dashboards and decisions
+  /v1/jobs/{id}/pipeline/dashboard:
+    get:
+      summary: Review published pipeline progress and stage rankings
+      operationId: reviewPublishedPipeline
+      tags: [Pipeline execution]
+      security:
+        - SessionCookie: []
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: string, format: uuid}}
+      responses:
+        '200':
+          description: Stage counts, transitions, and score-ranked anonymous candidate rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [active, finalistTarget, links, stages]
+                properties:
+                  active: {type: integer}
+                  finalistTarget: {type: [integer, 'null']}
+                  links:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        from: {type: string, format: uuid}
+                        to: {type: string, format: uuid}
+                  stages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: {type: string, format: uuid}
+                        name: {type: string}
+                        stage_order: {type: integer}
+                        rule: {type: string}
+                        threshold: {type: [integer, 'null']}
+                        active: {type: integer}
+                        passed: {type: integer}
+                        rejected: {type: integer}
+                        candidates:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id: {type: string, format: uuid, description: Stage execution ID.}
+                              candidate: {type: string, format: uuid, description: Anonymous pipeline identifier.}
+                              status: {type: string}
+                              active: {type: boolean}
+                              score: {type: [integer, 'null']}
+                              niceToHaveScore: {type: [integer, 'null']}
+                              percentile: {type: [integer, 'null']}
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v1/pipeline-stages/{stageId}/threshold/preview:
+    post:
+      summary: Preview waiting candidate outcomes at a revised threshold
+      operationId: previewStageThreshold
+      tags: [Pipeline execution]
+      security:
+        - SessionCookie: []
+      parameters:
+        - {name: stageId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [threshold, expectedThreshold]
+              properties:
+                threshold: {type: integer, minimum: 0, maximum: 100}
+                expectedThreshold: {type: integer, minimum: 0, maximum: 100}
+      responses:
+        '200':
+          $ref: '#/components/responses/StageThresholdOutcomes'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /v1/pipeline-stages/{stageId}/threshold:
+    put:
+      summary: Apply a reviewed stage threshold and record its audit history
+      operationId: applyStageThreshold
+      description: The owning Hiring Manager submits the current threshold and the reviewed outcomes.
+        A stale threshold or preview returns a conflict. Previously passed and terminal executions are preserved.
+      tags: [Pipeline execution]
+      security:
+        - SessionCookie: []
+      parameters:
+        - {name: stageId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [threshold, expectedThreshold, preview]
+              properties:
+                threshold: {type: integer, minimum: 0, maximum: 100}
+                expectedThreshold: {type: integer, minimum: 0, maximum: 100}
+                preview:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/StageThresholdOutcome'
+      responses:
+        '200':
+          $ref: '#/components/responses/StageThresholdOutcomes'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
   /v1/pipelines/{pipelineId}/dashboard:
     parameters:
       - $ref: '#/components/parameters/PipelineId'
@@ -5793,6 +5927,15 @@ components:
 
 
   responses:
+    StageThresholdOutcomes:
+      description: Changed outcomes for waiting candidates.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/StageThresholdOutcome'
+
     BadRequest:
       description: Bad Request (RFC 9457)
       content:
@@ -5922,6 +6065,14 @@ components:
             $ref: '#/components/schemas/PostingErrorResponse'
 
   schemas:
+    StageThresholdOutcome:
+      type: object
+      required: [candidate, status, score]
+      properties:
+        candidate: {type: string, format: uuid, description: Anonymous pipeline identifier.}
+        status: {type: string, enum: [held, passed, rejected]}
+        score: {type: integer, minimum: 0, maximum: 100}
+
     LinearPipelineDraft:
       type: object
       required: [id, postingId, versionId, versionNumber]
@@ -6791,6 +6942,11 @@ components:
         application_deadline:
           type: [string, 'null']
           format: date-time
+        finalist_target:
+          type: [integer, 'null']
+          format: int32
+          minimum: 1
+          description: Optional planning target for finalist selection.
         max_applications:
           type: [integer, 'null']
           format: int32
@@ -6874,6 +7030,11 @@ components:
         application_deadline:
           type: [string, 'null']
           format: date-time
+        finalist_target:
+          type: [integer, 'null']
+          format: int32
+          minimum: 1
+          description: Optional planning target for finalist selection.
         max_applications:
           type: [integer, 'null']
           format: int32

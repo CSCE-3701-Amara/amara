@@ -49,6 +49,7 @@ type postingRequest struct {
 	ApplicationOpening  *timeJSON            `json:"application_opening"`
 	ApplicationDeadline *timeJSON            `json:"application_deadline"`
 	MaxApplications     *int32               `json:"max_applications"`
+	FinalistTarget      *int32               `json:"finalist_target"`
 	Requirements        []domain.Requirement `json:"requirements"`
 	Amarat              []domain.Amara       `json:"amarat"`
 }
@@ -74,7 +75,7 @@ func (r postingRequest) posting() domain.Posting {
 		Title: r.Title, Description: r.Description, Language: r.Language, Currency: r.Currency,
 		SeniorityLevel: r.SeniorityLevel, EmploymentType: r.EmploymentType, Location: r.Location,
 		SalaryMin: r.SalaryMin, SalaryMax: r.SalaryMax, SalaryVisible: r.SalaryVisible,
-		OpenPositions: r.OpenPositions, MaxApplications: r.MaxApplications,
+		OpenPositions: r.OpenPositions, MaxApplications: r.MaxApplications, FinalistTarget: r.FinalistTarget,
 		Requirements: r.Requirements, Amarat: r.Amarat,
 	}
 	if r.ApplicationOpening != nil {

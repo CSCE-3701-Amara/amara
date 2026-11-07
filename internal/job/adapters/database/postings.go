@@ -22,7 +22,7 @@ func NewPostingManagementRepository(pool *pgxpool.Pool) *PostingManagementReposi
 
 const postingColumns = `id::text, company_id::text, title, description, language, currency,
 	seniority_level, employment_type, location, salary_min, salary_max, salary_visible,
-	open_positions, application_opening, application_deadline, max_applications, status,
+	open_positions, application_opening, application_deadline, max_applications, finalist_target, status,
 	last_autosaved_at, published_at, archived_at, created_at, updated_at`
 
 type rowQuerier interface {
@@ -37,7 +37,7 @@ func scanPosting(row pgx.Row) (domain.Posting, error) {
 	err := row.Scan(&p.ID, &p.CompanyID, &p.Title, &p.Description, &p.Language, &p.Currency,
 		&seniority, &employmentType, &p.Location, &p.SalaryMin, &p.SalaryMax,
 		&p.SalaryVisible, &p.OpenPositions, &p.ApplicationOpening, &p.ApplicationDeadline,
-		&p.MaxApplications, &status, &p.LastAutosavedAt, &p.PublishedAt, &p.ArchivedAt,
+		&p.MaxApplications, &p.FinalistTarget, &status, &p.LastAutosavedAt, &p.PublishedAt, &p.ArchivedAt,
 		&createdAt, &updatedAt)
 	if seniority.Valid {
 		p.SeniorityLevel = seniority.String
@@ -69,13 +69,13 @@ func (r *PostingManagementRepository) Create(ctx context.Context, companyID stri
 	row, err := scanPosting(tx.QueryRow(ctx, `INSERT INTO job_postings
 		(id, company_id, title, description, language, currency, seniority_level, employment_type,
 		 location, salary_min, salary_max, salary_visible, open_positions, application_opening,
-		 application_deadline, max_applications, status, created_at, updated_at)
-		VALUES (gen_random_uuid(), $1::uuid, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 'draft', now(), now())
+		 application_deadline, max_applications, finalist_target, status, created_at, updated_at)
+		VALUES (gen_random_uuid(), $1::uuid, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, 'draft', now(), now())
 		RETURNING `+postingColumns,
 		companyID, strings.TrimSpace(p.Title), p.Description, p.Language, p.Currency,
 		strings.TrimSpace(p.SeniorityLevel), p.EmploymentType, p.Location, p.SalaryMin,
 		p.SalaryMax, p.SalaryVisible, p.OpenPositions, p.ApplicationOpening,
-		p.ApplicationDeadline, p.MaxApplications))
+		p.ApplicationDeadline, p.MaxApplications, p.FinalistTarget))
 	if err != nil {
 		return domain.Posting{}, fmt.Errorf("insert job posting: %w", err)
 	}
@@ -147,13 +147,13 @@ func (r *PostingManagementRepository) Update(ctx context.Context, companyID, id 
 	_, err = scanPosting(tx.QueryRow(ctx, `UPDATE job_postings SET title=$3, description=$4, language=$5,
 		currency=$6, seniority_level=$7, employment_type=$8, location=$9, salary_min=$10,
 		salary_max=$11, salary_visible=$12, open_positions=$13, application_opening=$14,
-		application_deadline=$15, max_applications=$16, updated_at=now()
+		application_deadline=$15, max_applications=$16, finalist_target=$17, updated_at=now()
 		WHERE id=$1::uuid AND company_id=$2::uuid AND deleted_at IS NULL
 		RETURNING `+postingColumns,
 		id, companyID, strings.TrimSpace(p.Title), p.Description, p.Language, p.Currency,
 		strings.TrimSpace(p.SeniorityLevel), p.EmploymentType, p.Location, p.SalaryMin,
 		p.SalaryMax, p.SalaryVisible, p.OpenPositions, p.ApplicationOpening,
-		p.ApplicationDeadline, p.MaxApplications))
+		p.ApplicationDeadline, p.MaxApplications, p.FinalistTarget))
 	if errors.Is(err, pgx.ErrNoRows) {
 		return domain.Posting{}, domain.ErrPostingNotFound
 	}
