@@ -7,6 +7,7 @@ import (
 )
 
 type ProfileRepository interface {
+	GetCandidateProfile(context.Context, string) (domain.CandidateProfile, error)
 	GetCompanyProfile(context.Context, string, bool) (domain.CompanyProfile, error)
 	ListCompanyInterviewers(context.Context, string, int32, int32) ([]domain.InterviewerProfile, int64, error)
 	GetInterviewerProfile(context.Context, string) (domain.InterviewerProfile, error)

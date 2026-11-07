@@ -16,6 +16,7 @@ import (
 )
 
 type profileQueries interface {
+	GetCandidateProfile(context.Context, pgtype.UUID) (sqlc.GetCandidateProfileRow, error)
 	GetCompanyProfile(context.Context, sqlc.GetCompanyProfileParams) (sqlc.GetCompanyProfileRow, error)
 	GetPublicCompanyProfile(context.Context, pgtype.UUID) (sqlc.GetPublicCompanyProfileRow, error)
 	GetInterviewerProfile(context.Context, pgtype.UUID) (sqlc.GetInterviewerProfileRow, error)
@@ -40,6 +41,21 @@ func NewProfileRepositoryWithQueries(queries profileQueries) (*ProfileRepository
 		return nil, errors.New("database queries must not be nil")
 	}
 	return &ProfileRepository{queries: queries}, nil
+}
+
+func (r *ProfileRepository) GetCandidateProfile(ctx context.Context, id string) (domain.CandidateProfile, error) {
+	accountID, err := parseUUID(id)
+	if err != nil {
+		return domain.CandidateProfile{}, domain.ErrProfileNotFound
+	}
+	row, err := r.queries.GetCandidateProfile(ctx, accountID)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.CandidateProfile{}, domain.ErrProfileNotFound
+	}
+	if err != nil {
+		return domain.CandidateProfile{}, fmt.Errorf("get candidate profile: %w", err)
+	}
+	return mapCandidateProfileRow(row), nil
 }
 
 func (r *ProfileRepository) GetCompanyProfile(ctx context.Context, id string, includePrivate bool) (domain.CompanyProfile, error) {
@@ -183,14 +199,22 @@ func (r *ProfileRepository) UpdateInterviewerProfile(ctx context.Context, id, na
 }
 
 func mapCandidateProfile(row sqlc.UpdateCandidateProfileRow) domain.CandidateProfile {
+	return mapCandidateProfileValues(row.ID, row.Name, row.Email, row.CreatedAt, row.UpdatedAt, row.PhoneNumber, row.GithubProfile, row.LinkedinProfile, row.PortfolioLink, row.Gender, row.BirthDate, row.Nationality, row.Address, row.Biography, row.YearsOfExperience, row.Available)
+}
+
+func mapCandidateProfileRow(row sqlc.GetCandidateProfileRow) domain.CandidateProfile {
+	return mapCandidateProfileValues(row.ID, row.Name, row.Email, row.CreatedAt, row.UpdatedAt, row.PhoneNumber, row.GithubProfile, row.LinkedinProfile, row.PortfolioLink, row.Gender, row.BirthDate, row.Nationality, row.Address, row.Biography, row.YearsOfExperience, row.Available)
+}
+
+func mapCandidateProfileValues(id, name, email string, createdAt, updatedAt pgtype.Timestamp, phoneNumber, githubProfile, linkedinProfile, portfolioLink, gender pgtype.Text, birthDate pgtype.Date, nationality, address, biography pgtype.Text, yearsOfExperience pgtype.Int4, available pgtype.Bool) domain.CandidateProfile {
 	return domain.CandidateProfile{
-		ID: row.ID, Name: row.Name, Email: row.Email, CreatedAt: row.CreatedAt.Time,
-		UpdatedAt: timestampPtr(row.UpdatedAt), PhoneNumber: row.PhoneNumber.String,
-		GithubProfile: row.GithubProfile.String, LinkedinProfile: row.LinkedinProfile.String,
-		PortfolioLink: row.PortfolioLink.String, Gender: row.Gender.String,
-		BirthDate: datePtr(row.BirthDate), Nationality: row.Nationality.String,
-		Address: row.Address.String, Biography: row.Biography.String,
-		YearsOfExperience: intPtr(row.YearsOfExperience), Available: boolPtr(row.Available),
+		ID: id, Name: name, Email: email, CreatedAt: createdAt.Time,
+		UpdatedAt: timestampPtr(updatedAt), PhoneNumber: phoneNumber.String,
+		GithubProfile: githubProfile.String, LinkedinProfile: linkedinProfile.String,
+		PortfolioLink: portfolioLink.String, Gender: gender.String,
+		BirthDate: datePtr(birthDate), Nationality: nationality.String,
+		Address: address.String, Biography: biography.String,
+		YearsOfExperience: intPtr(yearsOfExperience), Available: boolPtr(available),
 	}
 }
 

@@ -20,6 +20,13 @@ func NewProfileService(repository ports.ProfileRepository) (*ProfileService, err
 	return &ProfileService{repository: repository}, nil
 }
 
+func (s *ProfileService) GetCandidate(ctx context.Context, id string) (domain.CandidateProfile, error) {
+	if id == "" {
+		return domain.CandidateProfile{}, domain.ErrProfileNotFound
+	}
+	return s.repository.GetCandidateProfile(ctx, id)
+}
+
 func (s *ProfileService) GetCompany(ctx context.Context, id string, includePrivate bool) (domain.CompanyProfile, error) {
 	if id == "" {
 		return domain.CompanyProfile{}, domain.ErrProfileNotFound

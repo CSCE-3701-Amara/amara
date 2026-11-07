@@ -6,6 +6,14 @@ WHERE id = @id::uuid
   AND deleted_at IS NULL
   AND (@include_private::bool OR (approved = TRUE AND deactivated_at IS NULL AND COALESCE(banned, FALSE) = FALSE));
 
+-- name: GetCandidateProfile :one
+SELECT id::text, name, email, created_at, updated_at, phone_number, github_profile,
+       linkedin_profile, portfolio_link, gender, birth_date, nationality, address,
+       biography, years_of_experience, available
+FROM candidates
+WHERE id = @id::uuid
+  AND deleted_at IS NULL;
+
 -- name: GetPublicCompanyProfile :one
 SELECT id::text, legal_name, display_name, description, website_link, logo_url,
        contact_phone, contact_email, linkedin_profile, approved

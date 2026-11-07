@@ -29,6 +29,58 @@ func (q *Queries) CountCompanyInterviewers(ctx context.Context, companyID pgtype
 	return count, err
 }
 
+const getCandidateProfile = `-- name: GetCandidateProfile :one
+SELECT id::text, name, email, created_at, updated_at, phone_number, github_profile,
+       linkedin_profile, portfolio_link, gender, birth_date, nationality, address,
+       biography, years_of_experience, available
+FROM candidates
+WHERE id = $1::uuid
+  AND deleted_at IS NULL
+`
+
+type GetCandidateProfileRow struct {
+	ID                string
+	Name              string
+	Email             string
+	CreatedAt         pgtype.Timestamp
+	UpdatedAt         pgtype.Timestamp
+	PhoneNumber       pgtype.Text
+	GithubProfile     pgtype.Text
+	LinkedinProfile   pgtype.Text
+	PortfolioLink     pgtype.Text
+	Gender            pgtype.Text
+	BirthDate         pgtype.Date
+	Nationality       pgtype.Text
+	Address           pgtype.Text
+	Biography         pgtype.Text
+	YearsOfExperience pgtype.Int4
+	Available         pgtype.Bool
+}
+
+func (q *Queries) GetCandidateProfile(ctx context.Context, id pgtype.UUID) (GetCandidateProfileRow, error) {
+	row := q.db.QueryRow(ctx, getCandidateProfile, id)
+	var i GetCandidateProfileRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.PhoneNumber,
+		&i.GithubProfile,
+		&i.LinkedinProfile,
+		&i.PortfolioLink,
+		&i.Gender,
+		&i.BirthDate,
+		&i.Nationality,
+		&i.Address,
+		&i.Biography,
+		&i.YearsOfExperience,
+		&i.Available,
+	)
+	return i, err
+}
+
 const getCompanyProfile = `-- name: GetCompanyProfile :one
 SELECT id::text, legal_name, display_name, description, website_link, logo_url,
        contact_phone, contact_email, linkedin_profile, approved

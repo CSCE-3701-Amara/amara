@@ -33,6 +33,7 @@ func NewProfileHandler(service *application.ProfileService, validator ports.Sess
 
 func (h *ProfileHandler) RegisterRoutes(group *gin.RouterGroup) {
 	group.GET("/companies/me", CompanyAuth(h.validator, writeSessionError), h.getOwnCompany)
+	group.GET("/candidates/me", CandidateAuth(h.validator), h.getOwnCandidate)
 	group.PATCH("/candidates/me", CandidateAuth(h.validator), h.updateCandidate)
 	group.PATCH("/companies/me", CompanyAuth(h.validator, writeSessionError), h.updateCompany)
 	group.GET("/companies/me/interviewers", CompanyAuth(h.validator, writeSessionError), h.listCompanyInterviewers)
@@ -131,6 +132,20 @@ func (h *ProfileHandler) updateCandidate(c *gin.Context) {
 		BirthDate: birth, Nationality: input.Nationality, Address: input.Address, Biography: input.Biography,
 		YearsOfExperience: input.YearsOfExperience, Available: input.Available,
 	})
+	if err != nil {
+		writeProfileError(c.Writer, err)
+		return
+	}
+	writeJSON(c.Writer, http.StatusOK, makeCandidateProfileResponse(profile))
+}
+
+func (h *ProfileHandler) getOwnCandidate(c *gin.Context) {
+	identity, ok := Identity(c)
+	if !ok {
+		writeProblem(c.Writer, http.StatusInternalServerError, "internal_error", "An internal server error occurred.")
+		return
+	}
+	profile, err := h.service.GetCandidate(c.Request.Context(), identity.AccountID)
 	if err != nil {
 		writeProfileError(c.Writer, err)
 		return
