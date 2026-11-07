@@ -40,7 +40,7 @@ func testServer(t *testing.T, cfg config.HTTPConfig, output io.Writer, registrar
 func testServerWithDB(t *testing.T, cfg config.HTTPConfig, output io.Writer, dbSvc database.Service, registrars ...RouteRegistrar) *Server {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
-server, err := New(cfg, logging.New(output, slog.LevelInfo, "json"), dbSvc, registrars...)
+	server, err := New(cfg, logging.New(output, slog.LevelInfo, "json"), dbSvc, registrars...)
 	if err != nil {
 		t.Fatal(err)
 	}
