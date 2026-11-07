@@ -108,6 +108,9 @@ func (h *AssessmentHandler) evaluate(c *gin.Context) {
 		return
 	}
 	err := h.repo.FinalizeEvidence(c.Request.Context(), id, identity.CompanyID, body.Evidence)
+	if err == database.ErrAssessmentConflict {
+		err = h.repo.SaveMixedEvidence(c.Request.Context(), id, identity.CompanyID, body.Evidence)
+	}
 	if err != nil {
 		writeAssessment(c, nil, err)
 		return

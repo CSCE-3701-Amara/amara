@@ -145,9 +145,9 @@ It sends candidate source and test inputs to Judge0 and compares stdout with
 expected outputs in Amara. Comparison normalizes CRLF and ignores trailing
 newlines. Blank answers earn zero passed cases. Provider errors leave the
 attempt pending for retry, which reruns the attempt's cases.
-Attempts combining code and questions that require a separate score must be
-graded by a trusted evaluator that submits complete evidence through
-`FinalizeEvidence`.
+For mixed attempts that require human scores, the company submits evidence for
+all non-code questions to the assessment evaluation endpoint. The worker then
+combines that evidence with Judge0 case counts and finalizes the attempt.
 
 Development allows `http://localhost:5173` and `http://127.0.0.1:5173`.
 Cookie credentials are disabled; cross-origin clients can send an `Authorization`

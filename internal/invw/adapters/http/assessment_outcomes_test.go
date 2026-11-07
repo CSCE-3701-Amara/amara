@@ -337,8 +337,30 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); claimed || err != nil {
 		t.Fatalf("automatic grading claimed an attempt requiring separate scores: claimed=%v: %v", claimed, err)
 	}
+	humanEvidence := fmt.Sprintf(`{"evidence":[{"questionId":%q,"score":80}]}`, secondQuestion)
+	evaluationPath := codingPath + "/evaluation"
+	request(http.MethodPost, evaluationPath, "company",
+		fmt.Sprintf(`{"evidence":[{"questionId":%q,"passedCases":1,"totalCases":1}]}`, question), http.StatusConflict)
+	request(http.MethodPost, evaluationPath, "company", humanEvidence, http.StatusNoContent)
+	_, _, status, _ = load(3)
+	if status != "pending_grading" {
+		t.Fatalf("human evidence alone finalized the attempt: %s", status)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); !claimed || err != nil {
+		t.Fatalf("grade mixed attempt: claimed=%v: %v", claimed, err)
+	}
+	request(http.MethodPost, evaluationPath, "company", humanEvidence, http.StatusNoContent)
+	mixedReview := request(http.MethodGet, evaluationPath, "company", "", http.StatusOK)
+	for _, want := range []string{`"status":"scored"`, `"passedCases":1`, `"score":80`} {
+		if !strings.Contains(string(mixedReview), want) {
+			t.Fatalf("mixed evidence missing %s: %s", want, mixedReview)
+		}
+	}
+	// Restore the original coding fixture for the existing advancement checks.
 	exec(`UPDATE assessment_attempts
-		SET selected_content = jsonb_set(selected_content, '{0,questions,1,format}', '"code"')
+		SET selected_content = jsonb_set(selected_content, '{0,questions,1,format}', '"code"'),
+			status = 'pending_grading', code_grading_retry_at = NULL, non_code_evidence = NULL,
+			evaluated_at = NULL, final_evidence = NULL
 		WHERE id = $1::uuid`, id)
 	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); !claimed || err != nil {
 		t.Fatalf("grade coding attempt: claimed=%v: %v", claimed, err)

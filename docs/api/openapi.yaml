@@ -3911,6 +3911,7 @@ paths:
           $ref: '#/components/responses/NotFound'
     post:
       summary: Finalize human evaluation of a submitted assessment
+      description: For a mixed attempt that requires human scores, submit evidence for every non-code question. The worker combines it with Judge0 case counts before finalizing.
       operationId: finalizeHumanAssessmentEvaluation
       tags: [Assessments]
       x-implementation-status: implemented
