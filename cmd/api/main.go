@@ -125,6 +125,8 @@ func run() error {
 		candapplication.NewJobFeed(feedRepo, jobLifecycle),
 		authhttp.CandidateAuth(authRepo),
 	)
+	trackingRepo := canddatabase.NewApplicationTrackingRepository(dbSvc.Pool())
+	trackingHandler := candhttp.NewApplicationTrackingHandler(trackingRepo, authRepo)
 	// Candidate/interviewer registration needs a verification sender. Until that
 	// provider is configured, reject requests before creating unusable accounts.
 	server, err := httpserver.New(cfg.HTTP, logger, dbSvc,
@@ -136,6 +138,7 @@ func run() error {
 		feedHandler.RegisterRoutes,
 		postingHandler.RegisterRoutes,
 		applicationHandler.RegisterRoutes,
+		trackingHandler.RegisterRoutes,
 	)
 	if err != nil {
 		return fmt.Errorf("create HTTP server: %w", err)
