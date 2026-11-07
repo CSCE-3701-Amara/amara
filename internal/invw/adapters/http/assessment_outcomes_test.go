@@ -20,6 +20,7 @@ import (
 	authdomain "github.com/CSCE-3701-Amara/amara/internal/auth/domain"
 	authports "github.com/CSCE-3701-Amara/amara/internal/auth/ports"
 	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
+	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/judge0"
 )
 
 type outcomeSessions struct{}
@@ -266,6 +267,8 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		}
 	}
 	codingPath, id, question := start(3)
+	request(http.MethodPut, codingPath+"/submissions/"+question, "candidate",
+		`{"response":{"language":"python","code":"print()"}}`, http.StatusOK)
 	exec("UPDATE assessment_attempts SET deadline = now() - interval '1 second' WHERE id = $1::uuid", id)
 	sweep()
 	_, _, status, auto = load(3)
@@ -300,10 +303,42 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	}
 	failed := 0
 	evidence = append(evidence, database.QuestionEvidence{QuestionID: secondQuestion, PassedCases: &failed, TotalCases: &total})
-	for range 2 {
-		if err := repo.FinalizeEvidence(ctx, id, "", evidence); err != nil {
-			t.Fatal(err)
+	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("X-Auth-Token") == "unavailable" {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
 		}
+		switch r.Method {
+		case http.MethodPost:
+			fmt.Fprint(w, `{"token":"test-run"}`)
+		case http.MethodGet:
+			fmt.Fprint(w, `{"status":{"id":3},"stdout":"Cg=="}`)
+		}
+	}))
+	defer provider.Close()
+	unavailable, err := judge0.New(provider.URL, "unavailable", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, unavailable); !claimed || err == nil {
+		t.Fatalf("grade during provider outage: claimed=%v: %v", claimed, err)
+	}
+	runner, err := judge0.New(provider.URL, "", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); claimed || err != nil {
+		t.Fatalf("grading retried before backoff elapsed: claimed=%v: %v", claimed, err)
+	}
+	exec("UPDATE assessment_attempts SET code_grading_retry_at = now() WHERE id = $1::uuid", id)
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); !claimed || err != nil {
+		t.Fatalf("grade coding attempt: claimed=%v: %v", claimed, err)
+	}
+	if claimed, err := repo.GradeNextCodeAttempt(ctx, runner); claimed || err != nil {
+		t.Fatalf("repeat grading sweep: claimed=%v: %v", claimed, err)
+	}
+	if err := repo.FinalizeEvidence(ctx, id, "", evidence); err != nil {
+		t.Fatal(err)
 	}
 	_, _, status, _ = load(3)
 	if status != "scored" {
