@@ -1,3 +1,63 @@
+-- name: GetCompanyProfile :one
+SELECT id::text, legal_name, display_name, description, website_link, logo_url,
+       contact_phone, contact_email, linkedin_profile, approved
+FROM companies
+WHERE id = @id::uuid
+  AND deleted_at IS NULL
+  AND (@include_private::bool OR (approved = TRUE AND deactivated_at IS NULL AND COALESCE(banned, FALSE) = FALSE));
+
+-- name: GetCandidateProfile :one
+SELECT id::text, name, email, created_at, updated_at, phone_number, github_profile,
+       linkedin_profile, portfolio_link, gender, birth_date, nationality, address,
+       biography, years_of_experience, available
+FROM candidates
+WHERE id = @id::uuid
+  AND deleted_at IS NULL;
+
+-- name: GetPublicCompanyProfile :one
+SELECT id::text, legal_name, display_name, description, website_link, logo_url,
+       contact_phone, contact_email, linkedin_profile, approved
+FROM companies
+WHERE id = @id::uuid
+  AND approved = TRUE
+  AND deleted_at IS NULL
+  AND deactivated_at IS NULL
+  AND COALESCE(banned, FALSE) = FALSE;
+
+-- name: ListCompanyInterviewers :many
+SELECT i.id::text, i.company_id::text, i.name, i.email, i.account_status,
+       i.created_at, i.updated_at
+FROM interviewers i
+JOIN companies c ON c.id = i.company_id
+WHERE i.company_id = @company_id::uuid
+  AND i.deleted_at IS NULL
+  AND c.deleted_at IS NULL
+  AND c.deactivated_at IS NULL
+  AND c.approved = TRUE
+ORDER BY i.created_at DESC, i.id
+LIMIT @page_limit OFFSET @page_offset;
+
+-- name: CountCompanyInterviewers :one
+SELECT COUNT(*)
+FROM interviewers i
+JOIN companies c ON c.id = i.company_id
+WHERE i.company_id = @company_id::uuid
+  AND i.deleted_at IS NULL
+  AND c.deleted_at IS NULL
+  AND c.deactivated_at IS NULL
+  AND c.approved = TRUE;
+
+-- name: GetInterviewerProfile :one
+SELECT i.id::text, i.company_id::text, i.name, i.email, i.account_status,
+       i.created_at, i.updated_at
+FROM interviewers i
+JOIN companies c ON c.id = i.company_id
+WHERE i.id = @id::uuid
+  AND i.deleted_at IS NULL
+  AND c.deleted_at IS NULL
+  AND c.deactivated_at IS NULL
+  AND c.approved = TRUE;
+
 -- name: UpdateCandidateProfile :one
 UPDATE candidates
 SET name = CASE WHEN @set_name::bool THEN @name::text ELSE name END,
