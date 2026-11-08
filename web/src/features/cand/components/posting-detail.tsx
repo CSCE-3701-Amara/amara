@@ -1,4 +1,5 @@
 "use client";
+import { toError } from "@/shared/lib/errors";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -56,7 +57,7 @@ export function PostingDetail({ id }: { id: string }) {
           404,
         );
       } catch (error) {
-        if (!request.signal.aborted) setResult({ key, error: error as Error });
+        if (!request.signal.aborted) setResult({ key, error: toError(error) });
       }
     }
     void load();
@@ -72,7 +73,7 @@ export function PostingDetail({ id }: { id: string }) {
     try {
       setApplication(await applyToPosting(id));
     } catch (error) {
-      setApplyError(error as Error);
+      setApplyError(toError(error));
     } finally {
       pending.current = false;
       setBusy(false);

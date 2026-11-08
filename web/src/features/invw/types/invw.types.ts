@@ -14,6 +14,7 @@ export interface Question {
   options?: string[];
   amara?: string;
   difficulty?: string;
+  minimum_cases_passed?: number;
   test_cases?: { input: string; expected_output: string; weight: number }[];
 }
 export interface ProblemReference {
@@ -25,6 +26,8 @@ export interface ModuleDefinition {
   description?: string;
   type: "coding" | "programming_language" | "behavioral" | "recorded_video";
   active_minutes?: number;
+  behavioral?: boolean;
+  minimum_tests_passed?: number;
   threshold?: number;
   questions?: Question[];
   amarat?: Amara[];
@@ -59,6 +62,7 @@ export interface PipelineStage {
   scheduledEndAt: string;
   moduleIds?: string[];
   interview?: {
+    behavioral?: boolean;
     durationMinutes: number;
     interviewerIds: string[];
     threshold: number | null;

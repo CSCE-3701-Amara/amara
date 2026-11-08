@@ -1,0 +1,290 @@
+[
+  {
+    "file": "web/public/figma/pipeline/calendar-days.svg",
+    "bytes": 878,
+    "sha256": "91ebb1b99817bbdf3c046bd29b5647487a518a38dc182a2e0223e8a6c97d57e3",
+    "intrinsicDimensions": {
+      "width": 19.2,
+      "height": 19.2
+    },
+    "figmaSlot": "118:5974 \u00b7 Module palette / Live interview",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 19.1875,
+      "height": 19.1875,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/circle-check.svg",
+    "bytes": 685,
+    "sha256": "b28672f0076483492613d50371410fc66c49c01c31df9290100bef0e8ce41bf3",
+    "intrinsicDimensions": {
+      "width": 11.52,
+      "height": 11.52
+    },
+    "figmaSlot": "118:6016 \u00b7 Graph node status",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 11.515625,
+      "height": 11.515625,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/code-xml.svg",
+    "bytes": 415,
+    "sha256": "3831341fbb721f63baee853ea0d953f79139e6f7f44c099be8a2f8d38d44e896",
+    "intrinsicDimensions": {
+      "width": 19.2,
+      "height": 19.2
+    },
+    "figmaSlot": "118:5962 \u00b7 Module palette / Coding challenge",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 19.1875,
+      "height": 19.1875,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/flag.svg",
+    "bytes": 1013,
+    "sha256": "0c5d6642132d13bf00764bed2475fcf4f7287095b938b73076bfacfad3e08c02",
+    "intrinsicDimensions": {
+      "width": 15.36,
+      "height": 15.36
+    },
+    "figmaSlot": "118:5980 \u00b7 Palette / Finalist",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 15.359375,
+      "height": 15.359375,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/grip-vertical.svg",
+    "bytes": 1528,
+    "sha256": "b3771a5f8277aee8373ae03cbea36b6e535287152b8f3c7d16d4d8e8f50ba7f6",
+    "intrinsicDimensions": {
+      "width": 13.44,
+      "height": 13.44
+    },
+    "figmaSlot": "118:5959,118:6007,118:6013 \u00b7 Palette and graph-node grip",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 13.4375,
+      "height": 13.4375,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/incoming-port.svg",
+    "bytes": 291,
+    "sha256": "f59fa39bd1da5bbd5c64192cfaa94342bad55d70b56671754b8d3581a88f49c7",
+    "intrinsicDimensions": {
+      "width": 7.68,
+      "height": 7.68
+    },
+    "figmaSlot": "118:5751,118:5752 \u00b7 Graph connection ports",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 7.671875,
+      "height": 7.671875,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/list-checks.svg",
+    "bytes": 460,
+    "sha256": "7bb07781bffdfef1cfdc4dc2b4705514b5f90f31630cd63234981fe4d7dc5377",
+    "intrinsicDimensions": {
+      "width": 19.2,
+      "height": 19.2
+    },
+    "figmaSlot": "118:5956 \u00b7 Module palette / Question-based",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 19.1875,
+      "height": 19.1875,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/maximize.svg",
+    "bytes": 797,
+    "sha256": "6115a2db5ec98a12044c9d23e9ab672b4ead97ec3470979bac76e96a2184839d",
+    "intrinsicDimensions": {
+      "width": 15.36,
+      "height": 15.36
+    },
+    "figmaSlot": "118:6004 \u00b7 Canvas toolbar / Fit",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 15.359375,
+      "height": 15.359375,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/minus.svg",
+    "bytes": 314,
+    "sha256": "279f0fe68c13b91fb2a6af1f6f096a33c704c055ba2e40b5cff3e28055bfa9ed",
+    "intrinsicDimensions": {
+      "width": 15.36,
+      "height": 15.36
+    },
+    "figmaSlot": "118:5998 \u00b7 Canvas toolbar / Zoom out",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 15.359375,
+      "height": 15.359375,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/mouse-pointer2.svg",
+    "bytes": 1037,
+    "sha256": "be4f033de3f327052f713ed655e3e62f65d034c5997875756b6ef815d9362d98",
+    "intrinsicDimensions": {
+      "width": 15.36,
+      "height": 15.36
+    },
+    "figmaSlot": "118:5983 \u00b7 Canvas toolbar / Select",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 15.359375,
+      "height": 15.359375,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/plus.svg",
+    "bytes": 385,
+    "sha256": "e0aa724c014826620ca15b315a2ac56d2ff6cd33a7499528abe2b7e065a49a6f",
+    "intrinsicDimensions": {
+      "width": 15.36,
+      "height": 15.36
+    },
+    "figmaSlot": "118:6001 \u00b7 Canvas toolbar / Zoom in",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 15.359375,
+      "height": 15.359375,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/redo2.svg",
+    "bytes": 610,
+    "sha256": "593974523acb98c8f16d46be058f22be46111c2e18e6687f4ffc6aca98284944",
+    "intrinsicDimensions": {
+      "width": 15.36,
+      "height": 15.36
+    },
+    "figmaSlot": "118:5995 \u00b7 Canvas toolbar / Redo",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 15.359375,
+      "height": 15.359375,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/trash2.svg",
+    "bytes": 915,
+    "sha256": "7721b64f706b9a3d1d3c76981a4351a0f57b16eb9357531ceaf0e870c6bafbe5",
+    "intrinsicDimensions": {
+      "width": 15.36,
+      "height": 15.36
+    },
+    "figmaSlot": "118:5989 \u00b7 Canvas toolbar / Delete",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 15.359375,
+      "height": 15.359375,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/undo2.svg",
+    "bytes": 754,
+    "sha256": "5a42f7a7daa2d109594253c38d515fa464d34c5a07c1ac8ee370a646c67817b5",
+    "intrinsicDimensions": {
+      "width": 15.36,
+      "height": 15.36
+    },
+    "figmaSlot": "118:5992 \u00b7 Canvas toolbar / Undo",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 15.359375,
+      "height": 15.359375,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/video.svg",
+    "bytes": 982,
+    "sha256": "bc7ab841f0dcfe51fa5e4a4c1f422a680e836070c249a24a5b9cdf8a59889667",
+    "intrinsicDimensions": {
+      "width": 19.2,
+      "height": 19.2
+    },
+    "figmaSlot": "118:5968 \u00b7 Module palette / Video-recorded",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 19.1875,
+      "height": 19.1875,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  },
+  {
+    "file": "web/public/figma/pipeline/workflow.svg",
+    "bytes": 914,
+    "sha256": "98698d17d68889fbac38debb6d25f73412ffc6fcd53198d24a3e08beb49958ab",
+    "intrinsicDimensions": {
+      "width": 15.36,
+      "height": 15.36
+    },
+    "figmaSlot": "118:5986 \u00b7 Canvas toolbar / Connect",
+    "callsite": "web/src/features/invw/components/pipeline-studio.tsx \u00b7 StudioIcon; no CSS size override",
+    "browserGeometry": {
+      "viewport": 1728,
+      "loaded": true,
+      "width": 15.359375,
+      "height": 15.359375,
+      "result": "Matches intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel)."
+    }
+  }
+]

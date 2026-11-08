@@ -1,4 +1,5 @@
 "use client";
+import { toError } from "@/shared/lib/errors";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
@@ -62,7 +63,7 @@ export function ModuleLibrary({
       const result = await copyModule(selected);
       router.push(`/employer/modules/${resourceId(result.id)}/questions`);
     } catch (cause) {
-      setError(cause as Error);
+      setError(toError(cause));
       throw cause;
     } finally {
       pending.current = false;
@@ -291,6 +292,8 @@ function DefinitionEditor({
       amarat: module?.amarat,
       rubric: module?.rubric,
       library: module?.library,
+      behavioral: module?.behavioral,
+      minimum_tests_passed: module?.minimum_tests_passed,
       name: String(data.get("name") || "").trim(),
       description: String(data.get("description") || ""),
       type,
@@ -329,7 +332,7 @@ function DefinitionEditor({
         : await createModule(definition);
       onSaved(saved);
     } catch (cause) {
-      setError(cause as Error);
+      setError(toError(cause));
     } finally {
       pending.current = false;
       setBusy(false);
@@ -661,12 +664,7 @@ export function ModuleStudio({ id }: { id?: string }) {
             ? `${resource.data.name} · ${resource.data.published ? "Published" : "Draft"}`
             : "Build a reusable assessment definition."
         }
-        compact
-        artwork={{
-          src: "/figma/hiring-dag.svg",
-          width: 200.16,
-          height: 138.96,
-        }}
+        className={video ? e.titleBanner : e.largeTitle}
       />
       <BusyState loading={resource.loading} />
       <ApiFeedback error={resource.error} retry={resource.reload} />

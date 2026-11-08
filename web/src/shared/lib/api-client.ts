@@ -12,6 +12,26 @@ export class ApiError extends Error {
   }
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** Both registered error formats are untrusted JSON at the transport boundary. */
+function errorFields(data: unknown) {
+  const problem = isRecord(data) ? data : {};
+  const legacy = isRecord(problem.error) ? problem.error : {};
+  return {
+    message: [problem.detail, legacy.message].find(
+      (value): value is string => typeof value === "string" && value.length > 0,
+    ),
+    code: [problem.code, legacy.code].find(
+      (value): value is string => typeof value === "string" && value.length > 0,
+    ),
+    requestId:
+      typeof problem.request_id === "string" ? problem.request_id : undefined,
+  };
+}
+
 export async function apiRequest<T>(
   path: string,
   options: {
@@ -50,18 +70,17 @@ export async function apiRequest<T>(
   }
   if (response.status === 204 && response.ok) return undefined as T;
   const contentType = response.headers.get("Content-Type") || "";
-  const data = contentType.includes("json")
+  const data: unknown = contentType.includes("json")
     ? await response.json().catch(() => null)
     : null;
   if (!response.ok) {
+    const fields = errorFields(data);
     throw new ApiError(
-      data?.detail ||
-        data?.error?.message ||
-        "We couldn’t complete your request. Please try again.",
-      data?.code || data?.error?.code || "request_failed",
+      fields.message || "We couldn’t complete your request. Please try again.",
+      fields.code || "request_failed",
       response.status,
       response.headers.get("Retry-After"),
-      response.headers.get("X-Request-ID") || data?.request_id,
+      response.headers.get("X-Request-ID") || fields.requestId,
     );
   }
   if (data === null)
