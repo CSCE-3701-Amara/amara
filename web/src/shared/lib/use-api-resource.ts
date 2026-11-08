@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { apiRequest, ApiError } from "./api-client";
+import { apiRequest } from "./api-client";
+import { toError, type RequestError } from "./errors";
 
 /** Cancel stale reads, including hidden Next.js routes; keep private data uncached. */
 export function useApiResource<T>(path: string | null, reloadKey = "") {
@@ -9,7 +10,7 @@ export function useApiResource<T>(path: string | null, reloadKey = "") {
   const [result, setResult] = useState<{
     key: string;
     data?: T;
-    error?: ApiError;
+    error?: RequestError;
   }>();
   useEffect(() => {
     if (!path) return;
@@ -18,8 +19,8 @@ export function useApiResource<T>(path: string | null, reloadKey = "") {
       (data) => {
         if (!request.signal.aborted) setResult({ key, data });
       },
-      (error) => {
-        if (!request.signal.aborted) setResult({ key, error });
+      (error: unknown) => {
+        if (!request.signal.aborted) setResult({ key, error: toError(error) });
       },
     );
     return () => request.abort();

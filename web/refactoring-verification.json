@@ -1,0 +1,303 @@
+{
+  "checkedAt": "2026-11-08",
+  "browser": {
+    "server": "Next.js production",
+    "http": "mocked",
+    "stats": {
+      "startTime": "2026-11-08T13:09:44.449Z",
+      "duration": 130654.983,
+      "expected": 392,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "checks": {
+    "lint": "passed, no warnings",
+    "typescript": "passed",
+    "productionBuild": "passed, Next.js Turbopack",
+    "diffWhitespace": "passed"
+  },
+  "visualComparisons": [
+    {
+      "file": "118-5096-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": false,
+      "changedPixels": 21,
+      "changedPercent": 0.0005218023949239063,
+      "box": [
+        694,
+        776,
+        946,
+        787
+      ]
+    },
+    {
+      "file": "118-5096-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "125-51106-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "125-51106-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "125-51272-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "125-51272-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "125-51421-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "125-51421-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "125-51829-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "125-51829-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "264-1003-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "264-1003-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "264-1057-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "264-1057-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "264-1103-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "264-1103-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "264-1145-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "264-1145-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "264-500-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "264-500-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "393-1014-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "393-1014-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "393-670-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "393-670-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "446-983-1728.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    },
+    {
+      "file": "446-983-375.png",
+      "sameDimensions": true,
+      "pixelIdentical": true,
+      "changedPixels": 0,
+      "changedPercent": 0.0,
+      "box": null
+    }
+  ],
+  "performance": {
+    "method": "Fresh browser pages, production build, identical mocked API fixtures; fetched JavaScript body bytes and sum of default gzip-compressed body sizes. Includes shared framework code; does not measure latency or Core Web Vitals.",
+    "before": {
+      "pipeline": {
+        "calls": {
+          "/v1/jobs/11111111-1111-4111-8111-111111111111/pipeline": 2,
+          "/v1/pipeline-versions/33333333-3333-4333-8333-333333333333/stages": 2,
+          "/v1/pipeline-versions/33333333-3333-4333-8333-333333333333/transitions": 1,
+          "/v1/modules": 2
+        },
+        "scriptCount": 14,
+        "scriptBytes": 632695,
+        "scriptGzipBytes": 193032
+      },
+      "interviews": {
+        "calls": {
+          "/v1/interviews": 1
+        },
+        "scriptCount": 13,
+        "scriptBytes": 607221,
+        "scriptGzipBytes": 185154
+      },
+      "grading": {
+        "calls": {
+          "/v1/grading/submissions": 1
+        },
+        "scriptCount": 10,
+        "scriptBytes": 584226,
+        "scriptGzipBytes": 177028
+      }
+    },
+    "after": {
+      "pipeline": {
+        "calls": {
+          "/v1/jobs/11111111-1111-4111-8111-111111111111/pipeline": 1,
+          "/v1/pipeline-versions/33333333-3333-4333-8333-333333333333/stages": 1,
+          "/v1/pipeline-versions/33333333-3333-4333-8333-333333333333/transitions": 1,
+          "/v1/modules": 1
+        },
+        "scriptCount": 17,
+        "scriptBytes": 623190,
+        "scriptGzipBytes": 193054
+      },
+      "interviews": {
+        "calls": {
+          "/v1/interviews": 1
+        },
+        "scriptCount": 16,
+        "scriptBytes": 597137,
+        "scriptGzipBytes": 184702
+      },
+      "grading": {
+        "calls": {
+          "/v1/grading/submissions": 1
+        },
+        "scriptCount": 13,
+        "scriptBytes": 574117,
+        "scriptGzipBytes": 176556
+      }
+    }
+  },
+  "constraints": {
+    "backendChanged": false,
+    "dependenciesChanged": false,
+    "apiPayloadsChanged": false,
+    "routesChanged": false
+  }
+}
