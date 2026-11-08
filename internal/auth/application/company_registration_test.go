@@ -18,7 +18,7 @@ func validCompanyRegistration() domain.CompanyRegistration {
 
 func newCompanyService(t *testing.T, repository *fakeRepository, checker fakeChecker) *CompanyRegistrationService {
 	t.Helper()
-	service, err := NewCompanyRegistrationService(repository, checker)
+	service, err := NewCompanyRegistrationService(repository, checker, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,10 +27,10 @@ func newCompanyService(t *testing.T, repository *fakeRepository, checker fakeChe
 }
 
 func TestNewCompanyRegistrationServiceRequiresDependencies(t *testing.T) {
-	if _, err := NewCompanyRegistrationService(nil, fakeChecker{}); err == nil {
+	if _, err := NewCompanyRegistrationService(nil, fakeChecker{}, false); err == nil {
 		t.Fatal("expected repository error")
 	}
-	if _, err := NewCompanyRegistrationService(&fakeRepository{}, nil); err == nil {
+	if _, err := NewCompanyRegistrationService(&fakeRepository{}, nil, false); err == nil {
 		t.Fatal("expected checker error")
 	}
 }

@@ -14,16 +14,17 @@ import (
 )
 
 type CompanyRegistrationService struct {
-	repository ports.CompanyRegistrationRepository
-	checker    ports.PasswordCompromiseChecker
-	now        func() time.Time
+	repository  ports.CompanyRegistrationRepository
+	checker     ports.PasswordCompromiseChecker
+	now         func() time.Time
+	autoApprove bool
 }
 
-func NewCompanyRegistrationService(repository ports.CompanyRegistrationRepository, checker ports.PasswordCompromiseChecker) (*CompanyRegistrationService, error) {
+func NewCompanyRegistrationService(repository ports.CompanyRegistrationRepository, checker ports.PasswordCompromiseChecker, autoApprove bool) (*CompanyRegistrationService, error) {
 	if repository == nil || checker == nil {
 		return nil, errors.New("company registration dependencies must not be nil")
 	}
-	return &CompanyRegistrationService{repository: repository, checker: checker, now: time.Now}, nil
+	return &CompanyRegistrationService{repository: repository, checker: checker, now: time.Now, autoApprove: autoApprove}, nil
 }
 
 func (s *CompanyRegistrationService) Register(ctx context.Context, registration domain.CompanyRegistration) (domain.Account, error) {
@@ -62,7 +63,7 @@ func (s *CompanyRegistrationService) Register(ctx context.Context, registration 
 		CompanyName: registration.CompanyName, RegistrationNumber: registration.RegistrationNumber,
 		Email:        registration.Email,
 		PasswordHash: argon2.IDKey([]byte(registration.Password), salt, 3, 64*1024, 1, 32),
-		Salt:         salt, CreatedAt: s.now().UTC(),
+		Salt:         salt, CreatedAt: s.now().UTC(), AutoApprove: s.autoApprove,
 	})
 	if err != nil {
 		return domain.Account{}, fmt.Errorf("create company registration: %w", err)

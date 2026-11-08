@@ -236,12 +236,12 @@ test("candidate registration verifies by emailed code, preserves input on failur
   await expect(page.getByLabel("Email", { exact: true })).toHaveValue(
     "candidate@example.com",
   );
-  await page.getByLabel("Verification code").fill(code);
+  await page.getByLabel("Verification code").fill(` ${code} `);
   await page.getByRole("button", { name: "Verify account" }).click();
   await expect(page.locator("main").getByRole("alert")).toHaveText(
     "Invalid or expired code.",
   );
-  await expect(page.getByLabel("Verification code")).toHaveValue(code);
+  await expect(page.getByLabel("Verification code")).toHaveValue(` ${code} `);
   await page.getByRole("button", { name: "Verify account" }).click();
   await expect(
     page.getByRole("heading", { name: "Account verified" }),
@@ -261,8 +261,15 @@ test("direct verification state accepts a candidate email and rejects malformed 
   });
   await page.goto("/register?state=verification-pending");
   await page.getByLabel("Email", { exact: true }).fill("candidate@example.com");
+  await page.getByRole("button", { name: "Verify account" }).click();
+  await expect(page.locator("main").getByRole("alert")).toHaveText(
+    "Paste the code from your AMARA verification email.",
+  );
   await page.getByLabel("Verification code").fill("short");
   await page.getByRole("button", { name: "Verify account" }).click();
+  await expect(page.locator("main").getByRole("alert")).toHaveText(
+    "Enter the full 64-character code from your verification email.",
+  );
   expect(requests).toBe(0);
 });
 

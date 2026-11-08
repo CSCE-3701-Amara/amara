@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	authhttp "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/http"
 	"github.com/CSCE-3701-Amara/amara/internal/invw/application"
 	"github.com/CSCE-3701-Amara/amara/internal/invw/domain"
 	httpserver "github.com/CSCE-3701-Amara/amara/internal/platform/http"
@@ -26,7 +27,7 @@ func NewCandidatePipelineProgressHandler(progress *application.CandidatePipeline
 }
 
 func (h *CandidatePipelineProgressHandler) RegisterRoutes(group *gin.RouterGroup) {
-	route := group.Group("/applications/:applicationId/pipeline-progress")
+	route := group.Group("/applications/:application_id/pipeline-progress")
 	if h.candidateAuth == nil {
 		route.GET("", func(c *gin.Context) {
 			writePipelineProgressError(c, http.StatusUnauthorized, "authentication_required", "Candidate authentication is required.")
@@ -42,7 +43,7 @@ func (h *CandidatePipelineProgressHandler) get(c *gin.Context) {
 		writePipelineProgressError(c, http.StatusUnauthorized, "authentication_required", "Candidate authentication is required.")
 		return
 	}
-	progress, err := h.progress.Get(c.Request.Context(), candidateID, c.Param("applicationId"))
+	progress, err := h.progress.Get(c.Request.Context(), candidateID, c.Param("application_id"))
 	if err != nil {
 		switch {
 		case errors.Is(err, application.ErrInvalidPipelineProgressQuery):
@@ -60,6 +61,9 @@ func (h *CandidatePipelineProgressHandler) get(c *gin.Context) {
 }
 
 func authenticatedCandidateID(c *gin.Context) (string, bool) {
+	if identity, ok := authhttp.Identity(c); ok {
+		return identity.AccountID, identity.AccountType == "candidate" && identity.AccountID != ""
+	}
 	value, exists := c.Get(CandidateIDContextKey)
 	if !exists {
 		return "", false

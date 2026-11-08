@@ -19,7 +19,20 @@ SELECT EXISTS (
 );
 
 -- name: CreateCompanyRegistration :one
-INSERT INTO auth_company_registration_requests
-    (company_name, registration_number, email, password_hash, salt, status, created_at)
-VALUES ($1, $2, $3, $4, $5, 'pending_review', $6)
-RETURNING id::text, email, status, created_at;
+WITH request AS (
+    INSERT INTO auth_company_registration_requests
+        (company_name, registration_number, email, password_hash, salt, status, created_at, reviewed_at)
+    VALUES ($1, $2, $3, $4, $5,
+            CASE WHEN sqlc.arg(auto_approve)::boolean THEN 'approved' ELSE 'pending_review' END, $6::timestamp,
+            CASE WHEN sqlc.arg(auto_approve)::boolean THEN $6::timestamp END)
+    RETURNING id, company_name, email, password_hash, salt, status, created_at
+), company AS (
+    INSERT INTO companies (id, legal_name, email, password_hash, salt, approved, created_at)
+    SELECT id, company_name, email, password_hash, salt, TRUE, created_at
+    FROM request WHERE status = 'approved'
+    RETURNING id
+)
+SELECT request.id::text, request.email,
+       (CASE WHEN company.id IS NOT NULL THEN 'active' ELSE request.status END)::text AS status,
+       request.created_at
+FROM request LEFT JOIN company ON company.id = request.id;

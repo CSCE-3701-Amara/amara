@@ -100,6 +100,7 @@ function AuthScreen({
   const screenRef = useRef<HTMLElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
+  const [emailMfa, setEmailMfa] = useState(false);
   const isMfa = state === "mfa" || state === "code-rejected";
   const awaitingVerification =
     registration && state === "verification-pending" && !company;
@@ -144,6 +145,24 @@ function AuthScreen({
     event.preventDefault();
     if (inFlight.current) return;
     setError("");
+    const verificationEmail = email.trim().toLowerCase();
+    const code = verificationCode.trim();
+    const emailInput = event.currentTarget.elements.namedItem("verificationEmail");
+    if (!verificationEmail || (emailInput instanceof HTMLInputElement && emailInput.validity.typeMismatch)) {
+      setFieldErrors({ verificationEmail: "Enter the email address you registered with." });
+      if (emailInput instanceof HTMLInputElement) emailInput.focus();
+      return;
+    }
+    const codeInput = event.currentTarget.elements.namedItem("verificationCode");
+    if (!/^[0-9a-f]{64}$/i.test(code)) {
+      setFieldErrors({
+        verificationCode: code
+          ? "Enter the full 64-character code from your verification email."
+          : "Paste the code from your AMARA verification email.",
+      });
+      if (codeInput instanceof HTMLInputElement) codeInput.focus();
+      return;
+    }
     setFieldErrors({});
     const request = new AbortController();
     requestRef.current = request;
@@ -151,7 +170,7 @@ function AuthScreen({
     setBusy(true);
     try {
       const result = await verifyAccount(
-        { email: email.trim().toLowerCase(), code: verificationCode.trim() },
+        { email: verificationEmail, code },
         request.signal,
       );
       if (request.signal.aborted) return;
@@ -226,13 +245,17 @@ function AuthScreen({
             ?.focus();
           return;
         }
-        await registerAccount(
+        const result = await registerAccount(
           kind,
           { email: email.trim(), password, ...name },
           request.signal,
         );
         if (request.signal.aborted) return;
         setPassword("");
+        if (company && result.status === "active") {
+          router.push(loginHref);
+          return;
+        }
         setState(company ? "review-pending" : "verification-pending");
       } else {
         const result = await createSession(
@@ -264,8 +287,13 @@ function AuthScreen({
     } catch (cause) {
       if (request.signal.aborted) return;
       if (cause instanceof AuthError) {
-        if (cause.code === "mfa_required") setState("mfa");
-        else if (cause.code === "invalid_mfa_code") {
+        if (
+          cause.code === "mfa_required" ||
+          cause.code === "email_mfa_required"
+        ) {
+          setEmailMfa(cause.code === "email_mfa_required");
+          setState("mfa");
+        } else if (cause.code === "invalid_mfa_code") {
           setCode("");
           setState("code-rejected");
           screenRef.current
@@ -525,7 +553,11 @@ function AuthScreen({
             <form onSubmit={submit} aria-busy={busy}>
               <FormField
                 id="mfaCode"
-                hint="Enter the six-digit code from your authenticator."
+                hint={
+                  emailMfa
+                    ? "Enter the six-digit code sent to your company email. It expires after 10 minutes."
+                    : "Enter the six-digit code from your authenticator."
+                }
                 error={
                   state === "code-rejected"
                     ? "That code couldn’t be verified. Try a new code."
@@ -565,11 +597,12 @@ function AuthScreen({
               </button>
             </form>
           ) : awaitingVerification && !verified ? (
-            <form onSubmit={submitVerification} aria-busy={busy}>
+            <form onSubmit={submitVerification} noValidate aria-busy={busy}>
               <FormField
                 id="verificationEmail"
                 name="verificationEmail"
                 label="Email"
+                error={fieldErrors.verificationEmail}
                 type="email"
                 autoComplete="email"
                 required
@@ -587,9 +620,7 @@ function AuthScreen({
                 autoCorrect="off"
                 spellCheck={false}
                 inputMode="text"
-                pattern="[A-Fa-f0-9]{64}"
-                minLength={64}
-                maxLength={64}
+                placeholder="Paste the code from your email"
                 required
                 value={verificationCode}
                 onChange={(event) => setVerificationCode(event.target.value)}

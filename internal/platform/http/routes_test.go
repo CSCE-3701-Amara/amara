@@ -78,7 +78,7 @@ func registrationRegistrars(t *testing.T, deps *registrationDependencies) []Rout
 	if err != nil {
 		t.Fatal(err)
 	}
-	company, err := application.NewCompanyRegistrationService(deps, deps)
+	company, err := application.NewCompanyRegistrationService(deps, deps, false)
 	if err != nil {
 		t.Fatal(err)
 	}

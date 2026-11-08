@@ -50,6 +50,21 @@ func NewSMTPSender(config SMTPConfig) (*SMTPSender, error) {
 }
 
 func (s *SMTPSender) SendVerificationCode(ctx context.Context, recipient, code string) error {
+	if !isVerificationCode(code) {
+		return errors.New("verification code must contain only hexadecimal characters")
+	}
+	return s.send(ctx, recipient, buildVerificationMessage(code))
+}
+
+func (s *SMTPSender) SendLoginCode(ctx context.Context, recipient, code string) error {
+	if len(code) != 6 || strings.Trim(code, "0123456789") != "" {
+		return errors.New("login code must contain six digits")
+	}
+	message := []byte(fmt.Sprintf("Subject: AMARA sign-in code\r\n\r\nYour AMARA sign-in code is: %s\r\nIt expires in 10 minutes.\r\n", code))
+	return s.send(ctx, recipient, message)
+}
+
+func (s *SMTPSender) send(ctx context.Context, recipient string, message []byte) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
@@ -63,10 +78,6 @@ func (s *SMTPSender) SendVerificationCode(ctx context.Context, recipient, code s
 	if address, err := mail.ParseAddress(recipient); err != nil || address.Address != recipient {
 		return errors.New("verification recipient must be a valid email address")
 	}
-	if !isVerificationCode(code) {
-		return errors.New("verification code must contain only hexadecimal characters")
-	}
-	message := buildVerificationMessage(code)
 	address := net.JoinHostPort(s.config.Host, s.config.Port)
 	dialer := net.Dialer{Timeout: s.config.Timeout}
 	conn, err := dialer.DialContext(ctx, "tcp", address)

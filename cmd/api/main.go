@@ -102,7 +102,8 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("create verification handler: %w", err)
 	}
-	companyRegistration, err := authapplication.NewCompanyRegistrationService(authRepo, passwordChecker)
+	companyRegistration, err := authapplication.NewCompanyRegistrationService(authRepo, passwordChecker,
+		cfg.Environment == "development" && os.Getenv("AUTH_AUTO_APPROVE_COMPANIES") == "true")
 	if err != nil {
 		return fmt.Errorf("create company registration service: %w", err)
 	}
@@ -114,6 +115,7 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("create MFA service: %w", err)
 	}
+	mfaService.ConfigureCompanyEmail(authRepo, verificationSender)
 	loginService, err := authapplication.NewLoginService(authRepo, authRepo, mfaService)
 	if err != nil {
 		return fmt.Errorf("create login service: %w", err)
@@ -158,14 +160,11 @@ func run() error {
 	postingListHandler := jobhttp.NewPostingListHandler(jobapplication.NewCompanyPostingList(postingListRepo, jobLifecycle), authRepo)
 	postingRepo := jobdatabase.NewPostingManagementRepository(dbSvc.Pool())
 	postingService := jobapplication.NewPostingManagement(postingRepo)
-	// AUTH integration placeholder: the current checkout has no session middleware.
-	// The handler fails closed until AUTH supplies a middleware that sets its principal.
-	postingHandler := jobhttp.NewPostingHandler(postingService, nil)
+	postingHandler := jobhttp.NewPostingHandler(postingService, authhttp.AuthenticatedAuth(authRepo))
 	applicationRepo := jobdatabase.NewApplicationRepository(dbSvc.Pool())
 	applicationService := jobapplication.NewApplicationAdmission(applicationRepo)
-	applicationHandler := jobhttp.NewApplicationHandler(applicationService, nil)
-
 	candidateAuth := authhttp.CandidateAuth(authRepo)
+	applicationHandler := jobhttp.NewApplicationHandler(applicationService, candidateAuth)
 	feedRepo := canddatabase.NewJobFeedRepository(dbSvc.Pool())
 	feedHandler := candhttp.NewJobFeedHandler(
 		candapplication.NewJobFeed(feedRepo, jobLifecycle),
@@ -193,8 +192,6 @@ func run() error {
 		candidateAuth,
 	)
 
-	// Candidate/interviewer registration needs a verification sender. Until that
-	// provider is configured, reject requests before creating unusable accounts.
 	server, err := httpserver.New(cfg.HTTP, logger, dbSvc,
 		registrationHandler.RegisterRoutes,
 		verificationHandler.RegisterRoutes,

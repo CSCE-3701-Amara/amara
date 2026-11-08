@@ -34,7 +34,7 @@ func (h *AssessmentHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 	v1.POST("/pipeline-stages/:stageId/threshold/preview", company, h.stageThreshold(false))
 	v1.PUT("/pipeline-stages/:stageId/threshold", company, h.stageThreshold(true))
 	candidate := authhttp.CandidateAuthWithErrorWriter(h.sessions, writeError)
-	v1.GET("/applications/:applicationId/assessment-instances", candidate, h.listInstances)
+	v1.GET("/applications/:application_id/assessment-instances", candidate, h.listInstances)
 	v1.POST("/assessment-instances/:instanceId/start", candidate, h.attempt("instanceId", true, false))
 	v1.GET("/assessment-attempts/:attemptId", candidate, h.attempt("attemptId", false, false))
 	v1.POST("/assessment-attempts/:attemptId/submission", candidate, h.attempt("attemptId", false, true))
@@ -46,7 +46,7 @@ func (h *AssessmentHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 }
 
 func (h *AssessmentHandler) listInstances(c *gin.Context) {
-	id, ok := assessmentID(c, "applicationId")
+	id, ok := assessmentID(c, "application_id")
 	if !ok {
 		return
 	}

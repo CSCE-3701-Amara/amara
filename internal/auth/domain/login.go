@@ -3,6 +3,7 @@ package domain
 import "errors"
 
 var (
+	ErrEmailMFARequired   = errors.New("enter the six-digit sign-in code sent to your email")
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrLoginRateLimited   = errors.New("login attempts rate limited")
 	ErrInvalidSession     = errors.New("invalid session")

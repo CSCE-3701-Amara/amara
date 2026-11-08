@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE TABLE interviewers (
+CREATE TABLE IF NOT EXISTS interviewers (
     id              UUID        PRIMARY KEY,
     company_id      UUID        REFERENCES companies(id),
     name            TEXT        NOT NULL,

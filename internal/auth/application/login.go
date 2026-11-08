@@ -86,7 +86,7 @@ func (s *LoginService) Login(ctx context.Context, login domain.Login) (domain.Se
 	if credentials.AccountType == domain.AccountTypeInterviewer && !credentials.CompanyApproved {
 		return domain.Session{}, domain.ErrAccountForbidden
 	}
-	if err := s.mfa.VerifyLoginCode(ctx, credentials.ID, credentials.AccountType, login.MFACode); err != nil {
+	if err := s.mfa.verifyLogin(ctx, credentials.ID, credentials.AccountType, credentials.Email, login.MFACode); err != nil {
 		return domain.Session{}, err
 	}
 

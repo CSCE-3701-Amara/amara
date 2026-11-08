@@ -38,7 +38,7 @@ func (c companyHandlerChecker) IsCompromised(context.Context, string) (bool, err
 
 func newCompanyHandler(t *testing.T, repository companyHandlerRepository) *CompanyRegistrationHandler {
 	t.Helper()
-	service, err := application.NewCompanyRegistrationService(repository, companyHandlerChecker{})
+	service, err := application.NewCompanyRegistrationService(repository, companyHandlerChecker{}, false)
 	if err != nil {
 		t.Fatal(err)
 	}

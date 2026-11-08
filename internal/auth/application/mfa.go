@@ -25,9 +25,10 @@ const (
 )
 
 type MFAService struct {
-	repository ports.MFARepository
-	key        [32]byte
-	now        func() time.Time
+	companyEmail *companyEmailMFA
+	repository   ports.MFARepository
+	key          [32]byte
+	now          func() time.Time
 }
 
 func NewMFAService(repository ports.MFARepository, encryptionKey [32]byte) (*MFAService, error) {

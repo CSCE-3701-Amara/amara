@@ -36,26 +36,30 @@ func sessionAuth(validator ports.SessionValidator, requiredType domain.AccountTy
 func sessionAuthWithErrors(validator ports.SessionValidator, requiredType domain.AccountType,
 	writeError func(*gin.Context, int, string, string)) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		fail := func(status int, code, message string) {
+			c.Abort()
+			writeError(c, status, code, message)
+		}
 		if validator == nil {
-			writeError(c, http.StatusUnauthorized, "authentication_required", "Authentication is required.")
+			fail(http.StatusUnauthorized, "authentication_required", "Authentication is required.")
 			return
 		}
 		cookie, err := c.Request.Cookie(sessionCookieName)
 		if err != nil || cookie.Value == "" {
-			writeError(c, http.StatusUnauthorized, "authentication_required", "Authentication is required.")
+			fail(http.StatusUnauthorized, "authentication_required", "Authentication is required.")
 			return
 		}
 		identity, err := validator.ValidateSession(c.Request.Context(), cookie.Value)
 		if err != nil {
 			if errors.Is(err, domain.ErrInvalidSession) {
-				writeError(c, http.StatusUnauthorized, "authentication_required", "Authentication is required.")
+				fail(http.StatusUnauthorized, "authentication_required", "Authentication is required.")
 				return
 			}
-			writeError(c, http.StatusInternalServerError, "authentication_unavailable", "Authentication is temporarily unavailable.")
+			fail(http.StatusInternalServerError, "authentication_unavailable", "Authentication is temporarily unavailable.")
 			return
 		}
 		if requiredType != "" && identity.AccountType != requiredType {
-			writeError(c, http.StatusForbidden, "forbidden", "This account cannot access the requested resource.")
+			fail(http.StatusForbidden, "forbidden", "This account cannot access the requested resource.")
 			return
 		}
 		c.Set(identityContextKey, identity)

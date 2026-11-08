@@ -16,6 +16,7 @@ x-backend-env: &backend-env
   LOG_LEVEL: ${LOG_LEVEL:-info}
   HTTP_ADDR: ":8080"
   DATABASE_URL: ${DATABASE_URL:?database credentials are required, run under infisical run --path=/backend or set DATABASE_URL}
+  AUTH_AUTO_APPROVE_COMPANIES: ${AUTH_AUTO_APPROVE_COMPANIES:-false}
   AUTH_MFA_ENCRYPTION_KEY: ${AUTH_MFA_ENCRYPTION_KEY:?MFA encryption key is required, set a 32-byte secret}
   SMTP_HOST: ${SMTP_HOST:?SMTP host is required}
   SMTP_PORT: ${SMTP_PORT:?SMTP port is required}

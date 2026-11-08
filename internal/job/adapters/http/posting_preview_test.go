@@ -18,7 +18,7 @@ import (
 type previewSession struct{}
 
 func (previewSession) ValidateSession(_ context.Context, token string) (authports.Identity, error) {
-	return authports.Identity{AccountID: token, AccountType: authdomain.AccountTypeCompany}, nil
+	return authports.Identity{AccountID: "00000000-0000-0000-0000-000000000099", CompanyID: token, AccountType: authdomain.AccountTypeCompany}, nil
 }
 
 type previewRepository struct {

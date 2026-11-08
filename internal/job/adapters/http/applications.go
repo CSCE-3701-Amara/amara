@@ -20,7 +20,6 @@ func NewApplicationHandler(service *application.ApplicationAdmission, candidateA
 func (h *ApplicationHandler) RegisterRoutes(group *gin.RouterGroup) {
 	route := group.Group("/jobs")
 	if h == nil || h.candidateAuth == nil {
-		// AUTH candidate session middleware is not implemented/wired; fail closed with 401 until it supplies the principal.
 		route.POST("/:id/apply", func(c *gin.Context) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": gin.H{"code": "authentication_required", "message": "Candidate authentication is required."}})
 		})
@@ -38,8 +37,7 @@ func (h *ApplicationHandler) apply(c *gin.Context) {
 	if !ok {
 		return
 	}
-	accountType, _ := c.Get(AuthenticatedAccountTypeKey)
-	if accountType != "candidate" {
+	if authenticatedAccountType(c) != "candidate" {
 		c.JSON(http.StatusForbidden, gin.H{"error": gin.H{"code": "forbidden", "message": "Only a candidate may apply to a posting."}})
 		return
 	}

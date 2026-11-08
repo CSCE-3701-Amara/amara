@@ -5,18 +5,17 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
+	authhttp "github.com/CSCE-3701-Amara/amara/internal/auth/adapters/http"
 	"github.com/CSCE-3701-Amara/amara/internal/job/application"
 	"github.com/CSCE-3701-Amara/amara/internal/job/domain"
 )
 
 const (
-	// These Gin context keys are the contract AUTH middleware must populate after
-	// validating a session. Identity is never accepted from a request body/header.
+	// Legacy principal keys for callers that inject their own session middleware.
 	AuthenticatedAccountIDKey   = "authenticated_account_id"
 	AuthenticatedAccountTypeKey = "authenticated_account_type"
 	AccountTypeCompany          = "company"
@@ -24,7 +23,7 @@ const (
 )
 
 // PostingHandler exposes manager-only posting management and manager/admin deletion.
-// The injected middleware must authenticate a session and set the principal keys above.
+// The injected middleware must authenticate a session before running a handler.
 type PostingHandler struct {
 	service *application.PostingManagement
 	auth    gin.HandlerFunc
@@ -90,8 +89,6 @@ func (r postingRequest) posting() domain.Posting {
 func (h *PostingHandler) RegisterRoutes(group *gin.RouterGroup) {
 	route := group.Group("/jobs")
 	if h == nil || h.auth == nil {
-		// AUTH has no session middleware in the current checkout. Keep all management
-		// routes fail-closed until AUTH supplies its authenticated principal middleware.
 		unauthorized := func(c *gin.Context) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": gin.H{"code": "authentication_required", "message": "Company manager authentication is required."}})
 		}
@@ -219,7 +216,7 @@ func (h *PostingHandler) archive(c *gin.Context) {
 }
 
 func (h *PostingHandler) delete(c *gin.Context) {
-	id, ok := authenticatedAccount(c)
+	_, ok := authenticatedAccount(c)
 	if !ok {
 		return
 	}
@@ -227,8 +224,7 @@ func (h *PostingHandler) delete(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"code": "invalid_posting_id", "message": "id must be a UUID."}})
 		return
 	}
-	typeName, _ := c.Get(AuthenticatedAccountTypeKey)
-	accountType, _ := typeName.(string)
+	accountType := authenticatedAccountType(c)
 	systemAdmin := accountType == AccountTypeSystemAdmin
 	if !systemAdmin && accountType != AccountTypeCompany {
 		c.JSON(http.StatusForbidden, gin.H{"error": gin.H{"code": "forbidden", "message": "Only a company manager or system admin may delete a posting."}})
@@ -236,7 +232,10 @@ func (h *PostingHandler) delete(c *gin.Context) {
 	}
 	companyID := ""
 	if !systemAdmin {
-		companyID = id
+		companyID, ok = companyManager(c)
+		if !ok {
+			return
+		}
 	}
 	if err := h.service.Delete(c.Request.Context(), companyID, c.Param("id"), systemAdmin); err != nil {
 		writePostingError(c, err)
@@ -261,13 +260,25 @@ func decodePostingRequest(c *gin.Context) (postingRequest, bool) {
 }
 
 func authenticatedAccount(c *gin.Context) (string, bool) {
-	value, exists := c.Get(AuthenticatedAccountIDKey)
-	accountID, ok := value.(string)
-	if !exists || !ok || strings.TrimSpace(accountID) == "" || !validUUID(accountID) {
+	value, _ := c.Get(AuthenticatedAccountIDKey)
+	accountID, _ := value.(string)
+	if identity, ok := authhttp.Identity(c); ok {
+		accountID = identity.AccountID
+	}
+	if !validUUID(accountID) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": gin.H{"code": "authentication_required", "message": "A valid authenticated account is required."}})
 		return "", false
 	}
 	return accountID, true
+}
+
+func authenticatedAccountType(c *gin.Context) string {
+	if identity, ok := authhttp.Identity(c); ok {
+		return string(identity.AccountType)
+	}
+	value, _ := c.Get(AuthenticatedAccountTypeKey)
+	accountType, _ := value.(string)
+	return accountType
 }
 
 func companyManager(c *gin.Context) (string, bool) {
@@ -275,10 +286,16 @@ func companyManager(c *gin.Context) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	typeName, _ := c.Get(AuthenticatedAccountTypeKey)
-	if accountType, _ := typeName.(string); accountType != AccountTypeCompany {
+	if authenticatedAccountType(c) != AccountTypeCompany {
 		c.JSON(http.StatusForbidden, gin.H{"error": gin.H{"code": "forbidden", "message": "Only a company manager may manage postings."}})
 		return "", false
+	}
+	if identity, ok := authhttp.Identity(c); ok {
+		if !validUUID(identity.CompanyID) {
+			c.JSON(http.StatusForbidden, gin.H{"error": gin.H{"code": "forbidden", "message": "A company membership is required."}})
+			return "", false
+		}
+		return identity.CompanyID, true
 	}
 	return accountID, true
 }
