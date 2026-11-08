@@ -1,3064 +1,2731 @@
 {
-  "checkedAt": "2026-11-07",
-  "browserCommand": "PLAYWRIGHT_SERVER=production PLAYWRIGHT_PORT=3202 npm run test:e2e -- --workers=2 --reporter=json",
-  "browserServer": "Playwright-managed production server using the actual checkout build",
-  "browserStats": {
-    "startTime": "2026-11-07T19:43:29.488Z",
-    "duration": 98511.954,
-    "expected": 380,
+  "checkedAt": "2026-11-08",
+  "server": "Next.js production; Playwright-managed",
+  "apiResponses": "mocked",
+  "stats": {
+    "startTime": "2026-11-08T12:45:32.301Z",
+    "duration": 124034.54699999999,
+    "expected": 388,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
   },
-  "browserApiEvidence": "Mocked HTTP responses; no live authenticated writes verified",
-  "checks": {
-    "lint": "npm run lint passed",
-    "typecheck": "web/node_modules/.bin/tsc --project web/tsconfig.json --noEmit passed after fresh standard build",
-    "build": "npm run build passed (Next.js 16.4.3 / Turbopack)",
-    "goTests": "go test ./... passed",
-    "contractGeneration": "python3 web/scripts/contract-types.py succeeded",
-    "diffWhitespace": "git diff --check passed"
-  },
   "tests": [
     {
-      "file": "accessibility.spec.ts",
       "title": "field errors are described and focused; password can be revealed",
+      "file": "accessibility.spec.ts",
+      "line": 13,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2549
     },
     {
-      "file": "accessibility.spec.ts",
       "title": "pending registration keeps the workspace consistent",
+      "file": "accessibility.spec.ts",
+      "line": 34,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2398
     },
     {
-      "file": "accessibility.spec.ts",
       "title": "MFA and recovery restore keyboard focus",
+      "file": "accessibility.spec.ts",
+      "line": 64,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 948
     },
     {
-      "file": "accessibility.spec.ts",
       "title": "failed sign-in can be retried with Enter",
-      "status": "expected",
-      "runs": [
-        "passed"
-      ]
-    },
-    {
       "file": "accessibility.spec.ts",
+      "line": 75,
+      "status": "expected",
+      "durationMs": 1476
+    },
+    {
       "title": "mobile actions have sufficient targets and respect reduced motion",
+      "file": "accessibility.spec.ts",
+      "line": 100,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1830
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "auth selection, logo alignment, and overflow at 320px",
+      "file": "auth-polish.spec.ts",
+      "line": 23,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1094
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "auth selection, logo alignment, and overflow at 375px",
+      "file": "auth-polish.spec.ts",
+      "line": 23,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 758
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "auth selection, logo alignment, and overflow at 768px",
+      "file": "auth-polish.spec.ts",
+      "line": 23,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 747
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "auth selection, logo alignment, and overflow at 1024px",
+      "file": "auth-polish.spec.ts",
+      "line": 23,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 764
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "auth selection, logo alignment, and overflow at 1280px",
+      "file": "auth-polish.spec.ts",
+      "line": 23,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 769
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "auth selection, logo alignment, and overflow at 1728px",
+      "file": "auth-polish.spec.ts",
+      "line": 23,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1069
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "switching accounts moves the active indicator and preserves entered credentials",
+      "file": "auth-polish.spec.ts",
+      "line": 95,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 735
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "workspace-specific registration fields reset when switching accounts",
+      "file": "auth-polish.spec.ts",
+      "line": 126,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 556
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "motion is subtle when enabled and stops for reduced motion",
+      "file": "auth-polish.spec.ts",
+      "line": 141,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 320
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "welcome navigation and actions fit at 320px without WebGPU",
+      "file": "auth-polish.spec.ts",
+      "line": 169,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 481
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "welcome navigation and actions fit at 768px without WebGPU",
+      "file": "auth-polish.spec.ts",
+      "line": 169,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 517
     },
     {
-      "file": "auth-polish.spec.ts",
       "title": "welcome navigation and actions fit at 1024px without WebGPU",
-      "status": "expected",
-      "runs": [
-        "passed"
-      ]
-    },
-    {
       "file": "auth-polish.spec.ts",
+      "line": 169,
+      "status": "expected",
+      "durationMs": 198
+    },
+    {
       "title": "welcome navigation and actions fit at 1280px without WebGPU",
+      "file": "auth-polish.spec.ts",
+      "line": 169,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 191
     },
     {
-      "file": "auth.spec.ts",
       "title": "native validation prevents empty or invalid sign-in requests",
+      "file": "auth.spec.ts",
+      "line": 17,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 271
     },
     {
-      "file": "auth.spec.ts",
       "title": "successful candidate login follows the server role",
+      "file": "auth.spec.ts",
+      "line": 37,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 384
     },
     {
-      "file": "auth.spec.ts",
       "title": "successful company_representative login follows the server role",
+      "file": "auth.spec.ts",
+      "line": 37,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 573
     },
     {
-      "file": "auth.spec.ts",
       "title": "MFA retains credentials in memory, retries a rejected code, and then navigates",
+      "file": "auth.spec.ts",
+      "line": 58,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 733
     },
     {
-      "file": "auth.spec.ts",
       "title": "renders the invalid_credentials frame from the server response",
+      "file": "auth.spec.ts",
+      "line": 102,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 591
     },
     {
-      "file": "auth.spec.ts",
       "title": "renders the login_rate_limited frame from the server response",
+      "file": "auth.spec.ts",
+      "line": 102,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 625
     },
     {
-      "file": "auth.spec.ts",
       "title": "candidate registration only shows pending after server success",
+      "file": "auth.spec.ts",
+      "line": 124,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 507
     },
     {
-      "file": "auth.spec.ts",
       "title": "company registration only shows pending after server success",
-      "status": "expected",
-      "runs": [
-        "passed"
-      ]
-    },
-    {
       "file": "auth.spec.ts",
+      "line": 124,
+      "status": "expected",
+      "durationMs": 567
+    },
+    {
+      "title": "candidate registration verifies by emailed code, preserves input on failure, and opens sign-in",
+      "file": "auth.spec.ts",
+      "line": 187,
+      "status": "expected",
+      "durationMs": 816
+    },
+    {
+      "title": "direct verification state accepts a candidate email and rejects malformed codes locally",
+      "file": "auth.spec.ts",
+      "line": 254,
+      "status": "expected",
+      "durationMs": 720
+    },
+    {
       "title": "account selector and registration navigation preserve the workspace",
+      "file": "auth.spec.ts",
+      "line": 269,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 782
     },
     {
-      "file": "connected-screens.spec.ts",
       "title": "direct assessment confirmation keeps the submitted destination",
+      "file": "connected-screens.spec.ts",
+      "line": 4,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 574
     },
     {
-      "file": "connected-screens.spec.ts",
       "title": "direct account confirmation keeps the signed-out destination",
+      "file": "connected-screens.spec.ts",
+      "line": 46,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 526
     },
     {
-      "file": "connected-screens.spec.ts",
       "title": "company profile patches only edited fields and preserves values after failure",
+      "file": "connected-screens.spec.ts",
+      "line": 61,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 496
     },
     {
-      "file": "connected-screens.spec.ts",
       "title": "candidate profile updates do not send unloaded identity or empty URLs",
+      "file": "connected-screens.spec.ts",
+      "line": 111,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 384
     },
     {
-      "file": "connected-screens.spec.ts",
       "title": "assessment saves answers before submitting and locks the returned receipt",
+      "file": "connected-screens.spec.ts",
+      "line": 138,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 815
     },
     {
-      "file": "connected-screens.spec.ts",
       "title": "assessment save failures preserve the draft and expose session recovery",
+      "file": "connected-screens.spec.ts",
+      "line": 191,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 305
     },
     {
-      "file": "connected-screens.spec.ts",
       "title": "assessment start follows the returned attempt identity",
-      "status": "expected",
-      "runs": [
-        "passed"
-      ]
-    },
-    {
       "file": "connected-screens.spec.ts",
+      "line": 220,
+      "status": "expected",
+      "durationMs": 347
+    },
+    {
       "title": "manual stage decisions include the observed status and retain conflicts",
+      "file": "connected-screens.spec.ts",
+      "line": 239,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 456
     },
     {
-      "file": "integration.spec.ts",
       "title": "sign-in cookie reaches the candidate feed and logout handles an empty 204",
+      "file": "integration.spec.ts",
+      "line": 36,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 521
     },
     {
-      "file": "integration.spec.ts",
       "title": "feed filters use handler query names and cursor pagination preserves filters",
+      "file": "integration.spec.ts",
+      "line": 89,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 448
     },
     {
-      "file": "integration.spec.ts",
       "title": "apply displays backend rejection and only reports submission after success",
+      "file": "integration.spec.ts",
+      "line": 124,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1317
     },
     {
-      "file": "integration.spec.ts",
       "title": "application history reads the camelCase data envelope and private details",
+      "file": "integration.spec.ts",
+      "line": 171,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1084
     },
     {
-      "file": "integration.spec.ts",
       "title": "posting writes use backend field names and lifecycle deletion accepts 204",
+      "file": "integration.spec.ts",
+      "line": 211,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 478
     },
     {
-      "file": "integration.spec.ts",
       "title": "failed company requests stay recoverable and do not pretend the session expired",
+      "file": "integration.spec.ts",
+      "line": 259,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 277
     },
     {
-      "file": "integration.spec.ts",
       "title": "assessment forms use bare array responses and publish/copy existing modules",
+      "file": "integration.spec.ts",
+      "line": 288,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 699
     },
     {
-      "file": "integration.spec.ts",
       "title": "pipeline saves an ordered stage array with version id and RFC3339 times",
+      "file": "integration.spec.ts",
+      "line": 349,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 638
     },
     {
-      "file": "integration.spec.ts",
       "title": "connected workspaces fit at 375px",
+      "file": "integration.spec.ts",
+      "line": 404,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 770
     },
     {
-      "file": "integration.spec.ts",
       "title": "connected workspaces fit at 1280px",
-      "status": "expected",
-      "runs": [
-        "passed"
-      ]
-    },
-    {
       "file": "integration.spec.ts",
+      "line": 404,
+      "status": "expected",
+      "durationMs": 783
+    },
+    {
       "title": "non-JSON proxy errors stay readable and can be retried",
+      "file": "integration.spec.ts",
+      "line": 430,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 260
     },
     {
-      "file": "product-coverage.spec.ts",
+      "title": "candidate profile reads back saved details after reload",
+      "file": "pipeline-design.spec.ts",
+      "line": 8,
+      "status": "expected",
+      "durationMs": 476
+    },
+    {
+      "title": "threshold preview is required, echoed on apply, and refreshed after saving",
+      "file": "pipeline-design.spec.ts",
+      "line": 42,
+      "status": "expected",
+      "durationMs": 391
+    },
+    {
+      "title": "changing stages cancels pending threshold previews",
+      "file": "pipeline-design.spec.ts",
+      "line": 98,
+      "status": "expected",
+      "durationMs": 306
+    },
+    {
+      "title": "interview outcome uses the registered operation and retains selection after rejection",
+      "file": "pipeline-design.spec.ts",
+      "line": 146,
+      "status": "expected",
+      "durationMs": 484
+    },
+    {
+      "title": "local graph undo restores a removed node with all its connections",
+      "file": "pipeline-design.spec.ts",
+      "line": 182,
+      "status": "expected",
+      "durationMs": 485
+    },
+    {
+      "title": "module editing preserves backend behavioral and test-pass settings",
+      "file": "pipeline-design.spec.ts",
+      "line": 200,
+      "status": "expected",
+      "durationMs": 282
+    },
+    {
       "title": "212:329 Review before withdrawing at 1728px",
+      "file": "product-coverage.spec.ts",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 789
     },
     {
+      "title": "99:513 Profile \u00b7 Overview at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "99:513 Profile · Overview at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 442
     },
     {
+      "title": "89:298 Applications \u00b7 Empty at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "89:298 Applications · Empty at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 383
     },
     {
+      "title": "89:371 Applications \u00b7 Error at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "89:371 Applications · Error at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 343
     },
     {
+      "title": "34:7 Applications \u00b7 Overview at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "34:7 Applications · Overview at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 358
     },
     {
+      "title": "38:22 Profile \u00b7 Edit at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "38:22 Profile · Edit at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 498
     },
     {
+      "title": "212:71 Offers \u00b7 Review at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "212:71 Offers · Review at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 380
     },
     {
+      "title": "125:52481 Candidate \u2014 Submitted & pending at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:52481 Candidate — Submitted & pending at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 367
     },
     {
+      "title": "125:52370 Candidate \u2014 Video response at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:52370 Candidate — Video response at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 407
     },
     {
+      "title": "125:52134 Candidate \u2014 Coding assessment active at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:52134 Candidate — Coding assessment active at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 410
     },
     {
+      "title": "125:51985 Candidate \u2014 Stage progress at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51985 Candidate — Stage progress at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 546
     },
     {
+      "title": "224:137 Application \u00b7 Withdrawn at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "224:137 Application · Withdrawn at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 376
     },
     {
+      "title": "363:495 Feed \u00b7 Job discovery at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "363:495 Feed · Job discovery at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 424
     },
     {
+      "title": "375:958 Application \u00b7 Submitted details at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "375:958 Application · Submitted details at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 631
     },
     {
+      "title": "375:1077 Interview \u00b7 Schedule at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "375:1077 Interview · Schedule at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 430
     },
     {
+      "title": "375:1232 Offer \u00b7 Details at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "375:1232 Offer · Details at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 364
     },
     {
+      "title": "376:555 Dialog \u00b7 Confirm interview time? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:555 Dialog · Confirm interview time? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 619
     },
     {
+      "title": "376:564 Dialog \u00b7 Reschedule interview? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:564 Dialog · Reschedule interview? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 651
     },
     {
+      "title": "376:573 Dialog \u00b7 Accept this offer? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:573 Dialog · Accept this offer? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 579
     },
     {
+      "title": "376:582 Dialog \u00b7 Decline this offer? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:582 Dialog · Decline this offer? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 524
     },
     {
+      "title": "376:591 Dialog \u00b7 Deactivate your account? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:591 Dialog · Deactivate your account? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 674
     },
     {
+      "title": "376:600 Dialog \u00b7 Delete your account? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:600 Dialog · Delete your account? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 693
     },
     {
+      "title": "377:553 Dialog \u00b7 Submit assessment? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "377:553 Dialog · Submit assessment? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 689
     },
     {
+      "title": "378:571 Dialog \u00b7 Withdraw this application? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "378:571 Dialog · Withdraw this application? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 590
     },
     {
+      "title": "383:553 Assessment \u00b7 Question formats at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "383:553 Assessment · Question formats at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 561
     },
     {
+      "title": "383:675 Assessment \u00b7 Result disclosed at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "383:675 Assessment · Result disclosed at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 373
     },
     {
+      "title": "383:1196 Assessment \u00b7 Availability and resume at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "383:1196 Assessment · Availability and resume at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 339
     },
     {
+      "title": "384:641 Feed \u00b7 Posting details at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "384:641 Feed · Posting details at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 356
     },
     {
+      "title": "109:14385 22 \u00b7 Postings feed unavailable at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14385 22 · Postings feed unavailable at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 369
     },
     {
+      "title": "109:14301 21 \u00b7 Publication blocked at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14301 21 · Publication blocked at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 581
     },
     {
+      "title": "109:14178 23 \u00b7 Job posting save conflict at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14178 23 · Job posting save conflict at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 497
     },
     {
+      "title": "109:14106 09 \u00b7 Publication success at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14106 09 · Publication success at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 506
     },
     {
+      "title": "109:13810 03 \u00b7 Posting validation at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13810 03 · Posting validation at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 527
     },
     {
+      "title": "109:13624 04 \u00b7 Posting details at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13624 04 · Posting details at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 418
     },
     {
+      "title": "109:13334 02 \u00b7 Create and edit posting at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13334 02 · Create and edit posting at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 430
     },
     {
+      "title": "109:13232 01 \u00b7 Unified job postings feed at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13232 01 · Unified job postings feed at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 365
     },
     {
+      "title": "220:14 20 \u00b7 Edit company profile at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "220:14 20 · Edit company profile at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 409
     },
     {
+      "title": "225:87 08 \u00b7 Review publication at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "225:87 08 · Review publication at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 397
     },
     {
+      "title": "264:393 10 \u00b7 Applications for a job at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:393 10 · Applications for a job at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 404
     },
     {
+      "title": "264:449 11 \u00b7 Finalists at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:449 11 · Finalists at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 649
     },
     {
+      "title": "264:500 17 \u00b7 Create finalist offer at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:500 17 · Create finalist offer at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 480
     },
     {
+      "title": "264:550 19 \u00b7 Manage offer at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:550 19 · Manage offer at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 459
     },
     {
+      "title": "264:593 15 \u00b7 Edit interviewer profile at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:593 15 · Edit interviewer profile at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 432
     },
     {
+      "title": "376:1131 Dialog \u00b7 Publish this job? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1131 Dialog · Publish this job? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 664
     },
     {
+      "title": "376:1140 Dialog \u00b7 Archive this job? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1140 Dialog · Archive this job? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 723
     },
     {
+      "title": "376:1149 Dialog \u00b7 Republish this job? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1149 Dialog · Republish this job? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 755
     },
     {
+      "title": "376:1158 Dialog \u00b7 Delete this job? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1158 Dialog · Delete this job? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 671
     },
     {
+      "title": "376:1167 Dialog \u00b7 Publish this module? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1167 Dialog · Publish this module? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 791
     },
     {
+      "title": "376:1176 Dialog \u00b7 Delete this module? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1176 Dialog · Delete this module? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 723
     },
     {
+      "title": "376:1185 Dialog \u00b7 Release feedback to candidate? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1185 Dialog · Release feedback to candidate? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 635
     },
     {
+      "title": "376:1194 Dialog \u00b7 Confirm stage decision? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1194 Dialog · Confirm stage decision? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 633
     },
     {
+      "title": "376:1203 Dialog \u00b7 Override the current decision? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1203 Dialog · Override the current decision? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 884
     },
     {
+      "title": "376:1212 Dialog \u00b7 Create offer beyond open positions? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1212 Dialog · Create offer beyond open positions? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 705
     },
     {
+      "title": "376:1221 Dialog \u00b7 Withdraw this offer? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1221 Dialog · Withdraw this offer? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 671
     },
     {
+      "title": "376:1230 Dialog \u00b7 Extend offer deadline? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1230 Dialog · Extend offer deadline? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 663
     },
     {
+      "title": "377:1082 Dialog \u00b7 Pass this candidate? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1082 Dialog · Pass this candidate? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 635
     },
     {
+      "title": "377:1091 Dialog \u00b7 Reject this candidate? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1091 Dialog · Reject this candidate? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 564
     },
     {
+      "title": "393:670 05 \u00b7 Module question editor at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "393:670 05 · Module question editor at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 477
     },
     {
+      "title": "393:753 06 \u00b7 Coding problem library at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "393:753 06 · Coding problem library at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 404
     },
     {
+      "title": "393:834 07 \u00b7 Copy module to company at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "393:834 07 · Copy module to company at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 488
     },
     {
+      "title": "393:913 13 \u00b7 Compare applications \u00b7 4 candidates at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "393:913 13 · Compare applications · 4 candidates at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 661
     },
     {
+      "title": "393:1014 14 \u00b7 Interviewer management at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "393:1014 14 · Interviewer management at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 342
     },
     {
+      "title": "393:1095 16 \u00b7 Feedback authoring at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "393:1095 16 · Feedback authoring at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 436
     },
     {
+      "title": "393:1176 18 \u00b7 Offer capacity confirmation at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "393:1176 18 · Offer capacity confirmation at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 516
     },
     {
+      "title": "394:1622 12 \u00b7 Finalist ranking at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "394:1622 12 · Finalist ranking at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 446
     },
     {
+      "title": "125:51829 04 \u00b7 Assessment instances & extensions at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51829 04 · Assessment instances & extensions at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 466
     },
     {
+      "title": "125:51707 19 \u00b7 Candidate decision conflict at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51707 19 · Candidate decision conflict at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 680
     },
     {
+      "title": "125:51586 20 \u00b7 Candidate decision override at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51586 20 · Candidate decision override at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 472
     },
     {
+      "title": "125:51421 10 \u00b7 Candidate stage decisions at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51421 10 · Candidate stage decisions at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 347
     },
     {
+      "title": "125:51272 14 \u00b7 Interview scorecard & private notes at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51272 14 · Interview scorecard & private notes at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 714
     },
     {
+      "title": "125:51106 13 \u00b7 Interview scheduling & outcomes at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51106 13 · Interview scheduling & outcomes at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 379
     },
     {
+      "title": "125:50952 08 \u00b7 Published pipeline version at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50952 08 · Published pipeline version at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2003
     },
     {
+      "title": "125:50812 07 \u00b7 Pipeline migration review at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50812 07 · Pipeline migration review at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2086
     },
     {
+      "title": "125:50676 18 \u00b7 Pipeline migration blocked at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50676 18 · Pipeline migration blocked at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2105
     },
     {
+      "title": "125:50505 06 \u00b7 Pipeline graph validation errors at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50505 06 · Pipeline graph validation errors at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2009
     },
     {
+      "title": "125:50340 03 \u00b7 Pipeline video module setup at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50340 03 · Pipeline video module setup at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 553
     },
     {
+      "title": "118:5096 05 \u00b7 Pipeline designer at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "118:5096 05 · Pipeline designer at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1983
     },
     {
+      "title": "264:770 09 \u00b7 Pipeline dashboard at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:770 09 · Pipeline dashboard at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 406
     },
     {
+      "title": "264:829 11 \u00b7 Compare applications at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:829 11 · Compare applications at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 612
     },
     {
+      "title": "264:883 01 \u00b7 Assessment module library at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:883 01 · Assessment module library at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 464
     },
     {
+      "title": "264:934 02 \u00b7 Question module setup at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:934 02 · Question module setup at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 469
     },
     {
+      "title": "264:1003 16 \u00b7 Assigned grading at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1003 16 · Assigned grading at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 451
     },
     {
+      "title": "264:1057 12 \u00b7 Interview availability at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1057 12 · Interview availability at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 473
     },
     {
+      "title": "264:1103 17 \u00b7 Review rejection feedback at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1103 17 · Review rejection feedback at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 450
     },
     {
+      "title": "264:1145 15 \u00b7 Application scorecard at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1145 15 · Application scorecard at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 610
     },
     {
+      "title": "376:1995 Dialog \u00b7 Publish pipeline version? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1995 Dialog · Publish pipeline version? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2210
     },
     {
+      "title": "376:2004 Dialog \u00b7 Confirm pipeline migration? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2004 Dialog · Confirm pipeline migration? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2232
     },
     {
+      "title": "376:2013 Dialog \u00b7 Discard pipeline draft? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2013 Dialog · Discard pipeline draft? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2135
     },
     {
+      "title": "377:1856 Dialog \u00b7 Submit interview scorecard? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1856 Dialog · Submit interview scorecard? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 625
     },
     {
+      "title": "377:1865 Dialog \u00b7 Submit grading results? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1865 Dialog · Submit grading results? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 619
     },
     {
-      "file": "product-coverage.spec.ts",
       "title": "264:636 Company registration review at 1728px",
+      "file": "product-coverage.spec.ts",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 438
     },
     {
-      "file": "product-coverage.spec.ts",
       "title": "264:686 Manage accounts at 1728px",
+      "file": "product-coverage.spec.ts",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 479
     },
     {
+      "title": "376:2109 Dialog \u00b7 Approve company registration? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2109 Dialog · Approve company registration? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 586
     },
     {
+      "title": "376:2121 Dialog \u00b7 Reject company registration? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2121 Dialog · Reject company registration? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 595
     },
     {
+      "title": "376:2133 Dialog \u00b7 Ban this account? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2133 Dialog · Ban this account? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 627
     },
     {
+      "title": "376:2145 Dialog \u00b7 Unban this account? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2145 Dialog · Unban this account? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 675
     },
     {
+      "title": "376:2157 Dialog \u00b7 Deactivate this account? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2157 Dialog · Deactivate this account? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 660
     },
     {
+      "title": "376:2169 Dialog \u00b7 Reactivate this account? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2169 Dialog · Reactivate this account? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 671
     },
     {
+      "title": "376:2181 Dialog \u00b7 Delete this account? at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2181 Dialog · Delete this account? at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 685
     },
     {
+      "title": "446:983 25 \u00b7 Offers overview at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "446:983 25 · Offers overview at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 418
     },
     {
+      "title": "446:1085 26 \u00b7 Job postings \u00b7 Empty at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "446:1085 26 · Job postings · Empty at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 425
     },
     {
+      "title": "471:805 28 \u00b7 Company profile at 1728px",
       "file": "product-coverage.spec.ts",
-      "title": "471:805 28 · Company profile at 1728px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 377
     },
     {
-      "file": "product-coverage.spec.ts",
       "title": "212:329 Review before withdrawing at 1024px",
+      "file": "product-coverage.spec.ts",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 537
     },
     {
+      "title": "99:513 Profile \u00b7 Overview at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "99:513 Profile · Overview at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 383
     },
     {
+      "title": "89:298 Applications \u00b7 Empty at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "89:298 Applications · Empty at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 357
     },
     {
+      "title": "89:371 Applications \u00b7 Error at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "89:371 Applications · Error at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 319
     },
     {
+      "title": "34:7 Applications \u00b7 Overview at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "34:7 Applications · Overview at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 413
     },
     {
+      "title": "38:22 Profile \u00b7 Edit at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "38:22 Profile · Edit at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 469
     },
     {
+      "title": "212:71 Offers \u00b7 Review at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "212:71 Offers · Review at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 339
     },
     {
+      "title": "125:52481 Candidate \u2014 Submitted & pending at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:52481 Candidate — Submitted & pending at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 354
     },
     {
+      "title": "125:52370 Candidate \u2014 Video response at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:52370 Candidate — Video response at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 349
     },
     {
+      "title": "125:52134 Candidate \u2014 Coding assessment active at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:52134 Candidate — Coding assessment active at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 428
     },
     {
+      "title": "125:51985 Candidate \u2014 Stage progress at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51985 Candidate — Stage progress at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 552
     },
     {
+      "title": "224:137 Application \u00b7 Withdrawn at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "224:137 Application · Withdrawn at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 354
     },
     {
+      "title": "363:495 Feed \u00b7 Job discovery at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "363:495 Feed · Job discovery at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 420
     },
     {
+      "title": "375:958 Application \u00b7 Submitted details at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "375:958 Application · Submitted details at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 454
     },
     {
+      "title": "375:1077 Interview \u00b7 Schedule at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "375:1077 Interview · Schedule at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 464
     },
     {
+      "title": "375:1232 Offer \u00b7 Details at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "375:1232 Offer · Details at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 408
     },
     {
+      "title": "376:555 Dialog \u00b7 Confirm interview time? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:555 Dialog · Confirm interview time? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 818
     },
     {
+      "title": "376:564 Dialog \u00b7 Reschedule interview? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:564 Dialog · Reschedule interview? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 590
     },
     {
+      "title": "376:573 Dialog \u00b7 Accept this offer? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:573 Dialog · Accept this offer? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 513
     },
     {
+      "title": "376:582 Dialog \u00b7 Decline this offer? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:582 Dialog · Decline this offer? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 524
     },
     {
+      "title": "376:591 Dialog \u00b7 Deactivate your account? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:591 Dialog · Deactivate your account? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 663
     },
     {
+      "title": "376:600 Dialog \u00b7 Delete your account? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:600 Dialog · Delete your account? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 626
     },
     {
+      "title": "377:553 Dialog \u00b7 Submit assessment? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "377:553 Dialog · Submit assessment? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 611
     },
     {
+      "title": "378:571 Dialog \u00b7 Withdraw this application? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "378:571 Dialog · Withdraw this application? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 545
     },
     {
+      "title": "383:553 Assessment \u00b7 Question formats at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "383:553 Assessment · Question formats at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 429
     },
     {
+      "title": "383:675 Assessment \u00b7 Result disclosed at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "383:675 Assessment · Result disclosed at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 382
     },
     {
+      "title": "383:1196 Assessment \u00b7 Availability and resume at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "383:1196 Assessment · Availability and resume at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 455
     },
     {
+      "title": "384:641 Feed \u00b7 Posting details at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "384:641 Feed · Posting details at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 398
     },
     {
+      "title": "109:14385 22 \u00b7 Postings feed unavailable at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14385 22 · Postings feed unavailable at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 335
     },
     {
+      "title": "109:14301 21 \u00b7 Publication blocked at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14301 21 · Publication blocked at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 474
     },
     {
+      "title": "109:14178 23 \u00b7 Job posting save conflict at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14178 23 · Job posting save conflict at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 427
     },
     {
+      "title": "109:14106 09 \u00b7 Publication success at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14106 09 · Publication success at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 433
     },
     {
+      "title": "109:13810 03 \u00b7 Posting validation at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13810 03 · Posting validation at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 418
     },
     {
+      "title": "109:13624 04 \u00b7 Posting details at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13624 04 · Posting details at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 445
     },
     {
+      "title": "109:13334 02 \u00b7 Create and edit posting at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13334 02 · Create and edit posting at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 439
     },
     {
+      "title": "109:13232 01 \u00b7 Unified job postings feed at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13232 01 · Unified job postings feed at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 409
     },
     {
+      "title": "220:14 20 \u00b7 Edit company profile at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "220:14 20 · Edit company profile at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 417
     },
     {
+      "title": "225:87 08 \u00b7 Review publication at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "225:87 08 · Review publication at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 386
     },
     {
+      "title": "264:393 10 \u00b7 Applications for a job at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:393 10 · Applications for a job at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 365
     },
     {
+      "title": "264:449 11 \u00b7 Finalists at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:449 11 · Finalists at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 659
     },
     {
+      "title": "264:500 17 \u00b7 Create finalist offer at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:500 17 · Create finalist offer at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 473
     },
     {
+      "title": "264:550 19 \u00b7 Manage offer at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:550 19 · Manage offer at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 421
     },
     {
+      "title": "264:593 15 \u00b7 Edit interviewer profile at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:593 15 · Edit interviewer profile at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 377
     },
     {
+      "title": "376:1131 Dialog \u00b7 Publish this job? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1131 Dialog · Publish this job? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 643
     },
     {
+      "title": "376:1140 Dialog \u00b7 Archive this job? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1140 Dialog · Archive this job? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 848
     },
     {
+      "title": "376:1149 Dialog \u00b7 Republish this job? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1149 Dialog · Republish this job? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 526
     },
     {
+      "title": "376:1158 Dialog \u00b7 Delete this job? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1158 Dialog · Delete this job? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 537
     },
     {
+      "title": "376:1167 Dialog \u00b7 Publish this module? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1167 Dialog · Publish this module? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 913
     },
     {
+      "title": "376:1176 Dialog \u00b7 Delete this module? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1176 Dialog · Delete this module? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 643
     },
     {
+      "title": "376:1185 Dialog \u00b7 Release feedback to candidate? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1185 Dialog · Release feedback to candidate? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 540
     },
     {
+      "title": "376:1194 Dialog \u00b7 Confirm stage decision? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1194 Dialog · Confirm stage decision? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 539
     },
     {
+      "title": "376:1203 Dialog \u00b7 Override the current decision? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1203 Dialog · Override the current decision? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 745
     },
     {
+      "title": "376:1212 Dialog \u00b7 Create offer beyond open positions? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1212 Dialog · Create offer beyond open positions? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 606
     },
     {
+      "title": "376:1221 Dialog \u00b7 Withdraw this offer? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1221 Dialog · Withdraw this offer? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 838
     },
     {
+      "title": "376:1230 Dialog \u00b7 Extend offer deadline? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1230 Dialog · Extend offer deadline? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 577
     },
     {
+      "title": "377:1082 Dialog \u00b7 Pass this candidate? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1082 Dialog · Pass this candidate? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 515
     },
     {
+      "title": "377:1091 Dialog \u00b7 Reject this candidate? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1091 Dialog · Reject this candidate? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 484
     },
     {
+      "title": "393:670 05 \u00b7 Module question editor at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "393:670 05 · Module question editor at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 681
     },
     {
+      "title": "393:753 06 \u00b7 Coding problem library at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "393:753 06 · Coding problem library at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 347
     },
     {
+      "title": "393:834 07 \u00b7 Copy module to company at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "393:834 07 · Copy module to company at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 387
     },
     {
+      "title": "393:913 13 \u00b7 Compare applications \u00b7 4 candidates at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "393:913 13 · Compare applications · 4 candidates at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 368
     },
     {
+      "title": "393:1014 14 \u00b7 Interviewer management at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "393:1014 14 · Interviewer management at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 372
     },
     {
+      "title": "393:1095 16 \u00b7 Feedback authoring at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "393:1095 16 · Feedback authoring at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 355
     },
     {
+      "title": "393:1176 18 \u00b7 Offer capacity confirmation at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "393:1176 18 · Offer capacity confirmation at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 429
     },
     {
+      "title": "394:1622 12 \u00b7 Finalist ranking at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "394:1622 12 · Finalist ranking at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 368
     },
     {
+      "title": "125:51829 04 \u00b7 Assessment instances & extensions at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51829 04 · Assessment instances & extensions at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 386
     },
     {
+      "title": "125:51707 19 \u00b7 Candidate decision conflict at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51707 19 · Candidate decision conflict at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 366
     },
     {
+      "title": "125:51586 20 \u00b7 Candidate decision override at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51586 20 · Candidate decision override at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 390
     },
     {
+      "title": "125:51421 10 \u00b7 Candidate stage decisions at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51421 10 · Candidate stage decisions at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 418
     },
     {
+      "title": "125:51272 14 \u00b7 Interview scorecard & private notes at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51272 14 · Interview scorecard & private notes at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 415
     },
     {
+      "title": "125:51106 13 \u00b7 Interview scheduling & outcomes at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51106 13 · Interview scheduling & outcomes at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 381
     },
     {
+      "title": "125:50952 08 \u00b7 Published pipeline version at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50952 08 · Published pipeline version at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1910
     },
     {
+      "title": "125:50812 07 \u00b7 Pipeline migration review at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50812 07 · Pipeline migration review at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1910
     },
     {
+      "title": "125:50676 18 \u00b7 Pipeline migration blocked at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50676 18 · Pipeline migration blocked at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1945
     },
     {
+      "title": "125:50505 06 \u00b7 Pipeline graph validation errors at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50505 06 · Pipeline graph validation errors at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1922
     },
     {
+      "title": "125:50340 03 \u00b7 Pipeline video module setup at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50340 03 · Pipeline video module setup at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 474
     },
     {
+      "title": "118:5096 05 \u00b7 Pipeline designer at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "118:5096 05 · Pipeline designer at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1967
     },
     {
+      "title": "264:770 09 \u00b7 Pipeline dashboard at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:770 09 · Pipeline dashboard at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 377
     },
     {
+      "title": "264:829 11 \u00b7 Compare applications at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:829 11 · Compare applications at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 370
     },
     {
+      "title": "264:883 01 \u00b7 Assessment module library at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:883 01 · Assessment module library at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 378
     },
     {
+      "title": "264:934 02 \u00b7 Question module setup at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:934 02 · Question module setup at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 405
     },
     {
+      "title": "264:1003 16 \u00b7 Assigned grading at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1003 16 · Assigned grading at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 455
     },
     {
+      "title": "264:1057 12 \u00b7 Interview availability at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1057 12 · Interview availability at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 425
     },
     {
+      "title": "264:1103 17 \u00b7 Review rejection feedback at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1103 17 · Review rejection feedback at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 493
     },
     {
+      "title": "264:1145 15 \u00b7 Application scorecard at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1145 15 · Application scorecard at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 436
     },
     {
+      "title": "376:1995 Dialog \u00b7 Publish pipeline version? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1995 Dialog · Publish pipeline version? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2588
     },
     {
+      "title": "376:2004 Dialog \u00b7 Confirm pipeline migration? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2004 Dialog · Confirm pipeline migration? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2634
     },
     {
+      "title": "376:2013 Dialog \u00b7 Discard pipeline draft? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2013 Dialog · Discard pipeline draft? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2351
     },
     {
+      "title": "377:1856 Dialog \u00b7 Submit interview scorecard? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1856 Dialog · Submit interview scorecard? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 671
     },
     {
+      "title": "377:1865 Dialog \u00b7 Submit grading results? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1865 Dialog · Submit grading results? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 547
     },
     {
-      "file": "product-coverage.spec.ts",
       "title": "264:636 Company registration review at 1024px",
+      "file": "product-coverage.spec.ts",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 419
     },
     {
-      "file": "product-coverage.spec.ts",
       "title": "264:686 Manage accounts at 1024px",
+      "file": "product-coverage.spec.ts",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 473
     },
     {
+      "title": "376:2109 Dialog \u00b7 Approve company registration? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2109 Dialog · Approve company registration? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 477
     },
     {
+      "title": "376:2121 Dialog \u00b7 Reject company registration? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2121 Dialog · Reject company registration? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 538
     },
     {
+      "title": "376:2133 Dialog \u00b7 Ban this account? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2133 Dialog · Ban this account? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 532
     },
     {
+      "title": "376:2145 Dialog \u00b7 Unban this account? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2145 Dialog · Unban this account? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 540
     },
     {
+      "title": "376:2157 Dialog \u00b7 Deactivate this account? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2157 Dialog · Deactivate this account? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 627
     },
     {
+      "title": "376:2169 Dialog \u00b7 Reactivate this account? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2169 Dialog · Reactivate this account? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 612
     },
     {
+      "title": "376:2181 Dialog \u00b7 Delete this account? at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2181 Dialog · Delete this account? at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 670
     },
     {
+      "title": "446:983 25 \u00b7 Offers overview at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "446:983 25 · Offers overview at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 374
     },
     {
+      "title": "446:1085 26 \u00b7 Job postings \u00b7 Empty at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "446:1085 26 · Job postings · Empty at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 371
     },
     {
+      "title": "471:805 28 \u00b7 Company profile at 1024px",
       "file": "product-coverage.spec.ts",
-      "title": "471:805 28 · Company profile at 1024px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 368
     },
     {
-      "file": "product-coverage.spec.ts",
       "title": "212:329 Review before withdrawing at 375px",
+      "file": "product-coverage.spec.ts",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 401
     },
     {
+      "title": "99:513 Profile \u00b7 Overview at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "99:513 Profile · Overview at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 324
     },
     {
+      "title": "89:298 Applications \u00b7 Empty at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "89:298 Applications · Empty at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 315
     },
     {
+      "title": "89:371 Applications \u00b7 Error at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "89:371 Applications · Error at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 298
     },
     {
+      "title": "34:7 Applications \u00b7 Overview at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "34:7 Applications · Overview at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 282
     },
     {
+      "title": "38:22 Profile \u00b7 Edit at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "38:22 Profile · Edit at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 347
     },
     {
+      "title": "212:71 Offers \u00b7 Review at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "212:71 Offers · Review at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 262
     },
     {
+      "title": "125:52481 Candidate \u2014 Submitted & pending at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:52481 Candidate — Submitted & pending at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 304
     },
     {
+      "title": "125:52370 Candidate \u2014 Video response at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:52370 Candidate — Video response at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 353
     },
     {
+      "title": "125:52134 Candidate \u2014 Coding assessment active at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:52134 Candidate — Coding assessment active at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 375
     },
     {
+      "title": "125:51985 Candidate \u2014 Stage progress at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51985 Candidate — Stage progress at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 461
     },
     {
+      "title": "224:137 Application \u00b7 Withdrawn at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "224:137 Application · Withdrawn at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 310
     },
     {
+      "title": "363:495 Feed \u00b7 Job discovery at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "363:495 Feed · Job discovery at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 326
     },
     {
+      "title": "375:958 Application \u00b7 Submitted details at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "375:958 Application · Submitted details at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 315
     },
     {
+      "title": "375:1077 Interview \u00b7 Schedule at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "375:1077 Interview · Schedule at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 340
     },
     {
+      "title": "375:1232 Offer \u00b7 Details at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "375:1232 Offer · Details at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 307
     },
     {
+      "title": "376:555 Dialog \u00b7 Confirm interview time? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:555 Dialog · Confirm interview time? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 523
     },
     {
+      "title": "376:564 Dialog \u00b7 Reschedule interview? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:564 Dialog · Reschedule interview? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 519
     },
     {
+      "title": "376:573 Dialog \u00b7 Accept this offer? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:573 Dialog · Accept this offer? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 511
     },
     {
+      "title": "376:582 Dialog \u00b7 Decline this offer? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:582 Dialog · Decline this offer? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 484
     },
     {
+      "title": "376:591 Dialog \u00b7 Deactivate your account? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:591 Dialog · Deactivate your account? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 616
     },
     {
+      "title": "376:600 Dialog \u00b7 Delete your account? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:600 Dialog · Delete your account? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 593
     },
     {
+      "title": "377:553 Dialog \u00b7 Submit assessment? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "377:553 Dialog · Submit assessment? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 505
     },
     {
+      "title": "378:571 Dialog \u00b7 Withdraw this application? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "378:571 Dialog · Withdraw this application? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 518
     },
     {
+      "title": "383:553 Assessment \u00b7 Question formats at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "383:553 Assessment · Question formats at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 443
     },
     {
+      "title": "383:675 Assessment \u00b7 Result disclosed at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "383:675 Assessment · Result disclosed at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 411
     },
     {
+      "title": "383:1196 Assessment \u00b7 Availability and resume at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "383:1196 Assessment · Availability and resume at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 336
     },
     {
+      "title": "384:641 Feed \u00b7 Posting details at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "384:641 Feed · Posting details at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 308
     },
     {
+      "title": "109:14385 22 \u00b7 Postings feed unavailable at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14385 22 · Postings feed unavailable at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 318
     },
     {
+      "title": "109:14301 21 \u00b7 Publication blocked at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14301 21 · Publication blocked at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 399
     },
     {
+      "title": "109:14178 23 \u00b7 Job posting save conflict at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14178 23 · Job posting save conflict at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 348
     },
     {
+      "title": "109:14106 09 \u00b7 Publication success at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "109:14106 09 · Publication success at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 349
     },
     {
+      "title": "109:13810 03 \u00b7 Posting validation at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13810 03 · Posting validation at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 354
     },
     {
+      "title": "109:13624 04 \u00b7 Posting details at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13624 04 · Posting details at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 289
     },
     {
+      "title": "109:13334 02 \u00b7 Create and edit posting at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13334 02 · Create and edit posting at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 373
     },
     {
+      "title": "109:13232 01 \u00b7 Unified job postings feed at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "109:13232 01 · Unified job postings feed at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 334
     },
     {
+      "title": "220:14 20 \u00b7 Edit company profile at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "220:14 20 · Edit company profile at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 372
     },
     {
+      "title": "225:87 08 \u00b7 Review publication at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "225:87 08 · Review publication at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 597
     },
     {
+      "title": "264:393 10 \u00b7 Applications for a job at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:393 10 · Applications for a job at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 323
     },
     {
+      "title": "264:449 11 \u00b7 Finalists at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:449 11 · Finalists at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 300
     },
     {
+      "title": "264:500 17 \u00b7 Create finalist offer at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:500 17 · Create finalist offer at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 363
     },
     {
+      "title": "264:550 19 \u00b7 Manage offer at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:550 19 · Manage offer at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 370
     },
     {
+      "title": "264:593 15 \u00b7 Edit interviewer profile at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:593 15 · Edit interviewer profile at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 308
     },
     {
+      "title": "376:1131 Dialog \u00b7 Publish this job? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1131 Dialog · Publish this job? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 486
     },
     {
+      "title": "376:1140 Dialog \u00b7 Archive this job? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1140 Dialog · Archive this job? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 527
     },
     {
+      "title": "376:1149 Dialog \u00b7 Republish this job? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1149 Dialog · Republish this job? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 562
     },
     {
+      "title": "376:1158 Dialog \u00b7 Delete this job? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1158 Dialog · Delete this job? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 804
     },
     {
+      "title": "376:1167 Dialog \u00b7 Publish this module? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1167 Dialog · Publish this module? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 508
     },
     {
+      "title": "376:1176 Dialog \u00b7 Delete this module? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1176 Dialog · Delete this module? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 491
     },
     {
+      "title": "376:1185 Dialog \u00b7 Release feedback to candidate? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1185 Dialog · Release feedback to candidate? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 444
     },
     {
+      "title": "376:1194 Dialog \u00b7 Confirm stage decision? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1194 Dialog · Confirm stage decision? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 455
     },
     {
+      "title": "376:1203 Dialog \u00b7 Override the current decision? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1203 Dialog · Override the current decision? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 459
     },
     {
+      "title": "376:1212 Dialog \u00b7 Create offer beyond open positions? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1212 Dialog · Create offer beyond open positions? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 432
     },
     {
+      "title": "376:1221 Dialog \u00b7 Withdraw this offer? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1221 Dialog · Withdraw this offer? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 481
     },
     {
+      "title": "376:1230 Dialog \u00b7 Extend offer deadline? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1230 Dialog · Extend offer deadline? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 534
     },
     {
+      "title": "377:1082 Dialog \u00b7 Pass this candidate? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1082 Dialog · Pass this candidate? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 475
     },
     {
+      "title": "377:1091 Dialog \u00b7 Reject this candidate? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1091 Dialog · Reject this candidate? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 481
     },
     {
+      "title": "393:670 05 \u00b7 Module question editor at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "393:670 05 · Module question editor at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 380
     },
     {
+      "title": "393:753 06 \u00b7 Coding problem library at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "393:753 06 · Coding problem library at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 384
     },
     {
+      "title": "393:834 07 \u00b7 Copy module to company at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "393:834 07 · Copy module to company at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 360
     },
     {
+      "title": "393:913 13 \u00b7 Compare applications \u00b7 4 candidates at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "393:913 13 · Compare applications · 4 candidates at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 296
     },
     {
+      "title": "393:1014 14 \u00b7 Interviewer management at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "393:1014 14 · Interviewer management at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 254
     },
     {
+      "title": "393:1095 16 \u00b7 Feedback authoring at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "393:1095 16 · Feedback authoring at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 303
     },
     {
+      "title": "393:1176 18 \u00b7 Offer capacity confirmation at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "393:1176 18 · Offer capacity confirmation at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 453
     },
     {
+      "title": "394:1622 12 \u00b7 Finalist ranking at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "394:1622 12 · Finalist ranking at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 319
     },
     {
+      "title": "125:51829 04 \u00b7 Assessment instances & extensions at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51829 04 · Assessment instances & extensions at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 304
     },
     {
+      "title": "125:51707 19 \u00b7 Candidate decision conflict at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51707 19 · Candidate decision conflict at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 332
     },
     {
+      "title": "125:51586 20 \u00b7 Candidate decision override at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51586 20 · Candidate decision override at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 317
     },
     {
+      "title": "125:51421 10 \u00b7 Candidate stage decisions at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51421 10 · Candidate stage decisions at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 334
     },
     {
+      "title": "125:51272 14 \u00b7 Interview scorecard & private notes at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51272 14 · Interview scorecard & private notes at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 305
     },
     {
+      "title": "125:51106 13 \u00b7 Interview scheduling & outcomes at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:51106 13 · Interview scheduling & outcomes at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 284
     },
     {
+      "title": "125:50952 08 \u00b7 Published pipeline version at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50952 08 · Published pipeline version at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2188
     },
     {
+      "title": "125:50812 07 \u00b7 Pipeline migration review at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50812 07 · Pipeline migration review at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2161
     },
     {
+      "title": "125:50676 18 \u00b7 Pipeline migration blocked at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50676 18 · Pipeline migration blocked at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2540
     },
     {
+      "title": "125:50505 06 \u00b7 Pipeline graph validation errors at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50505 06 · Pipeline graph validation errors at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2366
     },
     {
+      "title": "125:50340 03 \u00b7 Pipeline video module setup at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "125:50340 03 · Pipeline video module setup at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 298
     },
     {
+      "title": "118:5096 05 \u00b7 Pipeline designer at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "118:5096 05 · Pipeline designer at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 1915
     },
     {
+      "title": "264:770 09 \u00b7 Pipeline dashboard at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:770 09 · Pipeline dashboard at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 307
     },
     {
+      "title": "264:829 11 \u00b7 Compare applications at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:829 11 · Compare applications at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 256
     },
     {
+      "title": "264:883 01 \u00b7 Assessment module library at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:883 01 · Assessment module library at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 298
     },
     {
+      "title": "264:934 02 \u00b7 Question module setup at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:934 02 · Question module setup at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 380
     },
     {
+      "title": "264:1003 16 \u00b7 Assigned grading at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1003 16 · Assigned grading at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 349
     },
     {
+      "title": "264:1057 12 \u00b7 Interview availability at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1057 12 · Interview availability at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 317
     },
     {
+      "title": "264:1103 17 \u00b7 Review rejection feedback at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1103 17 · Review rejection feedback at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 284
     },
     {
+      "title": "264:1145 15 \u00b7 Application scorecard at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "264:1145 15 · Application scorecard at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 345
     },
     {
+      "title": "376:1995 Dialog \u00b7 Publish pipeline version? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:1995 Dialog · Publish pipeline version? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2439
     },
     {
+      "title": "376:2004 Dialog \u00b7 Confirm pipeline migration? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2004 Dialog · Confirm pipeline migration? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2483
     },
     {
+      "title": "376:2013 Dialog \u00b7 Discard pipeline draft? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2013 Dialog · Discard pipeline draft? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 2325
     },
     {
+      "title": "377:1856 Dialog \u00b7 Submit interview scorecard? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1856 Dialog · Submit interview scorecard? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 465
     },
     {
+      "title": "377:1865 Dialog \u00b7 Submit grading results? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "377:1865 Dialog · Submit grading results? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 505
     },
     {
-      "file": "product-coverage.spec.ts",
       "title": "264:636 Company registration review at 375px",
+      "file": "product-coverage.spec.ts",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 371
     },
     {
-      "file": "product-coverage.spec.ts",
       "title": "264:686 Manage accounts at 375px",
-      "status": "expected",
-      "runs": [
-        "passed"
-      ]
-    },
-    {
       "file": "product-coverage.spec.ts",
-      "title": "376:2109 Dialog · Approve company registration? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 443
     },
     {
+      "title": "376:2109 Dialog \u00b7 Approve company registration? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2121 Dialog · Reject company registration? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 453
     },
     {
+      "title": "376:2121 Dialog \u00b7 Reject company registration? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2133 Dialog · Ban this account? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 473
     },
     {
+      "title": "376:2133 Dialog \u00b7 Ban this account? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2145 Dialog · Unban this account? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 483
     },
     {
+      "title": "376:2145 Dialog \u00b7 Unban this account? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2157 Dialog · Deactivate this account? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 489
     },
     {
+      "title": "376:2157 Dialog \u00b7 Deactivate this account? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2169 Dialog · Reactivate this account? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 501
     },
     {
+      "title": "376:2169 Dialog \u00b7 Reactivate this account? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "376:2181 Dialog · Delete this account? at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 494
     },
     {
+      "title": "376:2181 Dialog \u00b7 Delete this account? at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "446:983 25 · Offers overview at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 436
     },
     {
+      "title": "446:983 25 \u00b7 Offers overview at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "446:1085 26 · Job postings · Empty at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 324
     },
     {
+      "title": "446:1085 26 \u00b7 Job postings \u00b7 Empty at 375px",
       "file": "product-coverage.spec.ts",
-      "title": "471:805 28 · Company profile at 375px",
+      "line": 7,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 304
     },
     {
-      "file": "product-interactions.spec.ts",
+      "title": "471:805 28 \u00b7 Company profile at 375px",
+      "file": "product-coverage.spec.ts",
+      "line": 7,
+      "status": "expected",
+      "durationMs": 334
+    },
+    {
       "title": "DAG joins remain explicit, cycles are rejected, and nodes support keyboard positioning at 1728px",
+      "file": "product-interactions.spec.ts",
+      "line": 8,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 622
     },
     {
-      "file": "product-interactions.spec.ts",
       "title": "DAG joins remain explicit, cycles are rejected, and nodes support keyboard positioning at 1024px",
+      "file": "product-interactions.spec.ts",
+      "line": 8,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 577
     },
     {
-      "file": "product-interactions.spec.ts",
       "title": "DAG joins remain explicit, cycles are rejected, and nodes support keyboard positioning at 375px",
+      "file": "product-interactions.spec.ts",
+      "line": 8,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 653
     },
     {
-      "file": "product-interactions.spec.ts",
       "title": "failed lifecycle confirmation stays open and returns focus on cancellation",
+      "file": "product-interactions.spec.ts",
+      "line": 40,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 513
     },
     {
-      "file": "product-interactions.spec.ts",
       "title": "desktop collapse does not hide the mobile navigation",
-      "status": "expected",
-      "runs": [
-        "passed"
-      ]
-    },
-    {
       "file": "product-interactions.spec.ts",
+      "line": 65,
+      "status": "expected",
+      "durationMs": 255
+    },
+    {
       "title": "editing a module sends only definition fields and preserves all questions",
+      "file": "product-interactions.spec.ts",
+      "line": 82,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 318
     },
     {
-      "file": "screens.spec.ts",
       "title": "login-candidate at 1728px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 646
     },
     {
-      "file": "screens.spec.ts",
       "title": "login-company at 1728px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 659
     },
     {
-      "file": "screens.spec.ts",
       "title": "register-candidate at 1728px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 699
     },
     {
-      "file": "screens.spec.ts",
       "title": "register-company at 1728px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 661
     },
     {
-      "file": "screens.spec.ts",
       "title": "mfa at 1728px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 576
     },
     {
-      "file": "screens.spec.ts",
       "title": "code-rejected at 1728px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 624
     },
     {
-      "file": "screens.spec.ts",
       "title": "credentials-rejected at 1728px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 525
     },
     {
-      "file": "screens.spec.ts",
       "title": "rate-limited at 1728px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 573
     },
     {
-      "file": "screens.spec.ts",
       "title": "expired at 1728px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 588
     },
     {
-      "file": "screens.spec.ts",
       "title": "verification-pending at 1728px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 571
     },
     {
-      "file": "screens.spec.ts",
       "title": "review-pending at 1728px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 554
     },
     {
-      "file": "screens.spec.ts",
       "title": "login-candidate at 375px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 417
     },
     {
-      "file": "screens.spec.ts",
       "title": "login-company at 375px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 434
     },
     {
-      "file": "screens.spec.ts",
       "title": "register-candidate at 375px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 448
     },
     {
-      "file": "screens.spec.ts",
       "title": "register-company at 375px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 450
     },
     {
-      "file": "screens.spec.ts",
       "title": "mfa at 375px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 381
     },
     {
-      "file": "screens.spec.ts",
       "title": "code-rejected at 375px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 352
     },
     {
-      "file": "screens.spec.ts",
       "title": "credentials-rejected at 375px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 340
     },
     {
-      "file": "screens.spec.ts",
       "title": "rate-limited at 375px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 371
     },
     {
-      "file": "screens.spec.ts",
       "title": "expired at 375px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 388
     },
     {
-      "file": "screens.spec.ts",
       "title": "verification-pending at 375px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 438
     },
     {
-      "file": "screens.spec.ts",
       "title": "review-pending at 375px: assets and overflow",
+      "file": "screens.spec.ts",
+      "line": 32,
       "status": "expected",
-      "runs": [
-        "passed"
-      ]
+      "durationMs": 389
     }
   ]
 }

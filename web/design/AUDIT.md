@@ -1,4 +1,29 @@
-# Accessibility and React review
+# Accessibility and React review — 2026-11-08
+
+Applied `web-design-guidelines`, then `vercel-react-best-practices`. The [upstream interface guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md) were fetched on 2026-11-08. Figma remains the visual source. `frontend-skill` was not installed; the available `frontend-design` skill supplied responsive/interactivity guidance.
+
+Fixed findings:
+
+```text
+src/features/cand/components/profile.tsx:186 - populated biography had unstable implicit label; explicit accessible name added.
+src/features/management/components/evaluations.tsx:699 - stage selector label included option content; explicit Stage accessible name added.
+src/features/invw/components/pipeline-studio.module.css:88 - shared flex button styling compressed node text into a row; node-specific block layout restores readable cards.
+src/features/invw/components/threshold-review.tsx:79 - canceled preview could leave pending state retained; request-identity cleanup now clears it.
+src/features/management/components/profile.tsx:139 - async profile defaults could replace edits; form mounts after read completes.
+src/features/invw/components/module-studio.tsx:294 - current behavioral/minimum-test settings could be dropped by PUT; preserved with authored questions.
+src/features/invw/components/modules.tsx:52 - existing module editor now preserves the same current backend fields.
+src/features/invw/components/pipeline-studio.tsx:191 - repeated edge/node scans during dragging replaced with a node map and memoized edge counts.
+```
+
+All new icon controls have accessible names and intrinsic-size decorative images. Toolbar targets remain at least 44px, even though the Figma toolbar is denser. Graphs retain local scrolling and Alt+arrow movement, with bounded undo/redo. Shared keyboard focus, mobile navigation, reduced-motion CSS, modal focus/dismissal and return behavior remain intact. No added animation, dependency or server credential enters the client.
+
+Threshold requests abort on stage changes, require exact preview review, prevent duplicate submits, preserve errors and refresh after success/conflict. Profile reads mount initial fields once; edits stay local until PATCH. No profile or answer data is placed in browser storage. Offers filters/pagination use URLs and semantic links. Primary actions use Figma green with dark text; gradient slots retain the approved orange-to-coral tokens.
+
+Final checks: lint and TypeScript pass; production build passes; all 388 browser checks pass. Backend-dependent paths remain unverified because the current API cannot start. No complete WCAG or pixel-parity certification is claimed for unread Figma states or unavailable backend flows.
+
+---
+
+# Earlier accessibility and React review
 
 Reviewed the changed frontend code using the requested `web-design-guidelines`, followed by `vercel-react-best-practices`. The current interface guidelines were fetched from [the upstream source](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md) on 2026-11-07. Figma controls visual decisions; the audit does not replace missing design references.
 
