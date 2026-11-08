@@ -1,4 +1,5 @@
 "use client";
+import { toError } from "@/shared/lib/errors";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ApiError, apiRequest, resourceId } from "@/shared/lib/api-client";
@@ -70,7 +71,7 @@ export function ThresholdReview({
       }
     } catch (cause) {
       if (controller.signal.aborted) return;
-      setError(cause as Error);
+      setError(toError(cause));
       if (cause instanceof ApiError && cause.status === 409) {
         setPreview(null);
         onSaved();

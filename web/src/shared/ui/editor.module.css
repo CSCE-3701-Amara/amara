@@ -5,7 +5,8 @@
 .largeTitle.largeTitle h1 {
   font-size: clamp(32px, 3.403vw, 58.8px);
 }
-.section h2 {
+/* These component rules must win over workspace typography regardless of chunk order. */
+.section.section h2 {
   margin: 0 0 28px;
   font-size: 28px;
 }
@@ -111,33 +112,6 @@
   font-weight: 700;
   font-size: 25px;
 }
-.list {
-  display: grid;
-  gap: 0;
-  margin: 24px 28px;
-}
-.row {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 18px 0;
-  flex-wrap: wrap;
-}
-.row > :first-child {
-  margin-right: auto;
-  flex: 1;
-  min-width: 180px;
-}
-.row h2,
-.row h3 {
-  margin: 0 0 8px;
-  font-size: 25px;
-}
-.row p {
-  margin: 0;
-  color: var(--workspace-muted);
-  font-size: 18px;
-}
 .panel {
   padding: 28px;
   border: 1px solid var(--workspace-border);
@@ -145,7 +119,7 @@
   background: white;
   margin: 20px 0;
 }
-.panel h2 {
+.panel.panel h2 {
   font-size: 28px;
   margin-top: 0;
 }
@@ -183,12 +157,6 @@
   .section {
     padding: 24px 0;
   }
-  .list {
-    margin: 16px 0;
-  }
-  .row {
-    gap: 12px;
-  }
   .panel {
     padding: 20px;
   }
@@ -215,7 +183,6 @@
   overflow-wrap: anywhere;
 }
 .panel,
-.row,
 .table td,
 .table th {
   overflow-wrap: anywhere;

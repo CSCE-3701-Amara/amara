@@ -149,12 +149,15 @@ export function ConfirmDialog({
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const reasonRef = useRef<HTMLTextAreaElement>(null);
   const busyRef = useRef(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [reasonInvalid, setReasonInvalid] = useState(false);
   const titleId = useId();
   const descriptionId = useId();
   const reasonId = useId();
+  const errorId = useId();
   useEffect(() => {
     const previous =
       document.activeElement instanceof HTMLElement
@@ -177,8 +180,11 @@ export function ConfirmDialog({
     ).trim();
     if (reason && !value) {
       setError("Enter a reason to continue.");
+      setReasonInvalid(true);
+      reasonRef.current?.focus();
       return;
     }
+    setReasonInvalid(false);
     busyRef.current = true;
     setBusy(true);
     setError("");
@@ -223,12 +229,20 @@ export function ConfirmDialog({
         {reason && (
           <label htmlFor={reasonId} className={styles.reason}>
             Decision reason
-            <textarea id={reasonId} name="reason" required maxLength={5000} />
+            <textarea
+              ref={reasonRef}
+              id={reasonId}
+              name="reason"
+              required
+              maxLength={5000}
+              aria-invalid={reasonInvalid || undefined}
+              aria-describedby={reasonInvalid ? errorId : undefined}
+            />
           </label>
         )}
         {unavailable && <UnavailableNotice>{unavailable}</UnavailableNotice>}
         {error && (
-          <p role="alert" className={styles.dialogError}>
+          <p id={errorId} role="alert" className={styles.dialogError}>
             {error}
           </p>
         )}

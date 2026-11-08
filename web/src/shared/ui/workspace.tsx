@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Suspense, useId, useRef, useState, type ReactNode } from "react";
 import { deleteCurrentSession } from "@/features/auth/api/auth.api";
 import { ApiError } from "@/shared/lib/api-client";
+import { toError } from "@/shared/lib/errors";
 import { Brand } from "./brand";
 import { RouteDialog } from "./route-dialog";
 import styles from "./workspace.module.css";
@@ -126,7 +127,7 @@ export function Workspace({
       if (cause instanceof ApiError && cause.status === 401) {
         router.replace("/login?state=expired");
         router.refresh();
-      } else setError(cause as Error);
+      } else setError(toError(cause));
     } finally {
       pending.current = false;
       setBusy(false);

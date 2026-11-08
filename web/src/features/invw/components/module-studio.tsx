@@ -1,4 +1,5 @@
 "use client";
+import { toError } from "@/shared/lib/errors";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
@@ -62,7 +63,7 @@ export function ModuleLibrary({
       const result = await copyModule(selected);
       router.push(`/employer/modules/${resourceId(result.id)}/questions`);
     } catch (cause) {
-      setError(cause as Error);
+      setError(toError(cause));
       throw cause;
     } finally {
       pending.current = false;
@@ -331,7 +332,7 @@ function DefinitionEditor({
         : await createModule(definition);
       onSaved(saved);
     } catch (cause) {
-      setError(cause as Error);
+      setError(toError(cause));
     } finally {
       pending.current = false;
       setBusy(false);

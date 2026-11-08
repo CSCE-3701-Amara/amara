@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { StageDecisions } from "@/features/management/components/evaluations";
+import { StageDecisions } from "@/features/management/components/stage-decisions";
 async function Content({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return <StageDecisions id={id} />;
