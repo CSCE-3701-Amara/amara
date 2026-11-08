@@ -1,0 +1,49 @@
+.list {
+  display: grid;
+  gap: 16px;
+}
+.card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid #e3d4c4;
+  border-radius: 15px;
+  background: #fff;
+}
+.card > div {
+  flex: 1;
+  min-width: 0;
+}
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+.card p {
+  font-size: 14px;
+  margin: 0;
+  color: #655d55;
+}
+.card > a {
+  flex: none;
+}
+.count {
+  font-size: 14px;
+  color: #655d55;
+  margin-top: 24px;
+}
+a.selected {
+  background: #111;
+  color: #fff;
+}
+@media (max-width: 760px) {
+  .card {
+    flex-wrap: wrap;
+    padding: 18px;
+    gap: 12px;
+  }
+  .card > div {
+    flex-basis: 100%;
+  }
+}

@@ -136,7 +136,7 @@ export function TeamProfile({
           </dl>
         </section>
       )}
-      {editing && (
+      {editing && !company.loading && !profile.loading && (
         <form
           className={e.panel}
           onSubmit={update.onSubmit}

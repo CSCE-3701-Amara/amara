@@ -49,6 +49,8 @@ function ModuleForm({
       ...(module
         ? {
             threshold: module.threshold,
+            behavioral: module.behavioral,
+            minimum_tests_passed: module.minimum_tests_passed,
             amarat: module.amarat,
             rubric: module.rubric,
             library: module.library,

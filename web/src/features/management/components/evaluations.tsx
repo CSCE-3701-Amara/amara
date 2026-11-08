@@ -5,6 +5,7 @@ import { useState } from "react";
 import { apiRequest, resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
 import type { RuntimePipelineDashboard } from "@/features/invw/types/runtime.types";
+import { ThresholdReview } from "@/features/invw/components/threshold-review";
 import type {
   GradingSubmissionPage,
   InterviewPage,
@@ -29,6 +30,9 @@ export function Interviews({ interviewer = false }: { interviewer?: boolean }) {
   const [dialog, setDialog] = useState<string | null>(null);
   const [selected, setSelected] = useState("");
   const [offset, setOffset] = useState(0);
+  const [outcome, setOutcome] = useState<
+    "held" | "candidate_absent" | "interviewer_absent"
+  >("held");
   const resource = useApiResource<InterviewPage>(
     `/v1/interviews?limit=20&offset=${offset}`,
   );
@@ -47,11 +51,11 @@ export function Interviews({ interviewer = false }: { interviewer?: boolean }) {
             : "Manage scheduling, meeting confirmations, and recorded outcomes."
         }
         compact
-        artwork={art}
+        className={e.titleBanner}
       />
       <UnavailableNotice>
-        Scheduling and outcome changes aren’t available yet. An interview link
-        is shown only when the server provides it to an authorized participant.
+        Interview discovery and scheduling are not available yet. An authorized
+        participant can record an outcome when an interview is available.
       </UnavailableNotice>
       <BusyState loading={resource.loading} />
       {resource.error?.status !== 404 && (
@@ -134,6 +138,20 @@ export function Interviews({ interviewer = false }: { interviewer?: boolean }) {
           Absence holds the stage and does not record a failing score. A meeting
           is joinable only after provider confirmation.
         </p>
+        <label className={e.field}>
+          Interview outcome
+          <select
+            value={outcome}
+            disabled={!active}
+            onChange={(event) =>
+              setOutcome(event.target.value as typeof outcome)
+            }
+          >
+            <option value="held">Held</option>
+            <option value="candidate_absent">Candidate absent</option>
+            <option value="interviewer_absent">Interviewer absent</option>
+          </select>
+        </label>
         <div className={e.actions}>
           <Link
             href={`/interviewer/availability${selected ? "?interview=" + resourceId(selected) : ""}`}
@@ -176,12 +194,31 @@ export function Interviews({ interviewer = false }: { interviewer?: boolean }) {
               ? "Waive missing scorecard?"
               : "Record interview outcome?"
           }
-          description="This action is recorded for the hiring team. A waiver cannot create a score when no scorecards were submitted."
+          description={
+            dialog === "waiver"
+              ? "A waiver cannot create a score when no scorecards were submitted."
+              : `Record this interview as ${outcome.replaceAll("_", " ")}. Absence holds the stage without recording a failing score.`
+          }
           confirmLabel={
             dialog === "waiver" ? "Record waiver" : "Record outcome"
           }
-          reason
-          unavailable="Interview outcomes and waivers are not available yet."
+          reason={dialog === "waiver"}
+          unavailable={
+            dialog === "waiver"
+              ? "Scorecard waivers are not available yet."
+              : !active
+                ? "Select an authorized interview first."
+                : undefined
+          }
+          onConfirm={async () => {
+            if (!active)
+              throw new Error("Select an authorized interview first.");
+            await apiRequest(
+              `/v1/interviews/${resourceId(active.id)}/outcome`,
+              { method: "POST", body: { outcome } },
+            );
+            resource.reload();
+          }}
           onClose={() => setDialog(null)}
         />
       )}
@@ -322,7 +359,7 @@ export function InterviewScorecard({ id }: { id: string }) {
         title="Interview scorecard"
         description="Assigned interviewer · Private hiring workspace"
         compact
-        artwork={art}
+        className={e.titleBanner}
       />
       <UnavailableNotice>
         Scorecard drafts, notes, and submission aren’t available yet. Private
@@ -427,7 +464,7 @@ export function InterviewAvailability() {
         title="Your available times"
         description="Interview availability"
         compact
-        artwork={art}
+        className={e.titleBanner}
       />
       <UnavailableNotice>
         Availability updates aren’t available yet. Entered times remain on this
@@ -520,7 +557,7 @@ export function AssessmentInstances() {
         title="Assessment instances & extensions"
         description="Individual candidate + stage"
         compact
-        artwork={art}
+        className={e.titleBanner}
       />
       <UnavailableNotice>
         Hiring-team assessment timing and extensions require backend support.
@@ -628,7 +665,7 @@ export function StageDecisions({ id }: { id: string }) {
         title="Candidates · Stage decisions"
         description="Decision queue · Hiring manager only"
         compact
-        artwork={art}
+        className={e.titleBanner}
       />
       <nav className={e.actions}>
         <Link href={`/employer/pipelines/${resourceId(id)}`}>Pipeline</Link>
@@ -637,7 +674,7 @@ export function StageDecisions({ id }: { id: string }) {
       </nav>
       <UnavailableNotice>
         Manual pass and reject decisions are available for active candidates.
-        Automatic thresholds, completion rules, and overrides remain distinct.
+        Threshold changes require a separate preview of candidate outcomes.
         Decision overrides are not supported yet.
       </UnavailableNotice>
       {params.get("state") === "conflict" && (
@@ -659,6 +696,7 @@ export function StageDecisions({ id }: { id: string }) {
         <label className={e.field}>
           Stage
           <select
+            aria-label="Stage"
             value={stageId}
             onChange={(event) => {
               setStage(event.target.value);
@@ -685,6 +723,14 @@ export function StageDecisions({ id }: { id: string }) {
       <BusyState loading={executions.loading} />
       {executions.error?.status !== 404 && (
         <ApiFeedback error={executions.error} retry={executions.reload} />
+      )}
+      {activeStage?.rule === "threshold" && activeStage.threshold !== null && (
+        <ThresholdReview
+          key={`${activeStage.id}-${activeStage.threshold}`}
+          stageId={activeStage.id}
+          current={activeStage.threshold}
+          onSaved={executions.reload}
+        />
       )}
       <div className={e.tableWrap}>
         <table className={e.table}>

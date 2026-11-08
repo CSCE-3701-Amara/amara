@@ -133,9 +133,7 @@ export function HiringApplications({
               : undefined
         }
         compact
-        artwork={
-          view === "applications" || view === "finalists" ? undefined : art
-        }
+
         className={
           view === "applications" || view === "finalists"
             ? e.titleBanner

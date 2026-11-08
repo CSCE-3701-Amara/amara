@@ -1,9 +1,9 @@
 import { Suspense } from "react";
-import { HiringOffer } from "@/features/management/components/hiring";
+import { OffersOverview } from "@/features/management/components/offers-overview";
 export default function Page() {
   return (
     <Suspense fallback={<p>Loading hiring workspace…</p>}>
-      <HiringOffer />
+      <OffersOverview />
     </Suspense>
   );
 }

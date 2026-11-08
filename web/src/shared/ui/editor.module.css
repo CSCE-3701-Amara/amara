@@ -2,6 +2,9 @@
   padding: 32px 24px;
   border-bottom: 1px solid var(--workspace-border);
 }
+.largeTitle.largeTitle h1 {
+  font-size: clamp(32px, 3.403vw, 58.8px);
+}
 .section h2 {
   margin: 0 0 28px;
   font-size: 28px;
@@ -69,8 +72,8 @@
 }
 .actions .primary,
 .primary {
-  background: #7c3f1e;
-  color: white;
+  background: var(--accent);
+  color: #111;
 }
 .actions [aria-pressed="true"] {
   background: #211813;
