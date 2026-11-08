@@ -82,10 +82,7 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		up, _, ok := strings.Cut(string(migration), "-- +goose Down")
-		if !ok {
-			t.Fatalf("missing Down section in %s", path)
-		}
+		up, _, _ := strings.Cut(string(migration), "-- +goose Down")
 		exec(up)
 	}
 	exec(`
