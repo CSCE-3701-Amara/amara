@@ -4,6 +4,12 @@ The Go backend is a modular monolith. Each directory is a business module with
 its own domain rules, application use cases, ports, adapters, and transport
 code.
 
+The API is composed in [`cmd/api/main.go`](../cmd/api/main.go). Module HTTP
+adapters register routes on the shared `/v1` router, while the Next.js client
+calls those routes through its same-origin proxy. Authentication middleware is
+owned by `auth`; protected handlers must consume its validated session identity
+instead of request-provided account or company IDs.
+
 - `auth`: accounts and access control
 - `cand`: candidate-facing experiences
 - `job`: postings and application admission
@@ -103,6 +109,18 @@ pool and the HIBP password checker. Candidate/interviewer registration returns
 configured; no account is created in that case. With a sender available,
 construct `auth/application.RegistrationService` and its HTTP handler and pass
 `handler.RegisterRoutes` in place of `RegisterUnavailableRegistrationRoutes`.
+
+Current product route groups include:
+
+- `auth`: registration, verification, sessions, account actions, and profile.
+- `cand`: candidate job feed, application tracking, and pipeline progress.
+- `job`: company posting management, previews, and candidate applications.
+- `invw`: pipelines, modules, assessments, and workflow projections.
+
+Keep the route group and owning module aligned with the API contract in
+[`docs/api/openapi.yaml`](../docs/api/openapi.yaml). Add handler tests for
+authentication, malformed input, ownership checks, and error mapping when a
+route is introduced.
 
 The adapter must apply AUTH's authentication and authorization middleware to
 protected routes. Schema migrations live in `supabase/migrations/` and are

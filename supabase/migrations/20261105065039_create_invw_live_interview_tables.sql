@@ -1,5 +1,3 @@
--- +goose Up
--- +goose StatementBegin
 CREATE TABLE interviews (
     id UUID PRIMARY KEY,
     stage_execution_id UUID NOT NULL UNIQUE REFERENCES stage_executions(id),
@@ -55,7 +53,3 @@ CREATE TABLE interview_feedback (
 
 COMMENT ON COLUMN interview_feedback.notes IS
     'Private hiring-team notes; never included in Candidate feedback.';
--- +goose StatementEnd
-
--- +goose Down
-DROP TABLE interview_feedback, interviewer_assignments, interviews;

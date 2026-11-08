@@ -1,5 +1,3 @@
--- +goose Up
--- +goose StatementBegin
 CREATE TABLE pipeline_executions (
     id UUID PRIMARY KEY,
     application_id UUID NOT NULL UNIQUE REFERENCES applications(id),
@@ -99,22 +97,3 @@ ALTER TABLE candidate_stage_progress
 
 CREATE INDEX pipeline_executions_version_idx ON pipeline_executions (pipeline_version_id);
 CREATE INDEX stage_executions_stage_status_idx ON stage_executions (stage_id, status);
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-ALTER TABLE candidate_stage_progress DROP COLUMN stage_execution_id;
-ALTER TABLE assessment_results
-    DROP CONSTRAINT assessment_results_points_check,
-    DROP CONSTRAINT assessment_results_score_check,
-    DROP COLUMN scored_at,
-    DROP COLUMN disclosed_at,
-    DROP COLUMN feedback_approved_at,
-    DROP COLUMN feedback_is_ai_generated,
-    DROP COLUMN max_points,
-    DROP COLUMN earned_points,
-    DROP COLUMN attempt_id;
-
-DROP TABLE assessment_submissions, assessment_attempts, stage_executions, pipeline_executions;
-ALTER TABLE assessment_instances DROP CONSTRAINT assessment_instances_application_stage_key;
--- +goose StatementEnd

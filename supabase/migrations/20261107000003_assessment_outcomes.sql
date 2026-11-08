@@ -1,4 +1,3 @@
--- +goose Up
 ALTER TABLE assessment_attempts
     ADD COLUMN saved_responses JSONB NOT NULL DEFAULT '{}'
         CHECK (jsonb_typeof(saved_responses) = 'object'),
@@ -11,11 +10,3 @@ ALTER TABLE assessment_attempts
         AND (evaluated_at IS NULL OR (status = 'scored' AND submitted_at IS NOT NULL))
         AND (final_score IS NULL OR evaluated_at IS NOT NULL)
     );
-
--- +goose Down
-ALTER TABLE assessment_attempts
-    DROP CONSTRAINT assessment_evidence_atomic,
-    DROP COLUMN evaluated_at,
-    DROP COLUMN final_score,
-    DROP COLUMN final_evidence,
-    DROP COLUMN saved_responses;

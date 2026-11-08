@@ -58,10 +58,8 @@ func TestApplicationTrackingPostgres(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		up, _, ok := strings.Cut(string(migration), "-- +goose Down")
-		if !ok {
-			t.Fatalf("migration %s has no Down section", path)
-		}
+		// Run forward-only Supabase migrations in full, excluding rollback SQL in Goose files.
+		up, _, _ := strings.Cut(string(migration), "-- +goose Down")
 		if _, err := pool.Exec(ctx, up); err != nil {
 			t.Fatalf("apply %s: %v", path, err)
 		}

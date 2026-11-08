@@ -2,6 +2,11 @@
 
 This directory contains the product requirements, software design, diagrams, and documentation conventions for AMARA, a SaaS hiring platform for Computer Science-related roles. Use this page to find the right document and understand how the SRS and SDD fit together.
 
+Implementation documentation is split from the requirements baseline:
+repository setup is documented in the root [README](../README.md), backend
+module boundaries in [internal/README.md](../internal/README.md), and frontend
+runtime behavior in [web/README.md](../web/README.md).
+
 ## Where to start
 
 | If you need to… | Read… |
@@ -54,3 +59,10 @@ The component pages link to both the corresponding `.puml` source and rendered f
 ## Conventions and open work
 
 [`conventions/`](conventions/) contains project rules for SRS requirements, diagrams, documentation, code, testing, and development. [`srs/TBD.md`](srs/TBD.md) records specifications, architecture choices, plans, and verification evidence that are not yet written or finalized. Update that list as items are assigned and resolved; do not treat a TBD as an approved design decision.
+
+## Documentation maintenance
+
+Keep links relative to the document that owns them. Update the relevant SRS,
+SDD, API, and implementation README together when a public workflow or route
+changes. Generated diagrams have editable sources under `sdd/src/`; update
+their rendered counterparts under `sdd/img/` in the same change.

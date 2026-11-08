@@ -51,6 +51,24 @@ them before verification. The pending verification URL opens the real candidate
 verification form; other URL states are presentation views and do not create a
 session or bypass the API.
 
+## Ownership and API surface
+
+This feature owns login, MFA, candidate/company registration, and the
+authentication shell. Shared session and profile behavior belongs in the
+backend `auth` module; this feature only renders responses and chooses the
+role-specific destination.
+
+The API helpers live in `api/` and use:
+
+- `POST /v1/auth/sessions` for login and MFA continuation.
+- `DELETE /v1/auth/sessions/current` for logout.
+- `POST /v1/auth/registrations` for candidate/interviewer registration.
+- `POST /v1/auth/company-registrations` for company registration.
+- `POST /v1/auth/verifications` for verification flows.
+
+Keep credentials in component memory only. New server errors should use the
+shared `ApiError` feedback path rather than a success-shaped fallback.
+
 Run `npm run lint`, `npx tsc --noEmit`, `npm run build`, and `npm run test:e2e`
 from `web/`. Install the browser once with `npx playwright install chromium`.
 Browser tests mock API responses to cover validation, role navigation, MFA,

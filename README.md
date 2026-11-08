@@ -4,6 +4,11 @@ Amara's backend is a Go modular monolith using Gin. Business modules live under
 `internal/`; shared HTTP, configuration, and logging code lives under
 `internal/platform/`. See [backend module boundaries](internal/README.md).
 
+The Next.js App Router client lives in [web/](web/README.md). Browser requests
+use same-origin `/v1` paths and are rewritten by Next.js to the Go API while
+preserving the session cookie. Product requirements and design documentation
+are indexed in [docs/](docs/README.md).
+
 ## Run the API
 
 Install Go 1.26.10 or newer, then run from the repository root:
@@ -16,7 +21,7 @@ make run
 The API defaults to `:8080`. Check liveness with:
 
 ```sh
-curl http://localhost:8080/healthz
+curl http://localhost:8080/health
 # {"status":"ok"}
 ```
 
@@ -215,3 +220,20 @@ make gosec
 make govulncheck
 semgrep scan --config p/default --error --strict --metrics=off .
 ```
+
+## Frontend commands
+
+Run these commands from `web/`:
+
+```sh
+npm ci
+API_URL=http://127.0.0.1:8080 npm run dev
+npm run lint
+npm run build
+npm run test:e2e
+```
+
+End-to-end tests start a temporary frontend on port 3100. Install the browser
+once with `npx playwright install chromium`; set `PLAYWRIGHT_PORT` when that
+port is unavailable. The tests mock API responses and do not replace backend
+integration tests.

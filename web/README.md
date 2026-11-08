@@ -14,7 +14,7 @@ npm run test:e2e
 
 The browser calls same-origin `/v1/...`; Next.js rewrites these requests to the Go API, forwarding cookies and `Set-Cookie`. `/health` and `/health/*` are proxied too. Preserve the backend's Secure, HttpOnly session cookie; use HTTPS outside localhost. Do not run a development server on port 3000 while Docker publishes that port.
 
-Browser tests run a temporary development server on **3100**, configurable with `PLAYWRIGHT_PORT`. Install Chromium once using `npx playwright install chromium`. Tests mock authenticated API responses; read-only backend probes are described in [INTEGRATION.md](./INTEGRATION.md).
+Browser tests run a temporary development server on **3100**, configurable with `PLAYWRIGHT_PORT`. Install Chromium once using `npx playwright install chromium`. Tests mock authenticated API responses; use the backend health endpoints in the root [README](../README.md) for read-only connectivity checks.
 
 ## Connected screens
 
@@ -25,22 +25,21 @@ Browser tests run a temporary development server on **3100**, configurable with 
 - `/employer/pipelines`: assessment drafts, editing, publication, and copying from the published library.
 - Workspace headers: logout through the backend's current-session endpoint.
 
-Current backend blockers and contract discrepancies are recorded in [INTEGRATION.md](./INTEGRATION.md). A connected request can still be rejected by the existing backend; the UI displays the error and supports retry. It never fakes registration, submission, or persistence.
+Backend blockers and contract discrepancies should be recorded alongside the
+owning API or feature documentation. A connected request can still be rejected
+by the existing backend; the UI displays the error and supports retry. It never
+fakes registration, submission, or persistence.
 
-## Figma coverage and production browser checks
+## Source layout
 
-The current full-file inventory and per-state implementation/API status are in
-[design/COVERAGE.md](design/COVERAGE.md). Regenerate the Markdown table after
-editing the audited inventory with `python3 scripts/figma-coverage.py`.
+- `src/app/`: App Router pages and role-specific layouts.
+- `src/features/<epic>/`: API functions, types, components, and feature
+  documentation for `auth`, `cand`, `job`, `invw`, and `ana`.
+- `src/shared/`: API client, reusable UI, error handling, and cross-feature
+  hooks.
+- `tests/browser/`: Playwright flows covering connected screens and important
+  error or confirmation states.
 
-To exercise the built frontend with Playwright owning the server process:
-
-```sh
-npm run build
-PLAYWRIGHT_SERVER=production PLAYWRIGHT_PORT=3202 npm run test:e2e
-```
-
-The default test command still starts the development server on port 3100.
-Product-state smoke checks cover 1728px, 1024px, and 375px, with separate DAG
-interaction checks at all three widths. Browser API successes use mocks;
-[INTEGRATION.md](INTEGRATION.md) records why live API verification is blocked.
+Feature APIs should call `src/shared/lib/api-client.ts`; it enforces relative
+`/v1` paths, sends credentials, and maps the backend's JSON error shape to
+`ApiError`. Do not put session tokens in browser storage or URL parameters.

@@ -82,10 +82,8 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		up, _, ok := strings.Cut(string(migration), "-- +goose Down")
-		if !ok {
-			t.Fatalf("missing Down section in %s", path)
-		}
+		// Run forward-only Supabase migrations in full, excluding rollback SQL in Goose files.
+		up, _, _ := strings.Cut(string(migration), "-- +goose Down")
 		exec(up)
 	}
 	exec(`

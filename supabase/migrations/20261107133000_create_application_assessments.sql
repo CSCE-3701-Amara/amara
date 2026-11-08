@@ -1,4 +1,3 @@
--- +goose Up
 CREATE TABLE application_assessments (
     id                      UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
     application_id          UUID        NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
@@ -14,7 +13,3 @@ CREATE TABLE application_assessments (
 
 CREATE INDEX application_assessments_application_created_idx
     ON application_assessments (application_id, created_at, id);
-
--- +goose Down
-DROP INDEX IF EXISTS application_assessments_application_created_idx;
-DROP TABLE IF EXISTS application_assessments;

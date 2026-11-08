@@ -1,4 +1,3 @@
--- +goose Up
 ALTER TABLE modules
     ADD COLUMN authoring_definition JSONB,
     ADD COLUMN copied_from_module_id UUID REFERENCES modules(id),
@@ -9,11 +8,3 @@ ALTER TABLE modules
 -- Module definitions contain private grading material. The backend uses
 -- the database owner connection and enforces company authorization itself.
 ALTER TABLE modules ENABLE ROW LEVEL SECURITY;
-
--- +goose Down
-ALTER TABLE modules DISABLE ROW LEVEL SECURITY;
-
-ALTER TABLE modules
-    DROP CONSTRAINT authored_module_owner_check,
-    DROP COLUMN copied_from_module_id,
-    DROP COLUMN authoring_definition;
