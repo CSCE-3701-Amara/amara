@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Request } from "@playwright/test";
 import { ids, productFixtures } from "./support/product-fixtures";
 
 test("collapsed stage editor defers duplicate reads and retains edits after reopening", async ({
@@ -6,10 +6,19 @@ test("collapsed stage editor defers duplicate reads and retains edits after reop
 }) => {
   await productFixtures(page);
   const reads: string[] = [];
+  const pendingReads = new Set<Request>();
   page.on("request", (request) => {
+    if (new URL(request.url()).pathname.startsWith("/v1/"))
+      pendingReads.add(request);
+  });
+  // Strict Mode replays effects in development and aborts the first fetch.
+  // Count completed reads so canceled probes do not look like duplicate data loads.
+  page.on("requestfinished", (request) => {
+    pendingReads.delete(request);
     const path = new URL(request.url()).pathname;
     if (path.startsWith("/v1/")) reads.push(path);
   });
+  page.on("requestfailed", (request) => pendingReads.delete(request));
   await page.goto(`/employer/pipelines/${ids.job}`);
   await expect(
     page.getByRole("button", { name: /^English check, 0 incoming/ }),
@@ -21,22 +30,36 @@ test("collapsed stage editor defers duplicate reads and retains edits after reop
       includeHidden: true,
     }),
   ).toHaveCount(0);
-  expect(reads.filter((path) => path.endsWith("/pipeline"))).toHaveLength(1);
-  expect(reads.filter((path) => path.endsWith("/stages"))).toHaveLength(1);
-  expect(reads.filter((path) => path === "/v1/modules")).toHaveLength(1);
+  const completedReads = () => ({
+    pipeline: reads.filter((path) => path.endsWith("/pipeline")).length,
+    stages: reads.filter((path) => path.endsWith("/stages")).length,
+    modules: reads.filter((path) => path === "/v1/modules").length,
+  });
+  await expect
+    .poll(completedReads)
+    .toEqual({ pipeline: 1, stages: 1, modules: 1 });
   const summary = page.getByText("Server-supported stage configuration", {
     exact: true,
   });
   await summary.click();
-  const stage = page
-    .getByRole("region", { name: "Hiring pipeline" })
-    .getByLabel("Stage name", { exact: true })
-    .first();
+  const editor = page.getByRole("region", { name: "Hiring pipeline" });
+  const stage = editor.getByLabel("Stage name", { exact: true }).first();
   await stage.fill("Retained local edit");
+  await expect(
+    editor
+      .getByRole("checkbox", { name: "Go fundamentals", exact: true })
+      .first(),
+  ).toBeVisible();
+  // Opening the lazy component can replay existing effects in development.
+  // Wait for its data before measuring whether a later reopen triggers reads.
+  await expect.poll(() => pendingReads.size).toBe(0);
   const before = reads.length;
   await summary.click();
+  await expect(stage).toBeHidden();
   await summary.click();
+  await expect(stage).toBeVisible();
   await expect(stage).toHaveValue("Retained local edit");
+  await expect.poll(() => pendingReads.size).toBe(0);
   expect(reads).toHaveLength(before);
 });
 
