@@ -128,6 +128,54 @@ func (q *Queries) FindApprovedCompanyBySecret(ctx context.Context, registrationS
 	return id, err
 }
 
+const findPendingVerification = `-- name: FindPendingVerification :one
+SELECT c.id::text AS id, c.email, c.account_status, c.created_at,
+       'candidate'::text AS account_type, c.email AS recipient, d.expires_at, c.password_hash, c.salt
+FROM candidates c
+LEFT JOIN auth_email_verification_deliveries d
+  ON d.account_id = c.id AND d.account_type = 'candidate'
+WHERE lower(c.email) = lower($1)
+  AND c.account_status = 'pending_verification'
+UNION ALL
+SELECT i.id::text AS id, i.email, i.account_status, i.created_at,
+       'interviewer'::text AS account_type, i.email AS recipient, d.expires_at, i.password_hash, i.salt
+FROM interviewers i
+LEFT JOIN auth_email_verification_deliveries d
+  ON d.account_id = i.id AND d.account_type = 'interviewer'
+WHERE lower(i.email) = lower($1)
+  AND i.account_status = 'pending_verification'
+LIMIT 1
+`
+
+type FindPendingVerificationRow struct {
+	ID            string
+	Email         string
+	AccountStatus string
+	CreatedAt     pgtype.Timestamp
+	AccountType   string
+	Recipient     string
+	ExpiresAt     pgtype.Timestamp
+	PasswordHash  []byte
+	Salt          []byte
+}
+
+func (q *Queries) FindPendingVerification(ctx context.Context, email string) (FindPendingVerificationRow, error) {
+	row := q.db.QueryRow(ctx, findPendingVerification, email)
+	var i FindPendingVerificationRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.AccountStatus,
+		&i.CreatedAt,
+		&i.AccountType,
+		&i.Recipient,
+		&i.ExpiresAt,
+		&i.PasswordHash,
+		&i.Salt,
+	)
+	return i, err
+}
+
 const saveEmailVerificationChallenge = `-- name: SaveEmailVerificationChallenge :exec
 
 WITH deleted AS (
@@ -141,13 +189,12 @@ challenge AS (
     VALUES ($1::uuid, $2, $3, $4)
 )
 INSERT INTO auth_email_verification_deliveries
-    (account_id, account_type, recipient, expires_at)
-VALUES ($1::uuid, $2, $5, $4)
-ON CONFLICT (account_id) DO UPDATE SET
-    account_type = EXCLUDED.account_type,
-    recipient = EXCLUDED.recipient,
-    expires_at = EXCLUDED.expires_at
-
+        (account_id, account_type, recipient, expires_at)
+    VALUES ($1::uuid, $2, $5, $4)
+    ON CONFLICT (account_id) DO UPDATE SET
+        account_type = EXCLUDED.account_type,
+        recipient = EXCLUDED.recipient,
+        expires_at = EXCLUDED.expires_at
 `
 
 type SaveEmailVerificationChallengeParams struct {
@@ -167,40 +214,4 @@ func (q *Queries) SaveEmailVerificationChallenge(ctx context.Context, arg SaveEm
 		arg.Recipient,
 	)
 	return err
-}
-
-const findPendingVerification = `-- name: FindPendingVerification :one
-SELECT c.id::text, c.email, c.account_status, c.created_at,
-       'candidate', c.email, d.expires_at
-FROM candidates c
-LEFT JOIN auth_email_verification_deliveries d
-  ON d.account_id = c.id AND d.account_type = 'candidate'
-WHERE lower(c.email) = lower($1)
-  AND c.account_status = 'pending_verification'
-UNION ALL
-SELECT i.id::text, i.email, i.account_status, i.created_at,
-       'interviewer', i.email, d.expires_at
-FROM interviewers i
-LEFT JOIN auth_email_verification_deliveries d
-  ON d.account_id = i.id AND d.account_type = 'interviewer'
-WHERE lower(i.email) = lower($1)
-  AND i.account_status = 'pending_verification'
-LIMIT 1
-`
-
-type FindPendingVerificationRow struct {
-	ID            string
-	Email         string
-	AccountStatus string
-	CreatedAt     pgtype.Timestamp
-	AccountType   string
-	Recipient     string
-	ExpiresAt     pgtype.Timestamp
-}
-
-func (q *Queries) FindPendingVerification(ctx context.Context, email string) (FindPendingVerificationRow, error) {
-	row := q.db.QueryRow(ctx, findPendingVerification, email)
-	var i FindPendingVerificationRow
-	err := row.Scan(&i.ID, &i.Email, &i.AccountStatus, &i.CreatedAt, &i.AccountType, &i.Recipient, &i.ExpiresAt)
-	return i, err
 }

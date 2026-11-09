@@ -122,6 +122,7 @@ SELECT id::text
 FROM candidates
 WHERE id = $1::uuid
   AND account_status = 'active'
+  AND COALESCE(banned, FALSE) = FALSE
   AND deleted_at IS NULL
   AND deactivated_at IS NULL
 FOR UPDATE
@@ -205,6 +206,7 @@ WHERE s.token = $1
   AND (
     (s.account_type = 'candidate'
      AND c.account_status = 'active'
+     AND COALESCE(c.banned, FALSE) = FALSE
      AND c.deleted_at IS NULL
      AND c.deactivated_at IS NULL)
     OR

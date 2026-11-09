@@ -147,6 +147,9 @@ func assertProblem(t *testing.T, recorder *httptest.ResponseRecorder, status int
 	if err := json.NewDecoder(recorder.Body).Decode(&problem); err != nil {
 		t.Fatal(err)
 	}
+	if code == "internal_error" && problem.Detail != "An internal server error occurred." {
+		t.Errorf("internal implementation details reached the client: %q", problem.Detail)
+	}
 	if problem.Code != code {
 		t.Fatalf("expected code %q, got %q", code, problem.Code)
 	}

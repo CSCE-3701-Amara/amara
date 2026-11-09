@@ -233,12 +233,47 @@ func (r *RegistrationRepository) FindApprovedCompanyBySecret(ctx context.Context
 	return companyID, nil
 }
 
+// beginRegistration serializes the email namespace shared by all account tables.
+// The preflight in the application is advisory; the check after this lock is
+// authoritative and uses a fresh READ COMMITTED snapshot after any lock wait.
+func (r *RegistrationRepository) beginRegistration(ctx context.Context, email string) (pgx.Tx, *sqlc.Queries, error) {
+	if r == nil || r.pool == nil {
+		return nil, nil, errors.New("registration database is not configured")
+	}
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	if _, err = tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtextextended(lower(btrim($1)), 0))`, email); err != nil {
+		_ = tx.Rollback(ctx)
+		return nil, nil, err
+	}
+	queries := r.queries.WithTx(tx)
+	exists, err := queries.EmailExists(ctx, strings.ToLower(strings.TrimSpace(email)))
+	if err != nil || exists {
+		_ = tx.Rollback(ctx)
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, nil, domain.ErrEmailAlreadyExists
+	}
+	return tx, queries, nil
+}
+
 func (r *RegistrationRepository) CreateCandidate(ctx context.Context, name, email string, passwordHash, salt []byte, createdAt time.Time) (domain.Account, error) {
-	row, err := r.queries.CreateCandidateAccount(ctx, sqlc.CreateCandidateAccountParams{
+	tx, queries, err := r.beginRegistration(ctx, email)
+	if err != nil {
+		return domain.Account{}, err
+	}
+	defer tx.Rollback(ctx)
+	row, err := queries.CreateCandidateAccount(ctx, sqlc.CreateCandidateAccountParams{
 		Name: name, Email: email, PasswordHash: passwordHash, Salt: salt, CreatedAt: pgtype.Timestamp{Time: createdAt, Valid: true},
 	})
 	if err != nil {
 		return domain.Account{}, mapCreateError(err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return domain.Account{}, fmt.Errorf("commit registration: %w", err)
 	}
 	return domain.Account{
 		ID: row.ID, Type: domain.AccountTypeCandidate, Email: row.Email,
@@ -251,11 +286,19 @@ func (r *RegistrationRepository) CreateInterviewer(ctx context.Context, name, em
 	if err != nil {
 		return domain.Account{}, fmt.Errorf("parse company id: %w", err)
 	}
-	row, err := r.queries.CreateInterviewerAccount(ctx, sqlc.CreateInterviewerAccountParams{
+	tx, queries, err := r.beginRegistration(ctx, email)
+	if err != nil {
+		return domain.Account{}, err
+	}
+	defer tx.Rollback(ctx)
+	row, err := queries.CreateInterviewerAccount(ctx, sqlc.CreateInterviewerAccountParams{
 		Column1: companyUUID, Name: name, Email: email, PasswordHash: passwordHash, Salt: salt, CreatedAt: pgtype.Timestamp{Time: createdAt, Valid: true},
 	})
 	if err != nil {
 		return domain.Account{}, mapCreateError(err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return domain.Account{}, fmt.Errorf("commit registration: %w", err)
 	}
 	return domain.Account{
 		ID: row.ID, Type: domain.AccountTypeInterviewer, Email: row.Email,
@@ -295,7 +338,8 @@ func (r *RegistrationRepository) FindPendingVerification(ctx context.Context, em
 			ID: row.ID, Type: accountType, Email: row.Email,
 			Status: row.AccountStatus, CreatedAt: row.CreatedAt.Time.UTC().Format(time.RFC3339),
 		},
-		Recipient: row.Recipient,
+		Recipient:    row.Recipient,
+		PasswordHash: row.PasswordHash, Salt: row.Salt,
 		ExpiresAt: row.ExpiresAt.Time.UTC(),
 	}, nil
 }
@@ -368,7 +412,12 @@ func (r *RegistrationRepository) RegistrationNumberExists(ctx context.Context, n
 }
 
 func (r *RegistrationRepository) CreateCompanyRegistration(ctx context.Context, record ports.CompanyRegistrationRecord) (domain.Account, error) {
-	row, err := r.queries.CreateCompanyRegistration(ctx, sqlc.CreateCompanyRegistrationParams{
+	tx, queries, err := r.beginRegistration(ctx, record.Email)
+	if err != nil {
+		return domain.Account{}, err
+	}
+	defer tx.Rollback(ctx)
+	row, err := queries.CreateCompanyRegistration(ctx, sqlc.CreateCompanyRegistrationParams{
 		CompanyName: record.CompanyName, RegistrationNumber: record.RegistrationNumber,
 		AutoApprove: record.AutoApprove,
 		Email:       record.Email, PasswordHash: record.PasswordHash, Salt: record.Salt,
@@ -376,6 +425,9 @@ func (r *RegistrationRepository) CreateCompanyRegistration(ctx context.Context, 
 	})
 	if err != nil {
 		return domain.Account{}, mapCreateError(err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return domain.Account{}, fmt.Errorf("commit registration: %w", err)
 	}
 	return domain.Account{
 		ID: row.ID, Type: "company", Email: row.Email, Status: row.Status,
@@ -443,6 +495,9 @@ func parseUUID(value string) (pgtype.UUID, error) {
 func mapCreateError(err error) error {
 	var constraintError *pgconn.PgError
 	if errors.As(err, &constraintError) && constraintError.Code == "23505" {
+		if constraintError.ConstraintName == "auth_company_registration_number_idx" {
+			return domain.ErrCompanyRegistrationExists
+		}
 		return domain.ErrEmailAlreadyExists
 	}
 	return fmt.Errorf("insert account: %w", err)

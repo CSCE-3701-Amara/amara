@@ -38,6 +38,9 @@ func (s *RegistrationService) Register(ctx context.Context, registration domain.
 
 	pending, err := s.repository.FindPendingVerification(ctx, registration.Email)
 	if err == nil {
+		if pending.Account.Type != registration.AccountType || !verifyPassword(registration.Password, pending.PasswordHash, pending.Salt) {
+			return domain.Account{}, domain.ErrEmailAlreadyExists
+		}
 		return pending.Account, s.issueVerification(ctx, pending.Account, pending.Recipient, false)
 	}
 	if !errors.Is(err, domain.ErrPendingVerificationNotFound) {
