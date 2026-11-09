@@ -344,6 +344,7 @@ type candidateProfileResponse struct {
 	Biography         string     `json:"biography,omitempty"`
 	YearsOfExperience *int       `json:"yearsOfExperience,omitempty"`
 	Available         *bool      `json:"available,omitempty"`
+	Amarat            []string   `json:"amarat,omitempty"`
 }
 
 func makeCandidateProfileResponse(p domain.CandidateProfile) candidateProfileResponse {
@@ -352,7 +353,7 @@ func makeCandidateProfileResponse(p domain.CandidateProfile) candidateProfileRes
 		value := p.BirthDate.Format("2006-01-02")
 		birthDate = &value
 	}
-	return candidateProfileResponse{ID: p.ID, Name: p.Name, Email: p.Email, CreatedAt: p.CreatedAt, UpdatedAt: p.UpdatedAt, PhoneNumber: p.PhoneNumber, GithubProfile: p.GithubProfile, LinkedinProfile: p.LinkedinProfile, PortfolioLink: p.PortfolioLink, Gender: p.Gender, BirthDate: birthDate, Nationality: p.Nationality, Address: p.Address, Biography: p.Biography, YearsOfExperience: p.YearsOfExperience, Available: p.Available}
+	return candidateProfileResponse{ID: p.ID, Name: p.Name, Email: p.Email, CreatedAt: p.CreatedAt, UpdatedAt: p.UpdatedAt, PhoneNumber: p.PhoneNumber, GithubProfile: p.GithubProfile, LinkedinProfile: p.LinkedinProfile, PortfolioLink: p.PortfolioLink, Gender: p.Gender, BirthDate: birthDate, Nationality: p.Nationality, Address: p.Address, Biography: p.Biography, YearsOfExperience: p.YearsOfExperience, Available: p.Available, Amarat: p.Amarat}
 }
 
 type companyProfileResponse struct {

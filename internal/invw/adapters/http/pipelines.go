@@ -29,6 +29,20 @@ func (h *PipelineHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 	v1.POST("/jobs/:id/pipeline", company, h.create)
 	v1.GET("/pipeline-versions/:versionId/stages", company, h.stages)
 	v1.PUT("/pipeline-versions/:versionId/stages", company, h.replaceStages)
+	v1.POST("/pipeline-versions/:versionId/publish", company, h.publish)
+}
+
+func (h *PipelineHandler) publish(c *gin.Context) {
+	id, ok := pipelineID(c, "versionId")
+	if !ok {
+		return
+	}
+	identity, _ := authhttp.Identity(c)
+	if err := h.repo.Publish(c.Request.Context(), identity.CompanyID, id); err != nil {
+		writePipelineResult(c, http.StatusNoContent, nil, err)
+		return
+	}
+	c.Status(http.StatusNoContent)
 }
 
 func (h *PipelineHandler) get(c *gin.Context) {

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useApiResource } from "@/shared/lib/use-api-resource";
 import { useProfileUpdate } from "@/shared/lib/use-profile-update";
 import { ApiFeedback } from "@/shared/ui/workspace";
 import { performAccountAction } from "@/features/auth/api/auth.api";
@@ -23,8 +24,8 @@ interface CandidateProfile {
   linkedinProfile?: string;
   portfolioLink?: string;
   available?: boolean;
+  amarat?: string[];
 }
-/** Candidate profile editor uses the registered PATCH endpoint; profile reads remain unavailable. */
 export function CandidateProfileScreen({
   edit = false,
   profile,
@@ -34,7 +35,10 @@ export function CandidateProfileScreen({
 }) {
   const router = useRouter();
   const update = useProfileUpdate<CandidateProfile>("/v1/candidates/me");
-  profile = update.saved || profile;
+  const current = useApiResource<CandidateProfile>(
+    edit ? null : "/v1/candidates/me",
+  );
+  profile = update.saved || current.data || profile;
   const [dialog, setDialog] = useState<string | null>(null);
   const [biography, setBiography] = useState(profile?.biography || "");
   const action = dialog === "delete" ? "delete" : "deactivate";
@@ -53,10 +57,12 @@ export function CandidateProfileScreen({
         />
         <h1>{edit ? "Edit profile" : "Your profile"}</h1>
       </header>
-      <UnavailableNotice>
-        Your current profile can’t be loaded yet. Save only the fields you want
-        to update; other details will be kept.
-      </UnavailableNotice>
+      {edit && (
+        <UnavailableNotice>
+          Your current profile can’t be loaded yet. Save only the fields you
+          want to update; other details will be kept.
+        </UnavailableNotice>
+      )}
       {edit ? (
         <form
           onSubmit={update.onSubmit}
@@ -272,7 +278,19 @@ export function CandidateProfileScreen({
           <section className={`${styles.panel} ${styles.earned}`}>
             <h2>Earned amarat</h2>
             <p>Your verified awards and credentials</p>
-            <p>No awards can be loaded yet.</p>
+            {current.loading ? (
+              <p>Loading awards…</p>
+            ) : current.error ? (
+              <p>Your awards couldn’t be loaded.</p>
+            ) : current.data?.amarat?.length ? (
+              <ul>
+                {current.data.amarat.map((title) => (
+                  <li key={title}>{title}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>No awards yet.</p>
+            )}
           </section>
         </>
       )}

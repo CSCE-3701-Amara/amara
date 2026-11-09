@@ -40,6 +40,10 @@ export const createPipeline = (postingId: string) =>
   apiRequest<PipelineDraft>(`/v1/jobs/${resourceId(postingId)}/pipeline`, {
     method: "POST",
   });
+export const publishPipeline = (versionId: string) =>
+  apiRequest<void>(`/v1/pipeline-versions/${resourceId(versionId)}/publish`, {
+    method: "POST",
+  });
 export const listPipelineStages = (versionId: string, signal?: AbortSignal) =>
   apiRequest<PipelineStage[] | null>(
     `/v1/pipeline-versions/${resourceId(versionId)}/stages`,

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"html"
+	"io"
 	"net"
 	"net/mail"
 	"net/smtp"
@@ -127,6 +128,11 @@ func (s *SMTPSender) send(ctx context.Context, recipient string, message []byte)
 	writer, err := client.Data()
 	if err != nil {
 		return fmt.Errorf("start SMTP message: %w", err)
+	}
+	headers := fmt.Sprintf("From: %s\r\nTo: %s\r\nDate: %s\r\n",
+		s.config.From, recipient, time.Now().Format(time.RFC1123Z))
+	if _, err := io.WriteString(writer, headers); err != nil {
+		return fmt.Errorf("write SMTP headers: %w", err)
 	}
 	if _, err := writer.Write(message); err != nil {
 		_ = writer.Close()

@@ -65,6 +65,19 @@ export function ApplicationDetail({
   const assessments = useApiResource<AssessmentInstance[]>(
     `/v1/applications/${resourceId(id)}/assessment-instances`,
   );
+  function assessmentLink(instance: AssessmentInstance) {
+    return (
+      <Link
+        href={`/candidate/assessments/${resourceId(instance.id)}?state=availability&application=${resourceId(id)}`}
+      >
+        {instance.status === "in_progress"
+          ? "Continue assessment"
+          : instance.status === "available"
+            ? "Open assessment"
+            : "Review assessment"}
+      </Link>
+    );
+  }
   const withdrawn =
     params.get("state") === "withdrawn" || detail.data?.status === "withdrawn";
   if (withdrawn)
@@ -108,18 +121,18 @@ export function ApplicationDetail({
               {progress ? (
                 <>
                   <h2>Your hiring journey</h2>
-                  {!stages.data && (
+                  <BusyState loading={stageProgress.loading} />
+                  {stages.error?.status === 404 && (
                     <UnavailableNotice>
-                      Stage-by-stage progress cannot be loaded. Your recorded
-                      application status is shown below.
+                      The hiring pipeline isn’t available for this application yet.
                     </UnavailableNotice>
                   )}
-                  <ApiFeedback error={stages.error} retry={stages.reload} />
-                  <p>
-                    {stages.data
-                      ? `${stages.data.filter((stage) => stage.status === "passed").length} of ${stages.data.length} stages completed`
-                      : "Stage details unavailable"}
-                  </p>
+                  {stages.data && (
+                    <p>
+                      {stages.data.filter((stage) => stage.completedAt).length} of{" "}
+                      {stages.data.length} stages completed
+                    </p>
+                  )}
                   <div className={styles.journey}>
                     {stages.data?.map((stage, index) => (
                       <div className={styles.journeyStep} key={stage.id}>
@@ -132,6 +145,11 @@ export function ApplicationDetail({
                             {stage.status.replaceAll("_", " ")}
                           </StatusBadge>
                           <h3>{stage.name}</h3>
+                          {assessments.data
+                            ?.filter((instance) => instance.stageId === stage.stageId)
+                            .map((instance) => (
+                              <p key={instance.id}>{assessmentLink(instance)}</p>
+                            ))}
                           {stage.deadline && (
                             <p>
                               Due {new Date(stage.deadline).toLocaleString()}
@@ -212,6 +230,14 @@ export function ApplicationDetail({
                       </li>
                     )}
                   </ol>
+                  {!detail.data.screenedOut && (
+                    <Link
+                      href={`/candidate/applications/${resourceId(id)}/progress`}
+                      className={s.button}
+                    >
+                      View hiring pipeline
+                    </Link>
+                  )}
                 </>
               )}
             </section>
@@ -232,13 +258,7 @@ export function ApplicationDetail({
               />
               {assessments.data?.map((instance) => (
                 <p key={instance.id}>
-                  <Link
-                    href={`/candidate/assessments/${resourceId(instance.id)}?state=availability&application=${resourceId(id)}`}
-                  >
-                    {instance.status === "in_progress"
-                      ? "Continue assessment"
-                      : "Review assessment"}
-                  </Link>{" "}
+                  {assessmentLink(instance)}{" "}
                   · {instance.status.replaceAll("_", " ")}
                 </p>
               ))}

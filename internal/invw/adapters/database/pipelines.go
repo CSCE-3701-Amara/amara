@@ -22,14 +22,15 @@ func NewPipelineRepository(pool *pgxpool.Pool) *PipelineRepository {
 func (r *PipelineRepository) Get(ctx context.Context, company, posting string) (domain.PipelineDraft, error) {
 	var draft domain.PipelineDraft
 	err := r.pool.QueryRow(ctx, `
-		SELECT p.id::text, p.posting_id::text, v.id::text, v.version_number
+		SELECT p.id::text, p.posting_id::text, v.id::text, v.version_number,
+			p.published_version_id IS NOT DISTINCT FROM v.id
 		FROM pipelines p JOIN job_postings j ON j.id = p.posting_id
 		JOIN LATERAL (
 			SELECT id, version_number FROM pipeline_versions
 			WHERE pipeline_id = p.id ORDER BY version_number DESC LIMIT 1
 		) v ON true
 		WHERE p.posting_id = $1::text::uuid AND j.company_id = $2::text::uuid`,
-		posting, company).Scan(&draft.ID, &draft.PostingID, &draft.VersionID, &draft.VersionNumber)
+		posting, company).Scan(&draft.ID, &draft.PostingID, &draft.VersionID, &draft.VersionNumber, &draft.Published)
 	return draft, pipelineError(err)
 }
 
@@ -72,6 +73,53 @@ func (r *PipelineRepository) Create(ctx context.Context, company, posting string
 		return domain.PipelineDraft{}, err
 	}
 	return draft, tx.Commit(ctx)
+}
+
+func (r *PipelineRepository) Publish(ctx context.Context, company, version string) error {
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	published, err := pipelineVersion(ctx, tx, company, version, true)
+	if err != nil {
+		return err
+	}
+	var active, hasEntry bool
+	err = tx.QueryRow(ctx, `
+		SELECT p.published_version_id IS NOT DISTINCT FROM v.id,
+			EXISTS (SELECT 1 FROM pipeline_stages WHERE version_id = v.id AND stage_order = 1)
+		FROM pipeline_versions v JOIN pipelines p ON p.id = v.pipeline_id
+		WHERE v.id = $1::text::uuid`, version).Scan(&active, &hasEntry)
+	if err != nil {
+		return err
+	}
+	if active {
+		return nil
+	}
+	if published {
+		return domain.ErrPipelineLocked
+	}
+	if !hasEntry {
+		return &domain.InvalidPipelineError{Reason: "Save at least one stage before publishing the pipeline."}
+	}
+	tag, err := tx.Exec(ctx, `
+		UPDATE pipelines p SET published_version_id = v.id, status = 'published'
+		FROM pipeline_versions v WHERE v.id = $1::text::uuid AND p.id = v.pipeline_id
+			AND p.published_version_id IS NULL`, version)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return domain.ErrPipelineLocked
+	}
+	if _, err := tx.Exec(ctx, `
+		UPDATE pipeline_versions SET is_published = true, published_at = now(), published_by = $2::text::uuid
+		WHERE id = $1::text::uuid`, version, company); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 func (r *PipelineRepository) Stages(ctx context.Context, company, version string) ([]domain.Stage, error) {

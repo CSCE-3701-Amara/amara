@@ -50,6 +50,7 @@ export interface PipelineDraft {
   postingId: string;
   versionId: string;
   versionNumber: number;
+  published: boolean;
 }
 export interface PipelineStage {
   id?: string;

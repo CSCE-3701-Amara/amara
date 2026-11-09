@@ -27,6 +27,7 @@ type PipelineDraft struct {
 	PostingID     string `json:"postingId"`
 	VersionID     string `json:"versionId"`
 	VersionNumber int    `json:"versionNumber"`
+	Published     bool   `json:"published"`
 }
 
 type Stage struct {
