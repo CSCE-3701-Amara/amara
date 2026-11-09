@@ -11,4 +11,7 @@ CREATE INDEX auth_sessions_account_idx ON auth_sessions (account_id, account_typ
 CREATE INDEX auth_sessions_expiry_idx ON auth_sessions (expires_at);
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TABLE auth_sessions;
+*/

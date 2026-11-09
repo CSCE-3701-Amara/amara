@@ -20,6 +20,9 @@ CREATE UNIQUE INDEX auth_company_registration_number_idx
     WHERE status IN ('pending_review', 'approved');
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP INDEX auth_company_registration_number_idx;
 DROP INDEX auth_company_registration_email_idx;
 DROP TABLE auth_company_registration_requests;
+*/

@@ -21,8 +21,11 @@ CREATE INDEX job_posting_amarat_posting_idx ON job_posting_amarat(posting_id);
 CREATE UNIQUE INDEX job_posting_amarat_title_idx ON job_posting_amarat(posting_id, lower(amara_title));
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP INDEX IF EXISTS job_posting_amarat_title_idx;
 DROP INDEX IF EXISTS job_posting_amarat_posting_idx;
 DROP TABLE IF EXISTS job_posting_amarat;
 DROP INDEX IF EXISTS job_posting_requirements_posting_idx;
 DROP TABLE IF EXISTS job_posting_requirements;
+*/

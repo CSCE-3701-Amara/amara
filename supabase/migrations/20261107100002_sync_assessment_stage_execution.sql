@@ -31,5 +31,8 @@ FOR EACH ROW EXECUTE FUNCTION sync_assessment_stage_execution();
 UPDATE assessment_attempts SET status = status;
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TRIGGER assessment_attempt_sync_stage ON assessment_attempts;
 DROP FUNCTION sync_assessment_stage_execution();
+*/

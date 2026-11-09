@@ -56,6 +56,8 @@ CREATE INDEX candidate_amarat_candidate_awarded_idx ON candidate_amarat (cand_id
 -- +goose StatementEnd
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 -- +goose StatementBegin
 DROP TABLE offers, identity_reveal_records;
 DROP INDEX candidate_amarat_candidate_awarded_idx;
@@ -73,3 +75,4 @@ ALTER TABLE candidate_amarat
     DROP COLUMN company_id,
     DROP COLUMN id;
 -- +goose StatementEnd
+*/

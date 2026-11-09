@@ -123,6 +123,8 @@ CREATE TABLE test_configurations (
 -- +goose StatementEnd
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 -- +goose StatementBegin
 DROP TABLE test_configurations, assessment_questions, stage_transitions;
 
@@ -170,3 +172,4 @@ ALTER TABLE modules
     DROP COLUMN completion_window,
     DROP COLUMN source;
 -- +goose StatementEnd
+*/

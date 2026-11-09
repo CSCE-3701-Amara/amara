@@ -9,4 +9,7 @@ CREATE TABLE assessment_results (
 );
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TABLE assessment_results;
+*/

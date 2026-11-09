@@ -15,6 +15,8 @@ ALTER TABLE pipeline_stages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE test_configurations ENABLE ROW LEVEL SECURITY;
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 ALTER TABLE test_configurations DISABLE ROW LEVEL SECURITY;
 ALTER TABLE pipeline_stages DISABLE ROW LEVEL SECURITY;
 
@@ -27,3 +29,4 @@ ALTER TABLE pipeline_stages
     DROP COLUMN stage_order;
 
 ALTER TABLE pipelines DROP CONSTRAINT pipelines_posting_key;
+*/

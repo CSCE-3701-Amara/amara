@@ -14,4 +14,7 @@ CREATE TABLE IF NOT EXISTS interviewers (
 );
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TABLE interviewers;
+*/

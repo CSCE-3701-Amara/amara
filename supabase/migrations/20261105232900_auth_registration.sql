@@ -27,6 +27,8 @@ CREATE INDEX auth_email_verification_challenges_account_idx
     ON auth_email_verification_challenges (account_id, account_type);
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TABLE auth_email_verification_challenges;
 DROP INDEX companies_email_lower_idx;
 DROP INDEX interviewers_email_lower_idx;
@@ -36,3 +38,4 @@ ALTER TABLE companies
     DROP COLUMN approved;
 ALTER TABLE interviewers DROP COLUMN account_status;
 ALTER TABLE candidates DROP COLUMN account_status;
+*/

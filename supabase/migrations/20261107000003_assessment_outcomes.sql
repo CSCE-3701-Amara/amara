@@ -13,9 +13,12 @@ ALTER TABLE assessment_attempts
     );
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 ALTER TABLE assessment_attempts
     DROP CONSTRAINT assessment_evidence_atomic,
     DROP COLUMN evaluated_at,
     DROP COLUMN final_score,
     DROP COLUMN final_evidence,
     DROP COLUMN saved_responses;
+*/

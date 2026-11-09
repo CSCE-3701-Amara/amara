@@ -10,4 +10,7 @@ CREATE TABLE modules (
 );
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TABLE modules;
+*/

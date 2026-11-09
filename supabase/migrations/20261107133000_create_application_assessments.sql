@@ -16,5 +16,8 @@ CREATE INDEX application_assessments_application_created_idx
     ON application_assessments (application_id, created_at, id);
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP INDEX IF EXISTS application_assessments_application_created_idx;
 DROP TABLE IF EXISTS application_assessments;
+*/
