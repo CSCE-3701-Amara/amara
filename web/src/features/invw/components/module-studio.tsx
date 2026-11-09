@@ -327,12 +327,14 @@ function DefinitionEditor({
       name: String(data.get("name") || "").trim(),
       description: String(data.get("description") || ""),
       type,
+      behavioral: type === "recorded_video" ? module?.behavioral : undefined,
+      minimum_tests_passed: codeModule ? module?.minimum_tests_passed : undefined,
       active_minutes:
         type === "recorded_video"
           ? undefined
           : Number(data.get("active_minutes")) || undefined,
       threshold:
-        type === "behavioral" || data.get("threshold") === ""
+        type === "behavioral" || (type === "recorded_video" && module?.behavioral) || data.get("threshold") === ""
           ? undefined
           : Number(data.get("threshold")),
       questions: questions.map((question) => ({

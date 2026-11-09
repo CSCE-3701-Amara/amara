@@ -18,6 +18,8 @@ import (
 )
 
 type AssessmentHandler struct {
+	runner   database.CodeRunner
+	runs     chan struct{}
 	repo     *database.AssessmentRepository
 	sessions authports.SessionValidator
 }
@@ -34,6 +36,14 @@ func (h *AssessmentHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 	v1.POST("/pipeline-stages/:stageId/threshold/preview", company, h.stageThreshold(false))
 	v1.PUT("/pipeline-stages/:stageId/threshold", company, h.stageThreshold(true))
 	candidate := authhttp.CandidateAuthWithErrorWriter(h.sessions, writeError)
+	v1.POST("/assessment-attempts/:attemptId/run", candidate, h.runCode)
+	v1.GET("/execution-languages", candidate, func(c *gin.Context) {
+		names := []string{}
+		if provider, ok := h.runner.(interface{ SupportedLanguages() []string }); ok {
+			names = provider.SupportedLanguages()
+		}
+		c.JSON(200, names)
+	})
 	v1.GET("/applications/:application_id/assessment-instances", candidate, h.listInstances)
 	v1.POST("/assessment-instances/:instanceId/start", candidate, h.attempt("instanceId", true, false))
 	v1.GET("/assessment-attempts/:attemptId", candidate, h.attempt("attemptId", false, false))

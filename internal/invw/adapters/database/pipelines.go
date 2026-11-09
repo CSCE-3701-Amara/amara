@@ -134,7 +134,7 @@ func (r *PipelineRepository) Stages(ctx context.Context, company, version string
 	}
 	rows, err := tx.Query(ctx, `
 		SELECT s.id::text, s.name, s.module_type, s.scheduled_start_at, s.scheduled_end_at,
-			s.interview_configuration,
+			s.interview_configuration,s.advancement_rule,s.score_threshold,s.below_threshold_action,
 			ARRAY(SELECT tc.test_module_id::text FROM test_configurations tc WHERE tc.stage_id = s.id
 				ORDER BY (tc.configuration->>'position')::integer)
 		FROM pipeline_stages s WHERE s.version_id = $1::text::uuid
@@ -147,7 +147,7 @@ func (r *PipelineRepository) Stages(ctx context.Context, company, version string
 	for rows.Next() {
 		var stage domain.Stage
 		err := rows.Scan(&stage.ID, &stage.Name, &stage.Type, &stage.OpensAt, &stage.Deadline,
-			&stage.Interview, &stage.ModuleIDs)
+			&stage.Interview, &stage.Rule, &stage.ScoreThreshold, &stage.Below, &stage.ModuleIDs)
 		if err != nil {
 			return nil, err
 		}
@@ -195,6 +195,9 @@ func (r *PipelineRepository) ReplaceStages(ctx context.Context, company, version
 		}
 	}
 
+	if _, err := tx.Exec(ctx, `DELETE FROM stage_transitions WHERE pipeline_version_id=$1::uuid`, version); err != nil {
+		return nil, err
+	}
 	if _, err := tx.Exec(ctx, `
 		DELETE FROM test_configurations WHERE stage_id IN
 			(SELECT id FROM pipeline_stages WHERE version_id = $1::text::uuid)`, version); err != nil {
@@ -225,14 +228,7 @@ func pipelineVersion(ctx context.Context, tx pgx.Tx, company, version string, lo
 		return false, pipelineError(err)
 	}
 
-	var legacy bool
-	err := tx.QueryRow(ctx, `
-		SELECT EXISTS (SELECT 1 FROM pipeline_stages WHERE version_id = $1::text::uuid AND stage_order IS NULL)
-			OR EXISTS (SELECT 1 FROM stage_transitions WHERE pipeline_version_id = $1::text::uuid)`, version).Scan(&legacy)
-	if err == nil && legacy {
-		return false, domain.ErrPipelineLocked
-	}
-	return published, err
+	return published, nil
 }
 
 func moduleSnapshot(ctx context.Context, tx pgx.Tx, company, id string) (domain.Definition, error) {
@@ -279,14 +275,27 @@ func insertStage(ctx context.Context, tx pgx.Tx, version string, position int, s
 			threshold = stage.Interview.Threshold
 		}
 	}
+	if stage.Rule != "" {
+		rule = stage.Rule
+		if stage.ScoreThreshold != nil {
+			threshold = stage.ScoreThreshold
+		}
+	}
 	err := tx.QueryRow(ctx, `
-		INSERT INTO pipeline_stages (id, version_id, name, module_type, stage_order,
+  INSERT INTO pipeline_stages (id, version_id, name, module_type, stage_order,
 			scheduled_start_at, scheduled_end_at, interview_configuration, advancement_rule,
 			score_threshold)
 		VALUES (gen_random_uuid(), $1::text::uuid, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING id::text`, version, stage.Name, stage.Type, position,
 		stage.OpensAt, stage.Deadline, stage.Interview, rule, threshold).Scan(&stage.ID)
 	if err != nil {
+		return err
+	}
+	below := stage.Below
+	if below == "" {
+		below = "hold"
+	}
+	if _, err := tx.Exec(ctx, `UPDATE pipeline_stages SET below_threshold_action=$2 WHERE id=$1::uuid`, stage.ID, below); err != nil {
 		return err
 	}
 	for i, id := range stage.ModuleIDs {

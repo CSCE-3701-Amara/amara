@@ -5743,6 +5743,245 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /v1/pipeline-versions/{versionId}/graph:
+    parameters:
+    - $ref: '#/components/parameters/VersionId'
+    get:
+      operationId: getPipelineGraph
+      summary: Read an owned pipeline graph
+      security:
+      - SessionCookie: []
+      responses:
+        '200':
+          description: Stages, coordinates and explicit connections. Linear drafts are projected as adjacent
+            links.
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: replacePipelineGraph
+      summary: Atomically replace an unpublished owned pipeline graph
+      security:
+      - SessionCookie: []
+      description: Validates unique stage keys, modules/interviewers, schedules and an acyclic graph. Stage
+        IDs in input are client keys; the response maps nodes and links to persisted UUIDs. At most 100
+        stages and 1000 links. Published versions are locked.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - stages
+              - links
+              properties:
+                stages:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - id
+                    - name
+                    - type
+                    - scheduledStartAt
+                    - scheduledEndAt
+                    properties:
+                      id:
+                        type: string
+                        description: Client key on write; persisted UUID on read.
+                      name:
+                        type: string
+                      type:
+                        type: string
+                        enum:
+                        - assessment
+                        - live_interview
+                      scheduledStartAt:
+                        type: string
+                        format: date-time
+                      scheduledEndAt:
+                        type: string
+                        format: date-time
+                        description: Must be later than the opening time.
+                      moduleIds:
+                        description: Required for an assessment stage. Each module must belong to the company.
+                        type: array
+                        minItems: 1
+                        uniqueItems: true
+                        items:
+                          type: string
+                          format: uuid
+                      interview:
+                        description: Required for a live interview stage, which has no test modules.
+                        type: object
+                        required:
+                        - durationMinutes
+                        - interviewerIds
+                        - rubric
+                        - amarat
+                        properties:
+                          durationMinutes:
+                            type: integer
+                            minimum: 1
+                          interviewerIds:
+                            type: array
+                            minItems: 1
+                            uniqueItems: true
+                            items:
+                              type: string
+                              format: uuid
+                          behavioral:
+                            type: boolean
+                            description: Marks the interview as unscored behavioral evaluation.
+                          threshold:
+                            type:
+                            - integer
+                            - 'null'
+                            minimum: 0
+                            maximum: 100
+                            description: Required for scored interviews and omitted for behavioral interviews.
+                          rubric:
+                            type: array
+                            minItems: 1
+                            items:
+                              type: object
+                              required:
+                              - description
+                              - amara
+                              properties:
+                                description:
+                                  type: string
+                                amara:
+                                  type: string
+                          amarat:
+                            type: array
+                            minItems: 1
+                            items:
+                              type: object
+                              required:
+                              - name
+                              - crest
+                              - domain
+                              - description
+                              properties:
+                                name:
+                                  type: string
+                                crest:
+                                  type: string
+                                domain:
+                                  type: string
+                                description:
+                                  type: string
+                      x:
+                        type: number
+                      y:
+                        type: number
+                      advancementRule:
+                        type: string
+                        enum:
+                        - manual
+                        - completion
+                        - threshold
+                      scoreThreshold:
+                        type: integer
+                        minimum: 0
+                        maximum: 100
+                      belowThresholdAction:
+                        type: string
+                        enum:
+                        - hold
+                        - reject
+                links:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - fromStageId
+                    - toStageId
+                    properties:
+                      fromStageId:
+                        type: string
+                      toStageId:
+                        type: string
+      responses:
+        '200':
+          description: Saved graph with persisted stage IDs.
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+  /v1/execution-languages:
+    get:
+      operationId: getExecutionLanguages
+      summary: List configured candidate execution languages
+      security:
+      - SessionCookie: []
+      responses:
+        '200':
+          description: Configured language names, or an empty array when execution is unavailable.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /v1/assessment-attempts/{attemptId}/run:
+    parameters:
+    - name: attemptId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: runCandidateCode
+      summary: Run candidate source with custom stdin without saving or grading
+      security:
+      - SessionCookie: []
+      description: Candidate-owned active code question only. Maximum source 65536 bytes and input 16384
+        bytes. Concurrent runs are bounded. Private test cases are never returned.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - questionId
+              - language
+              - source
+              properties:
+                questionId:
+                  type: string
+                  format: uuid
+                language:
+                  type: string
+                source:
+                  type: string
+                stdin:
+                  type: string
+      responses:
+        '200':
+          description: Execution output and completion status. Failed programs include diagnostics in stdout.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - stdout
+                - succeeded
+                properties:
+                  stdout:
+                    type: string
+                  succeeded:
+                    type: boolean
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          description: Execution provider unavailable; answers and scores are unchanged.
+
 components:
 
   securitySchemes:
@@ -9336,6 +9575,10 @@ components:
       type: object
       additionalProperties: false
       properties:
+        savedResponses:
+          type: object
+          description: Candidate-owned saved responses, keyed by immutable question ID; returned only to the attempt owner. No grading evidence or hidden cases.
+          additionalProperties: true
         id:
           type: string
           format: uuid

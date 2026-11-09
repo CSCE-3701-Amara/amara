@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 )
@@ -79,10 +80,12 @@ func (c *Client) Run(ctx context.Context, language, source, input string) (strin
 	defer ticker.Stop()
 	for {
 		var result struct {
-			Stdout string
-			Status struct{ ID int }
+			Stdout        string
+			Stderr        string
+			CompileOutput string `json:"compile_output"`
+			Status        struct{ ID int }
 		}
-		path := "/submissions/" + url.PathEscape(created.Token) + "?base64_encoded=true&fields=stdout,status"
+		path := "/submissions/" + url.PathEscape(created.Token) + "?base64_encoded=true&fields=stdout,stderr,compile_output,status"
 		if err := c.request(ctx, http.MethodGet, path, nil, &result); err != nil {
 			return "", false, err
 		}
@@ -100,7 +103,15 @@ func (c *Client) Run(ctx context.Context, language, source, input string) (strin
 			}
 			return string(out), true, nil
 		case 4, 5, 6, 7, 8, 9, 10, 11, 12:
-			return "", false, nil
+			diagnostics := ""
+			for _, raw := range []string{result.Stdout, result.Stderr, result.CompileOutput} {
+				b, err := base64.StdEncoding.DecodeString(raw)
+				if err != nil {
+					return "", false, errors.New("Judge0 returned invalid output encoding")
+				}
+				diagnostics += string(b)
+			}
+			return diagnostics, false, nil
 		default:
 			return "", false, fmt.Errorf("unexpected Judge0 submission status %d", result.Status.ID)
 		}
@@ -130,4 +141,13 @@ func (c *Client) request(ctx context.Context, method, path string, body []byte, 
 		return errors.New("invalid Judge0 response")
 	}
 	return nil
+}
+
+func (c *Client) SupportedLanguages() []string {
+	names := make([]string, 0, len(c.languages))
+	for name := range c.languages {
+		names = append(names, name)
+	}
+	slices.Sort(names)
+	return names
 }

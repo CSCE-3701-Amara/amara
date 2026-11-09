@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"slices"
 	"strings"
 	"time"
@@ -17,6 +18,7 @@ type CodeRunner interface {
 }
 
 type codeGradingQuestion struct {
+	Legacy   bool
 	ID       string
 	Question domain.Question
 	Response struct {
@@ -94,7 +96,14 @@ func (r *AssessmentRepository) GradeNextCodeAttempt(ctx context.Context, runner 
 			FROM assessment_attempts a
 			JOIN stage_executions se ON se.id = a.stage_execution_id
 			JOIN pipeline_executions pe ON pe.id = se.pipeline_execution_id
-			WHERE a.status = 'pending_grading' AND a.submitted_at IS NOT NULL
+			WHERE (a.status = 'pending_grading' OR (a.status='scored' AND EXISTS (
+ SELECT 1 FROM (`+snapshotQuestions+`) q
+ WHERE q.question->>'format'='code'
+ AND a.configuration_snapshot #> ARRAY['modules',(q.module_ordinal-1)::text,'configuration','definition','minimum_tests_passed'] IS NULL
+ AND a.configuration_snapshot #> ARRAY['modules',(q.module_ordinal-1)::text,'configuration','definition','threshold'] IS NOT NULL
+ AND EXISTS (SELECT 1 FROM jsonb_array_elements(coalesce(a.final_evidence,'[]')) e
+ WHERE e->>'questionId'=q.id::text AND NOT e ? 'score')
+ ))) AND a.submitted_at IS NOT NULL
 				AND (a.code_grading_retry_at IS NULL OR a.code_grading_retry_at <= statement_timestamp())
 				AND (pe.status = 'active' OR se.status IN ('passed', 'rejected'))
 				AND EXISTS (SELECT 1 FROM (`+snapshotQuestions+`) q WHERE q.question->>'format' = 'code')
@@ -112,7 +121,7 @@ func (r *AssessmentRepository) GradeNextCodeAttempt(ctx context.Context, runner 
 		SET code_grading_retry_at = statement_timestamp() + interval '5 minutes'
 		FROM next WHERE a.id = next.id
 		RETURNING a.id::text, a.code_grading_retry_at, a.non_code_evidence, (
-			SELECT jsonb_agg(jsonb_build_object('id', q.id, 'question', q.question,
+			SELECT jsonb_agg(jsonb_build_object('id', q.id, 'question', q.question, 'legacy', (a.configuration_snapshot #> ARRAY['modules',(q.module_ordinal-1)::text,'configuration','definition','minimum_tests_passed'] IS NULL AND a.configuration_snapshot #> ARRAY['modules',(q.module_ordinal-1)::text,'configuration','definition','threshold'] IS NOT NULL),
 				'response', CASE WHEN q.question->>'format' = 'code' THEN a.saved_responses->q.id::text END)
 				ORDER BY q.module_ordinal, q.question_ordinal)
 			FROM (`+snapshotQuestions+`) q
@@ -132,6 +141,10 @@ func (r *AssessmentRepository) GradeNextCodeAttempt(ctx context.Context, runner 
 		item := QuestionEvidence{QuestionID: q.ID}
 		if q.Question.Format == "code" {
 			passed, total := 0, len(q.Question.TestCases)
+			weighted, totalWeight := 0.0, 0.0
+			for _, test := range q.Question.TestCases {
+				totalWeight += float64(test.Weight)
+			}
 			if strings.TrimSpace(q.Response.Code) != "" {
 				for _, test := range q.Question.TestCases {
 					// Renew before starting a case if the lease may expire during it.
@@ -139,7 +152,7 @@ func (r *AssessmentRepository) GradeNextCodeAttempt(ctx context.Context, runner 
 						err := r.pool.QueryRow(ctx, `
 							UPDATE assessment_attempts
 							SET code_grading_retry_at = statement_timestamp() + interval '5 minutes'
-							WHERE id = $1::uuid AND status = 'pending_grading'
+							WHERE id = $1::uuid AND status IN ('pending_grading','scored')
 								AND code_grading_retry_at = $2 AND code_grading_retry_at > statement_timestamp()
 							RETURNING code_grading_retry_at
 						`, attempt, lease).Scan(&lease)
@@ -153,10 +166,15 @@ func (r *AssessmentRepository) GradeNextCodeAttempt(ctx context.Context, runner 
 					}
 					if succeeded && normalizeCodeOutput(output) == normalizeCodeOutput(test.ExpectedOutput) {
 						passed++
+						weighted += float64(test.Weight)
 					}
 				}
 			}
 			item.PassedCases, item.TotalCases = &passed, &total
+			if q.Legacy && totalWeight > 0 {
+				score := int(math.Round(100 * weighted / totalWeight))
+				item.Score = &score
+			}
 		}
 		evidence = append(evidence, item)
 	}

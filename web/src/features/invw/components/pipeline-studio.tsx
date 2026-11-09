@@ -1,3 +1,4 @@
+import { DagEditor } from "./dag-editor";
 import Link from "next/link";
 import { resourceId } from "@/shared/lib/api-client";
 import { ProductHeading, WorkspaceFooter } from "@/shared/ui/product-ui";
@@ -11,7 +12,7 @@ export function PipelineStudio({ postingId }: { postingId: string }) {
     <>
       <ProductHeading
         title="Pipeline designer"
-        description="Build an ordered sequence of assessments and interviews for this job."
+        description="Design branches and joins between assessments and interviews for this job."
         compact
       />
       <nav className={styles.actions} aria-label="Pipeline views">
@@ -21,6 +22,7 @@ export function PipelineStudio({ postingId }: { postingId: string }) {
         <Link href="/employer/assessments">Assessment instances</Link>
         <Link href={`${pipelinePath}/dashboard`}>Dashboard</Link>
       </nav>
+      <DagEditor postingId={postingId} />
       <PipelineEditor postingId={postingId} />
       <WorkspaceFooter />
     </>

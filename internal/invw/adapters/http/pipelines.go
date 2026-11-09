@@ -25,6 +25,8 @@ func NewPipelineHandler(repo *database.PipelineRepository, sessions authports.Se
 
 func (h *PipelineHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 	company := authhttp.CompanyAuth(h.sessions, writeError)
+	v1.GET("/pipeline-versions/:versionId/graph", company, h.graph(false))
+	v1.PUT("/pipeline-versions/:versionId/graph", company, h.graph(true))
 	v1.GET("/jobs/:id/pipeline", company, h.get)
 	v1.POST("/jobs/:id/pipeline", company, h.create)
 	v1.GET("/pipeline-versions/:versionId/stages", company, h.stages)

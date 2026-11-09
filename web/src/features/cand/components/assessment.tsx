@@ -1,4 +1,5 @@
 "use client";
+import { CodeRunner } from "./code-runner";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -286,6 +287,10 @@ function AdvancedAssessment({
 }) {
   const [index, setIndex] = useState(0);
   const [languages, setLanguages] = useState<Record<string, string>>({});
+  const availableLanguages = useApiResource<string[]>(
+    "/v1/execution-languages",
+  );
+  const defaultLanguage = availableLanguages.data?.[0] || "typescript";
   const question = questions[index];
   return (
     <div className={styles.advancedAssessment}>
@@ -375,7 +380,7 @@ function AdvancedAssessment({
                     value={
                       languages[question.id] ||
                       savedLanguage(question) ||
-                      "javascript"
+                      defaultLanguage
                     }
                     onChange={(event) => {
                       onLanguageChange(question.id, event.target.value);
@@ -385,13 +390,37 @@ function AdvancedAssessment({
                       }));
                     }}
                   >
-                    {["javascript", "typescript", "python", "go", "cpp"].map(
-                      (language) => (
-                        <option key={language}>{language}</option>
-                      ),
-                    )}
+                    {(
+                      availableLanguages.data ?? [
+                        "javascript",
+                        "typescript",
+                        "python",
+                        "go",
+                        "cpp",
+                      ]
+                    ).map((language) => (
+                      <option key={language}>{language}</option>
+                    ))}
                   </select>
                 </label>
+              )}
+              {variant === "coding" && attempt && (
+                <CodeRunner
+                  key={question.id}
+                  attemptId={attempt.id}
+                  questionId={question.id}
+                  source={
+                    typeof answer(question) === "string"
+                      ? (answer(question) as string)
+                      : ""
+                  }
+                  language={
+                    languages[question.id] ||
+                    savedLanguage(question) ||
+                    defaultLanguage
+                  }
+                  disabled={busy || !canEdit}
+                />
               )}
               <QuestionInput
                 key={question.id}
@@ -415,7 +444,7 @@ function AdvancedAssessment({
                 question,
                 languages[question.id] ||
                   savedLanguage(question) ||
-                  "javascript",
+                  defaultLanguage,
               )
             }
           >
@@ -459,6 +488,11 @@ export function CandidateAssessment({
   const [dialog, setDialog] = useState<string | null>(null);
   const pending = useRef(false);
   const answerLanguages = useRef<Record<string, string>>({});
+  const [runLanguages, setRunLanguages] = useState<Record<string, string>>({});
+  const availableLanguages = useApiResource<string[]>(
+    "/v1/execution-languages",
+  );
+  const defaultLanguage = availableLanguages.data?.[0] || "typescript";
   const dirtyQuestions = useRef(new Set<string>());
   const [dirty, setDirty] = useState(false);
   useUnsavedChanges(dirty);
@@ -503,13 +537,24 @@ export function CandidateAssessment({
   );
   function answer(question: CandidateQuestion): string | number[] {
     if (Object.hasOwn(answers, question.id)) return answers[question.id];
-    const response = savedAnswers?.find(
-      (value) => value.questionId === question.id,
-    )?.response;
+    const response =
+      savedAnswers?.find((value) => value.questionId === question.id)
+        ?.response ?? attemptData?.savedResponses?.[question.id];
     if (typeof response === "string" || Array.isArray(response))
       return response;
     if (response && "code" in response) return response.code;
     return "";
+  }
+  function savedLanguage(question: CandidateQuestion): string {
+    const response =
+      savedAnswers.find((row) => row.questionId === question.id)?.response ??
+      attemptData?.savedResponses?.[question.id];
+    return response &&
+      !Array.isArray(response) &&
+      typeof response === "object" &&
+      "language" in response
+      ? response.language
+      : "";
   }
   const canEdit = attemptData?.status === "in_progress";
   async function writeAnswers(only?: CandidateQuestion, language?: string) {
@@ -529,7 +574,8 @@ export function CandidateAssessment({
                   language:
                     language ||
                     answerLanguages.current[question.id] ||
-                    "javascript",
+                    savedLanguage(question) ||
+                    defaultLanguage,
                   code: typeof value === "string" ? value : "",
                 }
               : value,
@@ -836,17 +882,7 @@ export function CandidateAssessment({
             dirtyQuestions.current.add(id);
             setDirty(true);
           }}
-          savedLanguage={(question) => {
-            const response = savedAnswers?.find(
-              (row) => row.questionId === question.id,
-            )?.response;
-            return response &&
-              !Array.isArray(response) &&
-              typeof response === "object" &&
-              "language" in response
-              ? response.language
-              : "";
-          }}
+          savedLanguage={savedLanguage}
         />
       ) : (
         <div className={styles.assessmentGrid}>
@@ -890,6 +926,58 @@ export function CandidateAssessment({
                     {question.responseFormat.replaceAll("_", " ")}
                   </p>
                   <h2>{question.prompt}</h2>
+                  {question.responseFormat === "code" && attemptData && (
+                    <>
+                      <label>
+                        Language
+                        <select
+                          disabled={busy || !canEdit}
+                          value={
+                            runLanguages[question.id] ||
+                            savedLanguage(question) ||
+                            defaultLanguage
+                          }
+                          onChange={(e) => {
+                            answerLanguages.current[question.id] =
+                              e.target.value;
+                            setRunLanguages((previous) => ({
+                              ...previous,
+                              [question.id]: e.target.value,
+                            }));
+                            dirtyQuestions.current.add(question.id);
+                            setDirty(true);
+                          }}
+                        >
+                          {(
+                            availableLanguages.data ?? [
+                              "javascript",
+                              "typescript",
+                              "python",
+                              "go",
+                              "cpp",
+                            ]
+                          ).map((l) => (
+                            <option key={l}>{l}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <CodeRunner
+                        attemptId={attemptId}
+                        questionId={question.id}
+                        source={
+                          typeof answer(question) === "string"
+                            ? (answer(question) as string)
+                            : ""
+                        }
+                        language={
+                          runLanguages[question.id] ||
+                          savedLanguage(question) ||
+                          defaultLanguage
+                        }
+                        disabled={busy || !canEdit}
+                      />
+                    </>
+                  )}
                   <QuestionInput
                     question={question}
                     value={answer(question)}

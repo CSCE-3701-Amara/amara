@@ -1,0 +1,88 @@
+.toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.toolbar button,
+.inspector button {
+  padding: 10px;
+  border: 1px solid #d4c8b9;
+  border-radius: 8px;
+  background: white;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 16px;
+}
+.viewport {
+  overflow: auto;
+  height: 580px;
+  border: 1px solid #d4c8b9;
+  background: #faf8f3;
+  background-image: radial-gradient(#d9d0c3 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+.canvas {
+  position: relative;
+  width: 1600px;
+  height: 1000px;
+  transform-origin: top left;
+}
+.edges {
+  position: absolute;
+  pointer-events: none;
+  color: #6c825c;
+}
+.node {
+  position: absolute;
+  width: 200px;
+  min-height: 130px;
+  border: 1px solid #adbaa5;
+  border-radius: 12px;
+  background: white;
+  padding: 16px;
+  text-align: left;
+  display: grid;
+  gap: 12px;
+  cursor: grab;
+}
+.node[aria-pressed="true"] {
+  outline: 3px solid #54a63e;
+}
+.node:focus-visible {
+  outline: 3px solid #333;
+}
+.inspector {
+  min-width: 0;
+}
+.inspector fieldset {
+  display: grid;
+  gap: 12px;
+  border: 0;
+  padding: 0;
+}
+.inspector label {
+  display: grid;
+  gap: 6px;
+}
+.inspector input,
+.inspector select {
+  max-width: 100%;
+  padding: 8px;
+  border: 1px solid #d4c8b9;
+  border-radius: 6px;
+}
+.inspector input[type="checkbox"] {
+  width: 18px;
+}
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .viewport {
+    height: 400px;
+  }
+}

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -96,6 +97,12 @@ func (s advancementStage) automaticDecision() stageDecision {
 		return stageDecision{status: "held", score: s.score}
 	}
 	if coding {
+		if s.rule == "threshold" {
+			if s.score == nil || s.threshold == nil {
+				return stageDecision{status: "pending_grading"}
+			}
+			passed = passed && *s.score >= *s.threshold
+		}
 		return s.thresholdDecision(passed)
 	}
 	if s.rule == "threshold" {
@@ -127,13 +134,41 @@ func (s advancementStage) codingThreshold() (coding, valid, passed bool) {
 	passed = true
 	for index, module := range s.configuration.Modules {
 		definition := module.Configuration.Definition
-		if definition.Type != domain.Coding {
+		if definition.Type != domain.Coding && definition.Type != domain.ProgrammingLanguage {
 			continue
 		}
 		coding = true
-		if !s.evaluated || s.outcome != "scored" || definition.MinimumTestsPassed == nil ||
+		if !s.evaluated || s.outcome != "scored" ||
 			index >= len(s.content) || s.content[index].ModuleID != module.ID {
 			return true, false, false
+		}
+		if definition.MinimumTestsPassed == nil {
+			if definition.Threshold == nil {
+				return true, false, false
+			}
+			sum := 0.0
+			for position, q := range s.content[index].Questions {
+				e := evidence[s.questionIDs[fmt.Sprintf("%d:%d", index+1, position+1)]]
+				if e.Score != nil {
+					sum += float64(*e.Score)
+					continue
+				}
+				if e.PassedCases == nil || e.TotalCases == nil || *e.TotalCases != len(q.TestCases) || *e.TotalCases == 0 || *e.PassedCases < 0 || *e.PassedCases > *e.TotalCases {
+					return true, false, false
+				}
+				weight := q.TestCases[0].Weight
+				for _, tc := range q.TestCases {
+					if tc.Weight != weight {
+						return true, false, false
+					}
+				}
+				sum += math.Round(100 * float64(*e.PassedCases) / float64(*e.TotalCases))
+			}
+			if len(s.content[index].Questions) == 0 {
+				return true, false, false
+			}
+			passed = passed && math.Round(sum/float64(len(s.content[index].Questions))) >= float64(*definition.Threshold)
+			continue
 		}
 		count := 0
 		for position, question := range s.content[index].Questions {

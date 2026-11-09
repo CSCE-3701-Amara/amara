@@ -29,6 +29,8 @@ func (outcomeSessions) ValidateSession(_ context.Context, token string) (authpor
 	switch token {
 	case "candidate":
 		return authports.Identity{AccountType: authdomain.AccountTypeCandidate, AccountID: "00000000-0000-0000-0000-000000000001"}, nil
+	case "other-candidate":
+		return authports.Identity{AccountType: authdomain.AccountTypeCandidate, AccountID: "00000000-0000-0000-0000-000000000099"}, nil
 	case "company":
 		return authports.Identity{AccountType: authdomain.AccountTypeCompany, CompanyID: "00000000-0000-0000-0000-000000000002"}, nil
 	default:
@@ -82,11 +84,7 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		up, _, ok := strings.Cut(string(migration), "-- +goose Down")
-		if !ok {
-			t.Fatalf("missing Down section in %s", path)
-		}
-		exec(up)
+		exec(string(migration))
 	}
 	exec(`
 		INSERT INTO candidates (id, name, email, password_hash, salt, created_at)
@@ -162,7 +160,8 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 
 	repo := database.NewAssessmentRepository(pool)
 	router := gin.New()
-	NewAssessmentHandler(repo, outcomeSessions{}).RegisterRoutes(router.Group("/v1"))
+	handler := NewAssessmentHandler(repo, outcomeSessions{})
+	handler.RegisterRoutes(router.Group("/v1"))
 	NewPipelineHandler(nil, outcomeSessions{}).RegisterRoutes(router.Group("/v1"))
 	request := func(method, path, token, body string, status int) []byte {
 		t.Helper()
@@ -267,9 +266,42 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		}
 	}
 	codingPath, id, question := start(3)
+	runBody := fmt.Sprintf(`{"questionId":%q,"language":"python","source":"print(input())","stdin":"hello"}`, question)
+	request(http.MethodPost, codingPath+"/run", "company", runBody, http.StatusForbidden)
+	request(http.MethodPost, codingPath+"/run", "candidate", runBody, http.StatusServiceUnavailable)
+	handler.ConfigureRunner(codeRunStub{})
+	request(http.MethodPost, codingPath+"/run", "other-candidate", runBody, http.StatusNotFound)
+	request(http.MethodPost, codingPath+"/run", "candidate", fmt.Sprintf(`{"language":"python","source":%q}`, strings.Repeat("x", 65537)), http.StatusBadRequest)
+	handler.runs <- struct{}{}
+	handler.runs <- struct{}{}
+	request(http.MethodPost, codingPath+"/run", "candidate", runBody, http.StatusTooManyRequests)
+	<-handler.runs
+	<-handler.runs
+	runResult := request(http.MethodPost, codingPath+"/run", "candidate", runBody, http.StatusOK)
+	if !strings.Contains(string(runResult), `"stdout":"hello"`) {
+		t.Fatalf("execution output: %s", runResult)
+	}
+	request(http.MethodPost, codingPath+"/run", "candidate", strings.Replace(runBody, question, "00000000-0000-0000-0000-000000000099", 1), http.StatusNotFound)
+	handler.ConfigureRunner(codeRunStub{fail: true})
+	request(http.MethodPost, codingPath+"/run", "candidate", runBody, http.StatusServiceUnavailable)
+	handler.ConfigureRunner(codeRunStub{})
+
 	request(http.MethodPut, codingPath+"/submissions/"+question, "candidate",
 		`{"response":{"language":"python","code":"print()"}}`, http.StatusOK)
+	reloaded := request(http.MethodGet, codingPath, "candidate", "", http.StatusOK)
+	var restored struct {
+		SavedResponses map[string]struct {
+			Language string
+			Code     string
+		} `json:"savedResponses"`
+	}
+	if err := json.Unmarshal(reloaded, &restored); err != nil || restored.SavedResponses[question].Language != "python" || restored.SavedResponses[question].Code != "print()" {
+		t.Fatalf("saved code not restored: %s (%v)", reloaded, err)
+	}
+	request(http.MethodGet, codingPath, "company", "", http.StatusForbidden)
+
 	exec("UPDATE assessment_attempts SET deadline = now() - interval '1 second' WHERE id = $1::uuid", id)
+	request(http.MethodPost, codingPath+"/run", "candidate", runBody, http.StatusConflict)
 	sweep()
 	_, _, status, auto = load(3)
 	if status != "pending_grading" || !auto {
@@ -636,4 +668,13 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 		FROM assessment_results WHERE attempt_id=$1::uuid`, finalAttempt).Scan(&persisted); err != nil || !persisted {
 		t.Fatalf("late grading result persisted=%v: %v", persisted, err)
 	}
+}
+
+type codeRunStub struct{ fail bool }
+
+func (s codeRunStub) Run(_ context.Context, _, _, input string) (string, bool, error) {
+	if s.fail {
+		return "", false, errors.New("provider unavailable")
+	}
+	return input, true, nil
 }

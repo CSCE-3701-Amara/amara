@@ -376,9 +376,6 @@ test("pipeline saves an ordered stage array with version id and RFC3339 times", 
     route.fulfill({ json: [assessment] }),
   );
   await page.goto(`/employer/pipelines/${jobId}`);
-  await page
-    .getByText("Server-supported stage configuration", { exact: true })
-    .click();
   await page.getByRole("button", { name: "Create pipeline draft" }).click();
   await page.getByRole("button", { name: "Add assessment stage" }).click();
   await page.getByLabel("Stage name").fill("Skills assessment");
@@ -387,7 +384,10 @@ test("pipeline saves an ordered stage array with version id and RFC3339 times", 
   await page.getByRole("checkbox", { name: "Teamwork" }).check();
   await page.getByRole("button", { name: "Save pipeline stages" }).click();
   await expect(
-    page.getByRole("form", { name: "Pipeline stages" }).getByRole("status"),
+    page
+      .getByRole("form", { name: "Pipeline stages" })
+      .getByRole("status")
+      .filter({ hasText: "Pipeline stages saved." }),
   ).toContainText("Pipeline stages saved.");
   expect(saved).toEqual([
     expect.objectContaining({

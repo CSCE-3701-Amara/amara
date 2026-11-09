@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-09",
+  "resolved": [
+    "R01",
+    "R02"
+  ],
+  "browser": {
+    "startTime": "2026-11-09T19:43:20.027Z",
+    "duration": 102675.646,
+    "expected": 396,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "go_race": "pass with real PostgreSQL and Docker; final focused regressions pass",
+  "build_lint_typecheck": "pass",
+  "gosec_findings": 0,
+  "official_judge0": "not verified; image download stalled",
+  "actual_docker_cases": 6,
+  "remaining_original_issues": [
+    "R03",
+    "R04",
+    "R05"
+  ]
+}

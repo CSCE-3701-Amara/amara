@@ -41,3 +41,13 @@ govulncheck:
 
 fmt:
 	go fmt ./...
+
+.PHONY: worker sandbox sandbox-judge0
+worker:
+	go run ./cmd/worker
+
+sandbox:
+	go run ./cmd/sandbox
+
+sandbox-judge0:
+	./scripts/start-judge0.sh

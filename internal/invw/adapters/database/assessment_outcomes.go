@@ -52,6 +52,7 @@ type AssessmentAttempt struct {
 	SubmittedAt      *time.Time      `json:"submittedAt"`
 	AutoSubmitted    bool            `json:"autoSubmitted"`
 	Questions        json.RawMessage `json:"questions"`
+	SavedResponses   json.RawMessage `json:"savedResponses"`
 }
 
 func (r *AssessmentRepository) CandidateAttempt(ctx context.Context, candidate, id string, start, submit bool) (AssessmentAttempt, error) {
@@ -115,10 +116,10 @@ func (r *AssessmentRepository) CandidateAttempt(ctx context.Context, candidate, 
 					'options', q.question->'options', 'position', q.question_ordinal - 1))
 					ORDER BY q.module_ordinal, q.question_ordinal)
 				FROM (`+snapshotQuestions+`) q
-			), '[]'::jsonb) END
+			), '[]'::jsonb) END, a.saved_responses
 		FROM assessment_attempts a WHERE a.id = $1::uuid`, attemptID).
 		Scan(&attempt.ID, &attempt.InstanceID, &attempt.StageExecutionID, &attempt.Status,
-			&attempt.StartedAt, &attempt.Deadline, &attempt.SubmittedAt, &attempt.AutoSubmitted, &attempt.Questions)
+			&attempt.StartedAt, &attempt.Deadline, &attempt.SubmittedAt, &attempt.AutoSubmitted, &attempt.Questions, &attempt.SavedResponses)
 	if err != nil {
 		return AssessmentAttempt{}, err
 	}
@@ -229,7 +230,7 @@ func (r *AssessmentRepository) FinalizeEvidence(ctx context.Context, attemptID, 
 						THEN round(avg((item->>'score')::numeric))::int END
 					FROM jsonb_array_elements($2::jsonb) item
 				)
-			WHERE a.id = $1::uuid AND a.status IN ('pending_grading', 'submitted')
+			WHERE a.id = $1::uuid AND (a.status IN ('pending_grading', 'submitted') OR ($3='' AND a.status='scored' AND a.final_score IS NULL))
 				AND a.submitted_at IS NOT NULL
 				AND EXISTS (
 					SELECT 1 FROM stage_executions se
@@ -250,7 +251,7 @@ func (r *AssessmentRepository) FinalizeEvidence(ctx context.Context, attemptID, 
 					) e ON true
 					WHERE e.copies <> 1 OR CASE
 						WHEN q.question->>'format' = 'code' THEN
-							$3 <> '' OR e.item ? 'score' OR coalesce(jsonb_array_length(q.question->'test_cases'), 0) = 0
+							$3 <> '' OR coalesce(jsonb_array_length(q.question->'test_cases'), 0) = 0
 							OR (e.item->>'totalCases')::int IS DISTINCT FROM jsonb_array_length(q.question->'test_cases')
 							OR NOT coalesce((e.item->>'passedCases')::int BETWEEN 0 AND (e.item->>'totalCases')::int, false)
 						ELSE
@@ -401,4 +402,10 @@ func (r *AssessmentRepository) ReviewEvaluation(ctx context.Context, attempt, co
 		WHERE a.id = $1::uuid AND j.company_id::text = $2 AND a.submitted_at IS NOT NULL
 	`, attempt, company).Scan(&result)
 	return result, err
+}
+
+func (r *AssessmentRepository) CanRunCode(ctx context.Context, candidate, attempt string) (bool, error) {
+	var allowed bool
+	err := r.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM assessment_attempts a JOIN stage_executions se ON se.id=a.stage_execution_id JOIN pipeline_executions pe ON pe.id=se.pipeline_execution_id WHERE a.id=$1::uuid AND a.candidate_id=$2::uuid AND a.status='in_progress' AND a.deadline>clock_timestamp() AND pe.status='active' AND se.status IN ('available','in_progress'))`, attempt, candidate).Scan(&allowed)
+	return allowed, err
 }

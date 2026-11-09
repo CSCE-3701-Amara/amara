@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/judge0"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -183,6 +186,20 @@ func run() error {
 	pipelineHandler := invwhttp.NewPipelineHandler(invwdatabase.NewPipelineRepository(dbSvc.Pool()), authRepo)
 	moduleHandler := invwhttp.NewModuleHandler(invwdatabase.NewModuleRepository(dbSvc.Pool()), authRepo)
 	assessmentHandler := invwhttp.NewAssessmentHandler(invwdatabase.NewAssessmentRepository(dbSvc.Pool()), authRepo)
+	if baseURL := strings.TrimSpace(os.Getenv("JUDGE0_URL")); baseURL != "" {
+		var languages map[string]int
+		if raw := os.Getenv("JUDGE0_LANGUAGE_IDS"); raw != "" {
+			if err := json.Unmarshal([]byte(raw), &languages); err != nil || len(languages) == 0 {
+				return fmt.Errorf("invalid JUDGE0_LANGUAGE_IDS")
+			}
+		}
+		runner, err := judge0.New(baseURL, os.Getenv("JUDGE0_AUTH_TOKEN"), languages, cfg.Environment == "development" && os.Getenv("JUDGE0_ALLOW_LOCAL_HTTP") == "true")
+		if err != nil {
+			return err
+		}
+		assessmentHandler.ConfigureRunner(runner)
+	}
+
 	trackingRepo := canddatabase.NewApplicationTrackingRepository(dbSvc.Pool())
 	trackingHandler := candhttp.NewApplicationTrackingHandler(trackingRepo, authRepo)
 

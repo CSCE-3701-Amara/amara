@@ -14,6 +14,7 @@ export interface Question {
   options?: string[];
   amara?: string;
   difficulty?: string;
+  minimum_cases_passed?: number;
   test_cases?: { input: string; expected_output: string; weight: number }[];
 }
 export interface ProblemReference {
@@ -24,6 +25,8 @@ export interface ModuleDefinition {
   name: string;
   description?: string;
   type: "coding" | "programming_language" | "behavioral" | "recorded_video";
+  behavioral?: boolean;
+  minimum_tests_passed?: number;
   active_minutes?: number;
   threshold?: number;
   questions?: Question[];
@@ -53,6 +56,9 @@ export interface PipelineDraft {
   published: boolean;
 }
 export interface PipelineStage {
+  advancementRule?: "manual" | "completion" | "threshold";
+  scoreThreshold?: number;
+  belowThresholdAction?: "hold" | "reject";
   id?: string;
   name: string;
   type: "assessment" | "live_interview";
