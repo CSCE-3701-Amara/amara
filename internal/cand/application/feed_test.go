@@ -208,3 +208,18 @@ func TestJobFeedListRejectsMissingDependencies(t *testing.T) {
 		t.Fatal("nil archiver should return an error")
 	}
 }
+
+func TestJobFeedDoesNotExposeHiddenSalary(t *testing.T) {
+	min, max := int32(40000), int32(70000)
+	for _, visibility := range []*bool{nil, new(bool), new(true)} {
+		posting := domain.FeedPosting{SalaryMin: &min, SalaryMax: &max, SalaryVisible: visibility}
+		item := mapFeedPosting(posting)
+		visible := visibility != nil && *visibility
+		if !visible && (item.SalaryMin != nil || item.SalaryMax != nil) {
+			t.Errorf("hidden salary leaked: %+v", item)
+		}
+		if visible && (item.SalaryMin == nil || *item.SalaryMin != min || item.SalaryMax == nil || *item.SalaryMax != max) {
+			t.Errorf("visible salary lost: %+v", item)
+		}
+	}
+}

@@ -18,6 +18,7 @@ export interface PostingInput {
   application_opening?: string | null;
   application_deadline?: string | null;
   max_applications?: number | null;
+  finalist_target?: number | null;
   requirements: {
     id?: string;
     text: string;
