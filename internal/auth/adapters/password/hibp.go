@@ -24,6 +24,8 @@ func NewHIBPChecker(client *http.Client) (*HIBPChecker, error) {
 }
 
 func (c *HIBPChecker) IsCompromised(ctx context.Context, password string) (bool, error) {
+	// HIBP requires SHA-1 for its prefix lookup protocol; passwords are stored with Argon2id.
+	// nosemgrep: go.lang.security.audit.crypto.use_of_weak_crypto.use-of-sha1
 	sum := sha1.Sum([]byte(password)) // #nosec G401 -- SHA-1 is required by the HIBP lookup protocol, not used for password storage.
 	hash := strings.ToUpper(hex.EncodeToString(sum[:]))
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+hash[:5], nil)

@@ -223,6 +223,7 @@ func (s *service) execute(token string, language int, source, stdin []byte) {
 	ctx, cancel := context.WithTimeout(context.Background(), executionTimeout)
 	defer cancel()
 	args := dockerArgs(name, config, path)
+	// #nosec G204 -- Fixed Docker binary and allowlisted language config; name/path are server-generated, and candidate code is read-only file data, never a shell argument.
 	cmd := exec.CommandContext(ctx, "docker", args...)
 	reader, writer := io.Pipe()
 	cmd.Stdin = reader
