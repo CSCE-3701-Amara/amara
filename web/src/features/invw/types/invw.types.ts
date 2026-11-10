@@ -28,6 +28,8 @@ export interface ModuleDefinition {
   behavioral?: boolean;
   minimum_tests_passed?: number;
   active_minutes?: number;
+  behavioral?: boolean;
+  minimum_tests_passed?: number;
   threshold?: number;
   questions?: Question[];
   amarat?: Amara[];
@@ -66,6 +68,7 @@ export interface PipelineStage {
   scheduledEndAt: string;
   moduleIds?: string[];
   interview?: {
+    behavioral?: boolean;
     durationMinutes: number;
     interviewerIds: string[];
     threshold: number | null;

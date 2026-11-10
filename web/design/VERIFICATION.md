@@ -1,4 +1,42 @@
-# Verification evidence
+# Verification evidence — 2026-11-08
+
+The final production browser suite passed **388/388**, with **0 failures, 0 skipped, 0 flaky**, in 124 seconds. [verification.json](verification.json) records each case. Browser HTTP responses are mocks.
+
+| Check | Result |
+| --- | --- |
+| `npm run lint` | Passed, no warnings |
+| `npx tsc --noEmit` | Passed |
+| `npm run build` | Passed using the standard Next.js 16.4.3 Turbopack command |
+| `go test ./...` | Passed |
+| `python web/scripts/contract-types.py` | Generated 36 projections; formatted output unchanged |
+| `git diff --check` | Passed |
+| `PLAYWRIGHT_SERVER=production npx playwright test --reporter=json` | 388 passed; Playwright starts/stops the production server |
+| `make run-secrets` | Development DB connected; API crashed during application wildcard registration |
+| Live authenticated writes/reload/permission verification | Blocked by current backend startup failure |
+
+All 102 workspace states were rendered at 1728px, 1024px and 375px, including the 35 dialog routes with Cancel focus and Escape dismissal. Authentication/entry suites cover their own desktop/mobile states. Screenshots are local artifacts under `web/tests/artifacts/product/<node-id>-<width>.png`; dialogs have `-dialog.png` variants. They are intentionally gitignored.
+
+New checks cover threshold preview/apply payloads and dashboard refresh, cancellation when switching stages, interview outcome rejection/retry, DAG undo restoring links, module test-pass setting preservation, and candidate profile readback after reload. The reload check uses a stateful mock and does not prove database persistence. Existing checks continue to exercise role redirects, auth errors, loading/empty/error screens, assessment save/submit ordering, manual decision conflicts, modules, posting lifecycle and DAG keyboard/cycle behavior.
+
+The first full run had one failure: the populated biography textarea lacked a stable explicit label for exact label lookup. `aria-label="Biography"` fixed it; the final full run is entirely green. No failing result is included as successful verification.
+
+## Figma inventory and visual limits
+
+All five pages were freshly enumerated, including nested frames and dialog collections: **114 product states**, **78 exclusions** and **6 collection containers**. Component samples are listed individually. No mobile-specific product frames, drawers or archived screen collections were found.
+
+**96 references** are available, including high-fidelity sublayers plus a full screenshot for the main DAG editor. **18 exact references** still hit the Education-plan MCP limit; links appear in [COVERAGE.md](COVERAGE.md). Separate motion verification remains missing for 11 auth/entry frames.
+
+Reference comparisons informed the DAG palette/toolbar/node/inspector, removal of absent header artwork, dedicated offers overview and shared primary color. Sixteen downloaded Figma SVGs retain their intrinsic dimensions; [pipeline-assets.json](pipeline-assets.json) records files, hashes, slots, callsite and measured browser geometry. All 16 SVGs loaded and matched intrinsic dimensions within browser subpixel rounding (<1/64 CSS pixel) in a separate production probe using mocks. Screenshots confirmed the node-text layout fix. Product data and unavailable integrations necessarily differ from the populated Figma examples. Full pixel parity is not signed off; available states remain **Implemented but unverified**, unread references **Blocked**.
+
+## Current backend blocker
+
+The current router panics before listening because `/v1/applications/:application_id/assessments` conflicts with `/v1/applications/:applicationId/assessment-instances`. The complete process fails even though isolated Go unit tests pass. JOB management/apply still use nil auth. Progress handlers also expect a context key not set by the shared session middleware. [INTEGRATION.md](../INTEGRATION.md) records current methods, schemas and dependencies.
+
+No backend code or database data was changed by this task. Earlier successful startup probes below belong to an older checkout and do not establish current API health.
+
+---
+
+# Earlier verification evidence
 
 ## Candidate email verification follow-up
 

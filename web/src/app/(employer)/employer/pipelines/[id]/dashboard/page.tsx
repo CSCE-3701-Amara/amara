@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { HiringApplications } from "@/features/management/components/hiring";
+import { HiringApplications } from "@/features/management/components/hiring-applications";
 async function Content({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return <HiringApplications id={id} view="dashboard" />;

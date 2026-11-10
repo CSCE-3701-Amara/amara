@@ -210,12 +210,6 @@
   .section {
     padding: 24px 0;
   }
-  .list {
-    margin: 16px 0;
-  }
-  .row {
-    gap: 12px;
-  }
   .panel {
     padding: 20px;
   }
@@ -245,7 +239,6 @@
 }
 
 .panel,
-.row,
 .table td,
 .table th {
   overflow-wrap: anywhere;

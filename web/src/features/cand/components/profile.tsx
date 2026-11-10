@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useApiResource } from "@/shared/lib/use-api-resource";
 import { useProfileUpdate } from "@/shared/lib/use-profile-update";
-import { ApiFeedback } from "@/shared/ui/workspace";
+import { ApiFeedback, BusyState } from "@/shared/ui/workspace";
+import { useApiResource } from "@/shared/lib/use-api-resource";
 import { performAccountAction } from "@/features/auth/api/auth.api";
 import {
   ConfirmDialog,
@@ -15,6 +16,7 @@ import {
 import { workspaceStyles as s } from "@/shared/ui/workspace";
 import styles from "./candidate.module.css";
 interface CandidateProfile {
+  id?: string;
   name?: string;
   email?: string;
   address?: string;
@@ -31,6 +33,30 @@ export function CandidateProfileScreen({
   profile,
 }: {
   edit?: boolean;
+  profile?: CandidateProfile;
+}) {
+  const resource = useApiResource<CandidateProfile>(
+    profile ? null : "/v1/candidates/me",
+  );
+  return (
+    <>
+      <BusyState loading={resource.loading} />
+      <ApiFeedback error={resource.error} retry={resource.reload} />
+      {!resource.loading && (
+        <CandidateProfileForm
+          key={profile?.id || resource.data?.id || "unavailable"}
+          edit={edit}
+          profile={profile || resource.data}
+        />
+      )}
+    </>
+  );
+}
+function CandidateProfileForm({
+  edit,
+  profile,
+}: {
+  edit: boolean;
   profile?: CandidateProfile;
 }) {
   const router = useRouter();
@@ -105,15 +131,29 @@ export function CandidateProfileScreen({
                 </label>
                 <label className={s.field}>
                   Nationality
-                  <input name="nationality" maxLength={100} />
+                  <input
+                    name="nationality"
+                    maxLength={100}
+                    defaultValue={profile?.nationality}
+                  />
                 </label>
                 <label className={s.field}>
                   Birth date
-                  <input name="birthDate" type="date" autoComplete="bday" />
+                  <input
+                    name="birthDate"
+                    type="date"
+                    autoComplete="bday"
+                    defaultValue={profile?.birthDate}
+                  />
                 </label>
                 <label className={s.field}>
                   Gender
-                  <input name="gender" autoComplete="sex" maxLength={50} />
+                  <input
+                    name="gender"
+                    autoComplete="sex"
+                    maxLength={50}
+                    defaultValue={profile?.gender}
+                  />
                 </label>
               </div>
             </section>
@@ -127,6 +167,7 @@ export function CandidateProfileScreen({
                     type="number"
                     min={0}
                     step={1}
+                    defaultValue={profile?.yearsOfExperience}
                   />
                 </label>
                 <label className={s.field}>
@@ -142,6 +183,7 @@ export function CandidateProfileScreen({
                 <label className={`${s.field} ${styles.fullWidth}`}>
                   Biography
                   <textarea
+                    aria-label="Biography"
                     name="biography"
                     maxLength={5000}
                     value={biography}
@@ -211,8 +253,8 @@ export function CandidateProfileScreen({
             </Link>
           </div>
           <p id="profile-save-note" className={s.muted}>
-            Only edited fields are sent. Saved details cannot yet be reloaded
-            from your profile.
+            Only edited fields are sent. Your saved details are available from
+            your profile after reloading.
           </p>
           <div className={s.actions}>
             <button type="button" onClick={() => setDialog("deactivate")}>

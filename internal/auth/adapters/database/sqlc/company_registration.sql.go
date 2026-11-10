@@ -75,6 +75,7 @@ type CreateCompanyRegistrationParams struct {
 	Salt               []byte
 	AutoApprove        bool
 	CreatedAt          pgtype.Timestamp
+	AutoApprove        bool
 }
 
 type CreateCompanyRegistrationRow struct {
@@ -93,6 +94,7 @@ func (q *Queries) CreateCompanyRegistration(ctx context.Context, arg CreateCompa
 		arg.Salt,
 		arg.AutoApprove,
 		arg.CreatedAt,
+		arg.AutoApprove,
 	)
 	var i CreateCompanyRegistrationRow
 	err := row.Scan(

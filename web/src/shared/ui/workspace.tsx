@@ -132,7 +132,7 @@ export function Workspace({
       if (cause instanceof ApiError && cause.status === 401) {
         router.replace("/login?state=expired");
         router.refresh();
-      } else setError(cause as Error);
+      } else setError(toError(cause));
     } finally {
       pending.current = false;
       setBusy(false);

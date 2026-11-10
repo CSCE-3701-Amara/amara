@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { FeedbackAuthor } from "@/features/management/components/hiring";
+import { FeedbackAuthor } from "@/features/management/components/feedback-author";
 async function Content({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return <FeedbackAuthor id={id} />;

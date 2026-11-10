@@ -1,4 +1,6 @@
 "use client";
+import { toDateTimeLocal } from "@/shared/lib/date-time";
+import { toError } from "@/shared/lib/errors";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { PostingPreview } from "./posting-preview";
@@ -21,13 +23,6 @@ import {
 } from "../api/job.api";
 import type { EmploymentType, Posting, PostingInput } from "../types/job.types";
 
-function localDate(value?: string | null) {
-  if (!value) return "";
-  const date = new Date(value);
-  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 16);
-}
 function PostingForm({
   initial,
   onSaved,
@@ -137,7 +132,7 @@ function PostingForm({
         onSaved?.();
       }
     } catch (cause) {
-      setError(cause as Error);
+      setError(toError(cause));
     } finally {
       pending.current = false;
       setBusy(false);
@@ -228,7 +223,7 @@ function PostingForm({
           <input
             name="application_opening"
             type="datetime-local"
-            defaultValue={localDate(initial?.application_opening)}
+            defaultValue={toDateTimeLocal(initial?.application_opening)}
           />
         </label>
         <label className={e.field}>
@@ -240,7 +235,7 @@ function PostingForm({
               invalidField === "application_deadline" ? errorId : undefined
             }
             type="datetime-local"
-            defaultValue={localDate(initial?.application_deadline)}
+            defaultValue={toDateTimeLocal(initial?.application_deadline)}
           />
         </label>
       </div>
@@ -327,7 +322,7 @@ function PostingActions({
         reload();
       }
     } catch (cause) {
-      setError(cause as Error);
+      setError(toError(cause));
       throw cause;
     } finally {
       setBusy(false);

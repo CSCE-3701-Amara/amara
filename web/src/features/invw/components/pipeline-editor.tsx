@@ -1,4 +1,6 @@
 "use client";
+import { toDateTimeLocal } from "@/shared/lib/date-time";
+import { toError } from "@/shared/lib/errors";
 import { useState, type FormEvent } from "react";
 import { resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
@@ -15,14 +17,6 @@ import type {
   PipelineStage,
   ModuleSummary,
 } from "../types/invw.types";
-function localDate(value: string) {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime())
-    ? ""
-    : new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 16);
-}
 function StageForm({
   initial,
   versionId,
@@ -77,7 +71,7 @@ function StageForm({
       setStages((await replacePipelineStages(versionId, stages)) || []);
       setMessage("Pipeline stages saved.");
     } catch (cause) {
-      setError(cause as Error);
+      setError(toError(cause));
     } finally {
       setBusy(false);
     }
@@ -110,7 +104,7 @@ function StageForm({
               <input
                 type="datetime-local"
                 required
-                value={localDate(stage.scheduledStartAt)}
+                value={toDateTimeLocal(stage.scheduledStartAt)}
                 onChange={(event) =>
                   update(index, {
                     scheduledStartAt: event.target.value
@@ -125,7 +119,7 @@ function StageForm({
               <input
                 type="datetime-local"
                 required
-                value={localDate(stage.scheduledEndAt)}
+                value={toDateTimeLocal(stage.scheduledEndAt)}
                 onChange={(event) =>
                   update(index, {
                     scheduledEndAt: event.target.value
@@ -259,7 +253,7 @@ export function PipelineEditor({ postingId }: { postingId: string }) {
       await createPipeline(postingId);
       pipeline.reload();
     } catch (cause) {
-      setError(cause as Error);
+      setError(toError(cause));
     } finally {
       setBusy(false);
     }

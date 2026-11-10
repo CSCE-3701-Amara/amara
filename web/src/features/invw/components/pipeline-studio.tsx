@@ -28,7 +28,7 @@ export function PipelineStudio({ postingId }: { postingId: string }) {
         <p>
           Use this editor for pipelines created with the earlier stage format.
         </p>
-        <PipelineEditor postingId={postingId} />
+        {stageEditorVisited && <PipelineEditor postingId={postingId} />}
       </details>
       <WorkspaceFooter />
     </>

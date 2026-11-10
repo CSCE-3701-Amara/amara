@@ -1,0 +1,2435 @@
+{
+  "checkedAt": "2026-11-08",
+  "contract": "docs/api/openapi.yaml",
+  "counts": {
+    "unspecified": 35,
+    "implemented": 20,
+    "planned": 87
+  },
+  "operations": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "operationId": "getHealth",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Health"
+      ],
+      "security": [],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/auth/registrations",
+      "operationId": "registerCandidateOrInterviewer",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Auth"
+      ],
+      "security": [],
+      "requestSchema": {
+        "$ref": "#/components/schemas/UserRegistrationRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/auth/company-registrations",
+      "operationId": "registerCompany",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Auth"
+      ],
+      "security": [],
+      "requestSchema": {
+        "$ref": "#/components/schemas/CompanyRegistrationRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/auth/verifications",
+      "operationId": "verifyAccount",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Auth"
+      ],
+      "security": [],
+      "requestSchema": {
+        "$ref": "#/components/schemas/AccountVerificationRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/auth/sessions",
+      "operationId": "createSession",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Auth"
+      ],
+      "security": [],
+      "requestSchema": {
+        "$ref": "#/components/schemas/LoginRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/auth/sessions/current",
+      "operationId": "deleteCurrentSession",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Auth"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/auth/account-actions",
+      "operationId": "performAccountAction",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Auth"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/AccountActionRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/candidates/me",
+      "operationId": "getOwnCandidateProfile",
+      "contractStatus": "implemented",
+      "tags": [
+        "Auth"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/candidates/me",
+      "operationId": "updateCandidateProfile",
+      "contractStatus": "implemented",
+      "tags": [
+        "Auth"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/CandidateProfileUpdateRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/candidates/me/applications",
+      "operationId": "listOwnApplications",
+      "contractStatus": "implemented",
+      "tags": [
+        "Applications"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/companies/me",
+      "operationId": "getOwnCompanyProfile",
+      "contractStatus": "implemented",
+      "tags": [
+        "Companies"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/companies/me",
+      "operationId": "updateOwnCompanyProfile",
+      "contractStatus": "implemented",
+      "tags": [
+        "Companies"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/CompanyProfileUpdate"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/companies/me/interviewers",
+      "operationId": "listCompanyInterviewers",
+      "contractStatus": "implemented",
+      "tags": [
+        "Companies"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/companies/{companyId}",
+      "operationId": "getPublicCompanyProfile",
+      "contractStatus": "implemented",
+      "tags": [
+        "Companies"
+      ],
+      "security": [],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/interviewers/me",
+      "operationId": "getOwnInterviewerProfile",
+      "contractStatus": "implemented",
+      "tags": [
+        "Interviewers"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/interviewers/me",
+      "operationId": "updateOwnInterviewerProfile",
+      "contractStatus": "implemented",
+      "tags": [
+        "Interviewers"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/InterviewerProfileUpdate"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/jobs",
+      "operationId": "listCompanyJobPostings",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/jobs",
+      "operationId": "createJobPosting",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/JobPostingRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/company/{company_id}/postings",
+      "operationId": "listCompanyPostings",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/jobs/feed",
+      "operationId": "getCandidateJobFeed",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/jobs/{id}",
+      "operationId": "getCompanyJobPosting",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/jobs/{id}",
+      "operationId": "updateCompanyJobPosting",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/JobPostingRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/jobs/{id}",
+      "operationId": "deleteCompanyJobPosting",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/jobs/{id}/preview",
+      "operationId": "previewSavedJobPosting",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/jobs/{id}/preview",
+      "operationId": "previewEditedJobPosting",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/JobPostingPreviewRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/jobs/{id}/publish",
+      "operationId": "publishJobPosting",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/jobs/{id}/archive",
+      "operationId": "archiveJobPosting",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/jobs/{id}/republish",
+      "operationId": "republishJobPosting",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/jobs/{id}/apply",
+      "operationId": "applyToJobPosting",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Jobs"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/modules",
+      "operationId": "listAssessmentModules",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/modules",
+      "operationId": "createAssessmentModule",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/ModuleAuthoringInput"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/modules/library",
+      "operationId": "listPublishedAssessmentModules",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/modules/library/problems",
+      "operationId": "listPublishedCodingProblems",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/modules/{moduleId}",
+      "operationId": "getAssessmentModule",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/modules/{moduleId}",
+      "operationId": "replaceAssessmentModule",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/ModuleAuthoringInput"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/modules/{moduleId}",
+      "operationId": "deleteAssessmentModule",
+      "contractStatus": "planned",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/modules/{moduleId}/questions",
+      "operationId": "listModuleQuestions",
+      "contractStatus": "planned",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/modules/{moduleId}/questions",
+      "operationId": "createAssessmentQuestion",
+      "contractStatus": "planned",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/AssessmentQuestionWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/assessment-questions/{questionId}",
+      "operationId": "getAssessmentQuestion",
+      "contractStatus": "planned",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/assessment-questions/{questionId}",
+      "operationId": "replaceAssessmentQuestion",
+      "contractStatus": "planned",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/AssessmentQuestionWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/assessment-questions/{questionId}",
+      "operationId": "deleteAssessmentQuestion",
+      "contractStatus": "planned",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/modules/{moduleId}/question-drafts",
+      "operationId": "generateAssessmentQuestionDrafts",
+      "contractStatus": "planned",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/QuestionDraftRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/assessment-questions/{questionId}/review",
+      "operationId": "approveAssessmentQuestion",
+      "contractStatus": "planned",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/QuestionReviewRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/modules/{moduleId}/publish",
+      "operationId": "publishAssessmentModule",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/modules/{moduleId}/copy",
+      "operationId": "copyPublishedAssessmentModule",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Modules"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/jobs/{id}/pipeline",
+      "operationId": "getJobPipeline",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/jobs/{id}/pipeline",
+      "operationId": "createJobPipeline",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipelines/{pipelineId}",
+      "operationId": "getPipeline",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PATCH",
+      "path": "/v1/pipelines/{pipelineId}",
+      "operationId": "updatePipelinePolicy",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/PipelinePolicyUpdate"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipelines/{pipelineId}/versions",
+      "operationId": "listPipelineVersions",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/pipelines/{pipelineId}/versions",
+      "operationId": "createPipelineVersion",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/VersionCreate"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipeline-versions/{versionId}",
+      "operationId": "getPipelineVersion",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/pipeline-versions/{versionId}",
+      "operationId": "deletePipelineDraftVersion",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipeline-versions/{versionId}/stages",
+      "operationId": "listPipelineStages",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/pipeline-versions/{versionId}/stages",
+      "operationId": "replaceLinearPipelineStages",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/LinearDraftStage"
+        }
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/pipeline-versions/{versionId}/stages",
+      "operationId": "createPipelineStage",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/PipelineStageWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipeline-stages/{stageId}",
+      "operationId": "getPipelineStage",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/pipeline-stages/{stageId}",
+      "operationId": "replacePipelineStage",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/PipelineStageWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/pipeline-stages/{stageId}",
+      "operationId": "deletePipelineStage",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipeline-stages/{stageId}/test-configuration",
+      "operationId": "getStageTestConfiguration",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/pipeline-stages/{stageId}/test-configuration",
+      "operationId": "replaceStageTestConfiguration",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/TestConfigurationWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipeline-versions/{versionId}/transitions",
+      "operationId": "listStageTransitions",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/pipeline-versions/{versionId}/transitions",
+      "operationId": "createStageTransition",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/StageTransitionWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "DELETE",
+      "path": "/v1/stage-transitions/{transitionId}",
+      "operationId": "deleteStageTransition",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/pipeline-versions/{versionId}/validation",
+      "operationId": "validatePipelineVersion",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/pipeline-versions/{versionId}/migration-preview",
+      "operationId": "previewPipelineMigration",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/PipelinePublicationRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/pipeline-versions/{versionId}/publish",
+      "operationId": "publishPipelineVersion",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipelines"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/PipelinePublicationRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/jobs/{id}/applications",
+      "operationId": "listJobApplications",
+      "contractStatus": "planned",
+      "tags": [
+        "Applications"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/applications/{applicationId}",
+      "operationId": "getApplication",
+      "contractStatus": "implemented",
+      "tags": [
+        "Applications"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/applications/{applicationId}/withdrawal",
+      "operationId": "withdrawApplication",
+      "contractStatus": "planned",
+      "tags": [
+        "Applications"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/ReasonRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/applications/{applicationId}/stage-progress",
+      "operationId": "getApplicationStageProgress",
+      "contractStatus": "planned",
+      "tags": [
+        "Applications"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/applications/{applicationId}/pipeline-execution",
+      "operationId": "getApplicationPipelineExecution",
+      "contractStatus": "planned",
+      "tags": [
+        "Applications"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/applications/{applicationId}/identity-reveal",
+      "operationId": "getIdentityRevealRecord",
+      "contractStatus": "planned",
+      "tags": [
+        "Applications"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/applications/{applicationId}/amarat",
+      "operationId": "listApplicationAmaraAwards",
+      "contractStatus": "planned",
+      "tags": [
+        "Applications"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/jobs/{id}/finalists",
+      "operationId": "listJobFinalists",
+      "contractStatus": "planned",
+      "tags": [
+        "Applications"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/applications/{applicationId}/rejection",
+      "operationId": "rejectFinalist",
+      "contractStatus": "planned",
+      "tags": [
+        "Applications"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/ReasonRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/jobs/{id}/finalist-rejections",
+      "operationId": "rejectJobFinalists",
+      "contractStatus": "planned",
+      "tags": [
+        "Applications"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/BulkFinalistRejectionRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/jobs/{id}/pipeline/dashboard",
+      "operationId": "reviewPublishedPipeline",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/pipeline-stages/{stageId}/threshold/preview",
+      "operationId": "previewStageThreshold",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "type": "object",
+        "required": [
+          "threshold",
+          "expectedThreshold"
+        ],
+        "properties": {
+          "threshold": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "expectedThreshold": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        }
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/pipeline-stages/{stageId}/threshold",
+      "operationId": "applyStageThreshold",
+      "contractStatus": "unspecified",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "type": "object",
+        "required": [
+          "threshold",
+          "expectedThreshold",
+          "preview"
+        ],
+        "properties": {
+          "threshold": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "expectedThreshold": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "preview": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StageThresholdOutcome"
+            }
+          }
+        }
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipelines/{pipelineId}/dashboard",
+      "operationId": "getPipelineDashboard",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipelines/{pipelineId}/executions",
+      "operationId": "listPipelineExecutions",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipelines/{pipelineId}/comparison",
+      "operationId": "comparePipelineApplications",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/applications/{applicationId}/scorecard",
+      "operationId": "getApplicationScorecard",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipeline-executions/{executionId}",
+      "operationId": "getPipelineExecution",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipeline-executions/{executionId}/stages",
+      "operationId": "listExecutionStages",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipeline-stages/{stageId}/executions",
+      "operationId": "listStageExecutions",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/stage-executions/{stageExecutionId}",
+      "operationId": "getStageExecution",
+      "contractStatus": "planned",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/stage-executions/{stageExecutionId}/decisions",
+      "operationId": "recordStageDecision",
+      "contractStatus": "implemented",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/StageDecisionRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/pipeline-stages/{stageId}/decisions",
+      "operationId": "recordBulkStageDecisions",
+      "contractStatus": "implemented",
+      "tags": [
+        "Pipeline execution"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/BulkStageDecisionRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/applications/{applicationId}/assessment-instances",
+      "operationId": "listApplicationAssessments",
+      "contractStatus": "implemented",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/assessment-instances/{instanceId}",
+      "operationId": "getAssessmentInstance",
+      "contractStatus": "planned",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/assessment-instances/{instanceId}/start",
+      "operationId": "startAssessmentInstance",
+      "contractStatus": "implemented",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/assessment-attempts/{attemptId}",
+      "operationId": "getAssessmentAttempt",
+      "contractStatus": "implemented",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/assessment-attempts/{attemptId}/submissions",
+      "operationId": "listSavedAssessmentAnswers",
+      "contractStatus": "planned",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/assessment-attempts/{attemptId}/submissions/{questionId}",
+      "operationId": "saveAssessmentAnswer",
+      "contractStatus": "implemented",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/CandidateAnswer"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/assessment-attempts/{attemptId}/video-uploads",
+      "operationId": "uploadAssessmentVideo",
+      "contractStatus": "planned",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/assessment-attempts/{attemptId}/submission",
+      "operationId": "submitAssessmentAttempt",
+      "contractStatus": "implemented",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/assessment-attempts/{attemptId}/evaluation",
+      "operationId": "reviewAssessmentEvaluation",
+      "contractStatus": "implemented",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/assessment-attempts/{attemptId}/evaluation",
+      "operationId": "finalizeHumanAssessmentEvaluation",
+      "contractStatus": "implemented",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "type": "object",
+        "required": [
+          "evidence"
+        ],
+        "properties": {
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "questionId"
+              ],
+              "properties": {
+                "questionId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "score": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Required for scored questions and omitted for behavioral questions."
+                },
+                "notes": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/assessment-attempts/{attemptId}/extensions",
+      "operationId": "extendAssessmentAttempt",
+      "contractStatus": "planned",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/AssessmentExtensionRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/assessment-instances/{instanceId}/result",
+      "operationId": "getDisclosedAssessmentResult",
+      "contractStatus": "planned",
+      "tags": [
+        "Assessments"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/grading/submissions",
+      "operationId": "listAssignedSubmissions",
+      "contractStatus": "planned",
+      "tags": [
+        "Grading"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/assessment-submissions/{submissionId}/grade",
+      "operationId": "gradeAssessmentSubmission",
+      "contractStatus": "planned",
+      "tags": [
+        "Grading"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/SubmissionGradeRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/assessment-instances/{instanceId}/grading-result",
+      "operationId": "getManagedAssessmentResult",
+      "contractStatus": "planned",
+      "tags": [
+        "Grading"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/interviews",
+      "operationId": "listAccessibleInterviews",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/interviews/{interviewId}",
+      "operationId": "getInterview",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/interviews/{interviewId}/assignments",
+      "operationId": "listInterviewAssignments",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/interviews/{interviewId}/assignments",
+      "operationId": "replaceInterviewAssignments",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/InterviewAssignmentWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/interviews/{interviewId}/availability",
+      "operationId": "getInterviewAvailability",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/interviews/{interviewId}/availability",
+      "operationId": "replaceOwnInterviewAvailability",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/InterviewAvailabilityWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/interviews/{interviewId}/confirmation",
+      "operationId": "confirmInterviewSlot",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/InterviewScheduleRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/interviews/{interviewId}/reschedules",
+      "operationId": "rescheduleInterview",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/InterviewScheduleRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/interviews/{interviewId}/outcome",
+      "operationId": "recordInterviewOutcome",
+      "contractStatus": "implemented",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/InterviewOutcomeRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/interviews/{interviewId}/rubric",
+      "operationId": "getPrivateInterviewRubric",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/interviews/{interviewId}/feedback",
+      "operationId": "listPrivateInterviewFeedback",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/interviews/{interviewId}/feedback/me",
+      "operationId": "getOwnInterviewFeedback",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/interviews/{interviewId}/feedback/me",
+      "operationId": "saveOwnInterviewFeedback",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/InterviewFeedbackWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/interviews/{interviewId}/feedback/me/submission",
+      "operationId": "submitOwnInterviewScorecard",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/interviews/{interviewId}/assignments/{interviewerId}/waiver",
+      "operationId": "waiveInterviewScorecard",
+      "contractStatus": "planned",
+      "tags": [
+        "Interviews"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/ReasonRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/stage-executions/{stageExecutionId}/feedback",
+      "operationId": "getStageFeedbackDraft",
+      "contractStatus": "planned",
+      "tags": [
+        "Feedback"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/stage-executions/{stageExecutionId}/feedback",
+      "operationId": "replaceStageFeedback",
+      "contractStatus": "planned",
+      "tags": [
+        "Feedback"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/FeedbackWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/stage-executions/{stageExecutionId}/feedback/release",
+      "operationId": "approveAndReleaseStageFeedback",
+      "contractStatus": "planned",
+      "tags": [
+        "Feedback"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/assessment-results/{resultId}/feedback",
+      "operationId": "writeAssessmentResultFeedback",
+      "contractStatus": "planned",
+      "tags": [
+        "Feedback"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/FeedbackWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/assessment-results/{resultId}/disclosure",
+      "operationId": "discloseAssessmentResult",
+      "contractStatus": "planned",
+      "tags": [
+        "Feedback"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/pipeline-executions/{executionId}/rejection-feedback",
+      "operationId": "getRejectionFeedbackDraft",
+      "contractStatus": "planned",
+      "tags": [
+        "Feedback"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/pipeline-executions/{executionId}/rejection-feedback",
+      "operationId": "replaceRejectionFeedback",
+      "contractStatus": "planned",
+      "tags": [
+        "Feedback"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/FeedbackWrite"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/pipeline-executions/{executionId}/rejection-feedback/release",
+      "operationId": "approveAndReleaseRejectionFeedback",
+      "contractStatus": "planned",
+      "tags": [
+        "Feedback"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/applications/{applicationId}/feedback",
+      "operationId": "getReleasedApplicationFeedback",
+      "contractStatus": "planned",
+      "tags": [
+        "Feedback"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/offers",
+      "operationId": "listAccessibleOffers",
+      "contractStatus": "planned",
+      "tags": [
+        "Offers"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/applications/{applicationId}/offers",
+      "operationId": "listApplicationOffers",
+      "contractStatus": "planned",
+      "tags": [
+        "Offers"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/applications/{applicationId}/offers",
+      "operationId": "createFinalistOffer",
+      "contractStatus": "planned",
+      "tags": [
+        "Offers"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/OfferCreateRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/offers/{offerId}",
+      "operationId": "getOffer",
+      "contractStatus": "planned",
+      "tags": [
+        "Offers"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/offers/{offerId}/response",
+      "operationId": "respondToOffer",
+      "contractStatus": "planned",
+      "tags": [
+        "Offers"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/OfferResponseRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/offers/{offerId}/deadline-extensions",
+      "operationId": "extendOfferDeadline",
+      "contractStatus": "planned",
+      "tags": [
+        "Offers"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/OfferDeadlineExtensionRequest"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/offers/{offerId}/withdrawal",
+      "operationId": "withdrawPendingOffer",
+      "contractStatus": "planned",
+      "tags": [
+        "Offers"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/company-registration-requests",
+      "operationId": "listCompanyRegistrationRequests",
+      "contractStatus": "planned",
+      "tags": [
+        "Administration"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/company-registration-requests/{requestId}",
+      "operationId": "getCompanyRegistrationRequest",
+      "contractStatus": "planned",
+      "tags": [
+        "Administration"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/admin/company-registration-requests/{requestId}/review",
+      "operationId": "reviewCompanyRegistrationRequest",
+      "contractStatus": "planned",
+      "tags": [
+        "Administration"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/CompanyRegistrationDecision"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/accounts",
+      "operationId": "listManagedAccounts",
+      "contractStatus": "planned",
+      "tags": [
+        "Administration"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "GET",
+      "path": "/v1/admin/accounts/{accountType}/{accountId}",
+      "operationId": "getManagedAccount",
+      "contractStatus": "planned",
+      "tags": [
+        "Administration"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": null,
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    },
+    {
+      "method": "POST",
+      "path": "/v1/admin/accounts/{accountType}/{accountId}/actions",
+      "operationId": "administerAccount",
+      "contractStatus": "planned",
+      "tags": [
+        "Administration"
+      ],
+      "security": [
+        {
+          "SessionCookie": []
+        }
+      ],
+      "requestSchema": {
+        "$ref": "#/components/schemas/AccountAdministrationAction"
+      },
+      "verification": "Code/contract inspection only; backend startup blocked by wildcard conflict."
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { InterviewScorecard } from "@/features/management/components/evaluations";
+import { InterviewScorecard } from "@/features/management/components/interview-scorecard";
 async function Content({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return <InterviewScorecard id={id} />;

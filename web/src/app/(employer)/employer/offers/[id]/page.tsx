@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { HiringOffer } from "@/features/management/components/hiring";
+import { HiringOffer } from "@/features/management/components/hiring-offer";
 async function Content({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return <HiringOffer id={id} />;

@@ -114,6 +114,14 @@ test("candidate profile updates do not send unloaded identity or empty URLs", as
   await productFixtures(page);
   let body: unknown;
   await page.route("**/v1/candidates/me", async (route) => {
+    if (route.request().method() === "GET")
+      return route.fulfill({
+        json: {
+          id: ids.application,
+          name: "Existing candidate",
+          available: true,
+        },
+      });
     expect(route.request().method()).toBe("PATCH");
     body = route.request().postDataJSON();
     return route.fulfill({

@@ -3,7 +3,7 @@ import { CodeRunner } from "./code-runner";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { useUnsavedChanges } from "@/shared/lib/use-unsaved-changes";
 import { resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
@@ -606,7 +606,7 @@ export function CandidateAssessment({
       await writeAnswers(question, language);
       setMessage("Progress saved.");
     } catch (cause) {
-      setActionError(cause as Error);
+      setActionError(toError(cause));
     } finally {
       pending.current = false;
       setBusy(false);
@@ -623,7 +623,7 @@ export function CandidateAssessment({
         `/candidate/assessments/${resourceId(id)}?attempt=${resourceId(opened.id)}${applicationId ? "&application=" + resourceId(applicationId) : ""}`,
       );
     } catch (cause) {
-      setActionError(cause as Error);
+      setActionError(toError(cause));
     } finally {
       pending.current = false;
       setBusy(false);
