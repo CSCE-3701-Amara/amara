@@ -3,16 +3,21 @@ import { useEffect, useState } from "react";
 import { apiRequest, resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
 import { ApiFeedback } from "@/shared/ui/workspace";
-import type {
-  PipelineDraft,
-  PipelineStage,
-  ModuleSummary,
-} from "../types/invw.types";
+import type { PipelineDraft, ModuleSummary } from "../types/invw.types";
 import styles from "./dag-editor.module.css";
+import { DagCanvas } from "./dag-canvas";
+import { DagConnections } from "./dag-connections";
 import { PipelineModulePicker } from "./pipeline-module-picker";
-type Node = PipelineStage & { id: string; x: number; y: number };
-type Edge = { fromStageId: string; toStageId: string };
-type Graph = { stages: Node[]; links: Edge[] };
+import {
+  addConnection,
+  normalizeGraph,
+  removeConnection,
+  removeStage,
+  wouldCreateCycle,
+  type DagEdge,
+  type DagNode,
+  type PipelineGraph,
+} from "./dag-graph";
 export function DagEditor({ postingId }: { postingId: string }) {
   const pipeline = useApiResource<PipelineDraft>(
     `/v1/jobs/${resourceId(postingId)}/pipeline`,
@@ -56,7 +61,7 @@ export function DagEditor({ postingId }: { postingId: string }) {
 }
 function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
   const path = `/v1/pipeline-versions/${resourceId(pipeline.versionId)}`;
-  const [graph, setGraph] = useState<Graph>({ stages: [], links: [] });
+  const [graph, setGraph] = useState<PipelineGraph>({ stages: [], links: [] });
   const [selected, select] = useState("");
   const [target, setTarget] = useState("");
   const [zoom, setZoom] = useState(100);
@@ -64,6 +69,7 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
   const [error, setError] = useState<Error>();
   const [busy, setBusy] = useState(false);
   const [supported, setSupported] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [published, setPublished] = useState(false);
   const team = useApiResource<{ data: { id: string; name: string }[] }>(
     "/v1/companies/me/interviewers?limit=100",
@@ -74,37 +80,31 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
     const controller = new AbortController();
     async function load() {
       try {
-        let g: Graph;
+        let g: PipelineGraph;
         try {
-          g = await apiRequest<Graph>(path + "/graph", {
+          g = await apiRequest<PipelineGraph>(path + "/graph", {
             signal: controller.signal,
           });
           if (!g.stages) throw new Error("Invalid graph");
           setSupported(true);
         } catch {
           if (controller.signal.aborted) return;
-          const stages = await apiRequest<Node[]>(path + "/stages", {
+          const stages = await apiRequest<DagNode[]>(path + "/stages", {
             signal: controller.signal,
           });
-          let links: Edge[] = [];
+          let links: DagEdge[] = [];
           try {
-            links = await apiRequest<Edge[]>(path + "/transitions", {
+            links = await apiRequest<DagEdge[]>(path + "/transitions", {
               signal: controller.signal,
             });
           } catch {}
           g = { stages, links };
         }
-        if (!controller.signal.aborted)
-          setGraph({
-            stages: g.stages.map((s, i) => ({
-              ...s,
-              x: s.x ?? 40 + (i % 3) * 260,
-              y: s.y ?? 40 + Math.floor(i / 3) * 200,
-            })),
-            links: g.links || [],
-          });
+        if (!controller.signal.aborted) setGraph(normalizeGraph(g));
       } catch (e) {
         if (!controller.signal.aborted) setError(e as Error);
+      } finally {
+        if (!controller.signal.aborted) setLoaded(true);
       }
     }
     void load();
@@ -112,9 +112,7 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
   }, [path]);
   const node = graph.stages.find((s) => s.id === selected);
   const locked = pipeline.published || published;
-  const canvasWidth = Math.max(1000, ...graph.stages.map((s) => s.x + 240));
-  const canvasHeight = Math.max(800, ...graph.stages.map((s) => s.y + 180));
-  function update(id: string, patch: Partial<Node>) {
+  function update(id: string, patch: Partial<DagNode>) {
     setGraph((g) => ({
       ...g,
       stages: g.stages.map((s) => (s.id === id ? { ...s, ...patch } : s)),
@@ -122,27 +120,11 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
   }
   function connect() {
     if (!node || !target) return;
-    const reaches = (id: string, seen = new Set<string>()): boolean => {
-      if (id === selected) return true;
-      if (seen.has(id)) return false;
-      seen.add(id);
-      return graph.links
-        .filter((e) => e.fromStageId === id)
-        .some((e) => reaches(e.toStageId, seen));
-    };
-    if (reaches(target)) {
+    if (wouldCreateCycle(graph, selected, target)) {
       setMessage("This connection would create a cycle.");
       return;
     }
-    if (
-      !graph.links.some(
-        (e) => e.fromStageId === selected && e.toStageId === target,
-      )
-    )
-      setGraph((g) => ({
-        ...g,
-        links: [...g.links, { fromStageId: selected, toStageId: target }],
-      }));
+    setGraph((current) => addConnection(current, selected, target));
     setMessage("");
   }
   async function save() {
@@ -150,7 +132,7 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
     setError(undefined);
     try {
       setGraph(
-        await apiRequest<Graph>(path + "/graph", {
+        await apiRequest<PipelineGraph>(path + "/graph", {
           method: "PUT",
           body: graph,
         }),
@@ -164,12 +146,28 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
     }
   }
   return (
-    <section aria-label="Pipeline graph">
-      <h2>Design the pipeline</h2>
-      <p>
-        Connect assessments to create branches. A joined stage opens after every
-        incoming stage passes.
-      </p>
+    <section aria-label="Pipeline graph" className={styles.designer}>
+      <div className={styles.heading}>
+        <div>
+          <h2>Design the pipeline</h2>
+          <p>
+            Build the path candidates follow, from their first stage to their
+            last.
+          </p>
+        </div>
+        <span className={styles.status}>{locked ? "Published" : "Draft"}</span>
+      </div>
+      <div className={styles.guide}>
+        <span>
+          <b>1</b> Add a stage
+        </span>
+        <span>
+          <b>2</b> Select and set it up
+        </span>
+        <span>
+          <b>3</b> Connect stages
+        </span>
+      </div>
       <div className={styles.toolbar}>
         <button
           disabled={locked || busy}
@@ -186,154 +184,99 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
                   scheduledStartAt: "",
                   scheduledEndAt: "",
                   moduleIds: [],
-                  x: 40,
-                  y: 40,
+                  x: 40 + (g.stages.length % 3) * 260,
+                  y: 40 + Math.floor(g.stages.length / 3) * 200,
                 },
               ],
             }));
             select(id);
           }}
         >
-          Add stage
+          <span aria-hidden="true">＋ </span>Add stage
         </button>
-        <button
-          aria-label="Zoom out"
-          onClick={() => setZoom((z) => Math.max(30, z - 10))}
-        >
-          −
-        </button>
-        <output>{zoom}%</output>
-        <button
-          aria-label="Zoom in"
-          onClick={() => setZoom((z) => Math.min(150, z + 10))}
-        >
-          +
-        </button>
+        <div className={styles.zoom} aria-label="Canvas zoom">
+          <button
+            aria-label="Zoom out"
+            onClick={() => setZoom((z) => Math.max(30, z - 10))}
+          >
+            −
+          </button>
+          <output>{zoom}%</output>
+          <button
+            aria-label="Zoom in"
+            onClick={() => setZoom((z) => Math.min(150, z + 10))}
+          >
+            +
+          </button>
+        </div>
+        <span className={styles.toolbarSpacer} />
         <button
           disabled={locked || busy || !supported}
           onClick={() => void save()}
         >
           Save graph draft
         </button>
+        <button
+          className={styles.publish}
+          disabled={locked || busy || !supported}
+          onClick={async () => {
+            setBusy(true);
+            try {
+              const saved = await apiRequest<PipelineGraph>(path + "/graph", {
+                method: "PUT",
+                body: graph,
+              });
+              setGraph(saved);
+              await apiRequest<void>(path + "/publish", { method: "POST" });
+              setPublished(true);
+              setMessage("Pipeline published.");
+            } catch (e) {
+              setError(e as Error);
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          Publish graph
+        </button>
       </div>
-      <button
-        disabled={locked || busy || !supported}
-        onClick={async () => {
-          setBusy(true);
-          try {
-            const saved = await apiRequest<Graph>(path + "/graph", {
-              method: "PUT",
-              body: graph,
-            });
-            setGraph(saved);
-            await apiRequest<void>(path + "/publish", { method: "POST" });
-            setPublished(true);
-            setMessage("Pipeline published.");
-          } catch (e) {
-            setError(e as Error);
-          } finally {
-            setBusy(false);
-          }
-        }}
-      >
-        Publish graph
-      </button>
-      <div className={styles.layout}>
-        <div className={styles.viewport}>
-          <div
-            className={styles.canvas}
-            style={{
-              transform: `scale(${zoom / 100})`,
-              width: canvasWidth,
-              height: canvasHeight,
-            }}
-          >
-            <svg
-              className={styles.edges}
-              width={canvasWidth}
-              height={canvasHeight}
-              aria-label="Stage connections"
-            >
-              {graph.links.map((e) => {
-                const a = graph.stages.find((s) => s.id === e.fromStageId),
-                  b = graph.stages.find((s) => s.id === e.toStageId);
-                return a && b ? (
-                  <g key={a.id + b.id}>
-                    <path
-                      d={`M${a.x + 200},${a.y + 65} C${a.x + 240},${a.y + 65} ${b.x - 40},${b.y + 65} ${b.x},${b.y + 65}`}
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                    <text x={(a.x + b.x + 200) / 2} y={(a.y + b.y) / 2 + 55}>
-                      →
-                    </text>
-                  </g>
-                ) : null;
-              })}
-            </svg>
-            {graph.stages.map((s) => (
-              <button
-                key={s.id}
-                className={styles.node}
-                style={{ left: s.x, top: s.y }}
-                aria-pressed={selected === s.id}
-                aria-label={`${s.name}, ${graph.links.filter((e) => e.toStageId === s.id).length} incoming connections`}
-                onClick={() => select(s.id)}
-                onKeyDown={(e) => {
-                  if (locked || busy || !e.altKey || !e.key.startsWith("Arrow"))
-                    return;
-                  e.preventDefault();
-                  update(s.id, {
-                    x: Math.max(
-                      0,
-                      s.x +
-                        (e.key === "ArrowRight"
-                          ? 20
-                          : e.key === "ArrowLeft"
-                            ? -20
-                            : 0),
-                    ),
-                    y: Math.max(
-                      0,
-                      s.y +
-                        (e.key === "ArrowDown"
-                          ? 20
-                          : e.key === "ArrowUp"
-                            ? -20
-                            : 0),
-                    ),
-                  });
-                }}
-                draggable={!locked && !busy}
-                onDragEnd={(e) => {
-                  if (locked || busy) return;
-                  const rect =
-                    e.currentTarget.parentElement!.getBoundingClientRect();
-                  update(s.id, {
-                    x: Math.max(
-                      0,
-                      ((e.clientX - rect.left) * 100) / zoom - 100,
-                    ),
-                    y: Math.max(0, ((e.clientY - rect.top) * 100) / zoom - 40),
-                  });
-                }}
-              >
-                <strong>{s.name}</strong>
-                <span>
-                  {s.type === "assessment"
-                    ? `${s.moduleIds?.length || 0} assessment modules`
-                    : "Live interview"}
-                </span>
-                <small>Alt + arrow keys to move</small>
-              </button>
-            ))}
-          </div>
+      {locked && (
+        <p className={styles.notice}>
+          This pipeline is published and cannot be edited.
+        </p>
+      )}
+      {loaded && !error && !supported && !locked && (
+        <p className={styles.notice}>
+          Graph editing is unavailable for this pipeline. You can view its
+          stages below.
+        </p>
+      )}
+      <div className={styles.canvasHeading}>
+        <div>
+          <strong>Candidate journey</strong>
+          <span>
+            {graph.stages.length} stages · {graph.links.length} connections
+          </span>
         </div>
-        <aside className={styles.inspector}>
+        <p>Drag stages to arrange them. Select a stage to edit it.</p>
+      </div>
+      <div className={styles.layout}>
+        <DagCanvas
+          graph={graph}
+          selectedStageId={selected}
+          zoom={zoom}
+          disabled={locked || busy}
+          onSelect={select}
+          onUpdate={update}
+        />
+        <aside className={styles.inspector} aria-label="Stage editor">
           {node ? (
             <fieldset disabled={locked || busy}>
               <legend>Stage settings</legend>
+              <p className={styles.inspectorIntro}>
+                Editing <strong>{node.name}</strong>. Changes are saved with the
+                graph draft.
+              </p>
               <label>
                 Advancement rule
                 <select
@@ -341,7 +284,7 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
                   onChange={(e) =>
                     update(node.id, {
                       advancementRule: e.target
-                        .value as Node["advancementRule"],
+                        .value as DagNode["advancementRule"],
                       scoreThreshold:
                         e.target.value === "threshold"
                           ? (node.scoreThreshold ?? 70)
@@ -567,54 +510,30 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
                   }}
                 />
               )}
-              <label>
-                Connect to stage
-                <select
-                  value={target}
-                  onChange={(e) => setTarget(e.target.value)}
-                >
-                  <option value="">Choose a stage</option>
-                  {graph.stages.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button onClick={connect}>Add connection</button>
-              {graph.links
-                .filter((e) => e.fromStageId === node.id)
-                .map((e) => (
-                  <button
-                    key={e.toStageId}
-                    onClick={() =>
-                      setGraph((g) => ({
-                        ...g,
-                        links: g.links.filter((x) => x !== e),
-                      }))
-                    }
-                  >
-                    Remove connection to{" "}
-                    {graph.stages.find((s) => s.id === e.toStageId)?.name}
-                  </button>
-                ))}
-              <button
-                onClick={() => {
-                  setGraph((g) => ({
-                    stages: g.stages.filter((s) => s.id !== node.id),
-                    links: g.links.filter(
-                      (e) =>
-                        e.fromStageId !== node.id && e.toStageId !== node.id,
-                    ),
-                  }));
+              <DagConnections
+                graph={graph}
+                node={node}
+                target={target}
+                onTargetChange={setTarget}
+                onConnect={connect}
+                onRemoveConnection={(edge) =>
+                  setGraph((current) => removeConnection(current, edge))
+                }
+                onRemoveStage={() => {
+                  setGraph((current) => removeStage(current, node.id));
                   select("");
                 }}
-              >
-                Remove stage
-              </button>
+              />
             </fieldset>
           ) : (
-            <p>Select a stage to edit its schedule, modules and connections.</p>
+            <div className={styles.emptyInspector}>
+              <span aria-hidden="true">◇</span>
+              <h3>Select a stage</h3>
+              <p>
+                Choose a stage on the canvas to edit its details and connect it
+                to the next step.
+              </p>
+            </div>
           )}
         </aside>
       </div>

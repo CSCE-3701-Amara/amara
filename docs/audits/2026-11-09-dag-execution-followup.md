@@ -21,7 +21,7 @@ R01 and R02 are resolved in the implementation. This report supplements the orig
 
 [Setup and configuration](../../deployments/judge0/README.md) covers both this working development runner and the pinned official Judge0 deployment. `make sandbox`, `make worker` and `make sandbox-judge0` provide entry points. Keep the normal database, SMTP and MFA configuration when starting Amara.
 
-The official Judge0 image download stalled in this environment. Its PostgreSQL/Redis containers and download process were stopped without deleting data. Full Judge0 startup, compiler execution and host cgroup compatibility are **not verified**. The lightweight runner was tested against real Docker; it is development infrastructure, not a production VM boundary. Full TypeScript compilation, Go and C++ require the separately configured Judge0 service.
+The official Judge0 1.13.1 image was downloaded and verified at digest `sha256:6b5d6a66aa19a8e878a52ea3c6a560afc1086734d96e2885b561fd5c6018f082`. Its API, PostgreSQL, Redis and workers started, but every real submission returned status 13. Worker logs confirmed that bundled isolate 1.8.1 tried to create the cgroup-v1 path `/sys/fs/cgroup/memory/box-*` on this cgroup-v2 host. The failing stack was stopped without deleting its database volume. `start-judge0.sh` now rejects incompatible hosts before starting containers. Full Judge0 execution therefore requires a dedicated cgroup-v1 VM. The lightweight runner was tested against real Docker on this host; it is development infrastructure, not a production VM boundary. Full TypeScript compilation, Go and C++ require the separately configured Judge0 service.
 
 ## Compatibility
 
@@ -39,7 +39,10 @@ The official Judge0 image download stalled in this environment. Its PostgreSQL/R
 | --- | --- |
 | Complete production Playwright suite | **396 passed, 0 failed, 0 skipped, 0 flaky** |
 | Go suite with race detector and real PostgreSQL/Docker enabled | PASS; fresh complete run plus final focused graph/HTTP regressions |
-| Actual Docker executions through Judge0 client | PASS: Python stdin, JavaScript, TypeScript, runtime diagnostics, infinite-loop termination and blocked networking |
+| Actual Docker executions through Judge0-compatible development runner | PASS: Python stdin, JavaScript, TypeScript, runtime diagnostics, infinite-loop termination and blocked networking |
+| Official Judge0 CE 1.13.1 startup | API/DB/Redis/workers start; execution BLOCKED by confirmed cgroup-v2 incompatibility. Stack stopped and its data volume was retained. |
+| Live development-container restrictions | PASS: `network=none`, read-only root, UID/GID 65534, all capabilities dropped, no-new-privileges, 32 PIDs, 128 MiB memory/swap and 1 CPU observed via `docker inspect` while code was running. |
+| Development-container cleanup and direct access controls | PASS: candidate container and temporary source removed after completion; browser-origin request rejected with 403; unknown language rejected with 422; only loopback port 2359 remained listening. |
 | Go build, vet, staticcheck | PASS |
 | Gosec using repository configuration | PASS; zero findings |
 | Frontend production build, ESLint, TypeScript | PASS |

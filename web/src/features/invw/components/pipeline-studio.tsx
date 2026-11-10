@@ -23,7 +23,13 @@ export function PipelineStudio({ postingId }: { postingId: string }) {
         <Link href={`${pipelinePath}/dashboard`}>Dashboard</Link>
       </nav>
       <DagEditor postingId={postingId} />
-      <PipelineEditor postingId={postingId} />
+      <details>
+        <summary>Legacy stage editor</summary>
+        <p>
+          Use this editor for pipelines created with the earlier stage format.
+        </p>
+        <PipelineEditor postingId={postingId} />
+      </details>
       <WorkspaceFooter />
     </>
   );

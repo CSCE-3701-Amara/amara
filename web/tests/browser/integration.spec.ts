@@ -376,6 +376,7 @@ test("pipeline saves an ordered stage array with version id and RFC3339 times", 
     route.fulfill({ json: [assessment] }),
   );
   await page.goto(`/employer/pipelines/${jobId}`);
+  await page.getByText("Legacy stage editor", { exact: true }).click();
   await page.getByRole("button", { name: "Create pipeline draft" }).click();
   await page.getByRole("button", { name: "Add assessment stage" }).click();
   await page.getByLabel("Stage name").fill("Skills assessment");

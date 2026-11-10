@@ -32,6 +32,17 @@ import {
   saveAssessmentAnswer,
   submitAssessmentAttempt,
 } from "../api/assessment.api";
+import {
+  FALLBACK_EXECUTION_LANGUAGES,
+  findSavedResponse,
+  responseLanguage,
+  responseValue,
+} from "../lib/assessment-responses";
+import {
+  AssessmentAvailabilityView,
+  AssessmentLockedView,
+  AssessmentResultView,
+} from "./assessment-state-views";
 
 function AttemptClock({
   deadline,
@@ -391,13 +402,7 @@ function AdvancedAssessment({
                     }}
                   >
                     {(
-                      availableLanguages.data ?? [
-                        "javascript",
-                        "typescript",
-                        "python",
-                        "go",
-                        "cpp",
-                      ]
+                      availableLanguages.data ?? FALLBACK_EXECUTION_LANGUAGES
                     ).map((language) => (
                       <option key={language}>{language}</option>
                     ))}
@@ -406,7 +411,6 @@ function AdvancedAssessment({
               )}
               {variant === "coding" && attempt && (
                 <CodeRunner
-                  key={question.id}
                   attemptId={attempt.id}
                   questionId={question.id}
                   source={
@@ -423,7 +427,6 @@ function AdvancedAssessment({
                 />
               )}
               <QuestionInput
-                key={question.id}
                 question={question}
                 value={answer(question)}
                 onChange={(value) => onAnswer(question.id, value)}
@@ -537,24 +540,14 @@ export function CandidateAssessment({
   );
   function answer(question: CandidateQuestion): string | number[] {
     if (Object.hasOwn(answers, question.id)) return answers[question.id];
-    const response =
-      savedAnswers?.find((value) => value.questionId === question.id)
-        ?.response ?? attemptData?.savedResponses?.[question.id];
-    if (typeof response === "string" || Array.isArray(response))
-      return response;
-    if (response && "code" in response) return response.code;
-    return "";
+    return responseValue(
+      findSavedResponse(question.id, savedAnswers, attemptData?.savedResponses),
+    );
   }
   function savedLanguage(question: CandidateQuestion): string {
-    const response =
-      savedAnswers.find((row) => row.questionId === question.id)?.response ??
-      attemptData?.savedResponses?.[question.id];
-    return response &&
-      !Array.isArray(response) &&
-      typeof response === "object" &&
-      "language" in response
-      ? response.language
-      : "";
+    return responseLanguage(
+      findSavedResponse(question.id, savedAnswers, attemptData?.savedResponses),
+    );
   }
   const canEdit = attemptData?.status === "in_progress";
   async function writeAnswers(only?: CandidateQuestion, language?: string) {
@@ -710,157 +703,19 @@ export function CandidateAssessment({
         />
       )}
       {state === "result" ? (
-        <>
-          <section className={result.data ? s.success : styles.panel}>
-            <StatusBadge tone={result.data ? "success" : "neutral"}>
-              {result.data ? "Result available" : "Result unavailable"}
-            </StatusBadge>
-            <h2>
-              {result.data
-                ? "Assessment completed"
-                : "Your result hasn’t been released"}
-            </h2>
-            <p>
-              {result.data
-                ? "Your score and reviewer feedback are now available."
-                : "Scores and reviewer feedback appear only after disclosure."}
-            </p>
-          </section>
-          {result.data && (
-            <>
-              <div className={styles.detailGrid}>
-                <section className={styles.panel}>
-                  <p>Overall score</p>
-                  <strong className={styles.clock}>
-                    {result.data.score !== null &&
-                    result.data.score !== undefined
-                      ? `${result.data.score} / 100`
-                      : "Not scored"}
-                  </strong>
-                </section>
-                <section className={styles.panel}>
-                  <p>Assessment outcome</p>
-                  <h2>
-                    {result.data.passed
-                      ? "Threshold achieved"
-                      : "Threshold not achieved"}
-                  </h2>
-                  <p>
-                    This outcome does not automatically determine whether you
-                    progress to the next hiring stage.
-                  </p>
-                </section>
-              </div>
-              <section className={styles.panel}>
-                <h2>Reviewer feedback</h2>
-                <p>{result.data.feedback || "No feedback was released."}</p>
-                <p>
-                  {result.data.feedbackIsAiGenerated
-                    ? "AI-generated feedback · "
-                    : ""}
-                  Released {new Date(result.data.disclosedAt).toLocaleString()}
-                </p>
-              </section>
-            </>
-          )}
-        </>
+        <AssessmentResultView result={result.data} />
       ) : state === "availability" ? (
-        <>
-          <section className={styles.panel}>
-            <StatusBadge>
-              {instanceData?.status || "Availability unavailable"}
-            </StatusBadge>
-            <h2>Technical skills assessment</h2>
-            <p>
-              {instanceData?.deadline
-                ? `Available until ${new Date(instanceData.deadline).toLocaleString()}`
-                : "Assessment availability will appear here when it is released."}
-            </p>
-          </section>
-          <div className={styles.detailGrid}>
-            <section className={styles.panel}>
-              <h2>Continue where you left off</h2>
-              <p>
-                Your saved answers can be restored while the attempt is active.
-              </p>
-              <button
-                type="button"
-                disabled={
-                  busy || !instanceData || instanceData.status !== "in_progress"
-                }
-                onClick={() => void openAttempt()}
-              >
-                {busy ? "Opening…" : "Resume assessment"}
-              </button>
-            </section>
-            <section className={styles.panel}>
-              <h2>Start a new attempt</h2>
-              <p>
-                Check your connection, available time, and the completion
-                deadline before starting.
-              </p>
-              <button
-                type="button"
-                className={s.primary}
-                disabled={
-                  busy ||
-                  (!!instanceData && instanceData.status !== "available")
-                }
-                onClick={() => void openAttempt()}
-              >
-                {busy ? "Opening…" : "Start assessment"}
-              </button>
-            </section>
-          </div>
-          <section className={styles.panel}>
-            <h2>Countdown and auto-submit</h2>
-            <p>
-              Starting begins the active timer. The server enforces the
-              completion deadline and locks closed attempts. Opening this
-              overview does not start an attempt.
-            </p>
-          </section>
-        </>
+        <AssessmentAvailabilityView
+          instance={instanceData}
+          busy={busy}
+          onOpen={openAttempt}
+        />
       ) : state === "submitted" || locked ? (
-        <div className={styles.detailGrid}>
-          <div>
-            <section className={styles.panel}>
-              <h2>
-                {locked
-                  ? "Your answers are saved and locked"
-                  : "Submission status unavailable"}
-              </h2>
-              <StatusBadge>
-                {attemptData?.status || "Not confirmed"}
-              </StatusBadge>
-              <p>
-                {locked
-                  ? "This attempt is closed. Its saved responses can no longer be edited."
-                  : "A submission can only be confirmed by the assessment service."}
-              </p>
-              {attemptData?.submittedAt && (
-                <p>
-                  Submitted {new Date(attemptData.submittedAt).toLocaleString()}
-                </p>
-              )}
-            </section>
-            <section className={styles.panel}>
-              <h2>Submission receipt</h2>
-              {questions.map((question) => (
-                <p key={question.id}>
-                  {question.position + 1} · {question.prompt} · Locked
-                </p>
-              ))}
-            </section>
-          </div>
-          <aside className={styles.panel}>
-            <h2>What happens next</h2>
-            <p>
-              Assessment evaluation and stage progression are separate. A
-              pending result is not a rejection or hiring decision.
-            </p>
-          </aside>
-        </div>
+        <AssessmentLockedView
+          locked={locked}
+          attempt={attemptData}
+          questions={questions}
+        />
       ) : variant !== "questions" ? (
         <AdvancedAssessment
           questions={questions}
@@ -928,7 +783,7 @@ export function CandidateAssessment({
                   <h2>{question.prompt}</h2>
                   {question.responseFormat === "code" && attemptData && (
                     <>
-                      <label>
+                      <label className={s.field}>
                         Language
                         <select
                           disabled={busy || !canEdit}
@@ -949,13 +804,8 @@ export function CandidateAssessment({
                           }}
                         >
                           {(
-                            availableLanguages.data ?? [
-                              "javascript",
-                              "typescript",
-                              "python",
-                              "go",
-                              "cpp",
-                            ]
+                            availableLanguages.data ??
+                            FALLBACK_EXECUTION_LANGUAGES
                           ).map((l) => (
                             <option key={l}>{l}</option>
                           ))}

@@ -15,8 +15,21 @@
   "go_race": "pass with real PostgreSQL and Docker; final focused regressions pass",
   "build_lint_typecheck": "pass",
   "gosec_findings": 0,
-  "official_judge0": "not verified; image download stalled",
+  "official_judge0": "image and services verified; real submissions blocked because Judge0 1.13.1 isolate requires cgroup v1 and this host uses cgroup v2; stack stopped",
+  "official_judge0_digest": "sha256:6b5d6a66aa19a8e878a52ea3c6a560afc1086734d96e2885b561fd5c6018f082",
   "actual_docker_cases": 6,
+  "actual_docker_limits": {
+    "network": "none",
+    "read_only_root": true,
+    "user": "65534:65534",
+    "capabilities_dropped": "ALL",
+    "no_new_privileges": true,
+    "pids": 32,
+    "memory_bytes": 134217728,
+    "memory_swap_bytes": 134217728,
+    "nano_cpus": 1000000000,
+    "cleanup": "pass"
+  },
   "remaining_original_issues": [
     "R03",
     "R04",
