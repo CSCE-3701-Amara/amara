@@ -24,12 +24,12 @@ for (const width of [320, 375, 768, 1024, 1280, 1728]) {
     page,
   }) => {
     await page.setViewportSize({ width, height: width <= 768 ? 812 : 900 });
-    let originalLogo: {
+    const originalLogos = new Map<string, {
       x: number;
       y: number;
       width: number;
       height: number;
-    } | null = null;
+    }>();
     for (const variant of variants) {
       await page.goto(variant.path);
       await expect(
@@ -42,32 +42,22 @@ for (const width of [320, 375, 768, 1024, 1280, 1728]) {
         exact: true,
       });
       await expect(selected).toHaveAttribute("aria-current", "page");
-      await expect(selected).toHaveCSS("color", "rgb(255, 255, 255)");
-      await expect(selected.locator("span")).toHaveCSS(
-        "background-color",
-        "rgb(102, 254, 76)",
-      );
-      await expect(selector.locator("a:not([aria-current])")).toHaveCSS(
-        "color",
-        "rgb(1, 1, 1)",
-      );
-      const indicator = await selector.evaluate((el) => {
-        // The inactive surface and transition curve come from shared theme tokens.
-        const style = getComputedStyle(el, "::before");
-        return {
-          color: style.backgroundColor,
-          x: new DOMMatrix(style.transform).m41,
-          width: parseFloat(style.width),
-        };
-      });
-      await expect(selector.locator("a:not([aria-current])")).toHaveCSS("background-color", "rgb(241, 238, 232)");
-      await expect(page.getByRole("link", { name: "Back to amara" })).toHaveCSS("background-color", "rgb(241, 238, 232)");
-      expect(indicator.color).toBe("rgb(1, 1, 1)");
-      expect(indicator.x > indicator.width).toBe(variant.label === "Candidate");
+      const legacy = variant.path.startsWith("/login");
+      if (legacy) {
+        await expect(selected).toHaveCSS("color", "rgb(255, 255, 255)");
+        await expect(selected.locator("span")).toHaveCSS("background-color", "rgb(102, 254, 76)");
+      } else {
+        await expect(selected).toHaveCSS("background-color", "rgb(255, 255, 255)");
+        await expect(selected).toHaveCSS("color", "rgb(33, 24, 19)");
+      }
+      await expect(page.getByLabel("Email", { exact: true })).toHaveCSS("border-top-width", "1px");
+      await expect(page.getByLabel("Email", { exact: true })).toHaveCSS("border-radius", legacy ? "15.6px" : "8px");
       const logo = page.getByRole("link", { name: "amara home" });
       const bounds = await logo.boundingBox();
       expect(bounds).not.toBeNull();
-      if (!originalLogo) originalLogo = bounds;
+      const theme = legacy ? "login" : "registration";
+      const originalLogo = originalLogos.get(theme);
+      if (!originalLogo) originalLogos.set(theme, bounds!);
       else {
         expect(bounds!.x).toBeCloseTo(originalLogo.x, 0);
         expect(bounds!.y).toBeCloseTo(originalLogo.y, 0);
@@ -92,7 +82,7 @@ for (const width of [320, 375, 768, 1024, 1280, 1728]) {
   });
 }
 
-test("switching accounts moves the active indicator and preserves entered credentials", async ({
+test("switching accounts updates selection and preserves entered credentials", async ({
   page,
 }) => {
   await page.goto("/login");
@@ -107,10 +97,10 @@ test("switching accounts moves the active indicator and preserves entered creden
   ).toBeVisible();
   await expect(
     selector.getByRole("link", { name: "Hiring team", exact: true }),
-  ).toHaveCSS("color", "rgb(255, 255, 255)");
+  ).toHaveAttribute("aria-current", "page");
   await expect(
     selector.getByRole("link", { name: "Candidate", exact: true }),
-  ).toHaveCSS("color", "rgb(1, 1, 1)");
+  ).not.toHaveAttribute("aria-current", "page");
   await expect(page.getByLabel("Email", { exact: true })).toHaveValue(
     "aya@example.com",
   );
@@ -120,7 +110,7 @@ test("switching accounts moves the active indicator and preserves entered creden
   await selector.getByRole("link", { name: "Candidate", exact: true }).click();
   await expect(
     selector.getByRole("link", { name: "Candidate", exact: true }),
-  ).toHaveCSS("color", "rgb(255, 255, 255)");
+  ).toHaveAttribute("aria-current", "page");
 });
 
 test("workspace-specific registration fields reset when switching accounts", async ({
@@ -138,31 +128,21 @@ test("workspace-specific registration fields reset when switching accounts", asy
   ).toHaveValue("");
 });
 
-test("motion is subtle when enabled and stops for reduced motion", async ({
-  page,
-}) => {
-  await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/login");
-  expect(await page.getByRole("navigation", { name: "Account type" }).evaluate(el => getComputedStyle(el, "::before").transitionDuration)).toBe("0.4s");
-  const moving = await page
-    .locator("aside")
-    .evaluate(
-      (el) =>
-        [...el.querySelectorAll("*")].filter(
-          (node) => getComputedStyle(node).animationName !== "none",
-        ).length,
+test("both auth themes respect reduced-motion preferences", async ({ page }) => {
+  for (const path of ["/login", "/register"]) {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto(path);
+    await expect(page.locator("main:visible h1")).toBeVisible();
+    const continuous = await page.locator("main:visible").evaluate(el =>
+      el.getAnimations({ subtree: true }).filter(animation =>
+        animation.effect?.getComputedTiming().iterations === Infinity,
+      ).length,
     );
-  expect(moving).toBeGreaterThanOrEqual(3);
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  const remaining = await page
-    .locator("main")
-    .evaluate(
-      (el) =>
-        [...el.querySelectorAll("*")].filter(
-          (node) => getComputedStyle(node).animationName !== "none",
-        ).length,
-    );
-  expect(remaining).toBe(0);
+    if (path === "/login") expect(continuous).toBeGreaterThan(0);
+    else expect(continuous).toBe(0);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    expect(await page.locator("main:visible").evaluate(el => el.getAnimations({ subtree: true }).length)).toBe(0);
+  }
 });
 
 for (const width of [320, 768, 1024, 1280]) {

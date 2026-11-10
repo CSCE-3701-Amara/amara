@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import styles from "./product-ui.module.css";
 export { styles as productStyles };
 
-/** Figma workspace heading; optional artwork stays in its original asset slot. */
+/** A compact page heading with optional supporting brand artwork. */
 export function ProductHeading({
   title,
   description,
@@ -44,7 +44,7 @@ export function ProductHeading({
     </header>
   );
 }
-/** Footer repeated by the hiring and administration Figma frames. */
+/** Quiet product signature shared by hiring and administration screens. */
 export function WorkspaceFooter() {
   return <footer className={styles.footer}>amara · Built in Egypt</footer>;
 }

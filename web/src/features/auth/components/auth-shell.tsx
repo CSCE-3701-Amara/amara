@@ -3,9 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode, RefObject } from "react";
-import { useLayoutEffect, useRef } from "react";
 import { Brand } from "@/shared/ui/brand";
-import styles from "./auth.module.css";
+import { useAuthDesign } from "./auth-design";
 
 /** Responsive shared layout for the login, registration, and auth state frames. */
 export function AuthShell({
@@ -19,24 +18,15 @@ export function AuthShell({
   children: ReactNode;
   contentRef?: RefObject<HTMLElement | null>;
 }) {
-  const panelRef = useRef<HTMLElement>(null);
-  useLayoutEffect(() => {
-    // Keep the background at the same phase when navigating between auth routes.
-    const elapsed = Number(document.timeline.currentTime ?? performance.now());
-    panelRef.current?.style.setProperty(
-      "--brand-delay",
-      `${-(elapsed % 14000)}ms`,
-    );
-  }, []);
+  const styles = useAuthDesign();
   return (
     <main className={styles.shell}>
       <aside
-        ref={panelRef}
         className={styles.panel}
         aria-label={company ? "For hiring teams" : "For candidates"}
       >
         <div className={styles.gradient} aria-hidden="true" />
-        <div className={styles.glow} aria-hidden="true" />
+        {styles.glow && <div className={styles.glow} aria-hidden="true" />}
         <Brand />
         <div className={styles.pitch} key={company ? "company" : "candidate"}>
           <p className={styles.eyebrow}>
@@ -46,13 +36,13 @@ export function AuthShell({
             {company ? (
               <>
                 Build teams
-                <br />
+                <br />{" "}
                 around skills.
               </>
             ) : (
               <>
                 Show what
-                <br />
+                <br />{" "}
                 you can do.
               </>
             )}
@@ -73,26 +63,26 @@ export function AuthShell({
                 registration ? (
                   <>
                     Build your
-                    <br />
+                    <br />{" "}
                     pipeline
                   </>
                 ) : (
                   <>
                     See every
-                    <br />
+                    <br />{" "}
                     hiring stage
                   </>
                 )
               ) : registration ? (
                 <>
                   Build your
-                  <br />
+                  <br />{" "}
                   skills profile
                 </>
               ) : (
                 <>
                   Your skills
-                  <br />
+                  <br />{" "}
                   in focus
                 </>
               )}

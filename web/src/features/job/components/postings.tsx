@@ -186,10 +186,6 @@ export function Postings() {
             </p>
           </>
         )}
-        <p className={styles.muted}>
-          Details opens the single posting view. Drafts can be published, live
-          roles can be archived, and archived roles can be republished.
-        </p>
       </section>
       {confirmation && (
         <ConfirmDialog

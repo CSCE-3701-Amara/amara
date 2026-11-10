@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { apiRequest, resourceId } from "@/shared/lib/api-client";
+import styles from "./candidate.module.css";
 export function CodeRunner({
   attemptId,
   questionId,
@@ -36,7 +37,7 @@ export function CodeRunner({
     }
   }
   return (
-    <section aria-label="Code execution">
+    <section className={styles.codeRunner} aria-label="Code execution">
       <label>
         Standard input
         <textarea
