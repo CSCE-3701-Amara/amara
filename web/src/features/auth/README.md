@@ -4,13 +4,12 @@ The Figma Login Page canvas is implemented at `/`, `/login`, and `/register`.
 `?account=company` selects the hiring workspace; the default is candidate.
 
 `AuthShell`, `FormField`, and the shared `Brand` component compose the frames.
-Login and its MFA/recovery states use the original Figma styling in
-`login.module.css`; registration retains the refined `auth.module.css` styling.
-`AuthDesign` supplies the theme to the existing shell and fields without changing
-form state, validation, focus handling, or password visibility. Both themes use
-local Funnel Sans / Funnel Display fonts and the existing SVG assets. The welcome
-page also retains its original design. Login animation respects reduced motion;
-registration has no perpetual animation.
+Login, registration, and their MFA/recovery states share the refined
+`auth.module.css` styling. The shell and fields use the same styles directly;
+form state, validation, focus handling, and password visibility are unchanged.
+All auth views use local Funnel Sans / Funnel Display fonts and the existing SVG
+assets, with no perpetual animation and support for reduced motion. The welcome
+page retains its original design.
 
 Account switches keep email and password in memory and clear workspace-specific
 registration fields. Content exceeding a viewport stays reachable by scrolling.

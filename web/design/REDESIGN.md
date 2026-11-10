@@ -1,8 +1,8 @@
 # Amara frontend refinement — 10 November 2026
 
-Follow-up: the original welcome and login visuals were restored at the user’s
-request; registration and workspaces retain the refinement below. Public entry
-now resumes validated sessions. See
+Current presentation: the welcome page retains its original design. Login,
+registration, and MFA/recovery views share the refined auth design; workspaces
+retain the refinement below. Public entry resumes validated sessions. See
 [`2026-11-10-session-entry-spec.md`](../../docs/audits/2026-11-10-session-entry-spec.md).
 
 ## Direction and references

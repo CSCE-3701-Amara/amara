@@ -12,7 +12,7 @@ import {
 import type { AccountKind, AuthState } from "../types/auth.types";
 import { AuthShell } from "./auth-shell";
 import { FormField } from "./form-field";
-import { AuthDesign, useAuthDesign } from "./auth-design";
+import styles from "./auth.module.css";
 
 const states: Record<
   Exclude<AuthState, "form">,
@@ -64,14 +64,12 @@ export function AuthRoute({
     ? (requestedState as AuthState)
     : "form";
   return (
-    <AuthDesign registration={registration}>
-      <AuthScreen
-        key={`${initialState}:${registration}`}
-        kind={kind}
-        registration={registration}
-        initialState={initialState}
-      />
-    </AuthDesign>
+    <AuthScreen
+      key={`${initialState}:${registration}`}
+      kind={kind}
+      registration={registration}
+      initialState={initialState}
+    />
   );
 }
 
@@ -84,7 +82,6 @@ function AuthScreen({
   registration: boolean;
   initialState: AuthState;
 }) {
-  const styles = useAuthDesign();
   const stateTitleId = useId();
   const company = kind === "company";
   const [state, setState] = useState<AuthState>(initialState);

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode, RefObject } from "react";
 import { Brand } from "@/shared/ui/brand";
-import { useAuthDesign } from "./auth-design";
+import styles from "./auth.module.css";
 
 /** Responsive shared layout for the login, registration, and auth state frames. */
 export function AuthShell({
@@ -18,7 +18,6 @@ export function AuthShell({
   children: ReactNode;
   contentRef?: RefObject<HTMLElement | null>;
 }) {
-  const styles = useAuthDesign();
   return (
     <main className={styles.shell}>
       <aside
@@ -26,7 +25,6 @@ export function AuthShell({
         aria-label={company ? "For hiring teams" : "For candidates"}
       >
         <div className={styles.gradient} aria-hidden="true" />
-        {styles.glow && <div className={styles.glow} aria-hidden="true" />}
         <Brand />
         <div className={styles.pitch} key={company ? "company" : "candidate"}>
           <p className={styles.eyebrow}>

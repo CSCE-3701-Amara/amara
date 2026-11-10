@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useId, useState, type InputHTMLAttributes } from "react";
-import { useAuthDesign } from "./auth-design";
+import styles from "./auth.module.css";
 
 /** Native validation, explicit descriptions, and a keyboard-accessible password toggle. */
 export function FormField({
@@ -17,7 +17,6 @@ export function FormField({
   hint?: string;
   error?: string;
 }) {
-  const styles = useAuthDesign();
   const uniqueId = useId();
   const inputId = `${props.id}-${uniqueId}`;
   const [visible, setVisible] = useState(false);

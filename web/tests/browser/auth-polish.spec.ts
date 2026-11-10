@@ -24,12 +24,12 @@ for (const width of [320, 375, 768, 1024, 1280, 1728]) {
     page,
   }) => {
     await page.setViewportSize({ width, height: width <= 768 ? 812 : 900 });
-    const originalLogos = new Map<string, {
+    let originalLogo: {
       x: number;
       y: number;
       width: number;
       height: number;
-    }>();
+    } | null = null;
     for (const variant of variants) {
       await page.goto(variant.path);
       await expect(
@@ -42,22 +42,14 @@ for (const width of [320, 375, 768, 1024, 1280, 1728]) {
         exact: true,
       });
       await expect(selected).toHaveAttribute("aria-current", "page");
-      const legacy = variant.path.startsWith("/login");
-      if (legacy) {
-        await expect(selected).toHaveCSS("color", "rgb(255, 255, 255)");
-        await expect(selected.locator("span")).toHaveCSS("background-color", "rgb(102, 254, 76)");
-      } else {
-        await expect(selected).toHaveCSS("background-color", "rgb(255, 255, 255)");
-        await expect(selected).toHaveCSS("color", "rgb(33, 24, 19)");
-      }
+      await expect(selected).toHaveCSS("background-color", "rgb(255, 255, 255)");
+      await expect(selected).toHaveCSS("color", "rgb(33, 24, 19)");
       await expect(page.getByLabel("Email", { exact: true })).toHaveCSS("border-top-width", "1px");
-      await expect(page.getByLabel("Email", { exact: true })).toHaveCSS("border-radius", legacy ? "15.6px" : "8px");
+      await expect(page.getByLabel("Email", { exact: true })).toHaveCSS("border-radius", "8px");
       const logo = page.getByRole("link", { name: "amara home" });
       const bounds = await logo.boundingBox();
       expect(bounds).not.toBeNull();
-      const theme = legacy ? "login" : "registration";
-      const originalLogo = originalLogos.get(theme);
-      if (!originalLogo) originalLogos.set(theme, bounds!);
+      if (!originalLogo) originalLogo = bounds;
       else {
         expect(bounds!.x).toBeCloseTo(originalLogo.x, 0);
         expect(bounds!.y).toBeCloseTo(originalLogo.y, 0);
@@ -128,7 +120,7 @@ test("workspace-specific registration fields reset when switching accounts", asy
   ).toHaveValue("");
 });
 
-test("both auth themes respect reduced-motion preferences", async ({ page }) => {
+test("login and registration avoid continuous motion and respect reduced motion", async ({ page }) => {
   for (const path of ["/login", "/register"]) {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto(path);
@@ -138,8 +130,7 @@ test("both auth themes respect reduced-motion preferences", async ({ page }) => 
         animation.effect?.getComputedTiming().iterations === Infinity,
       ).length,
     );
-    if (path === "/login") expect(continuous).toBeGreaterThan(0);
-    else expect(continuous).toBe(0);
+    expect(continuous).toBe(0);
     await page.emulateMedia({ reducedMotion: "reduce" });
     expect(await page.locator("main:visible").evaluate(el => el.getAnimations({ subtree: true }).length)).toBe(0);
   }
