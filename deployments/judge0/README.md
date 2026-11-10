@@ -1,6 +1,12 @@
 # Local code sandbox
 
-Use a disposable Linux VM for the Judge0 sandbox host. Judge0's official image uses privileged containers and requires a compatible cgroup configuration; Docker containers are not themselves VMs. The Amara API never receives the Docker socket.
+## Local cgroup v2 demo
+
+On a development machine, run `infisical run --env=dev --path=/backend -- docker compose up --build` from the repository root. The main Compose stack includes a pinned community cgroup v2 Judge0 build. The API and worker reach it through loopback proxy sidecars. Its local-only credentials and database are separate from the official Judge0 stack. This setup is for local demos, not production. Judge0 exposes port 2358 only on the host loopback interface.
+
+Stop the stack with `infisical run --env=dev --path=/backend -- docker compose stop`. Stopping preserves database volumes.
+
+Use a disposable Linux VM for the Judge0 sandbox host. Judge0 CE 1.13.1 bundles isolate 1.8.1 and requires Docker to report cgroup v1. It accepts API requests on a cgroup v2 host, but every submission fails with status 13 because isolate cannot create `/sys/fs/cgroup/memory/box-*`. The startup script checks this before starting services. Docker containers are not themselves VMs. The Amara API never receives the Docker socket.
 
 From the repository root:
 
@@ -10,6 +16,14 @@ curl http://127.0.0.1:2358/languages
 ```
 
 The script generates ignored, mode-600 database/Redis credentials once and starts the pinned Judge0 CE 1.13.1 image, PostgreSQL and Redis. The HTTP listener is bound to loopback. Submission networking is disabled both in server configuration and in Amara's requests. Keep this local listener private; use authenticated HTTPS when deploying Judge0 on another host.
+
+Verify the VM before starting:
+
+```sh
+docker info --format '{{.CgroupVersion}}'  # must print 1
+```
+
+Changing a host from cgroup v2 to v1 is an operating-system boot configuration change and requires a reboot. Do that only on the dedicated Judge0 VM; do not change a shared development workstation merely to run this stack. On cgroup v2, use the development runner below.
 
 Configure **both API and worker** when running them on the same development host:
 
@@ -27,10 +41,12 @@ Candidates can run code with their own stdin without changing saved answers. Sub
 Stop the local services without deleting data:
 
 ```sh
-docker compose -f deployments/judge0/compose.yml down
+docker compose -f deployments/judge0/compose.yml stop
 ```
 
-Official deployment prerequisites and security release notes: https://github.com/judge0/judge0/releases/tag/v1.13.1
+Use `down` instead when you also want to remove the stopped containers and network; the database volume remains unless `--volumes` is explicitly supplied.
+
+Official deployment release: https://github.com/judge0/judge0/releases/tag/v1.13.1. Judge0's cgroup v2 incompatibility is tracked in https://github.com/judge0/judge0/issues/543.
 
 ## Lightweight development runner
 
@@ -50,4 +66,10 @@ Exercise actual Docker execution through Amara's Judge0 client:
 
 ```sh
 AMARA_SANDBOX_URL=http://127.0.0.1:2359 go test ./internal/invw/adapters/judge0 -run TestDockerDevelopmentSandbox -v
+```
+
+After the test, verify that no candidate container remains:
+
+```sh
+docker ps -a --filter label=amara.sandbox=true
 ```

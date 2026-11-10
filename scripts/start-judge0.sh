@@ -1,5 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "Docker is required to run Judge0." >&2
+  exit 1
+fi
+
+cgroup_version=""
+if ! cgroup_version="$(docker info --format '{{.CgroupVersion}}' 2>/dev/null)"; then
+  echo "The Docker daemon must be running to start Judge0." >&2
+  exit 1
+fi
+if [[ "$cgroup_version" != "1" ]]; then
+  cat >&2 <<EOF
+Judge0 CE 1.13.1 cannot execute submissions on this host because Docker uses
+cgroup v${cgroup_version:-unknown}. Its bundled isolate 1.8.1 requires cgroup v1.
+
+Use a disposable Linux VM configured with cgroup v1 for full Judge0, or run
+"make sandbox" for Amara's limited Python/JavaScript/TypeScript development
+runner on this host. The development runner uses Docker's cgroup v2 limits.
+EOF
+  exit 1
+fi
+
 cd "$(dirname "$0")/../deployments/judge0"
 python3 - <<'PY'
 from pathlib import Path

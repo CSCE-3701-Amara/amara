@@ -42,7 +42,7 @@ govulncheck:
 fmt:
 	go fmt ./...
 
-.PHONY: worker sandbox sandbox-judge0
+.PHONY: worker sandbox sandbox-judge0 demo
 worker:
 	go run ./cmd/worker
 
@@ -51,3 +51,6 @@ sandbox:
 
 sandbox-judge0:
 	./scripts/start-judge0.sh
+
+demo:
+	bash scripts/start-demo.sh

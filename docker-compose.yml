@@ -2,9 +2,8 @@
 #
 # Per docs/sdd/03-system-architecture.md the backend is one container image
 # with two execution roles: the API process and the worker process. The web
-# client is an OCI container served to the browser. Persistent state stays in
-# the managed Supabase PostgreSQL instance and provider-integrated object
-# storage, so no database or queue containers are declared here.
+# client is an OCI container served to the browser. Judge0's database and Redis
+# are local demo services; Amara's persistent state remains in Supabase.
 name: amara
 
 # Infisical injects these values from the backend folder:
@@ -23,10 +22,10 @@ x-backend-env: &backend-env
   SMTP_USERNAME: ${SMTP_USERNAME:-}
   SMTP_PASSWORD: ${SMTP_PASSWORD:-}
   SMTP_FROM: ${SMTP_FROM:?SMTP sender address is required}
-  JUDGE0_URL: ${JUDGE0_URL:-}
+  JUDGE0_URL: ${JUDGE0_URL:-http://127.0.0.1:2358}
   JUDGE0_AUTH_TOKEN: ${JUDGE0_AUTH_TOKEN:-}
   JUDGE0_LANGUAGE_IDS: ${JUDGE0_LANGUAGE_IDS:-}
-  JUDGE0_ALLOW_LOCAL_HTTP: ${JUDGE0_ALLOW_LOCAL_HTTP:-false}
+  JUDGE0_ALLOW_LOCAL_HTTP: ${JUDGE0_ALLOW_LOCAL_HTTP:-true}
   DB_POOL_MAX_CONNS: ${DB_POOL_MAX_CONNS:-4}
   CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
   HTTP_READ_HEADER_TIMEOUT: ${HTTP_READ_HEADER_TIMEOUT:-5s}
@@ -58,10 +57,62 @@ services:
     command: ["/worker"]
     environment:
       <<: *backend-env
-      JUDGE0_URL: ${JUDGE0_URL:-}
-      JUDGE0_AUTH_TOKEN: ${JUDGE0_AUTH_TOKEN:-}
-      JUDGE0_LANGUAGE_IDS: ${JUDGE0_LANGUAGE_IDS:-}
-      JUDGE0_ALLOW_LOCAL_HTTP: ${JUDGE0_ALLOW_LOCAL_HTTP:-false}
+
+  api-judge0-proxy:
+    image: alpine/socat:1.8.0.3
+    network_mode: service:api
+    depends_on: [api, judge0]
+    command: ["TCP-LISTEN:2358,bind=127.0.0.1,fork,reuseaddr", "TCP:judge0:2358"]
+    restart: unless-stopped
+
+  worker-judge0-proxy:
+    image: alpine/socat:1.8.0.3
+    network_mode: service:worker
+    depends_on: [worker, judge0]
+    command: ["TCP-LISTEN:2358,bind=127.0.0.1,fork,reuseaddr", "TCP:judge0:2358"]
+    restart: unless-stopped
+
+  judge0:
+    container_name: amara-local-judge0-server
+    image: mrkushalsm/judge0@sha256:d60605ad448453ac3754629bc7121d379cf691e0c091aabbc03ff2886b2626b2
+    privileged: true
+    volumes:
+      - ./deployments/judge0/judge0.demo.conf:/judge0.conf:ro
+    ports:
+      - "127.0.0.1:2358:2358"
+    depends_on: [judge0-db, judge0-redis]
+    restart: unless-stopped
+
+  judge0-worker:
+    container_name: amara-local-judge0-worker
+    image: mrkushalsm/judge0@sha256:d60605ad448453ac3754629bc7121d379cf691e0c091aabbc03ff2886b2626b2
+    privileged: true
+    command: ["./scripts/workers"]
+    volumes:
+      - ./deployments/judge0/judge0.demo.conf:/judge0.conf:ro
+    depends_on: [judge0-db, judge0-redis]
+    restart: unless-stopped
+
+  judge0-db:
+    container_name: amara-local-judge0-db
+    image: postgres:16-alpine
+    env_file: ./deployments/judge0/judge0.demo.conf
+    networks:
+      default:
+        aliases: [db]
+    volumes:
+      - judge0-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  judge0-redis:
+    container_name: amara-local-judge0-redis
+    image: redis:7-alpine
+    env_file: ./deployments/judge0/judge0.demo.conf
+    networks:
+      default:
+        aliases: [redis]
+    command: ["sh", "-c", 'docker-entrypoint.sh --appendonly no --requirepass "$$REDIS_PASSWORD"']
+    restart: unless-stopped
 
   web:
     build:
@@ -76,3 +127,6 @@ services:
 
 # Interpolation happens in the x-backend-env block above; additional
 # secret-backed integrations add their variables there when they arrive.
+volumes:
+  judge0-data:
+    name: amara-judge0-local_data

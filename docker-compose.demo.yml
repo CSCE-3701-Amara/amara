@@ -1,0 +1,27 @@
+services:
+  api:
+    environment:
+      JUDGE0_URL: http://127.0.0.1:2358
+      JUDGE0_ALLOW_LOCAL_HTTP: "true"
+      JUDGE0_AUTH_TOKEN: ""
+      JUDGE0_LANGUAGE_IDS: '{"javascript":63,"typescript":74,"python":71,"go":60,"cpp":54}'
+  worker:
+    environment:
+      JUDGE0_URL: http://127.0.0.1:2358
+      JUDGE0_ALLOW_LOCAL_HTTP: "true"
+      JUDGE0_AUTH_TOKEN: ""
+      JUDGE0_LANGUAGE_IDS: '{"javascript":63,"typescript":74,"python":71,"go":60,"cpp":54}'
+  api-judge0-proxy:
+    image: alpine/socat:1.8.0.3
+    network_mode: service:api
+    depends_on:
+      - api
+    command: ["TCP-LISTEN:2358,bind=127.0.0.1,fork,reuseaddr", "TCP:judge0-demo:2358"]
+    restart: unless-stopped
+  worker-judge0-proxy:
+    image: alpine/socat:1.8.0.3
+    network_mode: service:worker
+    depends_on:
+      - worker
+    command: ["TCP-LISTEN:2358,bind=127.0.0.1,fork,reuseaddr", "TCP:judge0-demo:2358"]
+    restart: unless-stopped
