@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useApiResource } from "@/shared/lib/use-api-resource";
 import { useProfileUpdate } from "@/shared/lib/use-profile-update";
 import { ApiFeedback, BusyState } from "@/shared/ui/workspace";
-import { useApiResource } from "@/shared/lib/use-api-resource";
 import { performAccountAction } from "@/features/auth/api/auth.api";
 import {
   ConfirmDialog,
@@ -22,6 +21,10 @@ interface CandidateProfile {
   address?: string;
   biography?: string;
   phoneNumber?: string;
+  nationality?: string;
+  birthDate?: string;
+  gender?: string;
+  yearsOfExperience?: number;
   githubProfile?: string;
   linkedinProfile?: string;
   portfolioLink?: string;

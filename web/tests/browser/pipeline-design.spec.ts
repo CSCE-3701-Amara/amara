@@ -5,6 +5,22 @@ import {
   productFixtures,
 } from "./support/product-fixtures";
 
+test("legacy stage editor mounts on opening and retains edits when reopened", async ({ page }) => {
+  await productFixtures(page);
+  await page.goto(`/employer/pipelines/${ids.job}`);
+  const editor = page.getByRole("region", { name: "Hiring pipeline" });
+  await expect(editor).toHaveCount(0);
+  const toggle = page.getByText("Legacy stage editor", { exact: true });
+  await toggle.click();
+  const name = editor.getByLabel("Stage name", { exact: true }).first();
+  await name.fill("Retained stage draft");
+  await toggle.click();
+  await expect(name).toBeHidden();
+  await toggle.click();
+  await expect(name).toBeVisible();
+  await expect(name).toHaveValue("Retained stage draft");
+});
+
 test("candidate profile reads back saved details after reload", async ({
   page,
 }) => {

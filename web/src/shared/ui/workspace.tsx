@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Suspense, useId, useRef, useState, type ReactNode } from "react";
 import { deleteCurrentSession } from "@/features/auth/api/auth.api";
 import { ApiError } from "@/shared/lib/api-client";
+import { toError } from "@/shared/lib/errors";
 import { sessionHome } from "@/features/auth/lib/session-home";
 import { Brand } from "./brand";
 import { RouteDialog } from "./route-dialog";

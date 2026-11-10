@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { DagEditor } from "./dag-editor";
 import Link from "next/link";
 import { resourceId } from "@/shared/lib/api-client";
@@ -7,6 +10,7 @@ import { PipelineEditor } from "./pipeline-editor";
 
 export function PipelineStudio({ postingId }: { postingId: string }) {
   const pipelinePath = `/employer/pipelines/${resourceId(postingId)}`;
+  const [stageEditorVisited, setStageEditorVisited] = useState(false);
 
   return (
     <>
@@ -23,7 +27,11 @@ export function PipelineStudio({ postingId }: { postingId: string }) {
         <Link href={`${pipelinePath}/dashboard`}>Dashboard</Link>
       </nav>
       <DagEditor postingId={postingId} />
-      <details>
+      <details
+        onToggle={(event) => {
+          if (event.currentTarget.open) setStageEditorVisited(true);
+        }}
+      >
         <summary>Legacy stage editor</summary>
         <p>
           Use this editor for pipelines created with the earlier stage format.

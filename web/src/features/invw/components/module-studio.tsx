@@ -325,8 +325,6 @@ function DefinitionEditor({
       amarat: awards,
       rubric: module?.rubric,
       library: module?.library,
-      behavioral: module?.behavioral,
-      minimum_tests_passed: module?.minimum_tests_passed,
       name: String(data.get("name") || "").trim(),
       description: String(data.get("description") || ""),
       type,
