@@ -198,9 +198,36 @@
   color: var(--workspace-muted);
 }
 
-.contextBar > span:first-child {
+.contextNavigation {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 20px;
+  min-width: 0;
+}
+
+.contextNavigation > span {
   color: var(--workspace-ink);
   font-weight: 600;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 10px;
+  margin-left: -10px;
+  border-radius: var(--radius-control);
+  color: var(--workspace-muted);
+  font-size: 13px;
+  font-weight: 550;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: var(--workspace-ink);
+  background: var(--surface-secondary);
 }
 
 .contextBar > span:last-child {

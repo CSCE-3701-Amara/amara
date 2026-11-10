@@ -8,6 +8,7 @@ import { ApiError } from "@/shared/lib/api-client";
 import { sessionHome } from "@/features/auth/lib/session-home";
 import { Brand } from "./brand";
 import { RouteDialog } from "./route-dialog";
+import { WorkspaceBack } from "./workspace-back";
 import styles from "./workspace.module.css";
 export { styles as workspaceStyles };
 export type WorkspaceRole = "candidate" | "company" | "interviewer" | "admin";
@@ -213,7 +214,12 @@ export function Workspace({
       </aside>
       <main id="workspace-content" tabIndex={-1} className={styles.main}>
         <div className={styles.contextBar}>
-          <span>{workspaceLabel}</span>
+          <div className={styles.contextNavigation}>
+            <Suspense fallback={null}>
+              <WorkspaceBack home={sessionHome(role)!} />
+            </Suspense>
+            <span>{workspaceLabel}</span>
+          </div>
           <span>amara / Skills-first recruitment</span>
         </div>
         <ApiFeedback error={error} />
