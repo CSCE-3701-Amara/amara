@@ -6,10 +6,60 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/mail"
 	"strings"
 	"testing"
 	"time"
 )
+
+func TestBuildSMTPHeadersKeepsRecipientOutOfMessage(t *testing.T) {
+	date := time.Date(2026, 11, 10, 12, 0, 0, 0, time.UTC)
+	headers := buildSMTPHeaders(&mail.Address{Address: "no-reply@example.com"}, date)
+	want := "From: <no-reply@example.com>\r\nTo: undisclosed-recipients:;\r\nDate: Tue, 10 Nov 2026 12:00:00 +0000\r\n"
+	if headers != want {
+		t.Fatalf("headers = %q, want %q", headers, want)
+	}
+	message, err := mail.ReadMessage(strings.NewReader(headers + string(buildVerificationMessage("deadbeef"))))
+	if err != nil {
+		t.Fatal(err)
+	}
+	addresses, err := message.Header.AddressList("To")
+	if err != nil || len(addresses) != 0 {
+		t.Fatalf("To must be a valid empty group; got %v, error = %v", addresses, err)
+	}
+	if len(message.Header) != 4 || message.Header.Get("Bcc") != "" {
+		t.Fatalf("unexpected message headers: %v", message.Header)
+	}
+}
+
+func TestSMTPSenderRejectsUntrustedRecipientBeforeConnecting(t *testing.T) {
+	sender, err := NewSMTPSender(SMTPConfig{Host: "127.0.0.1", Port: "0", From: "no-reply@example.com"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, recipient := range []string{
+		"", "   ", "not-an-email",
+		"user@example.com\r\nBcc: victim@example.com",
+		"user@example.com\nBcc: victim@example.com",
+		"user@example.com\rBcc: victim@example.com",
+		"user@example.com\r\n\r\nInjected message body",
+		"user@example.com, victim@example.com",
+		"Display Name <user@example.com>",
+	} {
+		t.Run(recipient, func(t *testing.T) {
+			for name, send := range map[string]func() error{
+				"verification": func() error { return sender.SendVerificationCode(context.Background(), recipient, "deadbeef") },
+				"MFA":          func() error { return sender.SendLoginCode(context.Background(), recipient, "123456") },
+			} {
+				t.Run(name, func(t *testing.T) {
+					if err := send(); err == nil || !strings.Contains(err.Error(), "recipient") {
+						t.Fatalf("invalid recipient must fail before connecting to SMTP; got %v", err)
+					}
+				})
+			}
+		})
+	}
+}
 
 func TestNewSMTPSenderRejectsHeaderInjectionInFrom(t *testing.T) {
 	_, err := NewSMTPSender(SMTPConfig{

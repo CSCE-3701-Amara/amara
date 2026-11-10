@@ -129,8 +129,7 @@ func (s *SMTPSender) send(ctx context.Context, recipient string, message []byte)
 	if err != nil {
 		return fmt.Errorf("start SMTP message: %w", err)
 	}
-	headers := fmt.Sprintf("From: %s\r\nTo: %s\r\nDate: %s\r\n",
-		s.config.From, recipient, time.Now().Format(time.RFC1123Z))
+	headers := buildSMTPHeaders(&mail.Address{Address: s.config.From}, time.Now())
 	if _, err := io.WriteString(writer, headers); err != nil {
 		return fmt.Errorf("write SMTP headers: %w", err)
 	}
@@ -145,6 +144,13 @@ func (s *SMTPSender) send(ctx context.Context, recipient string, message []byte)
 		return fmt.Errorf("close SMTP session: %w", err)
 	}
 	return nil
+}
+
+func buildSMTPHeaders(from *mail.Address, date time.Time) string {
+	// Delivery uses the validated SMTP envelope recipient. Keep request data
+	// out of DATA headers; the empty group is a valid RFC 5322 To value.
+	return fmt.Sprintf("From: %s\r\nTo: undisclosed-recipients:;\r\nDate: %s\r\n",
+		from.String(), date.Format(time.RFC1123Z))
 }
 
 func closeOnContextCancellation(ctx context.Context, conn net.Conn, done <-chan struct{}) {
