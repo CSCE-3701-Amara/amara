@@ -214,6 +214,7 @@ func run() error {
 		verificationHandler.RegisterRoutes,
 		companyRegistrationHandler.RegisterRoutes,
 		loginHandler.RegisterRoutes,
+		func(group *gin.RouterGroup) { authhttp.RegisterCurrentSessionRoutes(group, authRepo) },
 		logoutHandler.RegisterRoutes,
 		accountActionHandler.RegisterRoutes,
 		profileHandler.RegisterRoutes,

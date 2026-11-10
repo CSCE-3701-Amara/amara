@@ -196,6 +196,43 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /v1/auth/sessions/current:
+    get:
+      summary: Read the current authenticated session
+      operationId: getCurrentSession
+      tags:
+        - Auth
+      security:
+        - SessionCookie: []
+      description: Validates the persisted HttpOnly cookie without issuing or extending a session. Never returns the token.
+      responses:
+        '200':
+          description: Validated identity and existing session expiry
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-store
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user, session]
+                properties:
+                  user:
+                    type: object
+                    required: [id, role]
+                    properties:
+                      id:
+                        type: string
+                      role:
+                        type: string
+                        enum: [candidate, company_representative, interviewer]
+                  session:
+                    $ref: '#/components/schemas/Session'
+        '401':
+          $ref: '#/components/responses/AuthenticatedUnauthorized'
+        '500':
+          description: Session validation is temporarily unavailable
     delete:
       summary: Terminate the current authenticated session
       operationId: deleteCurrentSession

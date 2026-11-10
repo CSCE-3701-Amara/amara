@@ -4,17 +4,30 @@ The Figma Login Page canvas is implemented at `/`, `/login`, and `/register`.
 `?account=company` selects the hiring workspace; the default is candidate.
 
 `AuthShell`, `FormField`, and the shared `Brand` component compose the frames.
-The CSS uses Figma's Funnel Sans / Funnel Display fonts, local SVG assets, and
-shared color tokens in `app/globals.css`. The fourteen-second gradient and glow
-animations stop when reduced motion is requested. Auth content that extends
-past Figma's 1117px frame stays reachable by scrolling.
+Login and its MFA/recovery states use the original Figma styling in
+`login.module.css`; registration retains the refined `auth.module.css` styling.
+`AuthDesign` supplies the theme to the existing shell and fields without changing
+form state, validation, focus handling, or password visibility. Both themes use
+local Funnel Sans / Funnel Display fonts and the existing SVG assets. The welcome
+page also retains its original design. Login animation respects reduced motion;
+registration has no perpetual animation.
 
-The account selector derives its active pill, text, and icon colors from the
-current workspace. The brand badge uses the same placement on every auth screen.
-Background animation stays at the same phase between auth routes. Tab switches
-keep email and password in memory and clear workspace-specific registration fields.
-Motion includes a sliding account indicator, short content entrances, a floating
-illustration, and hover/press feedback; reduced motion disables these effects.
+Account switches keep email and password in memory and clear workspace-specific
+registration fields. Content exceeding a viewport stays reachable by scrolling.
+
+`/` and `/login` read cookie presence inside a Suspense boundary. If an
+`amara_session` cookie exists, `SessionEntry` validates it through
+`GET /v1/auth/sessions/current` before showing public content. Valid sessions go
+to the role's workspace; expired/revoked sessions show the public page. Service
+failures show a retry message rather than pretending the visitor signed out.
+The lookup returns only ID, role, and expiry, uses `Cache-Control: no-store`, and
+does not issue/extend a cookie. Roles map only to fixed local destinations.
+Workspace logos link directly to their role's home, including administration.
+
+The backend keeps the existing 24-hour HttpOnly session cookie. Hiring-manager
+and interviewer MFA requirements remain enforced when creating a session; an
+already verified, valid session can be resumed without resubmitting credentials.
+Deploy/restart the API with the frontend so the new GET endpoint is available.
 
 Login posts to `/v1/auth/sessions`, including cookies. The server's role controls
 the destination. MFA reuses the entered credentials in component memory;

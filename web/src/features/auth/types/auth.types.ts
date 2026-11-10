@@ -21,6 +21,11 @@ export interface LoginResponse {
   };
   session: { expiresAt: string };
 }
+export interface CurrentSessionResponse {
+  user: Pick<LoginResponse["user"], "id" | "role">;
+  session: LoginResponse["session"];
+}
+
 export interface RegistrationRequest {
   email: string;
   password: string;

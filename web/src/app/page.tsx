@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { GuestEntry } from "@/features/auth/components/guest-entry";
 import Image from "next/image";
 import Link from "next/link";
 import { Brand } from "@/shared/ui/brand";
@@ -37,7 +39,7 @@ const toolkit = [
   ["Live interviews", "live-interviews-icon"],
 ];
 
-export default function Home() {
+function Welcome() {
   return (
     <main className={styles.page}>
       <section id="home" className={styles.hero}>
@@ -58,12 +60,12 @@ export default function Home() {
         <div className={styles.heroCopy}>
           <h1>
             Beyond Resumes.
-            <br />
+            <br />{" "}
             Towards Skills.
           </h1>
           <p>
             Find opportunities that value your skills.
-            <br />
+            <br />{" "}
             Give hiring teams a clearer picture of what you can do.
           </p>
           <a className={styles.heroAction} href="#how-it-works">
@@ -90,7 +92,7 @@ export default function Home() {
         <div className={styles.sectionCopy}>
           <h2 id="show-skills">
             Show what
-            <br />
+            <br />{" "}
             you can do
           </h2>
           <p>
@@ -134,7 +136,7 @@ export default function Home() {
       >
         <h2 id="how-heading">
           How amara
-          <br />
+          <br />{" "}
           works
         </h2>
         <div className={styles.steps}>
@@ -171,7 +173,7 @@ export default function Home() {
             <span className={styles.teamEyebrow}>For hiring teams</span>
             <h2 id="hiring-heading">
               Build a better
-              <br />
+              <br />{" "}
               hiring process
             </h2>
             <p>
@@ -282,7 +284,7 @@ export default function Home() {
           <div>
             <h2>
               Hiring built
-              <br />
+              <br />{" "}
               around skills.
             </h2>
             <p>
@@ -328,5 +330,13 @@ export default function Home() {
         </div>
       </footer>
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<main aria-busy="true"><p role="status">Checking your session…</p></main>}>
+      <GuestEntry><Welcome /></GuestEntry>
+    </Suspense>
   );
 }

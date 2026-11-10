@@ -1,4 +1,9 @@
 .page {
+  --foreground: #010101;
+  --text-muted: #55504c;
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: normal;
   max-width: 1728px;
   margin: auto;
   overflow: clip;
