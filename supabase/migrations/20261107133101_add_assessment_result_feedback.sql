@@ -25,6 +25,8 @@ CREATE INDEX application_assessments_result_lookup_idx
     WHERE status IN ('submitted', 'completed');
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP INDEX IF EXISTS application_assessments_result_lookup_idx;
 ALTER TABLE application_assessments
     DROP CONSTRAINT application_assessments_result_disclosure_check,
@@ -38,3 +40,4 @@ ALTER TABLE application_assessments
     DROP COLUMN evaluated_at,
     DROP COLUMN passed,
     DROP COLUMN evaluation_status;
+*/

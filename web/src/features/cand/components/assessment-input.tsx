@@ -18,7 +18,7 @@ export function QuestionInput({
   questionId: string;
 }) {
   if (question.responseFormat === "video")
-    return <VideoAnswer disabled={disabled} />;
+    return <VideoAnswer key={question.id} disabled={disabled} />;
   if (question.responseFormat === "multiple_choice")
     return (
       <fieldset className={styles.choiceGroup}>

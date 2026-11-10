@@ -64,6 +64,7 @@ function PostingForm({
       salary_visible: data.has("salary_visible"),
       open_positions: number("open_positions"),
       max_applications: number("max_applications"),
+      finalist_target: initial?.finalist_target,
       application_opening: date("application_opening"),
       application_deadline: date("application_deadline"),
       requirements: [

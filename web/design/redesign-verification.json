@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-10",
+  "page_files": 50,
+  "full_production_browser_suite": {
+    "startTime": "2026-11-10T13:59:43.410Z",
+    "duration": 98629.92599999999,
+    "expected": 403,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "final_affected_production_checks": {
+    "startTime": "2026-11-10T14:03:41.017Z",
+    "duration": 18817.445,
+    "expected": 45,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "unit_tests": {
+    "passed": 8
+  },
+  "lint": "passed",
+  "typecheck": "passed",
+  "production_build": "passed",
+  "diff_check": "passed",
+  "inventory_viewports": [
+    375,
+    1024,
+    1728
+  ],
+  "representative_viewports": [
+    375,
+    768,
+    1280,
+    1440,
+    1728
+  ],
+  "auth_viewports": [
+    320,
+    375,
+    768,
+    1024,
+    1280,
+    1728
+  ],
+  "integration_mode": "Repository API fixtures; live services not exercised",
+  "screenshots": [
+    "tests/artifacts/product",
+    "tests/artifacts/refinement"
+  ],
+  "limitations": [
+    "Live backend, email/MFA delivery, camera hardware, and Judge0 were not verified.",
+    "Existing feature-unavailability notices remain.",
+    "Targeted contrast and keyboard checks are not a complete WCAG audit."
+  ]
+}

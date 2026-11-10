@@ -38,7 +38,7 @@ test("collapsed stage editor defers duplicate reads and retains edits after reop
   await expect
     .poll(completedReads)
     .toEqual({ pipeline: 1, stages: 1, modules: 1 });
-  const summary = page.getByText("Server-supported stage configuration", {
+  const summary = page.getByText("Legacy stage editor", {
     exact: true,
   });
   await summary.click();
@@ -47,7 +47,7 @@ test("collapsed stage editor defers duplicate reads and retains edits after reop
   await stage.fill("Retained local edit");
   await expect(
     editor
-      .getByRole("checkbox", { name: "Go fundamentals", exact: true })
+      .getByRole("checkbox", { name: "Go fundamentals · Behavioral", exact: true })
       .first(),
   ).toBeVisible();
   // Opening the lazy component can replay existing effects in development.

@@ -22,14 +22,15 @@ func NewPipelineRepository(pool *pgxpool.Pool) *PipelineRepository {
 func (r *PipelineRepository) Get(ctx context.Context, company, posting string) (domain.PipelineDraft, error) {
 	var draft domain.PipelineDraft
 	err := r.pool.QueryRow(ctx, `
-		SELECT p.id::text, p.posting_id::text, v.id::text, v.version_number
+		SELECT p.id::text, p.posting_id::text, v.id::text, v.version_number,
+			p.published_version_id IS NOT DISTINCT FROM v.id
 		FROM pipelines p JOIN job_postings j ON j.id = p.posting_id
 		JOIN LATERAL (
 			SELECT id, version_number FROM pipeline_versions
 			WHERE pipeline_id = p.id ORDER BY version_number DESC LIMIT 1
 		) v ON true
 		WHERE p.posting_id = $1::text::uuid AND j.company_id = $2::text::uuid`,
-		posting, company).Scan(&draft.ID, &draft.PostingID, &draft.VersionID, &draft.VersionNumber)
+		posting, company).Scan(&draft.ID, &draft.PostingID, &draft.VersionID, &draft.VersionNumber, &draft.Published)
 	return draft, pipelineError(err)
 }
 
@@ -74,6 +75,53 @@ func (r *PipelineRepository) Create(ctx context.Context, company, posting string
 	return draft, tx.Commit(ctx)
 }
 
+func (r *PipelineRepository) Publish(ctx context.Context, company, version string) error {
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	published, err := pipelineVersion(ctx, tx, company, version, true)
+	if err != nil {
+		return err
+	}
+	var active, hasEntry bool
+	err = tx.QueryRow(ctx, `
+		SELECT p.published_version_id IS NOT DISTINCT FROM v.id,
+			EXISTS (SELECT 1 FROM pipeline_stages WHERE version_id = v.id AND stage_order = 1)
+		FROM pipeline_versions v JOIN pipelines p ON p.id = v.pipeline_id
+		WHERE v.id = $1::text::uuid`, version).Scan(&active, &hasEntry)
+	if err != nil {
+		return err
+	}
+	if active {
+		return nil
+	}
+	if published {
+		return domain.ErrPipelineLocked
+	}
+	if !hasEntry {
+		return &domain.InvalidPipelineError{Reason: "Save at least one stage before publishing the pipeline."}
+	}
+	tag, err := tx.Exec(ctx, `
+		UPDATE pipelines p SET published_version_id = v.id, status = 'published'
+		FROM pipeline_versions v WHERE v.id = $1::text::uuid AND p.id = v.pipeline_id
+			AND p.published_version_id IS NULL`, version)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return domain.ErrPipelineLocked
+	}
+	if _, err := tx.Exec(ctx, `
+		UPDATE pipeline_versions SET is_published = true, published_at = now(), published_by = $2::text::uuid
+		WHERE id = $1::text::uuid`, version, company); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
+}
+
 func (r *PipelineRepository) Stages(ctx context.Context, company, version string) ([]domain.Stage, error) {
 	// Keep ownership and stage reads in one snapshot, including for an empty draft.
 	tx, err := r.pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.RepeatableRead, AccessMode: pgx.ReadOnly})
@@ -86,7 +134,7 @@ func (r *PipelineRepository) Stages(ctx context.Context, company, version string
 	}
 	rows, err := tx.Query(ctx, `
 		SELECT s.id::text, s.name, s.module_type, s.scheduled_start_at, s.scheduled_end_at,
-			s.interview_configuration,
+			s.interview_configuration,s.advancement_rule,s.score_threshold,s.below_threshold_action,
 			ARRAY(SELECT tc.test_module_id::text FROM test_configurations tc WHERE tc.stage_id = s.id
 				ORDER BY (tc.configuration->>'position')::integer)
 		FROM pipeline_stages s WHERE s.version_id = $1::text::uuid
@@ -99,7 +147,7 @@ func (r *PipelineRepository) Stages(ctx context.Context, company, version string
 	for rows.Next() {
 		var stage domain.Stage
 		err := rows.Scan(&stage.ID, &stage.Name, &stage.Type, &stage.OpensAt, &stage.Deadline,
-			&stage.Interview, &stage.ModuleIDs)
+			&stage.Interview, &stage.Rule, &stage.ScoreThreshold, &stage.Below, &stage.ModuleIDs)
 		if err != nil {
 			return nil, err
 		}
@@ -147,6 +195,9 @@ func (r *PipelineRepository) ReplaceStages(ctx context.Context, company, version
 		}
 	}
 
+	if _, err := tx.Exec(ctx, `DELETE FROM stage_transitions WHERE pipeline_version_id=$1::uuid`, version); err != nil {
+		return nil, err
+	}
 	if _, err := tx.Exec(ctx, `
 		DELETE FROM test_configurations WHERE stage_id IN
 			(SELECT id FROM pipeline_stages WHERE version_id = $1::text::uuid)`, version); err != nil {
@@ -177,14 +228,7 @@ func pipelineVersion(ctx context.Context, tx pgx.Tx, company, version string, lo
 		return false, pipelineError(err)
 	}
 
-	var legacy bool
-	err := tx.QueryRow(ctx, `
-		SELECT EXISTS (SELECT 1 FROM pipeline_stages WHERE version_id = $1::text::uuid AND stage_order IS NULL)
-			OR EXISTS (SELECT 1 FROM stage_transitions WHERE pipeline_version_id = $1::text::uuid)`, version).Scan(&legacy)
-	if err == nil && legacy {
-		return false, domain.ErrPipelineLocked
-	}
-	return published, err
+	return published, nil
 }
 
 func moduleSnapshot(ctx context.Context, tx pgx.Tx, company, id string) (domain.Definition, error) {
@@ -231,14 +275,27 @@ func insertStage(ctx context.Context, tx pgx.Tx, version string, position int, s
 			threshold = stage.Interview.Threshold
 		}
 	}
+	if stage.Rule != "" {
+		rule = stage.Rule
+		if stage.ScoreThreshold != nil {
+			threshold = stage.ScoreThreshold
+		}
+	}
 	err := tx.QueryRow(ctx, `
-		INSERT INTO pipeline_stages (id, version_id, name, module_type, stage_order,
+  INSERT INTO pipeline_stages (id, version_id, name, module_type, stage_order,
 			scheduled_start_at, scheduled_end_at, interview_configuration, advancement_rule,
 			score_threshold)
 		VALUES (gen_random_uuid(), $1::text::uuid, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING id::text`, version, stage.Name, stage.Type, position,
 		stage.OpensAt, stage.Deadline, stage.Interview, rule, threshold).Scan(&stage.ID)
 	if err != nil {
+		return err
+	}
+	below := stage.Below
+	if below == "" {
+		below = "hold"
+	}
+	if _, err := tx.Exec(ctx, `UPDATE pipeline_stages SET below_threshold_action=$2 WHERE id=$1::uuid`, stage.ID, below); err != nil {
 		return err
 	}
 	for i, id := range stage.ModuleIDs {

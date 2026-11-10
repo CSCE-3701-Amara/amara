@@ -8,4 +8,7 @@ CREATE TABLE candidate_stage_progress (
 );
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TABLE candidate_stage_progress;
+*/

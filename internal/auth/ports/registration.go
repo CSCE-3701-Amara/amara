@@ -53,7 +53,9 @@ type VerificationChallenge struct {
 }
 
 type PendingVerification struct {
-	Account   domain.Account
-	Recipient string
-	ExpiresAt time.Time
+	PasswordHash []byte
+	Salt         []byte
+	Account      domain.Account
+	Recipient    string
+	ExpiresAt    time.Time
 }

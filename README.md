@@ -28,8 +28,9 @@ for the connection and migration approach.
 ## Docker Compose
 
 Compose builds the backend image (the API and worker are two execution roles
-of one codebase) and the web client image. No database or queue containers:
-persistent data stays in the managed Supabase PostgreSQL instance.
+of one codebase) and the web client image. It also starts a local Judge0 demo
+stack with its own PostgreSQL and Redis; Amara data stays in Supabase. The
+Judge0 configuration uses local demo credentials and is not for production.
 
 ```sh
 docker compose up --build
@@ -153,9 +154,10 @@ Development allows `http://localhost:5173` and `http://127.0.0.1:5173`.
 Cookie credentials are disabled; cross-origin clients can send an `Authorization`
 header. Configure trusted proxies explicitly when deploying behind a load balancer.
 
-Logs are JSON by default; set `LOG_FORMAT=text` for a human-readable format on
-container-console runs. Each request receives a generated `X-Request-ID`, also available
-through `http.RequestID(ctx)` and in JSON error responses. Request logs include
+Logs use a compact, readable format by default in container consoles; set
+`LOG_FORMAT=json` for structured JSON ingestion. Each request receives a
+generated `X-Request-ID`, also available through `http.RequestID(ctx)` and in
+JSON error responses. Request logs include
 route templates, status, and duration; they omit bodies, headers, query strings,
 and path parameter values. Gin prints its route diagnostics in development mode.
 

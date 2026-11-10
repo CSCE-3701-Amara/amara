@@ -5,8 +5,10 @@ import styles from "./brand.module.css";
 /** The shared Figma logo lockup, with its original mark dimensions. */
 export function Brand({
   variant = "badge",
+  href = "/",
 }: {
   variant?: "badge" | "header" | "footer" | "workspace";
+  href?: string;
 }) {
   const mark =
     variant === "workspace"
@@ -18,7 +20,7 @@ export function Brand({
           : { src: "/amara-logo.svg", width: 47.2, height: 40.8 };
   return (
     <Link
-      href="/"
+      href={href}
       aria-label="amara home"
       className={`${styles.brand} ${styles[variant]}`}
     >

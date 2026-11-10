@@ -2,7 +2,7 @@
 import { toError } from "@/shared/lib/errors";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState, type FormEvent } from "react";
+import { useId, useRef, useState, type FormEvent } from "react";
 import { resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
 import { ApiFeedback, BusyState } from "@/shared/ui/workspace";
@@ -22,6 +22,7 @@ import {
   copyModule,
 } from "../api/invw.api";
 import type {
+  Amara,
   AssessmentModule,
   ModuleDefinition,
   ModuleSummary,
@@ -262,6 +263,8 @@ function DefinitionEditor({
   video?: boolean;
   onSaved: (module: AssessmentModule) => void;
 }) {
+  const [amarat, setAmarat] = useState<Amara[]>(() => module?.amarat ?? []);
+  const amaraOptionsId = useId();
   const [questions, setQuestions] = useState<Question[]>(
     () =>
       module?.questions || [
@@ -275,8 +278,12 @@ function DefinitionEditor({
   const [error, setError] = useState<Error>();
   const [busy, setBusy] = useState(false);
   const [publish, setPublish] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
   const pending = useRef(false);
   const locked = !!(module?.published || module?.copied_from_module_id);
+  const codeModule = type === "coding" || type === "programming_language";
+  const defaultAmara =
+    codeModule && amarat.length === 1 ? amarat[0].name.trim() : "";
   function update(patch: Partial<Question>) {
     setQuestions((items) =>
       items.map((item, index) =>
@@ -284,28 +291,58 @@ function DefinitionEditor({
       ),
     );
   }
+  function addQuestionAmara(awards: Amara[], value: string) {
+    const name = value.trim();
+    if (!name || findAmara(awards, name)) {
+      return awards;
+    }
+    return [...awards, { name, crest: "", domain: "", description: "" }];
+  }
+  function findAmara(awards: Amara[], name: string) {
+    return awards.find(
+      (award) => award.name.trim().toLowerCase() === name.trim().toLowerCase(),
+    );
+  }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending.current || locked) return;
-    const data = new FormData(event.currentTarget);
+    try {
+      onSaved(await saveDraft(event.currentTarget));
+    } catch (cause) {
+      setError(cause as Error);
+    }
+  }
+  async function saveDraft(form: HTMLFormElement) {
+    const data = new FormData(form);
+    const awards = questions.reduce(
+      (items, question) => addQuestionAmara(items, question.amara ?? ""),
+      amarat,
+    ).map((amara) => ({
+      ...amara,
+      name: amara.name.trim(),
+    }));
     const definition: ModuleDefinition = {
-      amarat: module?.amarat,
+      amarat: awards,
       rubric: module?.rubric,
       library: module?.library,
-      behavioral: module?.behavioral,
-      minimum_tests_passed: module?.minimum_tests_passed,
       name: String(data.get("name") || "").trim(),
       description: String(data.get("description") || ""),
       type,
+      behavioral: type === "recorded_video" ? module?.behavioral : undefined,
+      minimum_tests_passed: codeModule ? module?.minimum_tests_passed : undefined,
       active_minutes:
         type === "recorded_video"
           ? undefined
           : Number(data.get("active_minutes")) || undefined,
       threshold:
-        type === "behavioral" || data.get("threshold") === ""
+        type === "behavioral" || (type === "recorded_video" && module?.behavioral) || data.get("threshold") === ""
           ? undefined
           : Number(data.get("threshold")),
-      questions,
+      questions: questions.map((question) => ({
+        ...question,
+        amara: findAmara(awards, question.amara ?? "")?.name ||
+          defaultAmara || undefined,
+      })),
     };
     if (
       !questions.length ||
@@ -316,23 +353,16 @@ function DefinitionEditor({
             (!q.options?.length || q.options.some((x) => !x.trim()))),
       )
     ) {
-      setError(
-        new Error(
-          "Every question needs a prompt. Multiple choice questions need non-empty options.",
-        ),
+      throw new Error(
+        "Every question needs a prompt. Multiple choice questions need non-empty options.",
       );
-      return;
     }
     pending.current = true;
     setBusy(true);
     setError(undefined);
     try {
-      const saved = module
-        ? await updateModule(module.id, definition)
-        : await createModule(definition);
-      onSaved(saved);
-    } catch (cause) {
-      setError(toError(cause));
+      if (module) return await updateModule(module.id, definition);
+      return await createModule(definition);
     } finally {
       pending.current = false;
       setBusy(false);
@@ -341,7 +371,7 @@ function DefinitionEditor({
   const question = questions[selected];
   return (
     <>
-      <form onSubmit={submit} aria-busy={busy}>
+      <form ref={formRef} onSubmit={submit} aria-busy={busy}>
         <section className={e.panel}>
           <h2>Module settings</h2>
           {locked && (
@@ -410,6 +440,48 @@ function DefinitionEditor({
             </label>
           </div>
         </section>
+        <section className={e.panel}>
+          <h2>Amarat</h2>
+          <p>Type a new Amara on a question to add it here, then fill in its crest, domain, and description before publishing.</p>
+          {amarat.map((amara, index) => (
+            <fieldset key={index} className={e.grid} disabled={locked}>
+              <legend>Amara {index + 1}</legend>
+              {(["name", "crest", "domain", "description"] as const).map((field) => (
+                <label key={field} className={e.field}>
+                  {field[0].toUpperCase() + field.slice(1)}
+                  <input
+                    value={amara[field]}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      setAmarat((items) => items.map((item, i) =>
+                        i === index ? { ...item, [field]: value } : item,
+                      ));
+                    }}
+                  />
+                </label>
+              ))}
+              {!locked && (
+                <button type="button" onClick={() => {
+                  setAmarat((items) => items.filter((_, i) => i !== index));
+                  setQuestions((items) => items.map((item) =>
+                    item.amara && findAmara([amara], item.amara)
+                      ? { ...item, amara: "" }
+                      : item,
+                  ));
+                }}>
+                  Remove Amara
+                </button>
+              )}
+            </fieldset>
+          ))}
+          {!locked && (
+            <button type="button" onClick={() => setAmarat((items) => [
+              ...items, { name: "", crest: "", domain: "", description: "" },
+            ])}>
+              Add Amara
+            </button>
+          )}
+        </section>
         {video && (
           <UnavailableNotice>
             Prompt recording limits, retakes, human grader assignment, and stage
@@ -431,7 +503,7 @@ function DefinitionEditor({
             </button>
             <p>{q.prompt || "Enter a question prompt"}</p>
             <p>
-              {q.amara || "Skill not assigned"} ·{" "}
+              {q.amara || defaultAmara || "Skill not assigned"} ·{" "}
               {q.difficulty || "Difficulty not assigned"}
             </p>
           </article>
@@ -474,10 +546,21 @@ function DefinitionEditor({
               <label className={e.field}>
                 amara skill
                 <input
-                  value={question.amara || ""}
+                  list={amaraOptionsId}
+                  placeholder={defaultAmara || "Choose or type an Amara"}
+                  value={question.amara ?? ""}
                   readOnly={locked}
                   onChange={(event) => update({ amara: event.target.value })}
+                  onBlur={(event) => {
+                    const value = event.target.value;
+                    if (!locked) setAmarat((items) => addQuestionAmara(items, value));
+                  }}
                 />
+                <datalist id={amaraOptionsId}>
+                  {amarat.map((amara, index) => amara.name.trim() && (
+                    <option key={index} value={amara.name.trim()} />
+                  ))}
+                </datalist>
               </label>
               <label className={e.field}>
                 Difficulty
@@ -606,7 +689,9 @@ function DefinitionEditor({
             type="button"
             className={e.primary}
             disabled={locked || !module || busy}
-            onClick={() => setPublish(true)}
+            onClick={() => {
+              if (formRef.current?.reportValidity()) setPublish(true);
+            }}
           >
             Publish module
           </button>
@@ -626,12 +711,15 @@ function DefinitionEditor({
       {publish && module && (
         <ConfirmDialog
           title="Publish this module?"
-          description="Publishing locks this definition. Save changes before publishing; only the saved definition will be published."
+          description="Your current changes will be saved before publishing. Publishing locks the definition."
           confirmLabel="Publish module"
           intent="success"
           onClose={() => setPublish(false)}
           onConfirm={async () => {
-            const result = await publishModule(module.id);
+            const form = formRef.current;
+            if (!form) throw new Error("The module form is unavailable.");
+            const saved = await saveDraft(form);
+            const result = await publishModule(saved.id);
             onSaved(result);
             setPublish(false);
           }}

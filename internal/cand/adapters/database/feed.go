@@ -29,6 +29,8 @@ func (r *JobFeedRepository) ListPublished(ctx context.Context, filter ports.JobF
 		"status = 'published'", "deleted_at IS NULL", "published_at IS NOT NULL",
 		"(application_opening IS NULL OR application_opening <= now())",
 		"(application_deadline IS NULL OR application_deadline > now())",
+		`EXISTS (SELECT 1 FROM companies c WHERE c.id = job_postings.company_id
+   AND c.deleted_at IS NULL AND c.deactivated_at IS NULL AND COALESCE(c.banned, FALSE) = FALSE)`,
 	}
 	add := func(expression string, value any) {
 		args = append(args, value)
@@ -51,6 +53,9 @@ func (r *JobFeedRepository) ListPublished(ctx context.Context, filter ports.JobF
 	}
 	if filter.Location != "" {
 		add("location ILIKE $%d", "%"+filter.Location+"%")
+	}
+	if filter.SalaryMin != nil || filter.SalaryMax != nil {
+		where = append(where, "salary_visible IS TRUE")
 	}
 	if filter.SalaryMin != nil {
 		add("(salary_max IS NULL OR salary_max >= $%d)", *filter.SalaryMin)

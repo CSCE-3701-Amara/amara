@@ -22,6 +22,7 @@ const (
 	maxLoginAttempts       = 5
 	loginAttemptWindow     = time.Minute
 	maxConcurrentPasswords = 4
+	maxTrackedLoginEmails  = 10000
 )
 
 type LoginService struct {
@@ -51,7 +52,7 @@ func (s *LoginService) Login(ctx context.Context, login domain.Login) (domain.Se
 	if login.Email == "" || login.Password == "" {
 		return domain.Session{}, domain.ErrInvalidCredentials
 	}
-	if !s.attempts.allow(login.Email, time.Now()) {
+	if !s.attempts.allow(login.Email, s.now()) {
 		return domain.Session{}, domain.ErrLoginRateLimited
 	}
 	loginSucceeded := false
@@ -114,8 +115,9 @@ type loginAttempt struct {
 }
 
 type loginAttemptLimiter struct {
-	mu      sync.Mutex
-	entries map[string]loginAttempt
+	mu          sync.Mutex
+	entries     map[string]loginAttempt
+	lastCleanup time.Time
 }
 
 func (l *loginAttemptLimiter) allow(email string, now time.Time) bool {
@@ -124,7 +126,18 @@ func (l *loginAttemptLimiter) allow(email string, now time.Time) bool {
 	if l.entries == nil {
 		l.entries = make(map[string]loginAttempt)
 	}
+	if now.Sub(l.lastCleanup) >= loginAttemptWindow {
+		for identity, entry := range l.entries {
+			if now.Sub(entry.windowStart) >= loginAttemptWindow {
+				delete(l.entries, identity)
+			}
+		}
+		l.lastCleanup = now
+	}
 	attempt, ok := l.entries[email]
+	if !ok && len(l.entries) >= maxTrackedLoginEmails {
+		return false
+	}
 	if !ok || now.Sub(attempt.windowStart) >= loginAttemptWindow {
 		l.entries[email] = loginAttempt{count: 1, windowStart: now}
 		return true

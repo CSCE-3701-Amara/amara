@@ -148,6 +148,7 @@ func TestRegisterRetriesPendingVerification(t *testing.T) {
 		Account: account, Recipient: repository.challenge.Recipient,
 		ExpiresAt: currentTime.Add(-time.Minute),
 	}
+	repository.pending.PasswordHash, repository.pending.Salt = hashedPassword(validRegistration().Password)
 	repository.pendingFound = true
 	sender.err = nil
 	firstHash := append([]byte(nil), repository.challenge.CodeHash...)
@@ -179,6 +180,7 @@ func TestRegisterRecoversWhenInitialChallengeSaveFails(t *testing.T) {
 
 	repository.challengeErr = nil
 	repository.pending = ports.PendingVerification{Account: account, Recipient: account.Email}
+	repository.pending.PasswordHash, repository.pending.Salt = hashedPassword(validRegistration().Password)
 	repository.pendingFound = true
 	sender := &fakeSender{}
 	service = newService(t, repository, fakeChecker{}, sender)
@@ -207,6 +209,7 @@ func TestRegisterDoesNotReplaceValidChallengeWhenResendIsAttempted(t *testing.T)
 		Account: account, Recipient: account.Email,
 		ExpiresAt: time.Date(2026, 10, 30, 20, 10, 0, 0, time.UTC),
 	}
+	repository.pending.PasswordHash, repository.pending.Salt = hashedPassword(validRegistration().Password)
 	repository.pendingFound = true
 	sender.err = errors.New("relay unavailable")
 	if _, err := service.Register(context.Background(), validRegistration()); err == nil {
@@ -294,4 +297,36 @@ func TestRegisterFailures(t *testing.T) {
 			t.Fatal("expected sender error")
 		}
 	})
+}
+
+func TestPendingRegistrationRetryRequiresOriginalCredentials(t *testing.T) {
+	hash, salt := hashedPassword("original password")
+	for _, tc := range []struct {
+		name     string
+		kind     domain.AccountType
+		password string
+		allowed  bool
+	}{
+		{"same account and password", domain.AccountTypeCandidate, "original password", true},
+		{"different password", domain.AccountTypeCandidate, "another password", false},
+		{"different account type", domain.AccountTypeInterviewer, "original password", false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			repo := &fakeRepository{pendingFound: true, pending: ports.PendingVerification{
+				Account:   domain.Account{ID: "existing-account", Type: domain.AccountTypeCandidate, Email: "user@example.com", Status: domain.PendingVerification},
+				Recipient: "user@example.com", PasswordHash: hash, Salt: salt,
+			}}
+			sender := &fakeSender{}
+			registration := validRegistration()
+			registration.AccountType, registration.Password, registration.CompanySecret = tc.kind, tc.password, "company-secret"
+			_, err := newService(t, repo, fakeChecker{}, sender).Register(t.Context(), registration)
+			if tc.allowed {
+				if err != nil || sender.sends != 1 {
+					t.Fatalf("valid resend: error=%v, sends=%d", err, sender.sends)
+				}
+			} else if !errors.Is(err, domain.ErrEmailAlreadyExists) || sender.sends != 0 {
+				t.Fatalf("unauthorized resend accepted: error=%v, sends=%d", err, sender.sends)
+			}
+		})
+	}
 }

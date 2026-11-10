@@ -6,8 +6,10 @@ import { Suspense, useId, useRef, useState, type ReactNode } from "react";
 import { deleteCurrentSession } from "@/features/auth/api/auth.api";
 import { ApiError } from "@/shared/lib/api-client";
 import { toError } from "@/shared/lib/errors";
+import { sessionHome } from "@/features/auth/lib/session-home";
 import { Brand } from "./brand";
 import { RouteDialog } from "./route-dialog";
+import { WorkspaceBack } from "./workspace-back";
 import styles from "./workspace.module.css";
 export { styles as workspaceStyles };
 export type WorkspaceRole = "candidate" | "company" | "interviewer" | "admin";
@@ -96,7 +98,7 @@ function WorkspaceNavigation({
   );
 }
 
-/** Shared Figma workspace chrome with stable branding and collapsible navigation. */
+/** Shared workspace chrome with stable branding and collapsible navigation. */
 export function Workspace({
   company = false,
   role: suppliedRole,
@@ -107,6 +109,10 @@ export function Workspace({
   children: ReactNode;
 }) {
   const role = suppliedRole || (company ? "company" : "candidate");
+  const workspaceLabel =
+    role === "company"
+      ? "Hiring workspace"
+      : `${role[0].toUpperCase()}${role.slice(1)} workspace`;
   const router = useRouter();
   const menuId = useId();
   const [collapsed, setCollapsed] = useState(false);
@@ -147,7 +153,7 @@ export function Workspace({
         aria-label={`${role === "company" ? "Hiring" : role} workspace`}
       >
         <div className={styles.brandRow}>
-          <Brand variant="workspace" />
+          <Brand variant="workspace" href={sessionHome(role)} />
           <button
             className={styles.mobileToggle}
             type="button"
@@ -179,6 +185,9 @@ export function Workspace({
           </button>
           <div className={styles.menuInner}>
             {!collapsed && (
+              <p className={styles.workspaceLabel}>{workspaceLabel}</p>
+            )}
+            {!collapsed && (
               <Suspense fallback={<p>Loading navigation…</p>}>
                 <WorkspaceNavigation
                   role={role}
@@ -205,6 +214,15 @@ export function Workspace({
         </div>
       </aside>
       <main id="workspace-content" tabIndex={-1} className={styles.main}>
+        <div className={styles.contextBar}>
+          <div className={styles.contextNavigation}>
+            <Suspense fallback={null}>
+              <WorkspaceBack home={sessionHome(role)!} />
+            </Suspense>
+            <span>{workspaceLabel}</span>
+          </div>
+          <span>amara / Skills-first recruitment</span>
+        </div>
         <ApiFeedback error={error} />
         {children}
       </main>

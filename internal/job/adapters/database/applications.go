@@ -45,6 +45,17 @@ func (r *ApplicationRepository) Apply(ctx context.Context, postingID, candidateI
 	if !domain.ApplicationIsOpen(postingStatus, opening, deadline, now) {
 		return domain.Application{}, domain.ErrApplicationPostingUnavailable
 	}
+	var employer string
+	err = tx.QueryRow(ctx, `SELECT c.id::text FROM companies c
+  JOIN job_postings j ON j.company_id = c.id
+  WHERE j.id = $1::uuid AND c.deleted_at IS NULL AND c.deactivated_at IS NULL
+   AND COALESCE(c.banned, FALSE) = FALSE FOR SHARE OF c`, postingID).Scan(&employer)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.Application{}, domain.ErrApplicationPostingUnavailable
+	}
+	if err != nil {
+		return domain.Application{}, fmt.Errorf("check employer eligibility: %w", err)
+	}
 	var eligible bool
 	if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM candidates WHERE id=$1::uuid AND deleted_at IS NULL AND deactivated_at IS NULL AND COALESCE(banned,FALSE)=FALSE)`, candidateID).Scan(&eligible); err != nil {
 		return domain.Application{}, fmt.Errorf("check candidate eligibility: %w", err)

@@ -9,7 +9,9 @@ WHERE id = @id::uuid
 -- name: GetCandidateProfile :one
 SELECT id::text, name, email, created_at, updated_at, phone_number, github_profile,
        linkedin_profile, portfolio_link, gender, birth_date, nationality, address,
-       biography, years_of_experience, available
+       biography, years_of_experience, available,
+       ARRAY(SELECT DISTINCT a.amara_title FROM candidate_amarat a
+             WHERE a.cand_id = candidates.id ORDER BY a.amara_title)::text[] AS amarat
 FROM candidates
 WHERE id = @id::uuid
   AND deleted_at IS NULL;

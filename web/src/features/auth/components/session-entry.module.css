@@ -1,0 +1,22 @@
+.status {
+  width: min(100% - 40px, 560px);
+  margin: 12vh auto;
+  color: var(--foreground);
+}
+.status h1 {
+  font-size: 30px;
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+.status p {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.status button {
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--accent);
+  color: var(--foreground);
+}

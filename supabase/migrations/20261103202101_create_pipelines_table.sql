@@ -24,4 +24,7 @@ CREATE TABLE pipeline_stages (
 -- +goose StatementEnd
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TABLE pipeline_versions, pipelines, pipeline_stages;
+*/

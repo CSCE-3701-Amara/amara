@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -149,5 +150,27 @@ func TestLoginAttemptLimiter(t *testing.T) {
 	}
 	if !limiter.allow("user@example.com", now.Add(loginAttemptWindow)) {
 		t.Fatal("expected attempts to be allowed after the window")
+	}
+}
+
+func TestLoginAttemptLimiterBoundsAndReclaimsIdentities(t *testing.T) {
+	var limiter loginAttemptLimiter
+	now := time.Unix(1000, 0)
+	for n := 0; n < 10000; n++ {
+		if !limiter.allow(fmt.Sprintf("user-%d@example.test", n), now) {
+			t.Fatalf("identity %d unexpectedly rejected", n)
+		}
+	}
+	if limiter.allow("overflow@example.test", now) {
+		t.Error("limiter retained an unbounded number of identities")
+	}
+	if !limiter.allow("user-0@example.test", now) {
+		t.Error("capacity must not block an existing identity's allowed attempts")
+	}
+	if !limiter.allow("new@example.test", now.Add(loginAttemptWindow)) {
+		t.Error("expired identities must release capacity")
+	}
+	if len(limiter.entries) != 1 {
+		t.Errorf("retained %d identities after expiry, want 1", len(limiter.entries))
 	}
 }

@@ -13,7 +13,7 @@ const LiveInterviewStage = "live_interview"
 var (
 	ErrPipelineNotFound = errors.New("pipeline resource not found")
 	ErrPipelineExists   = errors.New("the posting already has a pipeline")
-	ErrPipelineLocked   = errors.New("only an unpublished linear draft can be edited")
+	ErrPipelineLocked   = errors.New("only an unpublished draft can be edited")
 )
 
 type InvalidPipelineError struct {
@@ -27,16 +27,22 @@ type PipelineDraft struct {
 	PostingID     string `json:"postingId"`
 	VersionID     string `json:"versionId"`
 	VersionNumber int    `json:"versionNumber"`
+	Published     bool   `json:"published"`
 }
 
 type Stage struct {
-	ID        string         `json:"id,omitempty"`
-	Name      string         `json:"name"`
-	Type      string         `json:"type"`
-	OpensAt   time.Time      `json:"scheduledStartAt"`
-	Deadline  time.Time      `json:"scheduledEndAt"`
-	ModuleIDs []string       `json:"moduleIds,omitempty"`
-	Interview *LiveInterview `json:"interview,omitempty"`
+	Rule           string         `json:"advancementRule,omitempty"`
+	ScoreThreshold *int           `json:"scoreThreshold,omitempty"`
+	Below          string         `json:"belowThresholdAction,omitempty"`
+	X              float64        `json:"x"`
+	Y              float64        `json:"y"`
+	ID             string         `json:"id,omitempty"`
+	Name           string         `json:"name"`
+	Type           string         `json:"type"`
+	OpensAt        time.Time      `json:"scheduledStartAt"`
+	Deadline       time.Time      `json:"scheduledEndAt"`
+	ModuleIDs      []string       `json:"moduleIds,omitempty"`
+	Interview      *LiveInterview `json:"interview,omitempty"`
 }
 
 type LiveInterview struct {
@@ -65,6 +71,19 @@ func ValidateStages(stages []Stage) error {
 }
 
 func (s Stage) validate() error {
+	if s.Rule != "" && s.Rule != "completion" && s.Rule != "manual" && s.Rule != "threshold" {
+		return errors.New("invalid advancement rule")
+	}
+	if s.Below != "" && s.Below != "hold" && s.Below != "reject" {
+		return errors.New("invalid below-threshold action")
+	}
+	if s.ScoreThreshold != nil && (*s.ScoreThreshold < 0 || *s.ScoreThreshold > 100) {
+		return errors.New("score threshold must be between 0 and 100")
+	}
+	if s.Rule == "threshold" && s.ScoreThreshold == nil && s.Interview == nil {
+		return errors.New("a threshold rule requires a score threshold")
+	}
+
 	if s.OpensAt.IsZero() || !s.Deadline.After(s.OpensAt) {
 		return errors.New("the deadline must be after the opening time")
 	}

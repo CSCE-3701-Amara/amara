@@ -25,6 +25,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
+    env: { AMARA_E2E: "1" },
     command: `npm run ${production ? "start" : "dev"} -- --hostname 127.0.0.1 --port ${port}`,
     url: baseURL,
     reuseExistingServer: !production && !process.env.CI,

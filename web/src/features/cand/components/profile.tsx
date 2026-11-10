@@ -3,9 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useApiResource } from "@/shared/lib/use-api-resource";
 import { useProfileUpdate } from "@/shared/lib/use-profile-update";
 import { ApiFeedback, BusyState } from "@/shared/ui/workspace";
-import { useApiResource } from "@/shared/lib/use-api-resource";
 import { performAccountAction } from "@/features/auth/api/auth.api";
 import {
   ConfirmDialog,
@@ -21,16 +21,16 @@ interface CandidateProfile {
   address?: string;
   biography?: string;
   phoneNumber?: string;
-  githubProfile?: string;
-  linkedinProfile?: string;
-  portfolioLink?: string;
-  available?: boolean;
   nationality?: string;
   birthDate?: string;
   gender?: string;
   yearsOfExperience?: number;
+  githubProfile?: string;
+  linkedinProfile?: string;
+  portfolioLink?: string;
+  available?: boolean;
+  amarat?: string[];
 }
-/** Load the authenticated profile before mounting editable defaults. */
 export function CandidateProfileScreen({
   edit = false,
   profile,
@@ -64,7 +64,10 @@ function CandidateProfileForm({
 }) {
   const router = useRouter();
   const update = useProfileUpdate<CandidateProfile>("/v1/candidates/me");
-  profile = update.saved || profile;
+  const current = useApiResource<CandidateProfile>(
+    edit ? null : "/v1/candidates/me",
+  );
+  profile = update.saved || current.data || profile;
   const [dialog, setDialog] = useState<string | null>(null);
   const [biography, setBiography] = useState(profile?.biography || "");
   const action = dialog === "delete" ? "delete" : "deactivate";
@@ -83,10 +86,10 @@ function CandidateProfileForm({
         />
         <h1>{edit ? "Edit profile" : "Your profile"}</h1>
       </header>
-      {!profile && (
+      {edit && (
         <UnavailableNotice>
-          Your profile couldn’t be loaded. Retry above, or update individual
-          fields; untouched details are kept.
+          Your current profile can’t be loaded yet. Save only the fields you
+          want to update; other details will be kept.
         </UnavailableNotice>
       )}
       {edit ? (
@@ -320,7 +323,19 @@ function CandidateProfileForm({
           <section className={`${styles.panel} ${styles.earned}`}>
             <h2>Earned amarat</h2>
             <p>Your verified awards and credentials</p>
-            <p>No awards can be loaded yet.</p>
+            {current.loading ? (
+              <p>Loading awards…</p>
+            ) : current.error ? (
+              <p>Your awards couldn’t be loaded.</p>
+            ) : current.data?.amarat?.length ? (
+              <ul>
+                {current.data.amarat.map((title) => (
+                  <li key={title}>{title}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>No awards yet.</p>
+            )}
           </section>
         </>
       )}

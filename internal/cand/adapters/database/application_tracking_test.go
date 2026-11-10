@@ -58,8 +58,7 @@ func TestApplicationTrackingPostgres(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		up, _, _ := strings.Cut(string(migration), "-- +goose Down")
-		if _, err := pool.Exec(ctx, up); err != nil {
+		if _, err := pool.Exec(ctx, string(migration)); err != nil {
 			t.Fatalf("apply %s: %v", path, err)
 		}
 	}

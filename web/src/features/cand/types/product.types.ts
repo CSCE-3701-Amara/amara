@@ -25,6 +25,7 @@ export interface CandidateQuestion {
   position: number;
 }
 export interface AssessmentAttempt {
+  savedResponses?: Record<string, CandidateSubmission["response"]>;
   id: string;
   instanceId: string;
   stageExecutionId: string;

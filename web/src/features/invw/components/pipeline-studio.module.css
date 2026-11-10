@@ -1,3 +1,5 @@
+/* Inactive Pipeline Studio styles retained for future use.
+
 .editor {
   display: grid;
   grid-template-columns: 169px minmax(0, 1fr) minmax(300px, 33%);
@@ -435,3 +437,4 @@
     grid-column: auto;
   }
 }
+*/

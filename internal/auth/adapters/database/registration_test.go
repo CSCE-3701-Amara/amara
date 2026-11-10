@@ -12,6 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/CSCE-3701-Amara/amara/internal/auth/domain"
+	"github.com/CSCE-3701-Amara/amara/internal/auth/ports"
 )
 
 func TestAccountActionTable(t *testing.T) {
@@ -290,4 +291,53 @@ func TestPerformAccountActionConcurrentSessions(t *testing.T) {
 			t.Fatalf("concurrent account action: %v", err)
 		}
 	}
+}
+
+func TestBannedCandidateCannotUseOrCreateSessionPostgres(t *testing.T) {
+	dsn := os.Getenv("AMARA_TEST_DATABASE_URL")
+	if dsn == "" {
+		t.Skip("set AMARA_TEST_DATABASE_URL for PostgreSQL session tests")
+	}
+	ctx := t.Context()
+	pool, err := pgxpool.New(ctx, dsn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer pool.Close()
+	const id = "00000000-0000-0000-0000-000000000375"
+	const token = "audit-banned-candidate"
+	_, err = pool.Exec(ctx, `INSERT INTO candidates (id, name, email, password_hash, salt, created_at, account_status)
+ VALUES ($1::uuid, 'Session test', 'audit-banned@example.test', '', '', now(), 'active')`, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		_, _ = pool.Exec(context.Background(), "DELETE FROM auth_sessions WHERE account_id=$1::uuid", id)
+		_, _ = pool.Exec(context.Background(), "DELETE FROM candidates WHERE id=$1::uuid", id)
+	}()
+	repo, err := NewRegistrationRepository(pool)
+	if err != nil {
+		t.Fatal(err)
+	}
+	session := ports.Session{AccountID: id, AccountType: domain.AccountTypeCandidate, Token: token, ExpiresAt: time.Now().Add(time.Hour)}
+	if err := repo.CreateSession(ctx, session); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := repo.ValidateSession(ctx, token); err != nil {
+		t.Fatalf("active candidate: %v", err)
+	}
+	if _, err := pool.Exec(ctx, "UPDATE candidates SET banned=true WHERE id=$1::uuid", id); err != nil {
+		t.Fatal(err)
+	}
+	t.Run("existing session is denied after ban", func(t *testing.T) {
+		if _, err := repo.ValidateSession(ctx, token); !errors.Is(err, domain.ErrInvalidSession) {
+			t.Fatalf("banned session validation = %v, want invalid session", err)
+		}
+	})
+	t.Run("ban racing with login prevents session creation", func(t *testing.T) {
+		session.Token = token + "-new"
+		if err := repo.CreateSession(ctx, session); !errors.Is(err, domain.ErrAccountInactive) {
+			t.Fatalf("create banned session = %v, want inactive", err)
+		}
+	})
 }

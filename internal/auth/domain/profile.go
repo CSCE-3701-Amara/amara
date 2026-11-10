@@ -28,6 +28,7 @@ type CandidateProfile struct {
 	Biography         string
 	YearsOfExperience *int
 	Available         *bool
+	Amarat            []string
 }
 
 type CandidateProfilePatch struct {

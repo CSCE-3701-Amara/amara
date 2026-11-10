@@ -1,0 +1,14 @@
+services:
+  server:
+    image: mrkushalsm/judge0@sha256:d60605ad448453ac3754629bc7121d379cf691e0c091aabbc03ff2886b2626b2
+    networks:
+      default:
+      amara:
+        aliases:
+          - judge0-demo
+  workers:
+    image: mrkushalsm/judge0@sha256:d60605ad448453ac3754629bc7121d379cf691e0c091aabbc03ff2886b2626b2
+networks:
+  amara:
+    external: true
+    name: amara_default

@@ -24,4 +24,7 @@ CREATE TABLE IF NOT EXISTS candidate_amarat (
 -- +goose StatementEnd
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TABLE candidate_documents, candidate_certifications, candidate_amarat;
+*/

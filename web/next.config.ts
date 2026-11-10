@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Keep the development toolbar from covering app controls during browser tests.
+  // Compile and runtime error overlays remain enabled.
+  devIndicators: process.env.AMARA_E2E === "1" ? false : undefined,
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,

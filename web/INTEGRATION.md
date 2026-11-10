@@ -59,10 +59,6 @@ The legacy candidate assessment/result registrars mount `:application_id`; INVW 
 
 Further backend dependencies, established by code inspection:
 
-- JOB management and apply are still constructed with nil authentication in `main.go`, so they fail closed even after router startup is repaired.
-- Pipeline progress and legacy candidate assessment/result handlers expect a `candidate_id` context key. The passed shared middleware sets `amara.identity`; these need an ownership-preserving adapter or handler update.
-- Legacy results use `/v1/applications/{application_id}/assessments/results`; this differs from the planned instance-result read currently used by the disclosed-result screen. Raw saved-progress JSON is a separate legacy assessment model and cannot safely be treated as an INVW attempt response.
-- GET/POST `/v1/assessment-attempts/{attemptId}/evaluation` and POST result-disclosure exist, but a registered hiring-team discovery operation that supplies attempt IDs is missing. Do not substitute raw database ID entry for the product workflow.
-- Graph transitions, validation/publication/migration/privacy, video upload, grading discovery, scorecards, feedback, offers and administration retain the planned-operation limitations in the coverage table.
+Docker Compose ran the frontend, API, and worker against disposable PostgreSQL with the branch migrations. Application, assessment, and pipeline-progress routes use the same Gin wildcard, `:application_id`. The regression test registers the real handlers in both orders.
 
-All browser API responses in the verification report are mocks. Live authenticated writes, reload persistence, expired-session enforcement and role failures remain unverified. The successful live probes in the earlier 2026-11-07 report describe an older checkout and do not establish current startup health.
+Requests through the frontend proxy verified API readiness, candidate feed, company posting management and preview, candidate application submission and duplicate rejection, application history and details, assessment instance and result reads, logout, and session invalidation. The smoke test used seeded sessions and a screened-out application. It did not exercise browser login, a populated pipeline, SMTP delivery, or Judge0 grading.

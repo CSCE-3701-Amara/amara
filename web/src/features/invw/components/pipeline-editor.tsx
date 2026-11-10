@@ -9,7 +9,9 @@ import {
   BusyState,
   workspaceStyles as s,
 } from "@/shared/ui/workspace";
-import { createPipeline, replacePipelineStages } from "../api/invw.api";
+import { ConfirmDialog } from "@/shared/ui/product-ui";
+import { createPipeline, publishPipeline, replacePipelineStages } from "../api/invw.api";
+import { PipelineModulePicker } from "./pipeline-module-picker";
 import type {
   PipelineDraft,
   PipelineStage,
@@ -27,10 +29,11 @@ function StageForm({
   const [error, setError] = useState<Error>();
   const [message, setMessage] = useState("");
   const modules = useApiResource<ModuleSummary[] | null>("/v1/modules");
-  function update(index: number, patch: Partial<PipelineStage>) {
-    setStages(
-      stages.map((stage, i) => (i === index ? { ...stage, ...patch } : stage)),
-    );
+  const library = useApiResource<ModuleSummary[] | null>("/v1/modules/library");
+  function update(index: number, patch: Partial<PipelineStage> | ((stage: PipelineStage) => Partial<PipelineStage>)) {
+    setStages((items) => items.map((stage, i) =>
+      i === index ? { ...stage, ...(typeof patch === "function" ? patch(stage) : patch) } : stage,
+    ));
     setMessage("");
   }
   function move(index: number, by: number) {
@@ -78,8 +81,9 @@ function StageForm({
       <p>
         Stages run in the order shown. Saving replaces this draft’s stage list.
       </p>
-      <BusyState loading={modules.loading} />
+      <BusyState loading={modules.loading || library.loading} />
       <ApiFeedback error={modules.error} retry={modules.reload} />
+      <ApiFeedback error={library.error} retry={library.reload} />
       {stages.map((stage, index) => (
         <fieldset
           className={`${s.card} ${s.form}`}
@@ -127,25 +131,26 @@ function StageForm({
             </label>
           </div>
           {stage.type === "assessment" ? (
-            <fieldset>
-              <legend>Assessments</legend>
-              {modules.data?.map((module) => (
-                <label className={s.check} key={module.id}>
-                  <input
-                    type="checkbox"
-                    checked={stage.moduleIds?.includes(module.id) || false}
-                    onChange={(event) =>
-                      update(index, {
-                        moduleIds: event.target.checked
-                          ? [...(stage.moduleIds || []), module.id]
-                          : stage.moduleIds?.filter((id) => id !== module.id),
-                      })
-                    }
-                  />
-                  {module.name}
-                </label>
-              ))}
-            </fieldset>
+            <PipelineModulePicker
+              modules={modules.data ?? []}
+              library={library.data ?? []}
+              selected={stage.moduleIds ?? []}
+              disabled={busy}
+              onToggle={(id, checked) =>
+                update(index, {
+                  moduleIds: checked
+                    ? [...(stage.moduleIds ?? []), id]
+                    : stage.moduleIds?.filter((item) => item !== id),
+                })
+              }
+              onCopyingChange={setBusy}
+              onCopy={(module) => {
+                update(index, (current) => ({
+                  moduleIds: [...(current.moduleIds ?? []), module.id],
+                }));
+                modules.reload();
+              }}
+            />
           ) : (
             <p>
               Live interview · {stage.interview?.durationMinutes} minutes.
@@ -222,7 +227,13 @@ function Stages({ pipeline }: { pipeline: PipelineDraft }) {
       <BusyState loading={stages.loading} />
       <ApiFeedback error={stages.error} retry={stages.reload} />
       {!stages.loading && !stages.error && stages.data !== undefined && (
-        <StageForm initial={stages.data || []} versionId={pipeline.versionId} />
+        pipeline.published ? (
+          <ol>
+            {stages.data?.map((stage) => <li key={stage.id}>{stage.name}</li>)}
+          </ol>
+        ) : (
+          <StageForm initial={stages.data || []} versionId={pipeline.versionId} />
+        )
       )}
     </>
   );
@@ -232,6 +243,7 @@ export function PipelineEditor({ postingId }: { postingId: string }) {
     `/v1/jobs/${resourceId(postingId)}/pipeline`,
   );
   const [busy, setBusy] = useState(false);
+  const [confirmPublish, setConfirmPublish] = useState(false);
   const [error, setError] = useState<Error>();
   async function create() {
     if (busy) return;
@@ -262,7 +274,27 @@ export function PipelineEditor({ postingId }: { postingId: string }) {
       )}
       <ApiFeedback error={error} />
       {pipeline.data && (
-        <Stages key={pipeline.data.versionId} pipeline={pipeline.data} />
+        <>
+          <p>{pipeline.data.published ? "Published" : "Draft"}</p>
+          <Stages key={pipeline.data.versionId} pipeline={pipeline.data} />
+          {!pipeline.data.published && (
+            <button type="button" onClick={() => setConfirmPublish(true)}>
+              Publish saved stages
+            </button>
+          )}
+        </>
+      )}
+      {confirmPublish && pipeline.data && (
+        <ConfirmDialog
+          title="Publish this pipeline?"
+          description="Publishing locks the saved stages and starts the pipeline for eligible applicants."
+          confirmLabel="Publish pipeline"
+          onClose={() => setConfirmPublish(false)}
+          onConfirm={async () => {
+            await publishPipeline(pipeline.data!.versionId);
+            pipeline.reload();
+          }}
+        />
       )}
     </section>
   );

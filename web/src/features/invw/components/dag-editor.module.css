@@ -1,0 +1,380 @@
+.designer {
+  --ink: var(--workspace-ink);
+  --muted: var(--workspace-muted);
+  --line: var(--workspace-border);
+  --green: #3b6f2c;
+  --soft: var(--surface-muted);
+  color: var(--ink);
+  margin: 28px 0;
+}
+
+.heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.heading h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: -0.025em;
+}
+
+.heading p {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.status {
+  background: var(--soft);
+  border: 1px solid #d9d3ca;
+  border-radius: 5px;
+  color: #245b39;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.guide {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  margin: 22px 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.guide span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.guide b {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--green);
+  border: 1px solid #d9d3ca;
+  border-radius: 50%;
+  font-size: 0.75rem;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+
+.toolbar button,
+.inspector button {
+  min-height: 44px;
+  padding: 9px 13px;
+  border: 1px solid #d9d3ca;
+  border-radius: 7px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toolbar button:hover:not(:disabled),
+.inspector button:hover:not(:disabled) {
+  background: var(--soft);
+  border-color: var(--green);
+}
+
+.toolbar button:disabled,
+.inspector button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.toolbar .publish {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--workspace-ink);
+}
+
+.toolbar .publish:hover:not(:disabled) {
+  background: var(--accent-hover);
+  color: var(--workspace-ink);
+}
+
+.toolbarSpacer {
+  flex: 1;
+}
+
+.zoom {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.zoom button {
+  min-width: 40px;
+  padding: 6px;
+  font-size: 1.15rem;
+}
+
+.zoom output {
+  min-width: 48px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.notice {
+  padding: 10px 14px;
+  border-left: 3px solid #789c7d;
+  background: var(--soft);
+  color: var(--muted);
+}
+
+.canvasHeading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  background: #fff;
+}
+
+.canvasHeading div {
+  display: grid;
+  gap: 3px;
+}
+
+.canvasHeading span,
+.canvasHeading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 310px);
+  gap: 0;
+  align-items: start;
+}
+
+.viewport {
+  position: relative;
+  overflow: auto;
+  height: 580px;
+  border: 1px solid var(--line);
+  border-radius: 0 0 10px 10px;
+  background: #f8f6f2;
+  background-image: radial-gradient(#d9d3ca 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.canvas {
+  position: relative;
+  transform-origin: top left;
+}
+
+.edges {
+  position: absolute;
+  pointer-events: none;
+  color: #477b55;
+}
+
+.node {
+  position: absolute;
+  width: 200px;
+  min-height: 130px;
+  border: 1px solid #c9c0b4;
+  border-left: 4px solid #ff8e2e;
+  border-radius: 9px;
+  background: white;
+  padding: 15px;
+  text-align: left;
+  display: grid;
+  gap: 8px;
+  color: var(--ink);
+  cursor: grab;
+  box-shadow: 0 2px 5px #21181308;
+  overflow-wrap: anywhere;
+}
+
+.node strong {
+  font-size: 0.95rem;
+}
+
+.node span,
+.node small {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.node small {
+  align-self: end;
+}
+
+.node[aria-pressed="true"] {
+  outline: 3px solid #367f4b;
+  outline-offset: 2px;
+}
+
+.designer button:focus-visible,
+.designer input:focus-visible,
+.designer select:focus-visible {
+  outline: 3px solid #176c46;
+  outline-offset: 2px;
+}
+
+.emptyCanvas {
+  position: absolute;
+  top: 36px;
+  left: 36px;
+  z-index: 1;
+  max-width: 280px;
+  padding: 18px;
+  background: white;
+  border: 1px dashed #a89e92;
+  border-radius: 9px;
+  pointer-events: none;
+}
+
+.emptyCanvas p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.inspector {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 0 0 10px 0;
+  border-left: 0;
+  background: #fff;
+}
+
+.inspector fieldset {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.inspector legend {
+  padding: 0;
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.inspector label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.inspector input,
+.inspector select {
+  width: 100%;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+}
+
+.inspector input[type="checkbox"] {
+  width: 18px;
+  min-height: 18px;
+}
+
+.inspectorIntro,
+.connectionHeading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.connectionHeading {
+  margin-top: 8px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.connectionHeading h3 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+}
+
+.emptyInspector {
+  padding: 30px 4px;
+  text-align: center;
+}
+
+.emptyInspector span {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--green);
+  font-size: 1.5rem;
+}
+
+.emptyInspector h3 {
+  margin: 14px 0 6px;
+}
+
+.emptyInspector p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .viewport {
+    height: 400px;
+  }
+  .canvasHeading {
+    align-items: start;
+    flex-direction: column;
+  }
+  .toolbarSpacer {
+    display: none;
+  }
+  .inspector {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 800px) {
+  .layout {
+    gap: 16px;
+  }
+  .inspector {
+    border-left: 1px solid var(--line);
+    border-radius: 8px;
+  }
+}

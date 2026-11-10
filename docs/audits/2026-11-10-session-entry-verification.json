@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-10",
+  "browser_production_suite": {
+    "startTime": "2026-11-10T14:22:20.580Z",
+    "duration": 124298.43000000001,
+    "expected": 418,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "go_auth_tests": "passed",
+  "go_vet": "passed",
+  "lint": "passed",
+  "typecheck": "passed",
+  "production_build": "passed",
+  "new_browser_regressions": 15,
+  "new_backend_subtests": 6,
+  "mfa_policy": "Unchanged: required before creating hiring-manager/interviewer sessions. Already verified sessions resume until expiry or revocation.",
+  "live_database_email_delivery": "not exercised",
+  "rollout": "Run the updated API and frontend together."
+}

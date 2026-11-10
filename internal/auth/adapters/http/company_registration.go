@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -59,7 +60,12 @@ func (h *CompanyRegistrationHandler) ServeHTTP(writer http.ResponseWriter, reque
 		case errors.Is(err, domain.ErrEmailAlreadyExists), errors.Is(err, domain.ErrCompanyRegistrationExists):
 			status, code = http.StatusConflict, "company_registration_exists"
 		}
-		writeProblem(writer, status, code, strings.TrimPrefix(err.Error(), "invalid registration: "))
+		detail := strings.TrimPrefix(err.Error(), "invalid registration: ")
+		if status >= http.StatusInternalServerError {
+			slog.ErrorContext(request.Context(), "registration failed", "error", err)
+			detail = "An internal server error occurred."
+		}
+		writeProblem(writer, status, code, detail)
 		return
 	}
 	writer.Header().Set("Content-Type", "application/json")

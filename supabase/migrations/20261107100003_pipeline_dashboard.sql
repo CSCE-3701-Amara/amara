@@ -12,6 +12,9 @@ CREATE TABLE pipeline_threshold_changes (
 );
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TABLE pipeline_threshold_changes;
 ALTER TABLE applications DROP COLUMN nice_to_have_score;
 ALTER TABLE job_postings DROP COLUMN finalist_target;
+*/

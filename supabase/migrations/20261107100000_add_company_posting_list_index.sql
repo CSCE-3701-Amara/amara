@@ -8,4 +8,7 @@ CREATE INDEX job_postings_company_list_idx
     WHERE deleted_at IS NULL;
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP INDEX IF EXISTS job_postings_company_list_idx;
+*/

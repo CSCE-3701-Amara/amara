@@ -55,7 +55,9 @@ func (r *ProfileRepository) GetCandidateProfile(ctx context.Context, id string) 
 	if err != nil {
 		return domain.CandidateProfile{}, fmt.Errorf("get candidate profile: %w", err)
 	}
-	return mapCandidateProfileRow(row), nil
+	profile := mapCandidateProfileRow(row)
+	profile.Amarat = row.Amarat
+	return profile, nil
 }
 
 func (r *ProfileRepository) GetCompanyProfile(ctx context.Context, id string, includePrivate bool) (domain.CompanyProfile, error) {

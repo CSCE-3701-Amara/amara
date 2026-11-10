@@ -58,4 +58,7 @@ COMMENT ON COLUMN interview_feedback.notes IS
 -- +goose StatementEnd
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TABLE interview_feedback, interviewer_assignments, interviews;
+*/

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"strings"
 	"testing"
 )
 
@@ -37,7 +39,7 @@ func TestRun(t *testing.T) {
 					}
 					fmt.Fprint(w, "{\"token\":\"run-1\"}")
 				case r.Method == http.MethodGet && r.URL.Path == "/submissions/run-1":
-					fmt.Fprintf(w, "{\"status\":{\"id\":%d},\"stdout\":\"b3V0cHV0Cg==\"}", tc.status)
+					fmt.Fprintf(w, "{\"status\":{\"id\":%d},\"stdout\":\"b3V0cHV0Cg==\",\"compile_output\":\"c3ludGF4IGVycm9y\"}", tc.status)
 				default:
 					http.NotFound(w, r)
 				}
@@ -49,6 +51,9 @@ func TestRun(t *testing.T) {
 			}
 			client.http.Transport = server.Client().Transport
 			output, succeeded, err := client.Run(t.Context(), "python", "print()", "input")
+			if tc.status == 6 && output != "output\nsyntax error" {
+				t.Fatalf("compile diagnostics lost: %q", output)
+			}
 			if succeeded != tc.succeeded || (err != nil) != tc.wantError || (succeeded && output != "output\n") {
 				t.Fatalf("Run = %q, %v, %v", output, succeeded, err)
 			}
@@ -70,5 +75,37 @@ func TestNewPlaintextPolicy(t *testing.T) {
 		if _, err := New(tc.url, tc.token, nil, tc.allowLocalHTTP); (err != nil) != tc.wantError {
 			t.Errorf("New(%q, allowLocalHTTP=%v, credentialed=%v) = %v", tc.url, tc.allowLocalHTTP, tc.token != "", err)
 		}
+	}
+}
+
+func TestDockerDevelopmentSandbox(t *testing.T) {
+	base := os.Getenv("AMARA_SANDBOX_URL")
+	if base == "" {
+		t.Skip("set AMARA_SANDBOX_URL to exercise the real Docker development sandbox")
+	}
+	client, err := New(base, "", nil, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct {
+		language, source, input, want string
+		success                       bool
+	}{
+		{"python", "print(input())", "hello", "hello\n", true},
+		{"javascript", "console.log('hello')", "", "hello\n", true},
+		{"typescript", "const x: number = 42; console.log(x)", "", "42\n", true},
+		{"python", "raise RuntimeError('candidate error')", "", "", false},
+		{"python", "while True: pass", "", "", false},
+		{"python", "import socket\ntry: socket.create_connection(('1.1.1.1',80),timeout=1); print('network enabled')\nexcept OSError: print('network blocked')", "", "network blocked\n", true},
+	} {
+		t.Run(tc.language+tc.source, func(t *testing.T) {
+			out, success, err := client.Run(t.Context(), tc.language, tc.source, tc.input)
+			if strings.Contains(tc.source, "candidate error") && !strings.Contains(out, "candidate error") {
+				t.Fatalf("runtime diagnostic missing: %q", out)
+			}
+			if err != nil || success != tc.success || (success && out != tc.want) {
+				t.Fatalf("output=%q success=%v error=%v", out, success, err)
+			}
+		})
 	}
 }

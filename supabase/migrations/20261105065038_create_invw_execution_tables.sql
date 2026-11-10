@@ -102,6 +102,8 @@ CREATE INDEX stage_executions_stage_status_idx ON stage_executions (stage_id, st
 -- +goose StatementEnd
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 -- +goose StatementBegin
 ALTER TABLE candidate_stage_progress DROP COLUMN stage_execution_id;
 ALTER TABLE assessment_results
@@ -118,3 +120,4 @@ ALTER TABLE assessment_results
 DROP TABLE assessment_submissions, assessment_attempts, stage_executions, pipeline_executions;
 ALTER TABLE assessment_instances DROP CONSTRAINT assessment_instances_application_stage_key;
 -- +goose StatementEnd
+*/

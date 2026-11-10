@@ -10,4 +10,7 @@ CREATE TABLE auth_mfa_credentials (
 );
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 DROP TABLE auth_mfa_credentials;
+*/

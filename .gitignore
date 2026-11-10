@@ -53,3 +53,6 @@ web/vite.config.d.ts
 
 # Package manager logs
 npm-debug.log*
+
+# Generated local sandbox credentials
+/deployments/judge0/judge0.conf

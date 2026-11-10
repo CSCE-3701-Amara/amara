@@ -126,6 +126,9 @@ func (s *JobFeed) List(ctx context.Context, filter FeedFilter) (FeedPage, error)
 }
 
 func mapFeedPosting(posting domain.FeedPosting) FeedJob {
+	if posting.SalaryVisible == nil || !*posting.SalaryVisible {
+		posting.SalaryMin, posting.SalaryMax = nil, nil
+	}
 	return FeedJob{
 		ID: posting.ID, CompanyID: posting.CompanyID, Title: posting.Title,
 		Description: posting.Description, Language: posting.Language, Currency: posting.Currency,

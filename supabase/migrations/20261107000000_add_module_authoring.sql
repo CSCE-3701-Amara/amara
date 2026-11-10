@@ -11,9 +11,12 @@ ALTER TABLE modules
 ALTER TABLE modules ENABLE ROW LEVEL SECURITY;
 
 -- +goose Down
+-- Manual rollback reference only; Supabase executes the entire migration file.
+/*
 ALTER TABLE modules DISABLE ROW LEVEL SECURITY;
 
 ALTER TABLE modules
     DROP CONSTRAINT authored_module_owner_check,
     DROP COLUMN copied_from_module_id,
     DROP COLUMN authoring_definition;
+*/
