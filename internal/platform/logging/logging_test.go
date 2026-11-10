@@ -24,14 +24,29 @@ func TestNewJSONFormatWritesJSONLines(t *testing.T) {
 
 func TestNewTextFormatWritesPlainLines(t *testing.T) {
 	var output bytes.Buffer
-	logger := New(&output, slog.LevelInfo, "text")
-	logger.Info("HTTP request", "route", "/v1/jobs")
+	logger := New(&output, slog.LevelInfo, "text").With("service", "amara-api", "environment", "development")
+	logger.Info("HTTP request", "request_id", "ABC", "method", "POST", "route", "/v1/auth/sessions", "status", 429, "duration_ms", 0.066)
 	text := strings.TrimSpace(output.String())
 	if strings.HasPrefix(text, "{") {
 		t.Fatalf("text format must not emit JSON, got: %s", text)
 	}
-	if !strings.Contains(text, "HTTP request") || !strings.Contains(text, "/v1/jobs") {
-		t.Fatalf("message and attributes were not emitted: %s", text)
+	if !strings.Contains(text, "INFO  api    POST /v1/auth/sessions → 429  0.066ms  id=ABC") {
+		t.Fatalf("request summary is unreadable: %s", text)
+	}
+	if strings.Contains(text, "environment=") || strings.Contains(text, "method=") {
+		t.Fatalf("summary fields were duplicated: %s", text)
+	}
+}
+
+func TestTextFormatRetainsErrorAndGroups(t *testing.T) {
+	var output bytes.Buffer
+	logger := New(&output, slog.LevelInfo, "text").With("service", "amara-worker")
+	logger.WithGroup("grading").With("attempt", "42").Error("grading failed", "error", "provider unavailable")
+	line := output.String()
+	for _, expected := range []string{"ERROR worker grading failed", "grading.attempt=42", `grading.error="provider unavailable"`} {
+		if !strings.Contains(line, expected) {
+			t.Fatalf("missing %q in %s", expected, line)
+		}
 	}
 }
 
