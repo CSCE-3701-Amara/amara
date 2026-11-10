@@ -20,6 +20,10 @@ test("graph saves branches and reloads persisted connections", async ({
     },
   );
   await page.goto(`/employer/pipelines/${ids.job}`);
+  const undo = page.getByRole("button", { name: "Undo graph change" });
+  const redo = page.getByRole("button", { name: "Redo graph change" });
+  await expect(undo).toBeDisabled();
+  await expect(redo).toBeDisabled();
   await page
     .getByRole("button", { name: /^English check, 0 incoming/ })
     .click();
@@ -27,10 +31,13 @@ test("graph saves branches and reloads persisted connections", async ({
   await page
     .getByRole("button", { name: "Add connection", exact: true })
     .click();
+  await expect(undo).toBeEnabled();
   await page
     .getByRole("button", { name: "Save graph draft", exact: true })
     .click();
   await expect.poll(() => saves).toBe(1);
+  await expect(undo).toBeDisabled();
+  await expect(redo).toBeDisabled();
   expect(graph.links).toContainEqual({
     fromStageId: "stage-1",
     toStageId: "stage-2",
@@ -39,6 +46,31 @@ test("graph saves branches and reloads persisted connections", async ({
   await expect(page.getByRole("button", { name: /, 1 incoming/ })).toHaveCount(
     2,
   );
+});
+
+test("a new graph edit clears redo without writing the draft to the server", async ({ page }) => {
+  await productFixtures(page);
+  const writes: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname.endsWith("/graph") && request.method() !== "GET") {
+      writes.push(request.method());
+    }
+  });
+  await page.goto(`/employer/pipelines/${ids.job}`);
+  const stage = page.getByRole("button", { name: /^English check, 0 incoming/ });
+  await expect(stage).toBeVisible();
+  await page.getByRole("button", { name: "Add stage", exact: true }).click();
+  const added = page.getByRole("button", { name: /^New assessment, 0 incoming/ });
+  await expect(added).toBeVisible();
+  await page.getByRole("button", { name: "Undo graph change" }).click();
+  await expect(added).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Redo graph change" })).toBeEnabled();
+  await stage.focus();
+  const before = await stage.evaluate((element) => element.style.left);
+  await page.keyboard.press("Alt+ArrowRight");
+  await expect.poll(() => stage.evaluate((element) => element.style.left)).not.toBe(before);
+  await expect(page.getByRole("button", { name: "Redo graph change" })).toBeDisabled();
+  expect(writes).toEqual([]);
 });
 for (const variant of ["/coding", ""]) {
   test(`candidate runs code with custom input without submitting ${variant}`, async ({

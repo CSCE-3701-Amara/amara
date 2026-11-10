@@ -61,7 +61,12 @@ export function DagEditor({ postingId }: { postingId: string }) {
 }
 function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
   const path = `/v1/pipeline-versions/${resourceId(pipeline.versionId)}`;
-  const [graph, setGraph] = useState<PipelineGraph>({ stages: [], links: [] });
+  const [history, setHistory] = useState<{
+    past: PipelineGraph[];
+    present: PipelineGraph;
+    future: PipelineGraph[];
+  }>({ past: [], present: { stages: [], links: [] }, future: [] });
+  const graph = history.present;
   const [selected, select] = useState("");
   const [target, setTarget] = useState("");
   const [zoom, setZoom] = useState(100);
@@ -100,7 +105,7 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
           } catch {}
           g = { stages, links };
         }
-        if (!controller.signal.aborted) setGraph(normalizeGraph(g));
+        if (!controller.signal.aborted) resetGraph(normalizeGraph(g));
       } catch (e) {
         if (!controller.signal.aborted) setError(e as Error);
       } finally {
@@ -112,6 +117,40 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
   }, [path]);
   const node = graph.stages.find((s) => s.id === selected);
   const locked = pipeline.published || published;
+  function resetGraph(present: PipelineGraph) {
+    setHistory({ past: [], present, future: [] });
+  }
+  function setGraph(change: (current: PipelineGraph) => PipelineGraph) {
+    setHistory((current) => {
+      const next = change(current.present);
+      if (next === current.present) return current;
+      return {
+        past: [...current.past.slice(-49), current.present],
+        present: next,
+        future: [],
+      };
+    });
+  }
+  function restore(redo: boolean) {
+    setHistory((current) => {
+      if (redo) {
+        if (!current.future.length) return current;
+        return {
+          past: [...current.past.slice(-49), current.present],
+          present: current.future[0],
+          future: current.future.slice(1),
+        };
+      }
+      if (!current.past.length) return current;
+      return {
+        past: current.past.slice(0, -1),
+        present: current.past[current.past.length - 1],
+        future: [current.present, ...current.future],
+      };
+    });
+    select("");
+    setMessage(redo ? "Graph change redone locally." : "Graph change undone locally.");
+  }
   function update(id: string, patch: Partial<DagNode>) {
     setGraph((g) => ({
       ...g,
@@ -131,7 +170,7 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
     setBusy(true);
     setError(undefined);
     try {
-      setGraph(
+      resetGraph(
         await apiRequest<PipelineGraph>(path + "/graph", {
           method: "PUT",
           body: graph,
@@ -169,6 +208,22 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
         </span>
       </div>
       <div className={styles.toolbar}>
+        <button
+          type="button"
+          aria-label="Undo graph change"
+          disabled={locked || busy || !history.past.length}
+          onClick={() => restore(false)}
+        >
+          Undo
+        </button>
+        <button
+          type="button"
+          aria-label="Redo graph change"
+          disabled={locked || busy || !history.future.length}
+          onClick={() => restore(true)}
+        >
+          Redo
+        </button>
         <button
           disabled={locked || busy}
           onClick={() => {
@@ -226,7 +281,7 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
                 method: "PUT",
                 body: graph,
               });
-              setGraph(saved);
+              resetGraph(saved);
               await apiRequest<void>(path + "/publish", { method: "POST" });
               setPublished(true);
               setMessage("Pipeline published.");

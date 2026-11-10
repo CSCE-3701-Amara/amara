@@ -204,7 +204,7 @@ test("local graph undo restores a removed node with all its connections", async 
     name: /^Live interview, 3 incoming/,
   });
   await node.click();
-  await page.getByRole("button", { name: "Delete", exact: true }).click();
+  await page.getByRole("button", { name: "Remove stage", exact: true }).click();
   await expect(node).toHaveCount(0);
   await page.getByRole("button", { name: "Undo graph change" }).click();
   await expect(node).toBeVisible();
