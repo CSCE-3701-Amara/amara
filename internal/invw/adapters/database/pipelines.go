@@ -104,10 +104,17 @@ func (r *PipelineRepository) Publish(ctx context.Context, company, version strin
 	if !hasEntry {
 		return &domain.InvalidPipelineError{Reason: "Save at least one stage before publishing the pipeline."}
 	}
+
+	var pipeline string
+	if err = tx.QueryRow(ctx, `SELECT p.id::text FROM pipelines p JOIN pipeline_versions v ON v.pipeline_id=p.id WHERE v.id=$1::uuid FOR UPDATE OF p`, version).Scan(&pipeline); err != nil {
+		return err
+	}
+	if _, err = tx.Exec(ctx, `UPDATE pipeline_versions SET is_published=false,published_at=COALESCE(published_at,now()) WHERE pipeline_id=$1::uuid AND is_published=true`, pipeline); err != nil {
+		return err
+	}
 	tag, err := tx.Exec(ctx, `
 		UPDATE pipelines p SET published_version_id = v.id, status = 'published'
-		FROM pipeline_versions v WHERE v.id = $1::text::uuid AND p.id = v.pipeline_id
-			AND p.published_version_id IS NULL`, version)
+		FROM pipeline_versions v WHERE v.id = $1::text::uuid AND p.id = v.pipeline_id`, version)
 	if err != nil {
 		return err
 	}
@@ -176,6 +183,13 @@ func (r *PipelineRepository) ReplaceStages(ctx context.Context, company, version
 		return nil, domain.ErrPipelineLocked
 	}
 
+	var linked bool
+	if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM stage_transitions WHERE pipeline_version_id=$1::uuid)`, version).Scan(&linked); err != nil {
+		return nil, err
+	}
+	if linked {
+		return nil, domain.ErrPipelineLocked
+	}
 	definitions := make(map[string]domain.Definition)
 	for _, stage := range stages {
 		if stage.Interview != nil {
@@ -316,4 +330,48 @@ func pipelineError(err error) error {
 		return domain.ErrPipelineNotFound
 	}
 	return err
+}
+
+// NewDraft copies immutable snapshots; candidates keep their current version.
+func (r *PipelineRepository) NewDraft(ctx context.Context, company, posting string) (domain.PipelineDraft, error) {
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return domain.PipelineDraft{}, err
+	}
+	defer tx.Rollback(ctx)
+	d := domain.PipelineDraft{PostingID: posting}
+	var previous string
+	err = tx.QueryRow(ctx, `SELECT p.id::text FROM pipelines p JOIN job_postings j ON j.id=p.posting_id WHERE p.posting_id=$1::text::uuid AND j.company_id=$2::text::uuid FOR UPDATE OF p`, posting, company).Scan(&d.ID)
+	if err != nil {
+		return d, pipelineError(err)
+	}
+	var published bool
+	err = tx.QueryRow(ctx, `SELECT v.id::text,v.version_number,v.published_at IS NOT NULL OR COALESCE(v.is_published,false) OR p.published_version_id IS NOT DISTINCT FROM v.id FROM pipeline_versions v JOIN pipelines p ON p.id=v.pipeline_id WHERE v.pipeline_id=$1::text::uuid ORDER BY v.version_number DESC LIMIT 1`, d.ID).Scan(&previous, &d.VersionNumber, &published)
+	if err != nil {
+		return d, err
+	}
+	if !published {
+		d.VersionID = previous
+		return d, tx.Commit(ctx)
+	}
+	d.VersionNumber++
+	err = tx.QueryRow(ctx, `INSERT INTO pipeline_versions(id,pipeline_id,version_number,is_published,previous_version_id) VALUES(gen_random_uuid(),$1::text::uuid,$2,false,$3::text::uuid) RETURNING id::text`, d.ID, d.VersionNumber, previous).Scan(&d.VersionID)
+	if err != nil {
+		return d, err
+	}
+	// The temporary map exists only within this transaction and connection.
+	if _, err = tx.Exec(ctx, `CREATE TEMP TABLE pipeline_copy_ids ON COMMIT DROP AS SELECT id AS old_id,gen_random_uuid() AS new_id FROM pipeline_stages WHERE version_id=$1::text::uuid`, previous); err != nil {
+		return d, err
+	}
+	if _, err = tx.Exec(ctx, `INSERT INTO pipeline_stages(id,version_id,name,module_type,advancement_rule,score_threshold,below_threshold_action,feedback_mode,scheduled_start_at,scheduled_end_at,position_x,position_y,stage_order,interview_configuration)
+ SELECT m.new_id,$1::text::uuid,s.name,s.module_type,s.advancement_rule,s.score_threshold,s.below_threshold_action,s.feedback_mode,s.scheduled_start_at,s.scheduled_end_at,s.position_x,s.position_y,s.stage_order,s.interview_configuration FROM pipeline_stages s JOIN pipeline_copy_ids m ON m.old_id=s.id`, d.VersionID); err != nil {
+		return d, err
+	}
+	if _, err = tx.Exec(ctx, `INSERT INTO test_configurations(id,stage_id,test_module_id,active_time_limit,completion_window,configuration) SELECT gen_random_uuid(),m.new_id,t.test_module_id,t.active_time_limit,t.completion_window,t.configuration FROM test_configurations t JOIN pipeline_copy_ids m ON m.old_id=t.stage_id`); err != nil {
+		return d, err
+	}
+	if _, err = tx.Exec(ctx, `INSERT INTO stage_transitions(id,pipeline_version_id,from_stage_id,to_stage_id) SELECT gen_random_uuid(),$1::text::uuid,a.new_id,b.new_id FROM stage_transitions t JOIN pipeline_copy_ids a ON a.old_id=t.from_stage_id JOIN pipeline_copy_ids b ON b.old_id=t.to_stage_id WHERE t.pipeline_version_id=$2::text::uuid`, d.VersionID, previous); err != nil {
+		return d, err
+	}
+	return d, tx.Commit(ctx)
 }

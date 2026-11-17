@@ -54,12 +54,12 @@ export function DagEditor({ postingId }: { postingId: string }) {
         }
       />
       {pipeline.data && (
-        <Canvas key={pipeline.data.versionId} pipeline={pipeline.data} />
+        <Canvas key={pipeline.data.versionId} pipeline={pipeline.data} onDraftCreated={pipeline.reload} />
       )}
     </>
   );
 }
-function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
+function Canvas({ pipeline, onDraftCreated }: { pipeline: PipelineDraft; onDraftCreated: () => void }) {
   const path = `/v1/pipeline-versions/${resourceId(pipeline.versionId)}`;
   const [history, setHistory] = useState<{
     past: PipelineGraph[];
@@ -297,7 +297,15 @@ function Canvas({ pipeline }: { pipeline: PipelineDraft }) {
       </div>
       {locked && (
         <p className={styles.notice}>
-          This pipeline is published and cannot be edited.
+          Existing applications keep this version and their progress.
+          <button disabled={busy} onClick={async () => {
+            setBusy(true); setError(undefined);
+            try {
+              await apiRequest(`/v1/jobs/${resourceId(pipeline.postingId)}/pipeline/draft`, { method: "POST" });
+              onDraftCreated();
+            } catch (cause) { setError(cause as Error); }
+            finally { setBusy(false); }
+          }}>Create editable copy</button>
         </p>
       )}
       {loaded && !error && !supported && !locked && (

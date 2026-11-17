@@ -28,6 +28,7 @@ func (h *PipelineHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 	v1.GET("/pipeline-versions/:versionId/graph", company, h.graph(false))
 	v1.PUT("/pipeline-versions/:versionId/graph", company, h.graph(true))
 	v1.GET("/jobs/:id/pipeline", company, h.get)
+	v1.POST("/jobs/:id/pipeline/draft", company, h.newDraft)
 	v1.POST("/jobs/:id/pipeline", company, h.create)
 	v1.GET("/pipeline-versions/:versionId/stages", company, h.stages)
 	v1.PUT("/pipeline-versions/:versionId/stages", company, h.replaceStages)
@@ -139,4 +140,14 @@ func writePipelineResult(c *gin.Context, status int, result any, err error) {
 		slog.ErrorContext(c.Request.Context(), "pipeline request failed", "error", err)
 		writeError(c, http.StatusInternalServerError, "internal_error", "The pipeline request failed.")
 	}
+}
+
+func (h *PipelineHandler) newDraft(c *gin.Context) {
+	id, ok := pipelineID(c, "id")
+	if !ok {
+		return
+	}
+	identity, _ := authhttp.Identity(c)
+	d, err := h.repo.NewDraft(c.Request.Context(), identity.CompanyID, id)
+	writePipelineResult(c, http.StatusCreated, d, err)
 }

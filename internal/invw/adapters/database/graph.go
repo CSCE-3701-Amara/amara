@@ -100,6 +100,10 @@ func (r *PipelineRepository) SaveGraph(ctx context.Context, company, version str
 			defs[id] = d
 		}
 	}
+
+	if _, err := tx.Exec(ctx, `CREATE TEMP TABLE saved_pipeline_configs ON COMMIT DROP AS SELECT tc.* FROM test_configurations tc JOIN pipeline_stages s ON s.id=tc.stage_id WHERE s.version_id=$1::uuid`, version); err != nil {
+		return g, err
+	}
 	for _, q := range []string{`DELETE FROM stage_transitions WHERE pipeline_version_id=$1::uuid`, `DELETE FROM test_configurations WHERE stage_id IN (SELECT id FROM pipeline_stages WHERE version_id=$1::uuid)`, `DELETE FROM pipeline_stages WHERE version_id=$1::uuid`} {
 		if _, err := tx.Exec(ctx, q, version); err != nil {
 			return g, err
@@ -109,6 +113,10 @@ func (r *PipelineRepository) SaveGraph(ctx context.Context, company, version str
 	for i := range g.Stages {
 		key := g.Stages[i].ID
 		if err := insertStage(ctx, tx, version, i+1, &g.Stages[i], defs); err != nil {
+			return g, err
+		}
+
+		if _, err := tx.Exec(ctx, `UPDATE test_configurations tc SET active_time_limit=old.active_time_limit,completion_window=old.completion_window,configuration=old.configuration || jsonb_build_object('position',tc.configuration->'position') FROM saved_pipeline_configs old WHERE old.stage_id::text=$1 AND tc.stage_id=$2::uuid AND old.test_module_id=tc.test_module_id`, key, g.Stages[i].ID); err != nil {
 			return g, err
 		}
 		ids[key] = g.Stages[i].ID

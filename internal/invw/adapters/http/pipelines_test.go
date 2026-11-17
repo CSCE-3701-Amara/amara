@@ -24,6 +24,10 @@ func TestPipelineRoutesCoexistWithPostingRoutesAndRequireCompany(t *testing.T) {
 		{http.MethodPost, "/v1/jobs/id/pipeline"},
 		{http.MethodGet, "/v1/pipeline-versions/id/stages"},
 		{http.MethodPut, "/v1/pipeline-versions/id/stages"},
+		{http.MethodPost, "/v1/pipeline-versions/id/publish"},
+		{http.MethodGet, "/v1/pipeline-versions/id/graph"},
+		{http.MethodPut, "/v1/pipeline-versions/id/graph"},
+		{http.MethodPost, "/v1/jobs/id/pipeline/draft"},
 	} {
 		req := httptest.NewRequest(route.method, route.path, nil)
 		req.AddCookie(&http.Cookie{Name: "amara_session", Value: "test-session"})
