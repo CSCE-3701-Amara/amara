@@ -26,7 +26,8 @@ const destinations: Record<
   company: [
     ["/employer/jobs", "Job postings"],
     ["/employer/pipelines", "Pipeline studio"],
-    ["/employer/modules", "Modules"],
+    ["/employer/modules", "Assessment library"],
+    ["/employer/interviewers", "Interview team"],
     ["/employer/interviews", "Interviews"],
     ["/employer/grading", "Grading"],
     ["/employer/offers", "Offers"],
@@ -142,6 +143,7 @@ export function Workspace({
   return (
     <div
       className={styles.shell}
+      data-role={role}
       data-collapsed={collapsed}
       data-mobile-open={mobileOpen}
     >

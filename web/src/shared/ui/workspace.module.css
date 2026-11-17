@@ -539,3 +539,26 @@
     transition: background-color .15s ease, border-color .15s ease;
   }
 }
+
+/* Hiring workspaces share Amara's brand while prioritizing daily operations. */
+.shell:is([data-role="company"], [data-role="interviewer"]) .menu {
+  background: #f8f4ee;
+  border: 1px solid #e7ded3;
+}
+.shell:is([data-role="company"], [data-role="interviewer"]) .navigation a {
+  border-radius: 12px;
+  min-height: 46px;
+  padding: 12px 16px;
+}
+.shell:is([data-role="company"], [data-role="interviewer"])
+  .navigation
+  a[aria-current="page"] {
+  background: #211813;
+  box-shadow: inset 4px 0 0 var(--orange);
+}
+.shell:is([data-role="company"], [data-role="interviewer"])
+  .navigation
+  a:focus-visible {
+  outline: 3px solid var(--coral);
+  outline-offset: 3px;
+}

@@ -1,0 +1,70 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+  margin: 24px 0;
+}
+.schedule {
+  min-width: 0;
+  border: 1px solid var(--workspace-border);
+  border-radius: 18px;
+  background: #fff;
+  overflow: hidden;
+}
+.sectionHeading {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--workspace-border);
+}
+.sectionHeading h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.sectionHeading span {
+  color: var(--workspace-muted);
+  font-size: 14px;
+}
+.details {
+  padding: 24px;
+  background: #fff6eb;
+  border: 1px solid #eed4b9;
+  border-radius: 18px;
+  position: sticky;
+  top: 24px;
+}
+.details h2 {
+  margin-top: 0;
+  font-size: 22px;
+}
+.details p {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--workspace-muted);
+}
+.selectedRow {
+  background: #efffe9;
+}
+.schedule table {
+  margin: 0;
+}
+@media (max-width: 1200px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .details {
+    position: static;
+  }
+}
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.rowActions a {
+  text-underline-offset: 4px;
+}

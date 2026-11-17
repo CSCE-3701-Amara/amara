@@ -174,7 +174,12 @@ test("interview outcome uses the registered operation and retains selection afte
       : route.fulfill({ status: 204 });
   });
   await page.goto("/employer/interviews");
-  await page.getByRole("button", { name: ids.interview, exact: true }).click();
+  await page
+    .getByRole("button", {
+      name: `Interview ${ids.interview.slice(0, 8)}`,
+      exact: true,
+    })
+    .click();
   await page.getByLabel("Interview outcome").selectOption("candidate_absent");
   await page
     .getByRole("button", { name: "Review outcome", exact: true })
