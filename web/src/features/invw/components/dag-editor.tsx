@@ -54,12 +54,22 @@ export function DagEditor({ postingId }: { postingId: string }) {
         }
       />
       {pipeline.data && (
-        <Canvas key={pipeline.data.versionId} pipeline={pipeline.data} onDraftCreated={pipeline.reload} />
+        <Canvas
+          key={pipeline.data.versionId}
+          pipeline={pipeline.data}
+          onDraftCreated={pipeline.reload}
+        />
       )}
     </>
   );
 }
-function Canvas({ pipeline, onDraftCreated }: { pipeline: PipelineDraft; onDraftCreated: () => void }) {
+function Canvas({
+  pipeline,
+  onDraftCreated,
+}: {
+  pipeline: PipelineDraft;
+  onDraftCreated: () => void;
+}) {
   const path = `/v1/pipeline-versions/${resourceId(pipeline.versionId)}`;
   const [history, setHistory] = useState<{
     past: PipelineGraph[];
@@ -149,7 +159,9 @@ function Canvas({ pipeline, onDraftCreated }: { pipeline: PipelineDraft; onDraft
       };
     });
     select("");
-    setMessage(redo ? "Graph change redone locally." : "Graph change undone locally.");
+    setMessage(
+      redo ? "Graph change redone locally." : "Graph change undone locally.",
+    );
   }
   function update(id: string, patch: Partial<DagNode>) {
     setGraph((g) => ({
@@ -298,14 +310,26 @@ function Canvas({ pipeline, onDraftCreated }: { pipeline: PipelineDraft; onDraft
       {locked && (
         <p className={styles.notice}>
           Existing applications keep this version and their progress.
-          <button disabled={busy} onClick={async () => {
-            setBusy(true); setError(undefined);
-            try {
-              await apiRequest(`/v1/jobs/${resourceId(pipeline.postingId)}/pipeline/draft`, { method: "POST" });
-              onDraftCreated();
-            } catch (cause) { setError(cause as Error); }
-            finally { setBusy(false); }
-          }}>Create editable copy</button>
+          <button
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              setError(undefined);
+              try {
+                await apiRequest(
+                  `/v1/jobs/${resourceId(pipeline.postingId)}/pipeline/draft`,
+                  { method: "POST" },
+                );
+                onDraftCreated();
+              } catch (cause) {
+                setError(cause as Error);
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            Create editable copy
+          </button>
         </p>
       )}
       {loaded && !error && !supported && !locked && (

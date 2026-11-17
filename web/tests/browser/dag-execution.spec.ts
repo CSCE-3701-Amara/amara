@@ -48,28 +48,43 @@ test("graph saves branches and reloads persisted connections", async ({
   );
 });
 
-test("a new graph edit clears redo without writing the draft to the server", async ({ page }) => {
+test("a new graph edit clears redo without writing the draft to the server", async ({
+  page,
+}) => {
   await productFixtures(page);
   const writes: string[] = [];
   page.on("request", (request) => {
-    if (new URL(request.url()).pathname.endsWith("/graph") && request.method() !== "GET") {
+    if (
+      new URL(request.url()).pathname.endsWith("/graph") &&
+      request.method() !== "GET"
+    ) {
       writes.push(request.method());
     }
   });
   await page.goto(`/employer/pipelines/${ids.job}`);
-  const stage = page.getByRole("button", { name: /^English check, 0 incoming/ });
+  const stage = page.getByRole("button", {
+    name: /^English check, 0 incoming/,
+  });
   await expect(stage).toBeVisible();
   await page.getByRole("button", { name: "Add stage", exact: true }).click();
-  const added = page.getByRole("button", { name: /^New assessment, 0 incoming/ });
+  const added = page.getByRole("button", {
+    name: /^New assessment, 0 incoming/,
+  });
   await expect(added).toBeVisible();
   await page.getByRole("button", { name: "Undo graph change" }).click();
   await expect(added).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Redo graph change" })).toBeEnabled();
+  await expect(
+    page.getByRole("button", { name: "Redo graph change" }),
+  ).toBeEnabled();
   await stage.focus();
   const before = await stage.evaluate((element) => element.style.left);
   await page.keyboard.press("Alt+ArrowRight");
-  await expect.poll(() => stage.evaluate((element) => element.style.left)).not.toBe(before);
-  await expect(page.getByRole("button", { name: "Redo graph change" })).toBeDisabled();
+  await expect
+    .poll(() => stage.evaluate((element) => element.style.left))
+    .not.toBe(before);
+  await expect(
+    page.getByRole("button", { name: "Redo graph change" }),
+  ).toBeDisabled();
   expect(writes).toEqual([]);
 });
 for (const variant of ["/coding", ""]) {
@@ -152,4 +167,48 @@ test("new posting can create a graph without reloading the page", async ({
   await expect(
     page.getByRole("button", { name: "Save graph draft", exact: true }),
   ).toBeEnabled();
+});
+
+test("published graph creates an editable copy", async ({ page }) => {
+  await productFixtures(page);
+  let copied = false;
+  await page.route(`**/v1/jobs/${ids.job}/pipeline`, (route) =>
+    route.fulfill({
+      json: {
+        id: ids.job,
+        postingId: ids.job,
+        versionId: copied
+          ? "66666666-6666-4666-8666-666666666666"
+          : ids.version,
+        versionNumber: copied ? 3 : 2,
+        published: !copied,
+      },
+    }),
+  );
+  await page.route("**/v1/pipeline-versions/*/graph", (route) =>
+    route.fulfill({
+      json: {
+        stages: stages.map((stage, i) => ({
+          ...stage,
+          x: i * 260 + 40,
+          y: 40,
+        })),
+        links: [{ fromStageId: "stage-1", toStageId: "stage-4" }],
+      },
+    }),
+  );
+  await page.route(`**/v1/jobs/${ids.job}/pipeline/draft`, (route) => {
+    expect(route.request().method()).toBe("POST");
+    copied = true;
+    return route.fulfill({ json: { versionNumber: 3 } });
+  });
+  await page.goto(`/employer/pipelines/${ids.job}`);
+  await expect(
+    page.getByRole("button", { name: "Save graph draft", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Create editable copy" }).click();
+  await expect(
+    page.getByRole("button", { name: "Save graph draft", exact: true }),
+  ).toBeEnabled();
+  expect(copied).toBe(true);
 });
