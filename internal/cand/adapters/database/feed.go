@@ -11,6 +11,8 @@ import (
 	"github.com/CSCE-3701-Amara/amara/internal/cand/ports"
 )
 
+var likeEscaper = strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
+
 // JobFeedRepository reads candidate-visible postings from PostgreSQL.
 type JobFeedRepository struct {
 	pool *pgxpool.Pool
@@ -37,7 +39,8 @@ func (r *JobFeedRepository) ListPublished(ctx context.Context, filter ports.JobF
 		where = append(where, fmt.Sprintf(expression, len(args)))
 	}
 	if filter.Title != "" {
-		add("title ILIKE $%d", "%"+filter.Title+"%")
+		// Match the search text literally: "%" and "_" are not wildcards here.
+		add(`title ILIKE $%d ESCAPE '\'`, "%"+likeEscaper.Replace(filter.Title)+"%")
 	}
 	if filter.Language != "" {
 		add("language = $%d", filter.Language)

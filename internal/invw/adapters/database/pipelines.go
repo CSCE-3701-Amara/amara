@@ -29,7 +29,7 @@ func (r *PipelineRepository) Get(ctx context.Context, company, posting string) (
 			SELECT id, version_number FROM pipeline_versions
 			WHERE pipeline_id = p.id ORDER BY version_number DESC LIMIT 1
 		) v ON true
-		WHERE p.posting_id = $1::text::uuid AND j.company_id = $2::text::uuid`,
+		WHERE p.posting_id = $1::text::uuid AND j.company_id = $2::text::uuid AND j.deleted_at IS NULL`,
 		posting, company).Scan(&draft.ID, &draft.PostingID, &draft.VersionID, &draft.VersionNumber, &draft.Published)
 	return draft, pipelineError(err)
 }
@@ -44,7 +44,7 @@ func (r *PipelineRepository) Create(ctx context.Context, company, posting string
 	var attached bool
 	err = tx.QueryRow(ctx, `
 		SELECT pipeline_id IS NOT NULL FROM job_postings
-		WHERE id = $1::text::uuid AND company_id = $2::text::uuid FOR UPDATE`, posting, company).Scan(&attached)
+		WHERE id = $1::text::uuid AND company_id = $2::text::uuid AND deleted_at IS NULL FOR UPDATE`, posting, company).Scan(&attached)
 	if err != nil {
 		return domain.PipelineDraft{}, pipelineError(err)
 	}
@@ -233,7 +233,7 @@ func pipelineVersion(ctx context.Context, tx pgx.Tx, company, version string, lo
 		SELECT COALESCE(v.is_published, false) OR v.published_at IS NOT NULL OR p.published_version_id IS NOT DISTINCT FROM v.id
 		FROM pipeline_versions v JOIN pipelines p ON p.id = v.pipeline_id
 		JOIN job_postings j ON j.id = p.posting_id
-		WHERE v.id = $1::text::uuid AND j.company_id = $2::text::uuid`
+		WHERE v.id = $1::text::uuid AND j.company_id = $2::text::uuid AND j.deleted_at IS NULL`
 	if lock {
 		query += " FOR UPDATE OF v"
 	}
@@ -341,7 +341,7 @@ func (r *PipelineRepository) NewDraft(ctx context.Context, company, posting stri
 	defer tx.Rollback(ctx)
 	d := domain.PipelineDraft{PostingID: posting}
 	var previous string
-	err = tx.QueryRow(ctx, `SELECT p.id::text FROM pipelines p JOIN job_postings j ON j.id=p.posting_id WHERE p.posting_id=$1::text::uuid AND j.company_id=$2::text::uuid FOR UPDATE OF p`, posting, company).Scan(&d.ID)
+	err = tx.QueryRow(ctx, `SELECT p.id::text FROM pipelines p JOIN job_postings j ON j.id=p.posting_id WHERE p.posting_id=$1::text::uuid AND j.company_id=$2::text::uuid AND j.deleted_at IS NULL FOR UPDATE OF p`, posting, company).Scan(&d.ID)
 	if err != nil {
 		return d, pipelineError(err)
 	}

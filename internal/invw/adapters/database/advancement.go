@@ -348,6 +348,11 @@ func decideStages(ctx context.Context, pool *pgxpool.Pool, ids []string, company
 		return nil, err
 	}
 
+	// A manual decision is never answered with a different outcome. If the stage
+	// is already decided, or is decided automatically in this transaction, a
+	// disagreeing request is a conflict instead of a silent success. Repeating
+	// the same decision stays idempotent.
+	requested := map[string]string{"pass": "passed", "reject": "rejected"}[decision]
 	results := make([]json.RawMessage, 0, len(ids))
 	for _, id := range ids {
 		s, err := readAdvancement(ctx, tx, id, company, stage)
@@ -357,6 +362,9 @@ func decideStages(ctx context.Context, pool *pgxpool.Pool, ids []string, company
 		if s.active() {
 			d := s.automaticDecision()
 			actor := ""
+			if decision != "" && (d.status == "passed" || d.status == "rejected") && d.status != requested {
+				return nil, ErrDecisionConflict
+			}
 			if decision != "" && d.status != "passed" && d.status != "rejected" {
 				if d.status != "held" || (expected != "" && expected != s.status && expected != d.status) {
 					return nil, ErrDecisionConflict
@@ -370,7 +378,7 @@ func decideStages(ctx context.Context, pool *pgxpool.Pool, ids []string, company
 			if err = applyAdvancement(ctx, tx, id, actor, s, d); err != nil {
 				return nil, err
 			}
-		} else if decision != "" && s.status != "passed" && s.status != "rejected" {
+		} else if decision != "" && s.status != requested {
 			return nil, ErrDecisionConflict
 		}
 

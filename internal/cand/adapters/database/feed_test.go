@@ -53,3 +53,29 @@ func TestFeedSalaryFiltersAndCompanyEligibilityPostgres(t *testing.T) {
 		})
 	}
 }
+
+// "%" and "_" typed into the search box are literal characters, not wildcards.
+func TestFeedTitleSearchMatchesWildcardsLiterallyPostgres(t *testing.T) {
+	pool := testutil.Postgres(t)
+	ctx := t.Context()
+	if _, err := pool.Exec(ctx, `
+ INSERT INTO companies (id,email,password_hash,salt,legal_name,approved)
+ VALUES (md5('search-company')::uuid,'search@example.test','','','Search company',true);
+ INSERT INTO job_postings (id,company_id,title,status,published_at)
+ VALUES (md5('percent')::uuid,md5('search-company')::uuid,'100% remote','published',now()),
+ (md5('plain')::uuid,md5('search-company')::uuid,'1000 offices','published',now()),
+ (md5('under')::uuid,md5('search-company')::uuid,'snake_case role','published',now()),
+ (md5('other')::uuid,md5('search-company')::uuid,'snakeXcase role','published',now());`); err != nil {
+		t.Fatal(err)
+	}
+	repo := NewJobFeedRepository(pool)
+	for query, want := range map[string]string{"100%": "100% remote", "snake_case": "snake_case role"} {
+		result, err := repo.ListPublished(ctx, ports.JobFeedQuery{Limit: 10, Title: query})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(result.Postings) != 1 || result.Postings[0].Title != want {
+			t.Errorf("search %q returned %+v, want only %q", query, result.Postings, want)
+		}
+	}
+}

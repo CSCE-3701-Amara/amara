@@ -127,10 +127,9 @@ func (r *PostingManagementRepository) ListByCompany(ctx context.Context, company
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("read job postings: %w", err)
 	}
-	for i := range postings {
-		if err := loadScreeningData(ctx, r.pool, &postings[i]); err != nil {
-			return nil, err
-		}
+	rows.Close()
+	if err := loadScreeningDataBatch(ctx, r.pool, postings); err != nil {
+		return nil, err
 	}
 	return postings, nil
 }
@@ -220,17 +219,31 @@ func (r *PostingManagementRepository) SoftDelete(ctx context.Context, companyID,
 	if r == nil || r.pool == nil {
 		return errors.New("job posting database is not configured")
 	}
-	query := `UPDATE job_postings SET deleted_at=now(), updated_at=now() WHERE id=$1::uuid AND deleted_at IS NULL`
+	owner := ""
 	args := []any{id}
 	if !systemAdmin {
-		query += ` AND company_id=$2::uuid`
+		owner = ` AND company_id=$2::uuid`
 		args = append(args, companyID)
 	}
-	result, err := r.pool.Exec(ctx, query, args...)
+	// Deleting a posting also ends its hiring pipeline in the same statement:
+	// active executions are cancelled so the worker stops admitting, assessing
+	// and advancing candidates for a posting that no longer exists.
+	var deleted int
+	err := r.pool.QueryRow(ctx, `
+		WITH deleted AS (
+			UPDATE job_postings SET deleted_at=now(), updated_at=now()
+			WHERE id=$1::uuid AND deleted_at IS NULL`+owner+` RETURNING id
+		), cancelled AS (
+			UPDATE pipeline_executions pe SET status='cancelled'
+			FROM applications a JOIN deleted d ON d.id = a.posting_id
+			WHERE pe.application_id = a.id AND pe.status = 'active'
+			RETURNING pe.id
+		)
+		SELECT count(*) FROM deleted`, args...).Scan(&deleted)
 	if err != nil {
 		return fmt.Errorf("soft delete job posting: %w", err)
 	}
-	if result.RowsAffected() == 0 {
+	if deleted == 0 {
 		return domain.ErrPostingNotFound
 	}
 	return nil
@@ -269,41 +282,65 @@ func replaceScreeningData(ctx context.Context, tx pgx.Tx, postingID string, p do
 }
 
 func loadScreeningData(ctx context.Context, db rowQuerier, p *domain.Posting) error {
-	p.Requirements = make([]domain.Requirement, 0)
-	rows, err := db.Query(ctx, `SELECT id::text, requirement_text, requirement_type FROM job_posting_requirements WHERE posting_id=$1::uuid ORDER BY id`, p.ID)
+	postings := []domain.Posting{*p}
+	if err := loadScreeningDataBatch(ctx, db, postings); err != nil {
+		return err
+	}
+	*p = postings[0]
+	return nil
+}
+
+// loadScreeningDataBatch fills requirements and Amarat for many postings with
+// two queries in total, instead of two per posting.
+func loadScreeningDataBatch(ctx context.Context, db rowQuerier, postings []domain.Posting) error {
+	index := make(map[string]int, len(postings))
+	ids := make([]string, len(postings))
+	for i := range postings {
+		postings[i].Requirements = make([]domain.Requirement, 0)
+		postings[i].Amarat = make([]domain.Amara, 0)
+		index[postings[i].ID] = i
+		ids[i] = postings[i].ID
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	rows, err := db.Query(ctx, `SELECT posting_id::text, id::text, requirement_text, requirement_type FROM job_posting_requirements WHERE posting_id = ANY($1::uuid[]) ORDER BY posting_id, id`, ids)
 	if err != nil {
 		return fmt.Errorf("load posting requirements: %w", err)
 	}
 	for rows.Next() {
+		var posting string
 		var requirement domain.Requirement
-		if err := rows.Scan(&requirement.ID, &requirement.Text, &requirement.Type); err != nil {
+		if err := rows.Scan(&posting, &requirement.ID, &requirement.Text, &requirement.Type); err != nil {
 			rows.Close()
 			return fmt.Errorf("scan posting requirement: %w", err)
 		}
-		p.Requirements = append(p.Requirements, requirement)
-	}
-	if err := rows.Err(); err != nil {
-		rows.Close()
-		return fmt.Errorf("read posting requirements: %w", err)
+		if i, ok := index[posting]; ok {
+			postings[i].Requirements = append(postings[i].Requirements, requirement)
+		}
 	}
 	rows.Close()
-	p.Amarat = make([]domain.Amara, 0)
-	rows, err = db.Query(ctx, `SELECT id::text, amara_title, amara_description FROM job_posting_amarat WHERE posting_id=$1::uuid ORDER BY id`, p.ID)
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("read posting requirements: %w", err)
+	}
+	rows, err = db.Query(ctx, `SELECT posting_id::text, id::text, amara_title, amara_description FROM job_posting_amarat WHERE posting_id = ANY($1::uuid[]) ORDER BY posting_id, id`, ids)
 	if err != nil {
 		return fmt.Errorf("load posting Amarat: %w", err)
 	}
 	for rows.Next() {
+		var posting string
 		var amara domain.Amara
-		if err := rows.Scan(&amara.ID, &amara.Title, &amara.Description); err != nil {
+		if err := rows.Scan(&posting, &amara.ID, &amara.Title, &amara.Description); err != nil {
 			rows.Close()
 			return fmt.Errorf("scan posting Amara: %w", err)
 		}
-		p.Amarat = append(p.Amarat, amara)
-	}
-	if err := rows.Err(); err != nil {
-		rows.Close()
-		return fmt.Errorf("read posting Amarat: %w", err)
+		if i, ok := index[posting]; ok {
+			postings[i].Amarat = append(postings[i].Amarat, amara)
+		}
 	}
 	rows.Close()
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("read posting Amarat: %w", err)
+	}
 	return nil
 }

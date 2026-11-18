@@ -28,6 +28,7 @@ func SpawnAssessmentInstances(ctx context.Context, pool *pgxpool.Pool) error {
 			INSERT INTO pipeline_executions (id, application_id, pipeline_version_id)
 			SELECT gen_random_uuid(), a.id, v.id
 			FROM applications a
+			JOIN job_postings j ON j.id = a.posting_id AND j.deleted_at IS NULL
 			JOIN pipelines p ON p.posting_id = a.posting_id
 			JOIN pipeline_versions v ON v.id = p.published_version_id AND v.pipeline_id = p.id
 			WHERE a.status = 'admitted' AND a.screened_out IS FALSE

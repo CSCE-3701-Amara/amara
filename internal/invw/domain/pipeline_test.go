@@ -52,3 +52,26 @@ func TestValidateOrderedStages(t *testing.T) {
 		t.Fatal("the rubric must map to a configured Amara")
 	}
 }
+
+// A behavioral interview has no score, so a threshold rule on it must name one
+// explicitly; otherwise the stage could never be decided by threshold.
+func TestThresholdRuleOnBehavioralInterviewRequiresThreshold(t *testing.T) {
+	opens := time.Date(2026, time.November, 10, 8, 0, 0, 0, time.UTC)
+	stage := Stage{
+		Name: "Behavioral", Type: LiveInterviewStage, OpensAt: opens, Deadline: opens.Add(time.Hour),
+		Rule: "threshold",
+		Interview: &LiveInterview{
+			Behavioral: true, DurationMinutes: 30, InterviewerIDs: []string{"interviewer"},
+			Rubric: []Criterion{{Description: "Explains choices", Amara: "Communication"}},
+			Amarat: []Amara{{Name: "Communication", Crest: "crest", Domain: "communication", Description: "Explanation"}},
+		},
+	}
+	if err := ValidateStages([]Stage{stage}); err == nil {
+		t.Fatal("threshold rule without a threshold was accepted")
+	}
+	threshold := 60
+	stage.ScoreThreshold = &threshold
+	if err := ValidateStages([]Stage{stage}); err != nil {
+		t.Fatalf("explicit threshold rejected: %v", err)
+	}
+}

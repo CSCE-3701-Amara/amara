@@ -3,65 +3,19 @@ package database
 import (
 	"context"
 	"errors"
-	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
-
 	"github.com/CSCE-3701-Amara/amara/internal/cand/domain"
+	"github.com/CSCE-3701-Amara/amara/internal/testutil"
 )
 
 func TestApplicationTrackingPostgres(t *testing.T) {
-	dsn := os.Getenv("AMARA_TEST_DATABASE_URL")
-	if dsn == "" {
-		t.Skip("set AMARA_TEST_DATABASE_URL to run PostgreSQL tracking tests")
-	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	admin, err := pgx.Connect(ctx, dsn)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() { _ = admin.Close(context.Background()) }()
-	schema := pgx.Identifier{fmt.Sprintf("tracking_test_%d", time.Now().UnixNano())}.Sanitize()
-	if _, err := admin.Exec(ctx, "CREATE SCHEMA "+schema); err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		if _, err := admin.Exec(context.Background(), "DROP SCHEMA "+schema+" CASCADE"); err != nil {
-			t.Errorf("remove test schema: %v", err)
-		}
-	}()
-
-	cfg, err := pgxpool.ParseConfig(dsn)
-	if err != nil {
-		t.Fatal(err)
-	}
-	cfg.ConnConfig.RuntimeParams["search_path"] = schema
-	pool, err := pgxpool.NewWithConfig(ctx, cfg)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer pool.Close()
-
-	migrations, err := filepath.Glob("../../../../supabase/migrations/*.sql")
-	if err != nil || len(migrations) == 0 {
-		t.Fatalf("find migrations: %v", err)
-	}
-	for _, path := range migrations {
-		migration, err := os.ReadFile(path)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if _, err := pool.Exec(ctx, string(migration)); err != nil {
-			t.Fatalf("apply %s: %v", path, err)
-		}
-	}
+	pool := testutil.Postgres(t)
+	var err error
 
 	const candidate = "00000000-0000-0000-0000-000000000001"
 	const other = "00000000-0000-0000-0000-000000000002"
