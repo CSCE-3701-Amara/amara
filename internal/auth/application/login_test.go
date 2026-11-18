@@ -161,8 +161,11 @@ func TestLoginAttemptLimiterBoundsAndReclaimsIdentities(t *testing.T) {
 			t.Fatalf("identity %d unexpectedly rejected", n)
 		}
 	}
-	if limiter.allow("overflow@example.test", now) {
-		t.Error("limiter retained an unbounded number of identities")
+	if !limiter.allow("overflow@example.test", now) {
+		t.Error("a full limiter must not deny logins to new identities")
+	}
+	if len(limiter.entries) > maxTrackedLoginEmails {
+		t.Errorf("limiter retained %d identities, want at most %d", len(limiter.entries), maxTrackedLoginEmails)
 	}
 	if !limiter.allow("user-0@example.test", now) {
 		t.Error("capacity must not block an existing identity's allowed attempts")
@@ -172,5 +175,22 @@ func TestLoginAttemptLimiterBoundsAndReclaimsIdentities(t *testing.T) {
 	}
 	if len(limiter.entries) != 1 {
 		t.Errorf("retained %d identities after expiry, want 1", len(limiter.entries))
+	}
+}
+
+func TestLoginAttemptLimiterEvictionKeepsLockedIdentities(t *testing.T) {
+	var limiter loginAttemptLimiter
+	now := time.Unix(1000, 0)
+	for i := 0; i < maxLoginAttempts; i++ {
+		limiter.allow("target@example.test", now)
+	}
+	for n := 0; n < 2*maxTrackedLoginEmails; n++ {
+		limiter.allow(fmt.Sprintf("flood-%d@example.test", n), now.Add(time.Second))
+	}
+	if limiter.allow("target@example.test", now.Add(2*time.Second)) {
+		t.Fatal("flooding the limiter released a locked identity")
+	}
+	if len(limiter.entries) > maxTrackedLoginEmails {
+		t.Fatalf("limiter retained %d identities", len(limiter.entries))
 	}
 }
