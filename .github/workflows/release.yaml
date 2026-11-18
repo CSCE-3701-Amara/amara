@@ -15,10 +15,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Run ZAP full scan
-        uses: zaproxy/action-full-scan@v0.13.0
+        uses: zaproxy/action-full-scan@3c58388149901b9a03b7718852c5ba889646c27c # v0.13.0
         with:
           target: ${{ secrets.STAGING_URL }}
           fail_action: true

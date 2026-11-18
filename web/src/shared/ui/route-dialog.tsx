@@ -17,9 +17,7 @@ export function RouteDialog() {
   const action = params.get("dialog");
   if (!action) return null;
   const route = dialogRoutes.find(
-    (row) =>
-      row.dialog === action &&
-      new RegExp("^" + row.path.replace("[id]", "([^/]+)") + "$").test(path),
+    (row) => row.dialog === action && matchesRoute(row.path, path),
   );
   if (!route) return null;
   const spec = dialogSpecs[route.id];
@@ -45,5 +43,18 @@ export function RouteDialog() {
       unavailable="This preview can't make changes. Close it and use the button on this page to continue."
       onClose={close}
     />
+  );
+}
+
+/** Compare a route pattern such as `/candidate/offers/[id]` with a path. */
+function matchesRoute(pattern: string, path: string) {
+  const expected = pattern.split("/");
+  const actual = path.split("/");
+  return (
+    expected.length === actual.length &&
+    expected.every(
+      (segment, i) =>
+        segment === actual[i] || (segment === "[id]" && actual[i] !== ""),
+    )
   );
 }

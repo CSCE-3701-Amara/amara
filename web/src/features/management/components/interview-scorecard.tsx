@@ -84,7 +84,7 @@ export function InterviewScorecard({ id }: { id: string }) {
         </section>
         <aside className={e.panel}>
           <h2>Private interview notes</h2>
-          <StatusBadge>Hiring manager & assigned interviewer</StatusBadge>
+          <StatusBadge>Hiring manager &amp; assigned interviewer</StatusBadge>
           <p>Never shared with the candidate.</p>
           <label className={e.field}>
             New note

@@ -11,4 +11,7 @@ RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/api ./cmd/api \
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=build /out/api /api
 COPY --from=build /out/worker /worker
+# The distroless :nonroot base already defaults to UID 65532; stating it keeps
+# the image non-root even if the base tag changes.
+USER nonroot:nonroot
 CMD ["/api"]
