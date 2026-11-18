@@ -80,7 +80,8 @@ func (s Stage) validate() error {
 	if s.ScoreThreshold != nil && (*s.ScoreThreshold < 0 || *s.ScoreThreshold > 100) {
 		return errors.New("score threshold must be between 0 and 100")
 	}
-	if s.Rule == "threshold" && s.ScoreThreshold == nil && s.Interview == nil {
+	// A behavioral interview carries no threshold, so it cannot supply one either.
+	if s.Rule == "threshold" && s.ScoreThreshold == nil && (s.Interview == nil || s.Interview.Behavioral) {
 		return errors.New("a threshold rule requires a score threshold")
 	}
 

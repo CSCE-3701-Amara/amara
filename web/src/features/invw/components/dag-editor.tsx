@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { apiRequest, resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
+import { useUnsavedChanges } from "@/shared/lib/use-unsaved-changes";
 import { ApiFeedback } from "@/shared/ui/workspace";
 import type { PipelineDraft, ModuleSummary } from "../types/invw.types";
 import styles from "./dag-editor.module.css";
@@ -18,7 +19,14 @@ import {
   type DagNode,
   type PipelineGraph,
 } from "./dag-graph";
-export function DagEditor({ postingId }: { postingId: string }) {
+export function DagEditor({
+  postingId,
+  onChanged,
+}: {
+  postingId: string;
+  /** Called after the graph is saved or published on the server. */
+  onChanged?: () => void;
+}) {
   const pipeline = useApiResource<PipelineDraft>(
     `/v1/jobs/${resourceId(postingId)}/pipeline`,
   );
@@ -58,6 +66,7 @@ export function DagEditor({ postingId }: { postingId: string }) {
           key={pipeline.data.versionId}
           pipeline={pipeline.data}
           onDraftCreated={pipeline.reload}
+          onChanged={onChanged}
         />
       )}
     </>
@@ -66,17 +75,27 @@ export function DagEditor({ postingId }: { postingId: string }) {
 function Canvas({
   pipeline,
   onDraftCreated,
+  onChanged,
 }: {
   pipeline: PipelineDraft;
   onDraftCreated: () => void;
+  onChanged?: () => void;
 }) {
   const path = `/v1/pipeline-versions/${resourceId(pipeline.versionId)}`;
   const [history, setHistory] = useState<{
     past: PipelineGraph[];
     present: PipelineGraph;
     future: PipelineGraph[];
-  }>({ past: [], present: { stages: [], links: [] }, future: [] });
+    /** Last graph loaded from or saved to the server; null until loaded. */
+    saved: PipelineGraph | null;
+  }>({
+    past: [],
+    present: { stages: [], links: [] },
+    future: [],
+    saved: null,
+  });
   const graph = history.present;
+  const dirty = history.saved !== null && history.present !== history.saved;
   const [selected, select] = useState("");
   const [target, setTarget] = useState("");
   const [zoom, setZoom] = useState(100);
@@ -115,7 +134,15 @@ function Canvas({
           } catch {}
           g = { stages, links };
         }
-        if (!controller.signal.aborted) resetGraph(normalizeGraph(g));
+        // This effect also re-runs when a preserved route becomes visible
+        // again; keep unsaved edits and their undo history in that case.
+        const fresh = normalizeGraph(g);
+        if (!controller.signal.aborted)
+          setHistory((current) =>
+            current.saved && current.present !== current.saved
+              ? current
+              : { past: [], present: fresh, future: [], saved: fresh },
+          );
       } catch (e) {
         if (!controller.signal.aborted) setError(e as Error);
       } finally {
@@ -127,14 +154,16 @@ function Canvas({
   }, [path]);
   const node = graph.stages.find((s) => s.id === selected);
   const locked = pipeline.published || published;
+  useUnsavedChanges(dirty && !locked);
   function resetGraph(present: PipelineGraph) {
-    setHistory({ past: [], present, future: [] });
+    setHistory({ past: [], present, future: [], saved: present });
   }
   function setGraph(change: (current: PipelineGraph) => PipelineGraph) {
     setHistory((current) => {
       const next = change(current.present);
       if (next === current.present) return current;
       return {
+        ...current,
         past: [...current.past.slice(-49), current.present],
         present: next,
         future: [],
@@ -146,6 +175,7 @@ function Canvas({
       if (redo) {
         if (!current.future.length) return current;
         return {
+          ...current,
           past: [...current.past.slice(-49), current.present],
           present: current.future[0],
           future: current.future.slice(1),
@@ -153,6 +183,7 @@ function Canvas({
       }
       if (!current.past.length) return current;
       return {
+        ...current,
         past: current.past.slice(0, -1),
         present: current.past[current.past.length - 1],
         future: [current.present, ...current.future],
@@ -190,6 +221,7 @@ function Canvas({
       );
       select("");
       setMessage("Graph saved.");
+      onChanged?.();
     } catch (e) {
       setError(e as Error);
     } finally {
@@ -296,6 +328,7 @@ function Canvas({
               resetGraph(saved);
               await apiRequest<void>(path + "/publish", { method: "POST" });
               setPublished(true);
+              onChanged?.();
               setMessage("Pipeline published.");
             } catch (e) {
               setError(e as Error);

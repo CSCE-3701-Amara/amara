@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -94,9 +95,29 @@ func (h *AssessmentHandler) save(c *gin.Context) {
 		writeError(c, http.StatusBadRequest, "invalid_answer", "A response is required.")
 		return
 	}
+	if !h.languageSupported(body.Response) {
+		writeError(c, http.StatusUnprocessableEntity, "unsupported_language", "Choose one of the supported programming languages.")
+		return
+	}
 	identity, _ := authhttp.Identity(c)
 	at, err := h.repo.SaveAnswer(c.Request.Context(), identity.AccountID, attempt, question, body.Response)
 	writeAssessment(c, gin.H{"id": question, "attemptId": attempt, "questionId": question, "response": body.Response, "savedAt": at}, err)
+}
+
+// languageSupported rejects code answers the runner can never execute. Such an
+// answer would otherwise be accepted now and fail grading on every retry.
+func (h *AssessmentHandler) languageSupported(response json.RawMessage) bool {
+	var code struct {
+		Language *string `json:"language"`
+	}
+	if json.Unmarshal(response, &code) != nil || code.Language == nil {
+		return true // not a code answer; format checks happen in the repository
+	}
+	provider, ok := h.runner.(interface{ SupportedLanguages() []string })
+	if !ok {
+		return true
+	}
+	return slices.Contains(provider.SupportedLanguages(), strings.ToLower(strings.TrimSpace(*code.Language)))
 }
 
 func (h *AssessmentHandler) evaluate(c *gin.Context) {

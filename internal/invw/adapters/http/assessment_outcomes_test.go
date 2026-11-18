@@ -7,20 +7,17 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 
 	authdomain "github.com/CSCE-3701-Amara/amara/internal/auth/domain"
 	authports "github.com/CSCE-3701-Amara/amara/internal/auth/ports"
 	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
 	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/judge0"
+	"github.com/CSCE-3701-Amara/amara/internal/testutil"
 )
 
 type outcomeSessions struct{}
@@ -39,52 +36,14 @@ func (outcomeSessions) ValidateSession(_ context.Context, token string) (authpor
 }
 
 func TestAssessmentOutcomePathsPostgres(t *testing.T) {
-	dsn := os.Getenv("AMARA_TEST_DATABASE_URL")
-	if dsn == "" {
-		t.Skip("set AMARA_TEST_DATABASE_URL for the worker and HTTP outcome integration test")
-	}
 	ctx, cancel := context.WithTimeout(t.Context(), 45*time.Second)
 	defer cancel()
-	admin, err := pgx.Connect(ctx, dsn)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer admin.Close(context.Background())
-	schema := pgx.Identifier{fmt.Sprintf("outcomes_%d", time.Now().UnixNano())}.Sanitize()
-	if _, err := admin.Exec(ctx, "CREATE SCHEMA "+schema); err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		if _, err := admin.Exec(context.Background(), "DROP SCHEMA "+schema+" CASCADE"); err != nil {
-			t.Error(err)
-		}
-	}()
-	cfg, err := pgxpool.ParseConfig(dsn)
-	if err != nil {
-		t.Fatal(err)
-	}
-	cfg.ConnConfig.RuntimeParams["search_path"] = schema
-	pool, err := pgxpool.NewWithConfig(ctx, cfg)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer pool.Close()
+	pool := testutil.Postgres(t)
 	exec := func(sql string, args ...any) {
 		t.Helper()
 		if _, err := pool.Exec(ctx, sql, args...); err != nil {
 			t.Fatal(err)
 		}
-	}
-	migrations, err := filepath.Glob("../../../../supabase/migrations/*.sql")
-	if err != nil || len(migrations) == 0 {
-		t.Fatalf("locate migrations: %v", err)
-	}
-	for _, path := range migrations {
-		migration, err := os.ReadFile(path)
-		if err != nil {
-			t.Fatal(err)
-		}
-		exec(string(migration))
 	}
 	exec(`
 		INSERT INTO candidates (id, name, email, password_hash, salt, created_at)
@@ -494,9 +453,11 @@ func TestAssessmentOutcomePathsPostgres(t *testing.T) {
 	if first.code != 200 || first != second || !strings.Contains(first.body, `"scoreAtDecision":null`) {
 		t.Fatalf("concurrent behavioral pass: %+v vs %+v", first, second)
 	}
-	if retry := request(http.MethodPost, manualPath, "company", reject, http.StatusOK); string(retry) != first.body {
-		t.Fatalf("opposite decision changed the result: %s", retry)
+	// The same decision is idempotent; the opposite one is refused, not echoed.
+	if retry := request(http.MethodPost, manualPath, "company", pass, http.StatusOK); string(retry) != first.body {
+		t.Fatalf("repeated decision changed the result: %s", retry)
 	}
+	request(http.MethodPost, manualPath, "company", reject, http.StatusConflict)
 	var awards int
 	if err := pool.QueryRow(ctx, `SELECT count(*) FROM candidate_amarat
 		WHERE amara_title='Communication' AND score IS NULL`).Scan(&awards); err != nil || awards != 1 {

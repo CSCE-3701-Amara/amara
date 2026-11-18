@@ -84,7 +84,7 @@ func (r *RegistrationRepository) CreateSession(ctx context.Context, session port
 		return fmt.Errorf("lock session account: %w", lockErr)
 	}
 	if err := queries.CreateSession(ctx, sqlc.CreateSessionParams{
-		Token: session.Token, Column2: accountID, AccountType: sessionType,
+		Token: sessionDigest(session.Token), Column2: accountID, AccountType: sessionType,
 		ExpiresAt: pgtype.Timestamp{Time: session.ExpiresAt, Valid: true},
 	}); err != nil {
 		return fmt.Errorf("insert session: %w", err)
@@ -102,7 +102,7 @@ func (r *RegistrationRepository) TerminateSession(ctx context.Context, token str
 	if r.queries == nil {
 		return errors.New("session termination database is not configured")
 	}
-	return r.queries.TerminateSession(ctx, token)
+	return r.queries.TerminateSession(ctx, sessionDigest(token))
 }
 
 func (r *RegistrationRepository) PerformAccountAction(ctx context.Context, accountID, sessionToken string, accountType domain.AccountType, action domain.AccountAction) error {
@@ -141,7 +141,7 @@ func (r *RegistrationRepository) PerformAccountAction(ctx context.Context, accou
 		return fmt.Errorf("lock account: %w", err)
 	}
 	if _, err := queries.LockActiveSessionForAccount(ctx, sqlc.LockActiveSessionForAccountParams{
-		Token: sessionToken, Column2: accountUUID, AccountType: sessionType,
+		Token: sessionDigest(sessionToken), Column2: accountUUID, AccountType: sessionType,
 	}); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return domain.ErrInvalidSession
@@ -200,7 +200,7 @@ func (r *RegistrationRepository) ValidateSession(ctx context.Context, token stri
 	if r.pool == nil {
 		return ports.Identity{}, errors.New("session validation database is not configured")
 	}
-	row, err := r.queries.ValidateSession(ctx, token)
+	row, err := r.queries.ValidateSession(ctx, sessionDigest(token))
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return ports.Identity{}, domain.ErrInvalidSession
@@ -501,4 +501,12 @@ func mapCreateError(err error) error {
 		return domain.ErrEmailAlreadyExists
 	}
 	return fmt.Errorf("insert account: %w", err)
+}
+
+// sessionDigest is what auth_sessions stores instead of the bearer token. A
+// leaked database row (backup, replica, log) cannot be replayed as a cookie,
+// while lookups stay a single indexed equality on the digest.
+func sessionDigest(token string) string {
+	sum := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(sum[:])
 }

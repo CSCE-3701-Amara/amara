@@ -35,6 +35,13 @@ export function HiringApplications({
 }) {
   const params = useSearchParams();
   const [selected, setSelected] = useState<string[]>([]);
+  // The comparison page is its own route, so the finalists chosen elsewhere
+  // arrive in its URL (at most four, matching the comparison layout).
+  const compared =
+    view === "comparison" ? params.getAll("applicationId").slice(0, 4) : [];
+  const compareQuery = new URLSearchParams(
+    selected.slice(0, 4).map((value) => ["applicationId", value]),
+  ).toString();
   const [dialog, setDialog] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const pipeline = useApiResource<PipelineDraft>(
@@ -57,7 +64,7 @@ export function HiringApplications({
   );
   const comparisons = useApiResource<ApplicationScorecard[]>(
     view === "comparison" && pipeline.data
-      ? `/v1/pipelines/${resourceId(pipeline.data.id)}/comparison${selected.length ? "?" + selected.map((value) => `applicationIds=${resourceId(value)}`).join("&") : ""}`
+      ? `/v1/pipelines/${resourceId(pipeline.data.id)}/comparison${compared.length ? "?" + compared.map((value) => `applicationIds=${resourceId(value)}`).join("&") : ""}`
       : null,
   );
   const dashboard = useApiResource<RuntimePipelineDashboard>(
@@ -372,8 +379,12 @@ export function HiringApplications({
             <Link href={`/employer/jobs/${resourceId(id)}/applications`}>
               View applications
             </Link>
-            <Link href={`/employer/jobs/${resourceId(id)}/comparison`}>
-              Compare applications
+            <Link
+              href={`/employer/jobs/${resourceId(id)}/comparison${compareQuery ? "?" + compareQuery : ""}`}
+            >
+              {selected.length
+                ? `Compare ${Math.min(selected.length, 4)} selected`
+                : "Compare applications"}
             </Link>
             <Link
               href={`/employer/jobs/${resourceId(id)}/finalists?state=ranking`}

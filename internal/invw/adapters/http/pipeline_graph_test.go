@@ -3,66 +3,24 @@ package http
 import (
 	"context"
 	"errors"
-	"fmt"
-	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
-	"github.com/CSCE-3701-Amara/amara/internal/invw/domain"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"os"
-	"path/filepath"
-	"strings"
 	"testing"
 	"time"
+
+	"github.com/CSCE-3701-Amara/amara/internal/invw/adapters/database"
+	"github.com/CSCE-3701-Amara/amara/internal/invw/domain"
+	jobdb "github.com/CSCE-3701-Amara/amara/internal/job/adapters/database"
+	"github.com/CSCE-3701-Amara/amara/internal/testutil"
 )
 
 func TestPipelineGraphPostgres(t *testing.T) {
-	dsn := os.Getenv("AMARA_TEST_DATABASE_URL")
-	if dsn == "" {
-		t.Skip("set AMARA_TEST_DATABASE_URL for the worker and HTTP outcome integration test")
-	}
 	ctx, cancel := context.WithTimeout(t.Context(), 45*time.Second)
 	defer cancel()
-	admin, err := pgx.Connect(ctx, dsn)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer admin.Close(context.Background())
-	schema := pgx.Identifier{fmt.Sprintf("pipeline_graph_%d", time.Now().UnixNano())}.Sanitize()
-	if _, err := admin.Exec(ctx, "CREATE SCHEMA "+schema); err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		if _, err := admin.Exec(context.Background(), "DROP SCHEMA "+schema+" CASCADE"); err != nil {
-			t.Error(err)
-		}
-	}()
-	cfg, err := pgxpool.ParseConfig(dsn)
-	if err != nil {
-		t.Fatal(err)
-	}
-	cfg.ConnConfig.RuntimeParams["search_path"] = schema
-	pool, err := pgxpool.NewWithConfig(ctx, cfg)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer pool.Close()
+	pool := testutil.Postgres(t)
 	exec := func(sql string, args ...any) {
 		t.Helper()
 		if _, err := pool.Exec(ctx, sql, args...); err != nil {
 			t.Fatal(err)
 		}
-	}
-	migrations, err := filepath.Glob("../../../../supabase/migrations/*.sql")
-	if err != nil || len(migrations) == 0 {
-		t.Fatalf("locate migrations: %v", err)
-	}
-	for _, path := range migrations {
-		migration, err := os.ReadFile(path)
-		if err != nil {
-			t.Fatal(err)
-		}
-		up, _, _ := strings.Cut(string(migration), "-- +goose Down")
-		exec(up)
 	}
 	exec(`
  INSERT INTO companies(id,email,password_hash,salt,legal_name) VALUES ('00000000-0000-0000-0000-000000000002','graph@example.test','','','Graph');
@@ -170,5 +128,21 @@ func TestPipelineGraphPostgres(t *testing.T) {
 	current, err := repo.Get(ctx, company, posting)
 	if err != nil || !current.Published || current.VersionID != copy.VersionID {
 		t.Fatalf("publication state: %+v %v", current, err)
+	}
+
+	// Deleting the posting ends its pipeline: active runs are cancelled and the
+	// pipeline can no longer be read or edited through the posting.
+	if err := jobdb.NewPostingManagementRepository(pool).SoftDelete(ctx, company, posting, false); err != nil {
+		t.Fatal(err)
+	}
+	var active int
+	if err := pool.QueryRow(ctx, "SELECT count(*) FROM pipeline_executions WHERE status='active'").Scan(&active); err != nil || active != 0 {
+		t.Fatalf("deleted posting kept %d active executions: %v", active, err)
+	}
+	if _, err := repo.Get(ctx, company, posting); !errors.Is(err, domain.ErrPipelineNotFound) {
+		t.Fatalf("deleted posting pipeline still readable: %v", err)
+	}
+	if _, err := repo.NewDraft(ctx, company, posting); !errors.Is(err, domain.ErrPipelineNotFound) {
+		t.Fatalf("deleted posting pipeline still editable: %v", err)
 	}
 }

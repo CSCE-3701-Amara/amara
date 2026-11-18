@@ -1,6 +1,6 @@
 # Amara backend image: one codebase builds the API and worker binaries
 # (separate execution roles of the modular monolith, see docs/sdd/03).
-FROM golang:1.26.10-alpine AS build
+FROM golang:1.26.11-alpine AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
@@ -11,4 +11,7 @@ RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/api ./cmd/api \
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=build /out/api /api
 COPY --from=build /out/worker /worker
+# The distroless :nonroot base already defaults to UID 65532; stating it keeps
+# the image non-root even if the base tag changes.
+USER nonroot:nonroot
 CMD ["/api"]

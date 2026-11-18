@@ -35,7 +35,9 @@ export function InterviewScorecard({ id }: { id: string }) {
       {scorecard.error?.status !== 404 && (
         <ApiFeedback error={scorecard.error} retry={scorecard.reload} />
       )}
-      <div className={e.split}>
+      {/* The fields are uncontrolled; remount once the saved scorecard arrives
+          so its ratings, recommendation and notes become the default values. */}
+      <div className={e.split} key={scorecard.data ? "loaded" : "empty"}>
         <section>
           <h2>Mapped evaluation rubric</h2>
           <p>
@@ -82,7 +84,7 @@ export function InterviewScorecard({ id }: { id: string }) {
         </section>
         <aside className={e.panel}>
           <h2>Private interview notes</h2>
-          <StatusBadge>Hiring manager & assigned interviewer</StatusBadge>
+          <StatusBadge>Hiring manager &amp; assigned interviewer</StatusBadge>
           <p>Never shared with the candidate.</p>
           <label className={e.field}>
             New note

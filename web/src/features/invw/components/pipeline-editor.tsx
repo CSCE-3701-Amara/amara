@@ -20,9 +20,11 @@ import type {
 function StageForm({
   initial,
   versionId,
+  onSaved,
 }: {
   initial: PipelineStage[];
   versionId: string;
+  onSaved?: () => void;
 }) {
   const [stages, setStages] = useState(initial);
   const [busy, setBusy] = useState(false);
@@ -70,6 +72,7 @@ function StageForm({
     try {
       setStages((await replacePipelineStages(versionId, stages)) || []);
       setMessage("Pipeline stages saved.");
+      onSaved?.();
     } catch (cause) {
       setError(toError(cause));
     } finally {
@@ -218,7 +221,13 @@ function StageForm({
     </form>
   );
 }
-function Stages({ pipeline }: { pipeline: PipelineDraft }) {
+function Stages({
+  pipeline,
+  onSaved,
+}: {
+  pipeline: PipelineDraft;
+  onSaved?: () => void;
+}) {
   const stages = useApiResource<PipelineStage[] | null>(
     `/v1/pipeline-versions/${resourceId(pipeline.versionId)}/stages`,
   );
@@ -232,13 +241,24 @@ function Stages({ pipeline }: { pipeline: PipelineDraft }) {
             {stages.data?.map((stage) => <li key={stage.id}>{stage.name}</li>)}
           </ol>
         ) : (
-          <StageForm initial={stages.data || []} versionId={pipeline.versionId} />
+          <StageForm
+            initial={stages.data || []}
+            versionId={pipeline.versionId}
+            onSaved={onSaved}
+          />
         )
       )}
     </>
   );
 }
-export function PipelineEditor({ postingId }: { postingId: string }) {
+export function PipelineEditor({
+  postingId,
+  onChanged,
+}: {
+  postingId: string;
+  /** Called after stages are saved or published on the server. */
+  onChanged?: () => void;
+}) {
   const pipeline = useApiResource<PipelineDraft>(
     `/v1/jobs/${resourceId(postingId)}/pipeline`,
   );
@@ -276,7 +296,11 @@ export function PipelineEditor({ postingId }: { postingId: string }) {
       {pipeline.data && (
         <>
           <p>{pipeline.data.published ? "Published" : "Draft"}</p>
-          <Stages key={pipeline.data.versionId} pipeline={pipeline.data} />
+          <Stages
+            key={pipeline.data.versionId}
+            pipeline={pipeline.data}
+            onSaved={onChanged}
+          />
           {!pipeline.data.published && (
             <button type="button" onClick={() => setConfirmPublish(true)}>
               Publish saved stages
@@ -293,6 +317,7 @@ export function PipelineEditor({ postingId }: { postingId: string }) {
           onConfirm={async () => {
             await publishPipeline(pipeline.data!.versionId);
             pipeline.reload();
+            onChanged?.();
           }}
         />
       )}

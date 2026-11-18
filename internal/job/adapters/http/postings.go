@@ -65,7 +65,9 @@ func (t *timeJSON) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	t.Time = parsed
+	// The posting columns are TIMESTAMP without time zone, and pgx stores the
+	// wall-clock value as given. Normalize so an offset is never silently lost.
+	t.Time = parsed.UTC()
 	return nil
 }
 

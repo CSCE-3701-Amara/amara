@@ -204,7 +204,11 @@ export function StageDecisions({ id }: { id: string }) {
               : undefined
           }
           onConfirm={async (reason) => {
-            const chosen = rows.filter((row) => selected.includes(row.id));
+            // Use every selected candidate in the stage, not only those that
+            // match the current search; the badge counts all of them.
+            const chosen = (activeStage?.candidates || []).filter((row) =>
+              selected.includes(row.id),
+            );
             if (!chosen.length || chosen.some((row) => !row.active))
               throw new Error(
                 "Select active candidates and refresh changed records before deciding.",

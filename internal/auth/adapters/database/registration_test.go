@@ -9,10 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
-
 	"github.com/CSCE-3701-Amara/amara/internal/auth/domain"
 	"github.com/CSCE-3701-Amara/amara/internal/auth/ports"
+	"github.com/CSCE-3701-Amara/amara/internal/testutil"
 )
 
 func TestAccountActionTable(t *testing.T) {
@@ -50,34 +49,16 @@ func TestActivateRequiresDatabase(t *testing.T) {
 }
 
 func TestActivateCandidateAccount(t *testing.T) {
-	databaseURL := os.Getenv("AMARA_TEST_DATABASE_URL")
-	if databaseURL == "" {
-		t.Skip("set AMARA_TEST_DATABASE_URL to run the PostgreSQL integration test")
-	}
+	pool := testutil.Postgres(t)
+	var err error
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	pool, err := pgxpool.New(ctx, databaseURL)
-	if err != nil {
-		t.Fatalf("create database pool: %v", err)
-	}
-	defer pool.Close()
-	if err := pool.Ping(ctx); err != nil {
-		t.Fatalf("ping database: %v", err)
-	}
 
 	const accountID = "00000000-0000-0000-0000-000000000372"
 	const email = "activation-test@example.com"
 	const code = "12345678901234567890123456789012"
 	const createdAt = "2026-01-02T03:04:05Z"
 	hash := sha256.Sum256([]byte(code))
-	_, _ = pool.Exec(ctx, "DELETE FROM auth_email_verification_deliveries WHERE account_id = $1::uuid", accountID)
-	_, _ = pool.Exec(ctx, "DELETE FROM auth_email_verification_challenges WHERE account_id = $1::uuid", accountID)
-	_, _ = pool.Exec(ctx, "DELETE FROM candidates WHERE id = $1::uuid", accountID)
-	t.Cleanup(func() {
-		_, _ = pool.Exec(context.Background(), "DELETE FROM auth_email_verification_deliveries WHERE account_id = $1::uuid", accountID)
-		_, _ = pool.Exec(context.Background(), "DELETE FROM auth_email_verification_challenges WHERE account_id = $1::uuid", accountID)
-		_, _ = pool.Exec(context.Background(), "DELETE FROM candidates WHERE id = $1::uuid", accountID)
-	})
 	_, err = pool.Exec(ctx, `
 			INSERT INTO candidates (id, name, email, password_hash, salt, created_at, account_status)
 			VALUES ($1::uuid, 'Activation Test', $2, '', '', $3::timestamp, 'pending_verification')`,
@@ -122,16 +103,9 @@ func TestActivateCandidateAccount(t *testing.T) {
 }
 
 func TestActivateDistinguishesInvalidCodeFromDatabaseFailure(t *testing.T) {
-	databaseURL := os.Getenv("AMARA_TEST_DATABASE_URL")
-	if databaseURL == "" {
-		t.Skip("set AMARA_TEST_DATABASE_URL to run the PostgreSQL integration test")
-	}
+	pool := testutil.Postgres(t)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	pool, err := pgxpool.New(ctx, databaseURL)
-	if err != nil {
-		t.Fatalf("create database pool: %v", err)
-	}
 	repository, err := NewRegistrationRepository(pool)
 	if err != nil {
 		t.Fatal(err)
@@ -148,20 +122,10 @@ func TestActivateDistinguishesInvalidCodeFromDatabaseFailure(t *testing.T) {
 }
 
 func TestActivateInterviewerAccountReturnsCreationTimestamp(t *testing.T) {
-	databaseURL := os.Getenv("AMARA_TEST_DATABASE_URL")
-	if databaseURL == "" {
-		t.Skip("set AMARA_TEST_DATABASE_URL to run the PostgreSQL integration test")
-	}
+	pool := testutil.Postgres(t)
+	var err error
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	pool, err := pgxpool.New(ctx, databaseURL)
-	if err != nil {
-		t.Fatalf("create database pool: %v", err)
-	}
-	defer pool.Close()
-	if err := pool.Ping(ctx); err != nil {
-		t.Fatalf("ping database: %v", err)
-	}
 
 	const accountID = "00000000-0000-0000-0000-000000000373"
 	const companyID = "00000000-0000-0000-0000-000000000374"
@@ -169,16 +133,6 @@ func TestActivateInterviewerAccountReturnsCreationTimestamp(t *testing.T) {
 	const code = "23456789012345678901234567890123"
 	const createdAt = "2026-02-03T04:05:06Z"
 	hash := sha256.Sum256([]byte(code))
-	_, _ = pool.Exec(ctx, "DELETE FROM auth_email_verification_deliveries WHERE account_id IN ($1::uuid, $2::uuid)", accountID, companyID)
-	_, _ = pool.Exec(ctx, "DELETE FROM auth_email_verification_challenges WHERE account_id = $1::uuid", accountID)
-	_, _ = pool.Exec(ctx, "DELETE FROM interviewers WHERE id = $1::uuid", accountID)
-	_, _ = pool.Exec(ctx, "DELETE FROM companies WHERE id = $1::uuid", companyID)
-	t.Cleanup(func() {
-		_, _ = pool.Exec(context.Background(), "DELETE FROM auth_email_verification_deliveries WHERE account_id IN ($1::uuid, $2::uuid)", accountID, companyID)
-		_, _ = pool.Exec(context.Background(), "DELETE FROM auth_email_verification_challenges WHERE account_id = $1::uuid", accountID)
-		_, _ = pool.Exec(context.Background(), "DELETE FROM interviewers WHERE id = $1::uuid", accountID)
-		_, _ = pool.Exec(context.Background(), "DELETE FROM companies WHERE id = $1::uuid", companyID)
-	})
 	_, err = pool.Exec(ctx, `
 		INSERT INTO companies (id, email, password_hash, salt, legal_name)
 		VALUES ($1::uuid, $2, '', '', 'Activation Test Company')`,
@@ -227,31 +181,14 @@ func TestActivateInterviewerAccountReturnsCreationTimestamp(t *testing.T) {
 }
 
 func TestPerformAccountActionConcurrentSessions(t *testing.T) {
-	databaseURL := os.Getenv("AMARA_TEST_DATABASE_URL")
-	if databaseURL == "" {
-		t.Skip("set AMARA_TEST_DATABASE_URL to run the PostgreSQL integration test")
-	}
-
+	pool := testutil.Postgres(t)
+	var err error
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	pool, err := pgxpool.New(ctx, databaseURL)
-	if err != nil {
-		t.Fatalf("create database pool: %v", err)
-	}
-	defer pool.Close()
-	if err := pool.Ping(ctx); err != nil {
-		t.Fatalf("ping database: %v", err)
-	}
 
 	const accountID = "00000000-0000-0000-0000-000000000371"
 	const firstToken = "account-action-test-session-1"
 	const secondToken = "account-action-test-session-2"
-	_, _ = pool.Exec(ctx, "DELETE FROM auth_sessions WHERE token IN ($1, $2)", firstToken, secondToken)
-	_, _ = pool.Exec(ctx, "DELETE FROM companies WHERE id = $1::uuid", accountID)
-	t.Cleanup(func() {
-		_, _ = pool.Exec(context.Background(), "DELETE FROM auth_sessions WHERE token IN ($1, $2)", firstToken, secondToken)
-		_, _ = pool.Exec(context.Background(), "DELETE FROM companies WHERE id = $1::uuid", accountID)
-	})
 
 	_, err = pool.Exec(ctx, `
 		INSERT INTO companies (id, email, password_hash, salt, legal_name, approved)
@@ -264,7 +201,7 @@ func TestPerformAccountActionConcurrentSessions(t *testing.T) {
 		INSERT INTO auth_sessions (token, account_id, account_type, expires_at)
 		VALUES ($1, $3::uuid, 'company', now() + interval '1 hour'),
 		       ($2, $3::uuid, 'company', now() + interval '1 hour')`,
-		firstToken, secondToken, accountID)
+		sessionDigest(firstToken), sessionDigest(secondToken), accountID)
 	if err != nil {
 		t.Fatalf("insert test sessions: %v", err)
 	}
@@ -294,16 +231,9 @@ func TestPerformAccountActionConcurrentSessions(t *testing.T) {
 }
 
 func TestBannedCandidateCannotUseOrCreateSessionPostgres(t *testing.T) {
-	dsn := os.Getenv("AMARA_TEST_DATABASE_URL")
-	if dsn == "" {
-		t.Skip("set AMARA_TEST_DATABASE_URL for PostgreSQL session tests")
-	}
+	pool := testutil.Postgres(t)
+	var err error
 	ctx := t.Context()
-	pool, err := pgxpool.New(ctx, dsn)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer pool.Close()
 	const id = "00000000-0000-0000-0000-000000000375"
 	const token = "audit-banned-candidate"
 	_, err = pool.Exec(ctx, `INSERT INTO candidates (id, name, email, password_hash, salt, created_at, account_status)
@@ -311,10 +241,6 @@ func TestBannedCandidateCannotUseOrCreateSessionPostgres(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() {
-		_, _ = pool.Exec(context.Background(), "DELETE FROM auth_sessions WHERE account_id=$1::uuid", id)
-		_, _ = pool.Exec(context.Background(), "DELETE FROM candidates WHERE id=$1::uuid", id)
-	}()
 	repo, err := NewRegistrationRepository(pool)
 	if err != nil {
 		t.Fatal(err)
@@ -340,4 +266,60 @@ func TestBannedCandidateCannotUseOrCreateSessionPostgres(t *testing.T) {
 			t.Fatalf("create banned session = %v, want inactive", err)
 		}
 	})
+}
+
+// The table holds token digests only: a stored row must not work as a cookie,
+// and the migration must convert existing plaintext sessions in place.
+func TestSessionsStoreTokenDigestsPostgres(t *testing.T) {
+	pool := testutil.Postgres(t)
+	ctx := t.Context()
+	const id = "00000000-0000-0000-0000-000000000376"
+	if _, err := pool.Exec(ctx, `INSERT INTO candidates (id, name, email, password_hash, salt, created_at, account_status)
+ VALUES ($1::uuid, 'Digest test', 'digest@example.test', '', '', now(), 'active')`, id); err != nil {
+		t.Fatal(err)
+	}
+	repo, err := NewRegistrationRepository(pool)
+	if err != nil {
+		t.Fatal(err)
+	}
+	const token = "digest-test-token-0123456789abcdefghijklmnopq"
+	session := ports.Session{Token: token, AccountID: id, AccountType: domain.AccountTypeCandidate, ExpiresAt: time.Now().Add(time.Hour)}
+	if err := repo.CreateSession(ctx, session); err != nil {
+		t.Fatal(err)
+	}
+	var stored string
+	if err := pool.QueryRow(ctx, "SELECT token FROM auth_sessions WHERE account_id=$1::uuid", id).Scan(&stored); err != nil {
+		t.Fatal(err)
+	}
+	if stored == token || stored != sessionDigest(token) {
+		t.Fatalf("stored %q, want the digest of the token", stored)
+	}
+	if _, err := repo.ValidateSession(ctx, token); err != nil {
+		t.Fatalf("token no longer validates: %v", err)
+	}
+	if _, err := repo.ValidateSession(ctx, stored); !errors.Is(err, domain.ErrInvalidSession) {
+		t.Fatalf("a stored digest was accepted as a token: %v", err)
+	}
+
+	// Legacy plaintext row, then the migration's conversion statement.
+	const legacy = "legacy-plaintext-session-token-abcdefghijklm"
+	if _, err := pool.Exec(ctx, `INSERT INTO auth_sessions (token, account_id, account_type, expires_at)
+ VALUES ($1, $2::uuid, 'candidate', now() + interval '1 hour')`, legacy, id); err != nil {
+		t.Fatal(err)
+	}
+	migration, err := os.ReadFile("../../../../supabase/migrations/20261118000000_hash_auth_session_tokens.sql")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for range 2 { // idempotent
+		if _, err := pool.Exec(ctx, string(migration)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := repo.ValidateSession(ctx, legacy); err != nil {
+		t.Fatalf("existing session was signed out by the migration: %v", err)
+	}
+	if _, err := repo.ValidateSession(ctx, token); err != nil {
+		t.Fatalf("migration re-hashed an already hashed session: %v", err)
+	}
 }

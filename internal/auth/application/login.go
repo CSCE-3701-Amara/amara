@@ -135,7 +135,9 @@ func (l *loginAttemptLimiter) allow(email string, now time.Time) bool {
 		l.lastCleanup = now
 	}
 	attempt, ok := l.entries[email]
-	if !ok && len(l.entries) >= maxTrackedLoginEmails {
+	if !ok && len(l.entries) >= maxTrackedLoginEmails && !l.evictOldestUnlocked() {
+		// Every tracked identity is locked out; refuse rather than grow or
+		// release a lock an attacker deliberately triggered.
 		return false
 	}
 	if !ok || now.Sub(attempt.windowStart) >= loginAttemptWindow {
@@ -148,6 +150,23 @@ func (l *loginAttemptLimiter) allow(email string, now time.Time) bool {
 	attempt.count++
 	l.entries[email] = attempt
 	return true
+}
+
+// evictOldestUnlocked frees capacity without letting a flood of unknown emails
+// deny logins to everyone else. Locked identities are kept so that flooding the
+// limiter cannot be used to lift a lock on a targeted account.
+func (l *loginAttemptLimiter) evictOldestUnlocked() bool {
+	victim, found := "", false
+	var oldest time.Time
+	for identity, entry := range l.entries {
+		if entry.count < maxLoginAttempts && (!found || entry.windowStart.Before(oldest)) {
+			victim, oldest, found = identity, entry.windowStart, true
+		}
+	}
+	if found {
+		delete(l.entries, victim)
+	}
+	return found
 }
 
 func (l *loginAttemptLimiter) reset(email string) {
