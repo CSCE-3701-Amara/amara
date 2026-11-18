@@ -35,7 +35,9 @@ export function InterviewScorecard({ id }: { id: string }) {
       {scorecard.error?.status !== 404 && (
         <ApiFeedback error={scorecard.error} retry={scorecard.reload} />
       )}
-      <div className={e.split}>
+      {/* The fields are uncontrolled; remount once the saved scorecard arrives
+          so its ratings, recommendation and notes become the default values. */}
+      <div className={e.split} key={scorecard.data ? "loaded" : "empty"}>
         <section>
           <h2>Mapped evaluation rubric</h2>
           <p>

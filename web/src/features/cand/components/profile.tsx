@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useApiResource } from "@/shared/lib/use-api-resource";
 import { useProfileUpdate } from "@/shared/lib/use-profile-update";
@@ -62,7 +61,6 @@ function CandidateProfileForm({
   edit: boolean;
   profile?: CandidateProfile;
 }) {
-  const router = useRouter();
   const update = useProfileUpdate<CandidateProfile>("/v1/candidates/me");
   const current = useApiResource<CandidateProfile>(
     edit ? null : "/v1/candidates/me",
@@ -358,8 +356,8 @@ function CandidateProfileForm({
           onClose={() => setDialog(null)}
           onConfirm={async () => {
             await performAccountAction(action);
-            router.replace("/login");
-            router.refresh();
+            // Full reload: clear all preserved client state for this account.
+            window.location.replace("/login");
           }}
         />
       )}

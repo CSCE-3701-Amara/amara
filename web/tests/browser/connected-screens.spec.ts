@@ -1,59 +1,58 @@
 import { expect, test } from "@playwright/test";
 import { ids, productFixtures } from "./support/product-fixtures";
 
-test("direct assessment confirmation keeps the submitted destination", async ({
+test("a crafted dialog link cannot submit an assessment", async ({ page }) => {
+  await productFixtures(page);
+  const writes: string[] = [];
+  page.on("request", (request) => {
+    if (request.method() !== "GET" && request.url().includes("/v1/"))
+      writes.push(request.url());
+  });
+  await page.goto(
+    `/candidate/assessments/${ids.application}?dialog=submit&attempt=${ids.application}`,
+  );
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "Submit assessment", exact: true }),
+  ).toBeDisabled();
+  await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  expect(writes).toEqual([]);
+});
+
+test("a crafted dialog link cannot deactivate the account", async ({
   page,
 }) => {
   await productFixtures(page);
-  let submitted = false;
-  await page.route(`**/v1/assessment-attempts/${ids.application}`, (route) =>
-    route.fulfill({
-      json: {
-        id: ids.application,
-        instanceId: ids.application,
-        stageExecutionId: ids.application,
-        status: submitted ? "submitted" : "in_progress",
-        deadline: "2027-01-01T00:00:00Z",
-        autoSubmitted: false,
-        questions: [],
-      },
-    }),
-  );
-  await page.route(
-    `**/v1/assessment-attempts/${ids.application}/submission`,
-    (route) => {
-      submitted = true;
-      return route.fulfill({
-        json: { id: ids.application, status: "submitted" },
-      });
-    },
-  );
-  await page.goto(`/candidate/assessments/${ids.application}?dialog=submit`);
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Submit assessment", exact: true })
-    .click();
-  await expect(page).toHaveURL(/state=submitted/);
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  let actions = 0;
+  await page.route("**/v1/auth/account-actions", (route) => {
+    actions++;
+    return route.fulfill({ status: 204 });
+  });
+  await page.goto("/candidate/profile/edit?dialog=deactivate");
   await expect(
-    page.getByRole("heading", {
-      name: "Your answers are saved and locked",
-      exact: true,
-    }),
-  ).toBeVisible();
+    page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Deactivate", exact: true }),
+  ).toBeDisabled();
+  expect(actions).toBe(0);
 });
 
-test("direct account confirmation keeps the signed-out destination", async ({
+test("deactivating from the profile page signs out with a full reload", async ({
   page,
 }) => {
   await productFixtures(page);
   await page.route("**/v1/auth/account-actions", (route) =>
     route.fulfill({ status: 204 }),
   );
-  await page.goto("/candidate/profile/edit?dialog=deactivate");
+  await page.goto("/candidate/profile/edit");
+  await page
+    .getByRole("button", { name: "Deactivate account", exact: true })
+    .click();
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: "Deactivate", exact: true })
+    .getByRole("button", { name: "Deactivate account", exact: true })
     .click();
   await expect(page).toHaveURL(/\/login$/);
 });

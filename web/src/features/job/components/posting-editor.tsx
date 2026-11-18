@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useId, useRef, useState, type FormEvent } from "react";
 import { resourceId } from "@/shared/lib/api-client";
 import { useApiResource } from "@/shared/lib/use-api-resource";
+import { useUnsavedChanges } from "@/shared/lib/use-unsaved-changes";
 import {
   ApiFeedback,
   BusyState,
@@ -26,9 +27,11 @@ import type { EmploymentType, Posting, PostingInput } from "../types/job.types";
 function PostingForm({
   initial,
   onSaved,
+  onDirtyChange,
 }: {
   initial?: Posting;
   onSaved?: () => void;
+  onDirtyChange?: (dirty: boolean) => void;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -129,6 +132,7 @@ function PostingForm({
       if (!initial) router.push(`/employer/jobs/${resourceId(saved.id)}`);
       else {
         setMessage("Posting saved.");
+        onDirtyChange?.(false);
         onSaved?.();
       }
     } catch (cause) {
@@ -141,6 +145,10 @@ function PostingForm({
   return (
     <form
       onSubmit={submit}
+      onChange={() => {
+        setMessage("");
+        onDirtyChange?.(true);
+      }}
       className={`${e.section} ${s.form}`}
       aria-busy={busy}
     >
@@ -299,9 +307,12 @@ function PostingForm({
 function PostingActions({
   posting,
   reload,
+  unsaved,
 }: {
   posting: Posting;
   reload: () => void;
+  /** The form has edits that are not saved yet. */
+  unsaved: boolean;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<Error>();
@@ -334,7 +345,7 @@ function PostingActions({
         {posting.status !== "published" && (
           <button
             className={s.primary}
-            disabled={busy}
+            disabled={busy || unsaved}
             onClick={() =>
               setConfirm(
                 posting.status === "archived" ? "republish" : "publish",
@@ -347,7 +358,10 @@ function PostingActions({
           </button>
         )}
         {posting.status === "published" && (
-          <button disabled={busy} onClick={() => setConfirm("archive")}>
+          <button
+            disabled={busy || unsaved}
+            onClick={() => setConfirm("archive")}
+          >
             Archive posting
           </button>
         )}
@@ -359,6 +373,12 @@ function PostingActions({
           Delete posting
         </button>
       </div>
+      {unsaved && (
+        <p className={e.note} role="status">
+          Save your changes before publishing or archiving. Publishing uses the
+          saved posting.
+        </p>
+      )}
       <ApiFeedback error={error} />
       {confirm && (
         <ConfirmDialog
@@ -381,6 +401,15 @@ export function PostingEditor({ id }: { id?: string }) {
   const posting = useApiResource<Posting>(
     id ? `/v1/jobs/${resourceId(id)}` : null,
   );
+  const [unsaved, setUnsaved] = useState(false);
+  useUnsavedChanges(unsaved);
+  // Keep showing the last loaded posting while it reloads after a save or a
+  // status change; unmounting the form would discard what the user typed.
+  const [lastPosting, setLastPosting] = useState<Posting>();
+  if (posting.data && posting.data !== lastPosting)
+    setLastPosting(posting.data);
+  const current =
+    posting.data ?? (lastPosting?.id === id ? lastPosting : undefined);
   if (id && params.get("state") === "publication-review")
     return <PostingPreview id={id} review />;
   return (
@@ -389,16 +418,21 @@ export function PostingEditor({ id }: { id?: string }) {
       <ProductHeading
         title={id ? "Edit job posting" : "Create job posting"}
         description={
-          posting.data
-            ? `${posting.data.title} · ${posting.data.status}`
+          current
+            ? `${current.title} · ${current.status}`
             : "Build a clear role and choose the skills you need."
         }
         className={e.titleBanner}
       />
       <BusyState loading={posting.loading} />
       <ApiFeedback error={posting.error} retry={posting.reload} />
-      {(!id || posting.data) && (
-        <PostingForm key={posting.data?.id || "new"} initial={posting.data} />
+      {(!id || current) && (
+        <PostingForm
+          key={current?.id || "new"}
+          initial={current}
+          onSaved={posting.reload}
+          onDirtyChange={setUnsaved}
+        />
       )}
       {id && (
         <div className={e.actions}>
@@ -410,8 +444,12 @@ export function PostingEditor({ id }: { id?: string }) {
           </Link>
         </div>
       )}
-      {posting.data && (
-        <PostingActions posting={posting.data} reload={posting.reload} />
+      {current && (
+        <PostingActions
+          posting={current}
+          reload={posting.reload}
+          unsaved={unsaved}
+        />
       )}
       <section className={e.section}>
         <h2>Hiring pipeline</h2>

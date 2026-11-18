@@ -58,6 +58,9 @@ test("sign-in cookie reaches the candidate feed and logout handles an empty 204"
   });
   let logout = false;
   await page.route("**/v1/auth/sessions/current", async (route) => {
+    // Logout reloads /login, which checks for a session; there is none left.
+    if (logout && route.request().method() === "GET")
+      return route.fulfill({ status: 401, json: { detail: "No session" } });
     expect(route.request().method()).toBe("DELETE");
     expect((await route.request().allHeaders()).cookie).toContain(
       "amara_session=test-session",
@@ -76,7 +79,11 @@ test("sign-in cookie reaches the candidate feed and logout handles an empty 204"
   expect(await page.evaluate(() => document.cookie)).not.toContain(
     "amara_session",
   );
-  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  // Keyboard activation: in development Next.js may pin its badge over the
+  // bottom-left corner of the sidebar, which would intercept a pointer click.
+  await page
+    .getByRole("button", { name: "Log out", exact: true })
+    .press("Enter");
   await expect(page).toHaveURL(/\/login$/);
   expect(logout).toBe(true);
   expect(

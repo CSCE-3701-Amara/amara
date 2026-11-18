@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Suspense, useId, useRef, useState, type ReactNode } from "react";
 import { deleteCurrentSession } from "@/features/auth/api/auth.api";
 import { ApiError } from "@/shared/lib/api-client";
@@ -114,7 +114,6 @@ export function Workspace({
     role === "company"
       ? "Hiring workspace"
       : `${role[0].toUpperCase()}${role.slice(1)} workspace`;
-  const router = useRouter();
   const menuId = useId();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -128,12 +127,14 @@ export function Workspace({
     setError(undefined);
     try {
       await deleteCurrentSession();
-      router.replace(role === "company" ? "/login?account=company" : "/login");
-      router.refresh();
+      // A full reload discards preserved route state (drafts, fetched data) so
+      // the next person to sign in on this device never sees it.
+      window.location.replace(
+        role === "company" ? "/login?account=company" : "/login",
+      );
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 401) {
-        router.replace("/login?state=expired");
-        router.refresh();
+        window.location.replace("/login?state=expired");
       } else setError(toError(cause));
     } finally {
       pending.current = false;
@@ -202,12 +203,16 @@ export function Workspace({
               className={styles.logout}
               disabled={busy}
               onClick={logout}
-              aria-label={busy ? "Signing out" : "Sign out"}
+              // Only the icon-only collapsed state needs a label; otherwise the
+              // visible text is the name, so voice control can say "Log out".
+              aria-label={
+                collapsed ? (busy ? "Logging out" : "Log out") : undefined
+              }
             >
               {collapsed ? (
                 <span aria-hidden="true">↪</span>
               ) : busy ? (
-                "Signing out…"
+                "Logging out…"
               ) : (
                 "Log out"
               )}
